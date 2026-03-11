@@ -16,4 +16,8 @@ public class MainMenu : MonoBehaviour
     {
         Application.Quit();
     }
+    public void RegionSelect_Back()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }
