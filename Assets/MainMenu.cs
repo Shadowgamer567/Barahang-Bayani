@@ -18,7 +18,7 @@ public class MainMenu : MonoBehaviour
     }
     public void LoadGame()
     {
-        Debug.Log("Load game has not been implemented yet")
+        Debug.Log("Load game has not been implemented yet");
     }
     public void RegionSelect_Back()
     {
