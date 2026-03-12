@@ -16,6 +16,10 @@ public class MainMenu : MonoBehaviour
     {
         Application.Quit();
     }
+    public void LoadGame()
+    {
+        Debug.Log("Load game has not been implemented yet")
+    }
     public void RegionSelect_Back()
     {
         SceneManager.LoadScene("MainMenu");
