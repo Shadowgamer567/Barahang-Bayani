@@ -5,7 +5,7 @@ public class EnemyStats : MonoBehaviour
 {
     public EnemyTypes enemyType;
 
-    int currentHP;
+    public int currentHP;
 
     void OnEnable()
     {
