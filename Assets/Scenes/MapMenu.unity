@@ -1387,8 +1387,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1430769175}
-        m_TargetAssemblyTypeName: LevelSelect, Assembly-CSharp
-        m_MethodName: SelectLevel
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: SelectRegion1
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1445,9 +1445,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1430769170}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3f1f6a4d00c91f4eb166afb36c0be78, type: 3}
+  m_Script: {fileID: 11500000, guid: bd05c69a1b4ccc141b34c04cd07964b5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelSelect
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenu
 --- !u!1 &1528222665
 GameObject:
   m_ObjectHideFlags: 0

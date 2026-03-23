@@ -13,4 +13,9 @@ public class LevelSelect : MonoBehaviour
         Debug.Log("Level has not been made");
     }
 
+    public void SelectLevel_Back()
+    {
+        SceneManager.LoadScene("MapMenu");
+    }
+
 }

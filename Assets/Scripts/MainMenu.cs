@@ -24,4 +24,9 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu");
     }
+
+    public void SelectRegion1()
+    {
+        SceneManager.LoadScene("LevelSelect_Rizal");
+    }
 }
