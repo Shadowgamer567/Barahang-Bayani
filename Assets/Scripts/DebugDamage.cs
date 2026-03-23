@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// deprecated damage button script
+// functions merged into battle control script
 /*public class DebugDamage : MonoBehaviour
 {
     public int damage = 5;
