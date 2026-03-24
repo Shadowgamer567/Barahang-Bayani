@@ -35,11 +35,22 @@ public class BattleControl : MonoBehaviour
         enemies = GetComponentsInChildren<EnemyStats>(true);
     }
 
-    void AttackAllEnemies()
+    public void AttackAllEnemies()
     {
         foreach (EnemyStats enemy in enemies)
         {
             if (enemy.gameObject.activeSelf)
+            {
+                enemy.TakeDamage(damage);
+            }
+        }
+    }
+
+    public void DealDamageToAll(int damage)
+    {
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
             {
                 enemy.TakeDamage(damage);
             }
@@ -62,6 +73,7 @@ public class BattleControl : MonoBehaviour
         return true;
     }
 
+    //Debug Damage Button
     private void Update()
     {
         if (Keyboard.current.slashKey.wasPressedThisFrame)
@@ -75,6 +87,8 @@ public class BattleControl : MonoBehaviour
             StartCoroutine(NextBattle());
         }
     }
+
+    //Starting Battle Sequence
     IEnumerator BattleSequence()
     {
         groundloop.isMoving = true;
@@ -87,7 +101,7 @@ public class BattleControl : MonoBehaviour
         CacheEnemies();
     }
 
-
+    //Subsequent Battle Sequence
     IEnumerator NextBattle()
     {
         yield return new WaitForSeconds(2f);
