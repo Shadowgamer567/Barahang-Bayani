@@ -1,3 +1,5 @@
+//Handles Enemy information display
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

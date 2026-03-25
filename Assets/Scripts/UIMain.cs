@@ -1,3 +1,5 @@
+//Handles Primary UI display and displaly logic
+
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;

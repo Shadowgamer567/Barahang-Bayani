@@ -1,3 +1,5 @@
+//Handles Card effect logic
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,6 +34,7 @@ public class CardUI : MonoBehaviour
             battleControl.DealDamageToAll(cardType.damage);
         }
 
+        Destroy(gameObject);
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,6 +45,6 @@ public class CardUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+       
     }
 }

@@ -1,3 +1,6 @@
+//Handles Player hand logic
+
+using System.Collections;
 using UnityEngine;
 
 public class CardPanelManager : MonoBehaviour
@@ -8,6 +11,7 @@ public class CardPanelManager : MonoBehaviour
 
     public CardType[] availableCards;
     public int cardCount = 5;
+    private bool isRefilling = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -18,17 +22,44 @@ public class CardPanelManager : MonoBehaviour
     {
         for(int i = 0; i < cardCount; i++)
         {
-            CardType randomCard = availableCards[Random.Range(0, availableCards.Length)];
-            GameObject obj = Instantiate(cardTemplate, cardContainer);
-            obj.SetActive(true);
-
-            CardUI ui = obj.GetComponent<CardUI>();
-            ui.Setup(randomCard, battle);
+            DrawCard();
         }
     }
+
+    public void DrawCard()
+    {
+        if(availableCards.Length == 0)
+        {
+            return;
+        }
+
+        CardType randomCard = availableCards[Random.Range(0, availableCards.Length)];
+        GameObject obj = Instantiate(cardTemplate, cardContainer);
+        obj.SetActive(true);
+
+        CardUI ui = obj.GetComponent<CardUI>();
+        ui.Setup(randomCard, battle);
+    }
+
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log("Cards in hand: " + cardContainer.childCount);
+
+        if(cardContainer.childCount == 0 && !isRefilling)
+        {
+            StartCoroutine(RefillHand());
+        }
+    }
+
+    IEnumerator RefillHand()
+    {
+        isRefilling = true;
+
+        yield return new WaitForSeconds(0.5f);
+
+        GenerateCards();
+
+        isRefilling = false;
     }
 }

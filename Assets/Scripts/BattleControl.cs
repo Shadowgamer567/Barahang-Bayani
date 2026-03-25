@@ -1,3 +1,5 @@
+//Handles Battle Logic and sequence
+
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -71,6 +73,16 @@ public class BattleControl : MonoBehaviour
             }
         }
         return true;
+    }
+
+    void playersTurn()
+    {
+
+    }
+
+    void enemiesTurn()
+    {
+
     }
 
     //Debug Damage Button

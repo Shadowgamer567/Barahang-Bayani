@@ -1,3 +1,5 @@
+//Handles Enemy Statistics
+
 using System.Collections;
 using UnityEngine;
 

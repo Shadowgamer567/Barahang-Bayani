@@ -7,4 +7,5 @@ public class CardType : ScriptableObject
     public string cardDesc;
     public int damage;
     public int cost;
+    public bool quizCard;
 }
