@@ -78,7 +78,7 @@ public class BattleControl : MonoBehaviour
     void playersTurn()
     {
 
-    }
+         }
 
     void enemiesTurn()
     {

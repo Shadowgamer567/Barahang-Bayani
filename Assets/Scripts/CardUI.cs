@@ -12,11 +12,14 @@ public class CardUI : MonoBehaviour
 
     private CardType cardType;
     private BattleControl battleControl;
+    private CardPanelManager cardManager;
+    private QuizManager quizManager;
 
-    public void Setup(CardType type, BattleControl battle)
+    public void Setup(CardType type, BattleControl battle, CardPanelManager manager, QuizManager quiz)
     {
         cardType = type;
         battleControl = battle;
+        quizManager = quiz;
 
         nameText.text = type.cardName;
         costText.text = type.cost.ToString();
@@ -29,7 +32,13 @@ public class CardUI : MonoBehaviour
     {
         Debug.Log("Played Card: " + cardType.cardName);
 
-        if(battleControl != null)
+        if (cardType.quizCard)
+        {
+            QuizQuestion q = quizManager.GetRandomQuestions();
+            quizManager.StartQuiz(q, cardType.damage, battleControl);
+        }
+
+        else if (battleControl != null)
         {
             battleControl.DealDamageToAll(cardType.damage);
         }

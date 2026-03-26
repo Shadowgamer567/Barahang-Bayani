@@ -8,6 +8,7 @@ public class CardPanelManager : MonoBehaviour
     public GameObject cardTemplate;
     public Transform cardContainer;
     public BattleControl battle;
+    public QuizManager quizManager;
 
     public CardType[] availableCards;
     public int cardCount = 5;
@@ -38,13 +39,13 @@ public class CardPanelManager : MonoBehaviour
         obj.SetActive(true);
 
         CardUI ui = obj.GetComponent<CardUI>();
-        ui.Setup(randomCard, battle);
+        ui.Setup(randomCard, battle, this, quizManager);
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Cards in hand: " + cardContainer.childCount);
+        //Debug.Log("Cards in hand: " + cardContainer.childCount);
 
         if(cardContainer.childCount == 0 && !isRefilling)
         {
