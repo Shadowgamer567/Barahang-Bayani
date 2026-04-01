@@ -1,6 +1,7 @@
 //Handles Battle Logic and sequence
 
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,28 +9,38 @@ using UnityEngine.InputSystem;
 public class BattleControl : MonoBehaviour
 {
 
-    public GameObject EnemyController;
+    public Transform enemyController;
+    public Transform heroController;
     public GroundLoop groundloop;
+    public GameObject endButton;
 
     public float moveduration = 5f;
     public int damage = 5;
     public bool nextbattletriggered = false;
+    public BattleState currentstate;
 
     EnemyStats[] enemies;
+    HeroStats[] heroes;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         SetEnemiesActive(false);
 
-        StartCoroutine(BattleSequence());
-    }
+        CacheEnemies();
+        CacheHeroes();
 
-    void SetEnemiesActive(bool state)
+        currentstate = BattleState.PlayerTurn;
+
+        StartCoroutine(BattleSequence());
+        
+    }
+    public enum BattleState
     {
-        foreach (Transform child in EnemyController.transform) 
-        {
-            child.gameObject.SetActive(state);
-        }
+        PlayerTurn,
+        EnemyTurn,
+        Busy,
+        Win,
+        Lose
     }
 
     void CacheEnemies()
@@ -37,7 +48,21 @@ public class BattleControl : MonoBehaviour
         enemies = GetComponentsInChildren<EnemyStats>(true);
     }
 
-    public void AttackAllEnemies()
+    void CacheHeroes()
+    {
+        heroes = GetComponentsInChildren<HeroStats>(true);
+    }
+
+    void SetEnemiesActive(bool state)
+    {
+        foreach (Transform child in enemyController.transform)
+        {
+            child.gameObject.SetActive(state);
+        }
+    }
+
+    //Part of Debug Damage Button, Do 5 damage to all active enemies
+    /*public void AttackAllEnemies()
     {
         foreach (EnemyStats enemy in enemies)
         {
@@ -46,7 +71,7 @@ public class BattleControl : MonoBehaviour
                 enemy.TakeDamage(damage);
             }
         }
-    }
+    }*/
 
     public void DealDamageToAll(int damage)
     {
@@ -57,8 +82,106 @@ public class BattleControl : MonoBehaviour
                 enemy.TakeDamage(damage);
             }
         }
+
+        CheckWinCondition();
     }
 
+    public void endPlayersTurn()
+    {
+        if(currentstate != BattleState.PlayerTurn)
+        {
+            return;
+        }
+
+        StartCoroutine(EnemyTurn());
+    }
+
+    IEnumerator EnemyTurn()
+    {
+        currentstate = BattleState.Busy;
+
+        yield return new WaitForSeconds(1f);
+
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (!enemy.gameObject.activeInHierarchy)
+            {
+                continue;
+            }
+
+            HeroStats target = GetRandomAliveHero();
+
+            if(target != null)
+            {
+                target.TakeDamage(enemy.enemyType.damage);
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        if (CheckLoseCondition())
+        {
+            currentstate = BattleState.Lose;
+
+            Debug.Log("You Lost");
+
+            yield break;
+        }
+
+        currentstate = BattleState.PlayerTurn;
+    }
+
+    HeroStats GetRandomAliveHero()
+    {
+        List<HeroStats> alive = new List<HeroStats>();
+
+        foreach (var hero in heroes)
+        {
+            if (hero != null && hero.gameObject.activeInHierarchy)
+            {
+                alive.Add(hero);
+            }
+        }
+
+        if(alive.Count == 0)
+        {
+            return null;
+        }
+
+        return alive[Random.Range(0, alive.Count)];
+    }
+
+    bool CheckLoseCondition()
+    {
+        foreach(var enemy in enemies)
+        {
+            if(enemy != null && enemy.gameObject.activeInHierarchy)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void CheckWinCondition()
+    {
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            if (!nextbattletriggered)
+            {
+                nextbattletriggered = true;
+                StartCoroutine(NextBattle());
+            }
+        }
+    }
     bool allEnemiesAreDead()
     {
         if(enemies == null || enemies.Length == 0)
@@ -73,25 +196,14 @@ public class BattleControl : MonoBehaviour
             }
         }
         return true;
-    }
-
-    void playersTurn()
-    {
-
-         }
-
-    void enemiesTurn()
-    {
-
-    }
-
-    //Debug Damage Button
+    } 
     private void Update()
     {
-        if (Keyboard.current.slashKey.wasPressedThisFrame)
+        //Debug Damage Button
+        /*if (Keyboard.current.slashKey.wasPressedThisFrame)
         {
             AttackAllEnemies();
-        }
+        }*/
 
         if (!nextbattletriggered && allEnemiesAreDead())
         {
@@ -100,9 +212,16 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    void UpdateUI()
+    {
+        endButton.SetActive(currentstate == BattleState.PlayerTurn);
+    }
+
     //Starting Battle Sequence
     IEnumerator BattleSequence()
     {
+        currentstate = BattleState.Busy;
+
         groundloop.isMoving = true;
 
         yield return new WaitForSeconds(moveduration);
@@ -111,11 +230,15 @@ public class BattleControl : MonoBehaviour
 
         SetEnemiesActive(true);
         CacheEnemies();
+
+        currentstate = BattleState.PlayerTurn;
     }
 
     //Subsequent Battle Sequence
     IEnumerator NextBattle()
     {
+        currentstate = BattleState.Busy;
+
         yield return new WaitForSeconds(2f);
 
         groundloop.isMoving = true;
@@ -128,5 +251,7 @@ public class BattleControl : MonoBehaviour
         CacheEnemies();
 
         nextbattletriggered = false;
+
+        currentstate = BattleState.PlayerTurn;
     }
 }

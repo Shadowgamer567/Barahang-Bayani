@@ -30,6 +30,12 @@ public class CardUI : MonoBehaviour
 
     void OnClick()
     {
+        if(battleControl.currentstate != BattleControl.BattleState.PlayerTurn)
+        {
+            Debug.Log("Not your turn");
+            return;
+        }
+
         Debug.Log("Played Card: " + cardType.cardName);
 
         if (cardType.quizCard)

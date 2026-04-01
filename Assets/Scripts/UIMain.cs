@@ -13,43 +13,96 @@ public class EnemyPanel
     public Image hpFill;
     public TextMeshProUGUI hpText;
 }
+
+[System.Serializable]
+public class HeroPanel
+{
+    public GameObject heroPanel;
+    public TextMeshProUGUI HeroName;
+    public Image hpFill;
+    public TextMeshProUGUI hpText;
+}
 public class UIMain : MonoBehaviour
 {
     public EnemyPanel[] enemypanel;
     public EnemyStats[] enemies;
+    public HeroPanel[] heropanel;
+    public HeroStats[] heroes;
 
-    private float[] displayedHP;
+
+    private float[] enemydisplayedHP;
+    private float[] herodisplayedHP;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        displayedHP = new float[enemypanel.Length];
+        enemydisplayedHP = new float[enemypanel.Length];
+        herodisplayedHP = new float[heropanel.Length];
 
         for(int i = 0; i < enemypanel.Length; i++)
         {
             enemypanel[i].enemyPanel.SetActive(false);
-            displayedHP[i] = 1f;
+            enemydisplayedHP[i] = 1f;
+        }
+
+        for (int i = 0; i < heropanel.Length; i++)
+        {
+            heropanel[i].heroPanel.SetActive(false);
+            herodisplayedHP[i] = 1f;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-       for(int i = 0; i < enemypanel.Length; i++)
+        for (int i = 0; i < enemypanel.Length; i++)
         {
             EnemyStats enemy = (i < enemies.Length) ? enemies[i] : null;
 
-            if(enemy != null && enemy.gameObject.activeInHierarchy)
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
             {
                 enemypanel[i].enemyPanel.SetActive(true);
                 enemypanel[i].EnemyName.text = enemy.enemyType.enemyName;
 
                 float targetHP = (float)enemy.currentHP / enemy.enemyType.maxHp;
-                float speed = 5f + Mathf.Abs(displayedHP[i] - targetHP) * 10f;
-                displayedHP[i] = Mathf.Lerp(displayedHP[i], targetHP, Time.deltaTime * speed);
+                float speed = 5f + Mathf.Abs(enemydisplayedHP[i] - targetHP) * 10f;
+                enemydisplayedHP[i] = Mathf.Lerp(enemydisplayedHP[i], targetHP, Time.deltaTime * speed);
 
-                enemypanel[i].hpFill.fillAmount = displayedHP[i];
+                enemypanel[i].hpFill.fillAmount = enemydisplayedHP[i];
                 enemypanel[i].hpText.text = $"{enemy.currentHP} / {enemy.enemyType.maxHp}";
             }
+
+            /*else
+            {
+                if (displayedHP[i] > 0f)
+                {
+                    displayedHP[i] = Mathf.Lerp(displayedHP[i], 0f, Time.deltaTime * 10f);
+                    enemypanel[i].hpFill.fillAmount = displayedHP[i];
+                    enemypanel[i].hpText.text = $"0/{(i < enemies.Length ? enemies[i].enemyType.maxHp : 0)}";
+                }
+                else
+                {
+                    enemypanel[i].enemyPanel.SetActive(false);
+                }
+            }*/
+        }
+
+        for (int e = 0; e < heropanel.Length; e++)
+        {
+            HeroStats hero = (e < heroes.Length) ? heroes[e] : null;
+
+            if (hero != null && hero.gameObject.activeInHierarchy)
+            {
+                heropanel[e].heroPanel.SetActive(true);
+                heropanel[e].HeroName.text = hero.heroType.heroName;
+
+                float targetHP = (float)hero.currentHP / hero.heroType.maxHp;
+                float speed = 5f + Mathf.Abs(herodisplayedHP[e] - targetHP) * 10f;
+                herodisplayedHP[e] = Mathf.Lerp(herodisplayedHP[e], targetHP, Time.deltaTime * speed);
+
+                heropanel[e].hpFill.fillAmount = herodisplayedHP[e];
+                heropanel[e].hpText.text = $"{hero.currentHP} / {hero.heroType.maxHp}";
+            }
+
 
             /*else
             {

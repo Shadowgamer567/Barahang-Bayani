@@ -1,17 +1,20 @@
-1.When did the Bataan Death March occur.
-A. April 9, 1942 "C"
+1. When did the Bataan Death March occur?
+TYPE:TEXT
+A. April 9, 1942  ""
 B. March 8, 2027
 C. Never, it's fake
 D. Dec 7, 1941
 
-2. What is the Capital of Brazil.
+2. What is the location in the Image?
+TYPE:IMAGE
 A. Rio de Janeiro
 B. Brasilia "C"
 C. Moscow
 D. Washington DC
 
-3. Why did the chicken cross the road.
-A. Roblox
-B. Minecraft "C"
-C. Fall 76
-D. Skibidi Toilet
+3. Which of following make the following sound?
+TYPE:AUDIO
+A. M1 Garand "C"
+B. M249 SAW
+C. Glock 18
+D. Your Mom

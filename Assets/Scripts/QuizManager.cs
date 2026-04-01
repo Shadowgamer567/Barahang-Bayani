@@ -1,12 +1,19 @@
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine.UI;
 
 public class QuizManager : MonoBehaviour
 {
     public GameObject quizPanel;
     public GameObject cardPanel;
     public GameObject enemyPanel;
+    public GameObject heroPanel;
+    public GameObject imageObject;
+    public UnityEngine.UI.Image questionImage;
+    public AudioSource audioSource;
+    public Button audioButton;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] answerText;
@@ -28,14 +35,57 @@ public class QuizManager : MonoBehaviour
 
         enemyPanel.SetActive(false);
         cardPanel.SetActive(false);
+        heroPanel.SetActive(false);
 
         Time.timeScale = 0f;
+
+        questionText.gameObject.SetActive(true);
+        questionImage.gameObject.SetActive(false);
+        audioButton.gameObject.SetActive(false);
+        imageObject.SetActive(false);
+        audioSource.Stop();
 
         questionText.text = question.Question;
         
         for(int i = 0; i < answerText.Length; i++)
         {
             answerText[i].text = question.Answer[i];
+        }
+
+        switch (question.type)
+        {
+            case QuizType.Text:
+                break;
+
+            case QuizType.Image:
+                imageObject.SetActive(true);
+                Sprite sprite = Resources.Load<Sprite>("Images/" + question.imagePath);
+
+                if(sprite != null)
+                {
+                    questionImage.sprite = sprite;
+                }
+
+                else
+                {
+                    Debug.LogError("Image Not Found" + question.imagePath);
+                }
+                    break;
+
+            case QuizType.Audio:
+                AudioClip clip = Resources.Load<AudioClip>("Audio/" + question.audioPath);
+
+                if(clip != null)
+                {
+                    audioSource.clip = clip;
+                    audioSource.Play();
+                }
+
+                else
+                {
+                    Debug.LogError("Audio Not Found" + question.audioPath);
+                }
+                    break;
         }
     }
 
@@ -59,6 +109,7 @@ public class QuizManager : MonoBehaviour
 
         enemyPanel.SetActive(true);
         cardPanel.SetActive(true);
+        heroPanel.SetActive(true);
 
         Time.timeScale = 1f;
 
@@ -85,7 +136,25 @@ public class QuizManager : MonoBehaviour
 
         for(int i = 0; i < lines.Length;)
         {
-        
+            string typeline = lines[i + 1].Trim();
+
+            if (typeline.StartsWith("TYPE:TEXT"))
+            {
+                currentQuestion.type = QuizType.Text;
+            }
+
+            else if (typeline.StartsWith("TYPE:IMAGE"))
+            {
+                currentQuestion.type = QuizType.Image;
+                currentQuestion.imagePath = typeline.Split(":")[2];
+            }
+
+            else if (typeline.StartsWith("TYPE:AUDIO"))
+            {
+                currentQuestion.type = QuizType.Audio;
+                currentQuestion.audioPath = typeline.Split(":")[2];
+            }
+
             if (string.IsNullOrWhiteSpace(lines[i]))
             {
                 i++;
@@ -108,7 +177,7 @@ public class QuizManager : MonoBehaviour
 
             for(int j = 0; j < 4; j++)
             {
-                string line = lines[i + 1 + j].Trim();
+                string line = lines[i + 2 + j].Trim();
 
                 string answerText = line.Substring(3).Trim();
 
@@ -122,7 +191,7 @@ public class QuizManager : MonoBehaviour
             }
 
             questions.Add(q);
-            i += 5;
+            i += 6;
         }
     }
 

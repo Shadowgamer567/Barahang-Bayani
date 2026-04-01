@@ -1,33 +1,24 @@
-//Handles Enemy Statistics
-
 using System.Collections;
 using UnityEngine;
 
-public class EnemyStats : MonoBehaviour
+public class HeroStats : MonoBehaviour
 {
-    public EnemyTypes enemyType;
+    public HeroType heroType;
     public GameObject uiObject;
-    public EnemyUI ui;
 
     public int currentHP;
 
-    private void Start()
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        
-    }
-
-    void OnEnable()
-    {
-        currentHP = enemyType.maxHp;
-
-        transform.rotation = Quaternion.identity;
+        currentHP = heroType.maxHp;
     }
 
     public void TakeDamage(int amount)
     {
         currentHP -= amount;
 
-        if(currentHP <= 0)
+        if (currentHP <= 0)
         {
             StartCoroutine(Die());
         }
@@ -37,7 +28,7 @@ public class EnemyStats : MonoBehaviour
     {
         Quaternion startRotation = transform.rotation;
 
-        Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
+        Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, -90f);
 
         float elapsed = 0f;
         float duration = 2f;
@@ -53,12 +44,13 @@ public class EnemyStats : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         gameObject.SetActive(false);
     }
-        public bool IsDead()
+    public bool IsDead()
     {
         return currentHP <= 0;
     }
 
-    private void Update()
+    // Update is called once per frame
+    void Update()
     {
         
     }
