@@ -14,6 +14,7 @@ public class QuizManager : MonoBehaviour
     public UnityEngine.UI.Image questionImage;
     public AudioSource audioSource;
     public GameObject audioButton;
+    public GameObject endButton;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] answerText;
@@ -33,6 +34,7 @@ public class QuizManager : MonoBehaviour
 
         quizPanel.SetActive(true);
 
+        endButton.SetActive(false);
         enemyPanel.SetActive(false);
         cardPanel.SetActive(false);
         heroPanel.SetActive(false);
@@ -119,6 +121,7 @@ public class QuizManager : MonoBehaviour
         enemyPanel.SetActive(true);
         cardPanel.SetActive(true);
         heroPanel.SetActive(true);
+        endButton.SetActive(true);
 
         Time.timeScale = 1f;
 
