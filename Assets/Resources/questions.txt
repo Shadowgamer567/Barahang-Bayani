@@ -1,19 +1,19 @@
 1. When did the Bataan Death March occur?
 TYPE:TEXT
-A. April 9, 1942  ""
+A. April 9, 1942 "C"
 B. March 8, 2027
 C. Never, it's fake
 D. Dec 7, 1941
 
 2. What is the location in the Image?
-TYPE:IMAGE
+TYPE:IMAGE:Brasilia
 A. Rio de Janeiro
 B. Brasilia "C"
 C. Moscow
 D. Washington DC
 
 3. Which of following make the following sound?
-TYPE:AUDIO
+TYPE:AUDIO:Aud_q1
 A. M1 Garand "C"
 B. M249 SAW
 C. Glock 18

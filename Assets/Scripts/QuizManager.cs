@@ -13,7 +13,7 @@ public class QuizManager : MonoBehaviour
     public GameObject imageObject;
     public UnityEngine.UI.Image questionImage;
     public AudioSource audioSource;
-    public Button audioButton;
+    public GameObject audioButton;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] answerText;
@@ -41,9 +41,13 @@ public class QuizManager : MonoBehaviour
 
         questionText.gameObject.SetActive(true);
         questionImage.gameObject.SetActive(false);
-        audioButton.gameObject.SetActive(false);
+        audioButton.SetActive(false);
         imageObject.SetActive(false);
-        audioSource.Stop();
+
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
 
         questionText.text = question.Question;
         
@@ -59,7 +63,11 @@ public class QuizManager : MonoBehaviour
 
             case QuizType.Image:
                 imageObject.SetActive(true);
+                questionImage.gameObject.SetActive(true);
+
                 Sprite sprite = Resources.Load<Sprite>("Images/" + question.imagePath);
+                Debug.Log("Question Type" + question.type);
+                Debug.Log("Image Question Tirggered");
 
                 if(sprite != null)
                 {
@@ -68,11 +76,12 @@ public class QuizManager : MonoBehaviour
 
                 else
                 {
-                    Debug.LogError("Image Not Found" + question.imagePath);
+                    Debug.LogError("Image Not Found " + question.imagePath);
                 }
                     break;
 
             case QuizType.Audio:
+                audioButton.SetActive(true);
                 AudioClip clip = Resources.Load<AudioClip>("Audio/" + question.audioPath);
 
                 if(clip != null)
@@ -83,7 +92,7 @@ public class QuizManager : MonoBehaviour
 
                 else
                 {
-                    Debug.LogError("Audio Not Found" + question.audioPath);
+                    Debug.LogError("Audio Not Found " + question.audioPath);
                 }
                     break;
         }
@@ -136,24 +145,6 @@ public class QuizManager : MonoBehaviour
 
         for(int i = 0; i < lines.Length;)
         {
-            string typeline = lines[i + 1].Trim();
-
-            if (typeline.StartsWith("TYPE:TEXT"))
-            {
-                currentQuestion.type = QuizType.Text;
-            }
-
-            else if (typeline.StartsWith("TYPE:IMAGE"))
-            {
-                currentQuestion.type = QuizType.Image;
-                currentQuestion.imagePath = typeline.Split(":")[2];
-            }
-
-            else if (typeline.StartsWith("TYPE:AUDIO"))
-            {
-                currentQuestion.type = QuizType.Audio;
-                currentQuestion.audioPath = typeline.Split(":")[2];
-            }
 
             if (string.IsNullOrWhiteSpace(lines[i]))
             {
@@ -170,8 +161,26 @@ public class QuizManager : MonoBehaviour
             {
                 q.Question = q.Question.Substring(dotIndex + 1).Trim();
             }
-            
-            
+
+            string typeline = lines[i + 1].Trim();
+
+            if (typeline.StartsWith("TYPE:TEXT"))
+            {
+                q.type = QuizType.Text;
+            }
+
+            else if (typeline.StartsWith("TYPE:IMAGE"))
+            {
+                q.type = QuizType.Image;
+                q.imagePath = typeline.Split(":")[2].Trim();
+            }
+
+            else if (typeline.StartsWith("TYPE:AUDIO"))
+            {
+                q.type = QuizType.Audio;
+                q.audioPath = typeline.Split(":")[2].Trim();
+            }
+
             q.Answer = new string[4];
             q.correctIndex = 0;
 
@@ -197,7 +206,22 @@ public class QuizManager : MonoBehaviour
 
     public QuizQuestion GetRandomQuestions()
     {
+        if(questions.Count == 0)
+        {
+            Debug.LogError("No Questions Loaded");
+            return null;
+        }
+
         return questions[Random.Range(0, questions.Count)];
+    }
+
+    public void PlayAudio()
+    {
+        if(audioSource != null && audioSource.clip != null)
+        {
+            audioSource.Stop();
+            audioSource.Play();
+        }
     }
 
 
