@@ -12,7 +12,7 @@ B. Brasilia "C"
 C. Moscow
 D. Washington DC
 
-3. Which of following make the following sound?
+3. Which of the following makes the sound?
 TYPE:AUDIO:Aud_q1
 A. M1 Garand "C"
 B. M249 SAW
