@@ -33,6 +33,11 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
+    public void SyncToData(GameData data)
+    {
+        data.enemy_health = this.currentHP;
+    }
+
     IEnumerator Die()
     {
         Quaternion startRotation = transform.rotation;

@@ -53,6 +53,11 @@ public class CardPanelManager : MonoBehaviour
         }
     }
 
+    public void SyncToData(GameData data)
+    {
+        data.cards = this.cardCount;
+    }
+
     IEnumerator RefillHand()
     {
         isRefilling = true;
