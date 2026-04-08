@@ -24,6 +24,11 @@ public class HeroStats : MonoBehaviour
         }
     }
 
+    public void SyncToData(GameData data)
+    {
+        data.hero_health = this.currentHP;
+    }
+
     IEnumerator Die()
     {
         Quaternion startRotation = transform.rotation;
