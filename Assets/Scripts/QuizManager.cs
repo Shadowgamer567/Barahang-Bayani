@@ -14,10 +14,13 @@ public class QuizManager : MonoBehaviour
     public UnityEngine.UI.Image questionImage;
     public AudioSource audioSource;
     public GameObject audioButton;
+    public GameObject submitButton;
     public GameObject endButton;
+    public GameObject inputPanel;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] answerText;
+    public TMP_InputField inputField;
 
     private QuizQuestion currentQuestion;
     private BattleControl battleControl;
@@ -98,6 +101,31 @@ public class QuizManager : MonoBehaviour
                 }
                     break;
         }
+
+        switch (question.inputType)
+        {
+            case InputType.MultipleChoice:
+                inputPanel.SetActive(false);
+
+                for (int i = 0; i < answerText.Length; i++)
+                {
+                    answerText[i].transform.parent.gameObject.SetActive(true);
+                }
+                break;
+
+            case InputType.Identification:
+                inputPanel.SetActive(true);
+
+                inputField.text = "";
+                inputField.ActivateInputField();
+
+                for (int i = 0; i < answerText.Length; i++)
+                {
+                    answerText[i].transform.parent.gameObject.SetActive(false);
+                }
+                break;
+        }
+
     }
 
     public void Answers(int index)
@@ -107,6 +135,23 @@ public class QuizManager : MonoBehaviour
         Debug.Log(correct ? "Correct!" : "Incorrect");
 
         if (correct && battleControl != null)
+        {
+            battleControl.DealDamageToAll(pendingDamage);
+        }
+
+        EndQuiz();
+    }
+
+    public void SubmitIdentification()
+    {
+        string userAnswer = inputField.text.Trim().ToLower();
+        string correct = currentQuestion.correctAnswer.Trim().ToLower();
+
+        bool iscorrect = userAnswer == correct;
+
+        Debug.Log(iscorrect ? "Correct" : "Incorrect");
+
+        if(iscorrect && battleControl != null)
         {
             battleControl.DealDamageToAll(pendingDamage);
         }
@@ -184,26 +229,41 @@ public class QuizManager : MonoBehaviour
                 q.audioPath = typeline.Split(":")[2].Trim();
             }
 
-            q.Answer = new string[4];
+            string inputLine = lines[i + 2].Trim();
+
+            if (inputLine.StartsWith("INPUT:MULTIPLE_CHOICE"))
+            {
+                q.inputType = InputType.MultipleChoice;
+            }
+
+            else if (inputLine.StartsWith("INPUT:IDENTIFICATION"))
+            {
+                q.inputType = InputType.Identification;
+            }
+
+                q.Answer = new string[4];
             q.correctIndex = 0;
 
             for(int j = 0; j < 4; j++)
             {
-                string line = lines[i + 2 + j].Trim();
+                string line = lines[i + 3 + j];
 
-                string answerText = line.Substring(3).Trim();
+                bool isCorrect = line.Contains("\"C\"");
 
-                if (answerText.Contains("\"C\""))
+                string answerText = line.Substring(3).Replace("\"C\"", "").Trim();
+
+                if (isCorrect)
                 {
                     q.correctIndex = j;
-                    answerText = answerText.Replace("\"C\"", "").Trim();
+
+                    q.correctAnswer = answerText;
                 }
 
                 q.Answer[j] = answerText;
             }
 
             questions.Add(q);
-            i += 6;
+            i += 7;
         }
     }
 
