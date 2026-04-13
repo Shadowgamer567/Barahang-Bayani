@@ -63,7 +63,15 @@ public class QuizManager : MonoBehaviour
         
         for(int i = 0; i < answerText.Length; i++)
         {
-            answerText[i].text = question.Answer[i];
+            if (i < question.Answer.Length)
+            {
+                answerText[i].text = question.Answer[i];
+            }
+
+            else
+            {
+                answerText[i].text = "";
+            }
         }
 
         switch (question.type)
@@ -277,7 +285,7 @@ public class QuizManager : MonoBehaviour
                 q.inputType = InputType.TrueOrFalse;
             }
 
-            if (q.inputType ==InputType.TrueOrFalse)
+            if (q.inputType == InputType.TrueOrFalse)
             {
                 q.Answer = new string[0];
 
@@ -292,6 +300,13 @@ public class QuizManager : MonoBehaviour
                 {
                     q.correctBool = false;
                 }
+
+                q.Answer = new string[0];
+
+                questions.Add(q);
+
+                i += 4;
+                continue;
             }
 
             else {
