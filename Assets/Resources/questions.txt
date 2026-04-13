@@ -21,3 +21,8 @@ A. M1 Garand "C"
 B. M249 SAW
 C. Glock 18
 D. Your Mom
+
+4. Was Jose Rizal Shot by the Spaniards during his death
+TYPE:TEXT
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE

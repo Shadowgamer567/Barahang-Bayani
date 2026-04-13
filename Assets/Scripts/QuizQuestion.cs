@@ -11,7 +11,8 @@ public enum QuizType
 public enum InputType
 {
     MultipleChoice,
-    Identification
+    Identification,
+    TrueOrFalse
 }
 
 [System.Serializable]
@@ -24,6 +25,7 @@ public class QuizQuestion
     public string[] Answer;
     public string correctAnswer;
     public int correctIndex;
+    public bool correctBool;
 
     public string imagePath;
     public string audioPath;
