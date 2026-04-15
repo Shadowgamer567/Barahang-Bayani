@@ -93,45 +93,103 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
+        Debug.Log("Starting Enemy Turn");
         StartCoroutine(EnemyTurn());
     }
 
     IEnumerator EnemyTurn()
     {
+        Debug.Log("EnemyTurn Started");
+
         currentstate = BattleState.Busy;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
 
         foreach (EnemyStats enemy in enemies)
         {
             if (!enemy.gameObject.activeInHierarchy)
-            {
                 continue;
-            }
 
-            HeroStats target = GetRandomAliveHero();
+            EnemyAction action;
 
-            if(target != null)
+            if (enemy.action != null && enemy.action.Length > 0)
             {
-                target.TakeDamage(enemy.enemyType.damage);
+                action = enemy.action[Random.Range(0, enemy.action.Length)];
+            }
+            else
+            {
+                action = new EnemyAction
+                {
+                    actionType = EnemyActionType.Attack,
+                    value = enemy.enemyType.damage
+                };
             }
 
-            yield return new WaitForSeconds(0.5f);
+            Debug.Log("Enemy uses: " + action.actionType);
+
+            ExecuteEnemyAction(enemy, action);
+
+            yield return new WaitForSecondsRealtime(0.5f);
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
 
         if (CheckLoseCondition())
         {
             currentstate = BattleState.Lose;
-
             Debug.Log("You Lost");
-
             yield break;
         }
 
         currentstate = BattleState.PlayerTurn;
     }
+
+    void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
+    {
+        switch (action.actionType)
+        {
+            case EnemyActionType.Attack:
+                HeroStats target = GetRandomAliveHero();
+                if(target != null)
+                {
+                    target.TakeDamage(enemy.enemyType.damage);
+                }
+                break;
+
+            case EnemyActionType.Shield:
+                EnemyStats shieldTarget = GetRandomAliveEnemy();
+                if (shieldTarget != null)
+                {
+                    shieldTarget.AddShield(action.value);
+                }
+                break;
+
+            case EnemyActionType.Heal:
+                EnemyStats healTarget = GetRandomAliveEnemy();
+                if (healTarget != null)
+                {
+                    healTarget.Heal(action.value);
+                }
+                break;
+
+            case EnemyActionType.Buff:
+                EnemyStats buffTarget = GetRandomAliveEnemy();
+                if (buffTarget != null)
+                {
+                    buffTarget.BuffAttack(action.value);
+                }
+                break;
+
+            case EnemyActionType.Debuff:
+                HeroStats debuffTarget = GetRandomAliveHero();
+                if (debuffTarget != null)
+                {
+                    debuffTarget.ReduceAttack(action.value);
+                }
+                break;
+        }
+    }
+
 
     HeroStats GetRandomAliveHero()
     {
@@ -149,6 +207,24 @@ public class BattleControl : MonoBehaviour
         {
             return null;
         }
+
+        return alive[Random.Range(0, alive.Count)];
+    }
+
+    EnemyStats GetRandomAliveEnemy()
+    {
+        List<EnemyStats> alive = new List<EnemyStats>();
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            {
+                alive.Add(enemy);
+            }
+        }
+
+        if (alive.Count == 0)
+            return null;
 
         return alive[Random.Range(0, alive.Count)];
     }
@@ -210,6 +286,8 @@ public class BattleControl : MonoBehaviour
             nextbattletriggered = true;
             StartCoroutine(NextBattle());
         }
+
+        UpdateUI();
     }
 
     void UpdateUI()

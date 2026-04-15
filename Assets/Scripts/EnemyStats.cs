@@ -1,6 +1,7 @@
 //Handles Enemy Statistics
 
 using System.Collections;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
@@ -8,8 +9,11 @@ public class EnemyStats : MonoBehaviour
     public EnemyTypes enemyType;
     public GameObject uiObject;
     public EnemyUI ui;
+    public EnemyAction[] action;
 
     public int currentHP;
+    public int shield;
+    public int attack;
 
     private void Start()
     {
@@ -19,18 +23,57 @@ public class EnemyStats : MonoBehaviour
     void OnEnable()
     {
         currentHP = enemyType.maxHp;
+        shield = enemyType.maxShield;
+
+        attack = enemyType.damage;
 
         transform.rotation = Quaternion.identity;
     }
 
     public void TakeDamage(int amount)
     {
-        currentHP -= amount;
+        if(shield > 0)
+        {
+            int shieldDamage = Mathf.Min(shield, amount);
+            shield -= shieldDamage;
+
+            int excessDamage = amount - shieldDamage;
+
+            if(excessDamage > 0)
+            {
+                currentHP -= excessDamage;
+            }
+        }
+
+        else
+        {
+            currentHP -= amount;
+        }
+
+        Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
 
         if(currentHP <= 0)
         {
             StartCoroutine(Die());
         }
+    }
+
+    public void Heal(int amount)
+    {
+        currentHP = Mathf.Min(currentHP + amount, enemyType.maxHp);
+        Debug.Log(name + " healed for: " + amount);
+    }
+
+    public void AddShield(int amount)
+    {
+        shield += amount;
+        Debug.Log(name + " gained shield " + amount);
+    }
+
+    public void BuffAttack(int amount)
+    {
+        attack += amount;
+        Debug.Log(name + " attack increased by " + amount);
     }
 
     public void SyncToData(GameData data)

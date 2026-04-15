@@ -7,21 +7,45 @@ public class HeroStats : MonoBehaviour
     public GameObject uiObject;
 
     public int currentHP;
+    public int attack;
+    public int shield;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         currentHP = heroType.maxHp;
+        shield = heroType.maxShield;
     }
 
     public void TakeDamage(int amount)
     {
-        currentHP -= amount;
+        if (shield > 0)
+        {
+            int shieldDamage = Mathf.Min(shield, amount);
+            shield -= shieldDamage;
+
+            int remaining = amount - shieldDamage;
+
+            if (remaining > 0)
+            {
+                currentHP -= remaining;
+            }
+        }
+        else
+        {
+            currentHP -= amount;
+        }
 
         if (currentHP <= 0)
         {
             StartCoroutine(Die());
         }
+    }
+
+    public void ReduceAttack(int amount)
+    {
+        attack -= amount;
+        Debug.Log(name + " reduced " + amount);
     }
 
     public void SyncToData(GameData data)
