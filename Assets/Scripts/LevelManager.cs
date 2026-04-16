@@ -1,0 +1,52 @@
+using System;
+using UnityEngine;
+
+public class LevelManager : MonoBehaviour
+{
+    public LevelData levelData;
+    public BattleControl battleControl;
+
+    private int battlesCompleted = 0;
+
+    void Start()
+    {
+        if (battleControl == null)
+        {
+            Debug.LogError("BattleControl not assigned!");
+            return;
+        }
+
+        battleControl.OnBattleWon += HandleBattleWon;
+    }
+
+    void HandleBattleWon()
+    {
+        battlesCompleted++;
+
+        Debug.Log($"Progress: {battlesCompleted}/{levelData.battlesRequired}");
+
+        if (battlesCompleted >= levelData.battlesRequired)
+        {
+            LevelComplete();
+        }
+    }
+
+    void LevelComplete()
+    {
+        Debug.Log("LEVEL COMPLETE");
+
+        ProgressManager.Instance.CompleteLevel(levelData.levelName);
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LevelSelect_Rizal");
+    }
+
+    void Start()
+    {
+
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}

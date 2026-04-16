@@ -19,6 +19,8 @@ public class BattleControl : MonoBehaviour
     public bool nextbattletriggered = false;
     public BattleState currentstate;
 
+    public System.Action OnBattleWon;
+
     EnemyStats[] enemies;
     HeroStats[] heroes;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -250,15 +252,22 @@ public class BattleControl : MonoBehaviour
             {
                 return;
             }
+        }
 
-            if (!nextbattletriggered)
-            {
-                nextbattletriggered = true;
-                StartCoroutine(NextBattle());
-            }
+        Debug.Log("Battle Won");
+
+        OnBattleWon?.Invoke();
+
+        if (!nextbattletriggered)
+        {
+            nextbattletriggered = true;
+            StartCoroutine(NextBattle());
         }
     }
-    bool allEnemiesAreDead()
+
+    //Depecrated Battle Win function
+    /*
+    bool AllEnemiesAreDead()
     {
         if(enemies == null || enemies.Length == 0)
         {
@@ -272,7 +281,8 @@ public class BattleControl : MonoBehaviour
             }
         }
         return true;
-    } 
+    } */
+
     private void Update()
     {
         //Debug Damage Button
@@ -281,11 +291,12 @@ public class BattleControl : MonoBehaviour
             AttackAllEnemies();
         }*/
 
-        if (!nextbattletriggered && allEnemiesAreDead())
+        //Old Battle Progression Code
+        /* if (!nextbattletriggered && allEnemiesAreDead())
         {
             nextbattletriggered = true;
             StartCoroutine(NextBattle());
-        }
+        }*/
 
         UpdateUI();
     }
