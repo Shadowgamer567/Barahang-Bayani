@@ -40,10 +40,6 @@ public class LevelManager : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene("LevelSelect_Rizal");
     }
 
-    void Start()
-    {
-
-    }
     // Update is called once per frame
     void Update()
     {
