@@ -10,6 +10,10 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
+        levelData = GameManager.Instance.selectedLevel;
+
+        battleControl = FindFirstObjectByType<BattleControl>();
+
         if (battleControl == null)
         {
             Debug.LogError("BattleControl not assigned!");
@@ -17,6 +21,9 @@ public class LevelManager : MonoBehaviour
         }
 
         battleControl.OnBattleWon += HandleBattleWon;
+
+        Debug.Log("Loaded Level: " + levelData.levelName);
+        Debug.Log("Battles Required: " + levelData.battlesRequired);
     }
 
     void HandleBattleWon()
@@ -28,6 +35,14 @@ public class LevelManager : MonoBehaviour
         if (battlesCompleted >= levelData.battlesRequired)
         {
             LevelComplete();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (battleControl == null)
+        {
+            battleControl.OnBattleWon -= HandleBattleWon;
         }
     }
 

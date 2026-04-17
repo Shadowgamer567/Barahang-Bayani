@@ -15,5 +15,5 @@ MonoBehaviour:
   levelName: Level1-3
   sceneName: 
   battlesRequired: 5
-  nextLevel: {fileID: 0}
+  previousLevel: {fileID: 11400000, guid: 0a041b3313cc6fe4fa2b93270201e0de, type: 2}
   isBossLevel: 0

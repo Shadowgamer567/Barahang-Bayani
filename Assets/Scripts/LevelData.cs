@@ -5,9 +5,8 @@ public class LevelData : ScriptableObject
 {
     public string levelName;
     public string sceneName;
-
     public int battlesRequired;
-    public LevelData nextLevel;
+    public LevelData previousLevel;
 
     //unused for now
     public bool isBossLevel;

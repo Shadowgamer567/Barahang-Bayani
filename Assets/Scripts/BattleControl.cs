@@ -246,6 +246,8 @@ public class BattleControl : MonoBehaviour
 
     void CheckWinCondition()
     {
+        CacheEnemies();
+
         foreach (var enemy in enemies)
         {
             if (enemy != null && enemy.gameObject.activeInHierarchy)
@@ -328,11 +330,11 @@ public class BattleControl : MonoBehaviour
     {
         currentstate = BattleState.Busy;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSecondsRealtime(2f);
 
         groundloop.isMoving = true;
 
-        yield return new WaitForSeconds(moveduration);
+        yield return new WaitForSecondsRealtime(moveduration);
 
         groundloop.isMoving = false;
 
