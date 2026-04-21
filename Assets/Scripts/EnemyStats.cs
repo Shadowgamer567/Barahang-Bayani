@@ -37,7 +37,9 @@ public class EnemyStats : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        if(shield > 0)
+        Debug.Log(name + " RECEIVED DAMAGE CALL");
+
+        if (shield > 0)
         {
             int shieldDamage = Mathf.Min(shield, amount);
             shield -= shieldDamage;
@@ -54,23 +56,34 @@ public class EnemyStats : MonoBehaviour
         {
             currentHP -= amount;
         }
+        Debug.Log(name + " HP AFTER DAMAGE: " + currentHP);
 
         currentHP = Mathf.Max(currentHP, 0);
+        shield = Mathf.Max(shield, 0);
 
         Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
 
         if(currentHP <= 0 && !isDying)
         {
+            Debug.Log(name + " ENTERING DEATH");
             isDying = true;
-
-            BattleControl battle = FindFirstObjectByType<BattleControl>();
-            if (battle != null)
-            {
-                battle.OnEnemyKilled();
-            }
-
-            StartCoroutine(Die());
+            DieImmediate();
         }
+    }
+
+    void DieImmediate()
+    {
+        isDying = true;
+
+        Debug.Log(name + " IMMEDIATE DEATH");
+
+        BattleControl battle = FindFirstObjectByType<BattleControl>();
+        if (battle != null)
+        {
+            battle.OnEnemyKilled();
+        }
+
+        gameObject.SetActive(false);
     }
 
     public void Heal(int amount)
@@ -96,18 +109,11 @@ public class EnemyStats : MonoBehaviour
         data.enemy_health = this.currentHP;
     }
 
-    void OnMouseDown()
-    {
-        Debug.Log("Clicked " + name);
-        
-        if (battle != null && battle.isSelectingTarget)
-        {
-            battle.SelectEnemyTarget(this);
-        }
-    }
-
+    /*
     IEnumerator Die()
     {
+        Debug.Log(name + " DIE STARTED");
+
         Quaternion startRotation = transform.rotation;
 
         Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
@@ -133,9 +139,10 @@ public class EnemyStats : MonoBehaviour
     {
         return currentHP <= 0;
     }
+    */
 
     private void Update()
     {
-        
+
     }
 }

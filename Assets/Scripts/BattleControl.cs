@@ -62,6 +62,16 @@ public class BattleControl : MonoBehaviour
                 aliveEnemies++;
             }
         }
+
+        Debug.Log("=== ENEMY CACHE START ===");
+
+        foreach (var e in enemies)
+        {
+            Debug.Log("Cached: " + e.name);
+        }
+
+        Debug.Log("=== ENEMY CACHE END ===");
+        Debug.Log("Alive Enemies:" + aliveEnemies);
     }
 
     void CacheHeroes()
@@ -329,6 +339,7 @@ public class BattleControl : MonoBehaviour
             pendingCard = card;
 
             cardPanel.SetActive(false);
+
             Destroy(cardUI.gameObject);
         }
     }
@@ -343,14 +354,21 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
-        Debug.Log("Selected Enemy: " + enemy.name);
+        Debug.Log("Applying Damage: " + pendingCard.damage);
 
         enemy.TakeDamage(pendingCard.damage);
 
         isSelectingTarget = false;
+
+        CardType usedCard = pendingCard;
         pendingCard = null;
 
-        cardPanel.SetActive(true);
+        if (cardPanel != null)
+        {
+            cardPanel.SetActive(true);
+        }
+        Debug.Log("TARGET CLICKED: " + enemy.name);
+        Debug.Log("Pending damage: " + pendingCard.damage);
     }
 
     //Depecrated Battle Win function
@@ -386,14 +404,19 @@ public class BattleControl : MonoBehaviour
             StartCoroutine(NextBattle());
         }*/
 
-        UpdateUI();
-
         if (Mouse.current.leftButton.wasPressedThisFrame) {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 Debug.Log("Hit: " + hit.collider.name);
+
+                EnemyStats enemy = hit.collider.GetComponent<EnemyStats>();
+
+                if(enemy != null)
+                {
+                    SelectEnemyTarget(enemy);
+                }
             }
 
             else
@@ -401,6 +424,8 @@ public class BattleControl : MonoBehaviour
                 Debug.Log("Nothing Hit");
             }
         }
+
+        UpdateUI();
     }
 
     void UpdateUI()
