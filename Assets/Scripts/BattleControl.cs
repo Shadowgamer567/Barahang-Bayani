@@ -109,7 +109,7 @@ public class BattleControl : MonoBehaviour
             }
         }
 
-        CheckWinCondition();
+
     }
 
     public void endPlayersTurn()
@@ -268,38 +268,6 @@ public class BattleControl : MonoBehaviour
         return true;
     }
 
-    void CheckWinCondition()
-    {
-        Debug.Log("Checking Win Condition");
-
-        foreach (var enemy in enemies)
-        {
-            if (enemy == null)
-            {
-                Debug.Log("Enemy is Null");
-                continue;
-            }
-
-            Debug.Log(enemy.name + " active: " + enemy.gameObject.activeInHierarchy);
-
-            if (enemy.gameObject.activeInHierarchy)
-            {
-                Debug.Log("Still Enemies alive -> now win");
-                return;
-            }
-        }
-
-        Debug.Log("Battle Won");
-
-        OnBattleWon?.Invoke();
-
-        if (!nextbattletriggered)
-        {
-            nextbattletriggered = true;
-            StartCoroutine(NextBattle());
-        }
-    }
-
     public void OnEnemyKilled()
     {
         aliveEnemies--;
@@ -354,21 +322,22 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
+        CardType usedCard = pendingCard;
+
         Debug.Log("Applying Damage: " + pendingCard.damage);
+
+        Debug.Log("TARGET CLICKED: " + enemy.name);
+        Debug.Log("Pending damage: " + pendingCard.damage);
 
         enemy.TakeDamage(pendingCard.damage);
 
         isSelectingTarget = false;
-
-        CardType usedCard = pendingCard;
         pendingCard = null;
 
         if (cardPanel != null)
         {
             cardPanel.SetActive(true);
         }
-        Debug.Log("TARGET CLICKED: " + enemy.name);
-        Debug.Log("Pending damage: " + pendingCard.damage);
     }
 
     //Depecrated Battle Win function

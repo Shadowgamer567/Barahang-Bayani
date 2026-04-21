@@ -77,7 +77,6 @@ public class EnemyStats : MonoBehaviour
 
         Debug.Log(name + " IMMEDIATE DEATH");
 
-        BattleControl battle = FindFirstObjectByType<BattleControl>();
         if (battle != null)
         {
             battle.OnEnemyKilled();
@@ -110,7 +109,7 @@ public class EnemyStats : MonoBehaviour
     }
 
     /*
-    IEnumerator Die()
+d    IEnumerator Die()
     {
         Debug.Log(name + " DIE STARTED");
 
