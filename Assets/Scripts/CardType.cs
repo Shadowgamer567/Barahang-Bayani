@@ -5,7 +5,14 @@ public class CardType : ScriptableObject
 {
     public string cardName;
     public string cardDesc;
+    public TargetType targetType;
     public int damage;
     public int cost;
     public bool quizCard;
+}
+
+public enum TargetType
+{
+    AllEnemies,
+    SingleTarget
 }

@@ -13,11 +13,16 @@ public class BattleControl : MonoBehaviour
     public Transform heroController;
     public GroundLoop groundloop;
     public GameObject endButton;
+    public GameObject cardPanel;
+    public CardType pendingCard;
 
     public float moveduration = 5f;
     public int damage = 5;
     public bool nextbattletriggered = false;
+    public int aliveEnemies = 0;
     public BattleState currentstate;
+    public bool isSelectingTarget = false;
+
 
     public System.Action OnBattleWon;
 
@@ -48,6 +53,15 @@ public class BattleControl : MonoBehaviour
     void CacheEnemies()
     {
         enemies = GetComponentsInChildren<EnemyStats>(true);
+
+        aliveEnemies = 0;
+        foreach(var e in enemies)
+        {
+            if (e.gameObject.activeInHierarchy)
+            {
+                aliveEnemies++;
+            }
+        }
     }
 
     void CacheHeroes()
@@ -246,12 +260,21 @@ public class BattleControl : MonoBehaviour
 
     void CheckWinCondition()
     {
-        CacheEnemies();
+        Debug.Log("Checking Win Condition");
 
         foreach (var enemy in enemies)
         {
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            if (enemy == null)
             {
+                Debug.Log("Enemy is Null");
+                continue;
+            }
+
+            Debug.Log(enemy.name + " active: " + enemy.gameObject.activeInHierarchy);
+
+            if (enemy.gameObject.activeInHierarchy)
+            {
+                Debug.Log("Still Enemies alive -> now win");
                 return;
             }
         }
@@ -265,6 +288,69 @@ public class BattleControl : MonoBehaviour
             nextbattletriggered = true;
             StartCoroutine(NextBattle());
         }
+    }
+
+    public void OnEnemyKilled()
+    {
+        aliveEnemies--;
+
+        Debug.Log("Enemied Left: " + aliveEnemies);
+
+        if(aliveEnemies <= 0)
+        {
+            Debug.Log("Battle Won");
+
+            OnBattleWon?.Invoke();
+
+            if (!nextbattletriggered)
+            {
+                nextbattletriggered = true;
+                StartCoroutine(NextBattle());
+            }
+        }
+    }
+
+    public void HandleCardPlay(CardType card, CardUI cardUI)
+    {
+        Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
+
+        if (card.targetType == TargetType.AllEnemies)
+        {
+            DealDamageToAll(card.damage);
+            Destroy(cardUI.gameObject);
+            return;
+        }
+
+        if (card.targetType == TargetType.SingleTarget)
+        {
+            Debug.Log("Select a Target");
+
+            isSelectingTarget = true;
+            pendingCard = card;
+
+            cardPanel.SetActive(false);
+            Destroy(cardUI.gameObject);
+        }
+    }
+
+    public void SelectEnemyTarget(EnemyStats enemy)
+    {
+        Debug.Log("SelectEnemyTarget Called");
+
+        if (!isSelectingTarget || pendingCard == null)
+        {
+            Debug.Log("Blocked: selecting=" + isSelectingTarget + " pending=" + pendingCard);
+            return;
+        }
+
+        Debug.Log("Selected Enemy: " + enemy.name);
+
+        enemy.TakeDamage(pendingCard.damage);
+
+        isSelectingTarget = false;
+        pendingCard = null;
+
+        cardPanel.SetActive(true);
     }
 
     //Depecrated Battle Win function
@@ -301,6 +387,20 @@ public class BattleControl : MonoBehaviour
         }*/
 
         UpdateUI();
+
+        if (Mouse.current.leftButton.wasPressedThisFrame) {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Debug.Log("Hit: " + hit.collider.name);
+            }
+
+            else
+            {
+                Debug.Log("Nothing Hit");
+            }
+        }
     }
 
     void UpdateUI()

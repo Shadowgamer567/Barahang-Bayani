@@ -11,9 +11,12 @@ public class EnemyStats : MonoBehaviour
     public EnemyUI ui;
     public EnemyAction[] action;
 
+    private BattleControl battle;
+
     public int currentHP;
     public int shield;
     public int attack;
+    private bool isDying = false;
 
     private void Start()
     {
@@ -22,6 +25,8 @@ public class EnemyStats : MonoBehaviour
 
     void OnEnable()
     {
+       battle = FindFirstObjectByType<BattleControl>();
+
         currentHP = enemyType.maxHp;
         shield = enemyType.maxShield;
 
@@ -50,10 +55,20 @@ public class EnemyStats : MonoBehaviour
             currentHP -= amount;
         }
 
+        currentHP = Mathf.Max(currentHP, 0);
+
         Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
 
-        if(currentHP <= 0)
+        if(currentHP <= 0 && !isDying)
         {
+            isDying = true;
+
+            BattleControl battle = FindFirstObjectByType<BattleControl>();
+            if (battle != null)
+            {
+                battle.OnEnemyKilled();
+            }
+
             StartCoroutine(Die());
         }
     }
@@ -81,6 +96,16 @@ public class EnemyStats : MonoBehaviour
         data.enemy_health = this.currentHP;
     }
 
+    void OnMouseDown()
+    {
+        Debug.Log("Clicked " + name);
+        
+        if (battle != null && battle.isSelectingTarget)
+        {
+            battle.SelectEnemyTarget(this);
+        }
+    }
+
     IEnumerator Die()
     {
         Quaternion startRotation = transform.rotation;
@@ -99,7 +124,10 @@ public class EnemyStats : MonoBehaviour
 
         transform.rotation = targetRotation;
         yield return new WaitForSeconds(0.3f);
+
         gameObject.SetActive(false);
+
+
     }
         public bool IsDead()
     {

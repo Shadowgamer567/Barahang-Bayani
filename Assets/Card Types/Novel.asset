@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Novel
   cardDesc: 
+  targetType: 1
   damage: 7
   cost: 1
+  quizCard: 0

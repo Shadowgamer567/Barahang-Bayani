@@ -30,26 +30,27 @@ public class CardUI : MonoBehaviour
 
     void OnClick()
     {
-        if(battleControl.currentstate != BattleControl.BattleState.PlayerTurn)
+        Debug.Log("Card clicked -> sending to BattleControl");
+
+        if (battleControl.currentstate != BattleControl.BattleState.PlayerTurn)
         {
             Debug.Log("Not your turn");
             return;
         }
 
         Debug.Log("Played Card: " + cardType.cardName);
+        Debug.Log("Target Type: " + cardType.targetType);
 
         if (cardType.quizCard)
         {
             QuizQuestion q = quizManager.GetRandomQuestions();
             quizManager.StartQuiz(q, cardType.damage, battleControl);
+
+            Destroy(gameObject);
+            return;
         }
 
-        else if (battleControl != null)
-        {
-            battleControl.DealDamageToAll(cardType.damage);
-        }
-
-        Destroy(gameObject);
+            battleControl.HandleCardPlay(cardType, this);
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
