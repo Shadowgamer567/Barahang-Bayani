@@ -32,6 +32,8 @@ public class EnemyStats : MonoBehaviour
 
         attack = enemyType.damage;
 
+        isDying = false;
+
         transform.rotation = Quaternion.identity;
     }
 
@@ -77,12 +79,12 @@ public class EnemyStats : MonoBehaviour
 
         Debug.Log(name + " IMMEDIATE DEATH");
 
+        gameObject.SetActive(false);
+
         if (battle != null)
         {
             battle.OnEnemyKilled();
         }
-
-        gameObject.SetActive(false);
     }
 
     public void Heal(int amount)
@@ -108,10 +110,17 @@ public class EnemyStats : MonoBehaviour
         data.enemy_health = this.currentHP;
     }
 
-    /*
-d    IEnumerator Die()
+    
+    IEnumerator Die()
     {
         Debug.Log(name + " DIE STARTED");
+
+        GetComponent<Collider>().enabled = false;
+
+        if(battle != null)
+        {
+            battle.OnEnemyKilled();
+        }
 
         Quaternion startRotation = transform.rotation;
 
@@ -131,14 +140,12 @@ d    IEnumerator Die()
         yield return new WaitForSeconds(0.3f);
 
         gameObject.SetActive(false);
-
-
     }
         public bool IsDead()
     {
         return currentHP <= 0;
     }
-    */
+    
 
     private void Update()
     {

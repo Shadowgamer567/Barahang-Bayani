@@ -5,12 +5,27 @@ public class LevelManager : MonoBehaviour
 {
     public LevelData levelData;
     public BattleControl battleControl;
+    public LevelData debugLevelData;
 
     private int battlesCompleted = 0;
 
     void Start()
     {
-        levelData = GameManager.Instance.selectedLevel;
+        if (GameManager.Instance != null && GameManager.Instance.selectedLevel != null)
+        {
+            levelData = GameManager.Instance.selectedLevel;
+        }
+        else
+        {
+            Debug.LogWarning("Using DEBUG LevelData");
+            levelData = debugLevelData;
+        }
+
+        if (levelData == null)
+        {
+            Debug.LogError("No LevelData assigned!");
+            return;
+        }
 
         battleControl = FindFirstObjectByType<BattleControl>();
 
@@ -28,6 +43,13 @@ public class LevelManager : MonoBehaviour
 
     void HandleBattleWon()
     {
+        Debug.Log("HandleBattleWon Called");
+
+        if (levelData == null)
+        {
+            Debug.LogError("levelData is Null");
+            return;
+        }
         battlesCompleted++;
 
         Debug.Log($"Progress: {battlesCompleted}/{levelData.battlesRequired}");
@@ -40,7 +62,7 @@ public class LevelManager : MonoBehaviour
 
     void OnDestroy()
     {
-        if (battleControl == null)
+        if (battleControl != null)
         {
             battleControl.OnBattleWon -= HandleBattleWon;
         }
@@ -49,6 +71,18 @@ public class LevelManager : MonoBehaviour
     void LevelComplete()
     {
         Debug.Log("LEVEL COMPLETE");
+
+        if (ProgressManager.Instance == null)
+        {
+            Debug.LogError("ProgressManager is Null");
+            return;
+        }
+
+        if (levelData == null)
+        {
+            Debug.LogError("levelData is Null in LevelComplete");
+            return;
+        }
 
         ProgressManager.Instance.CompleteLevel(levelData.levelName);
 

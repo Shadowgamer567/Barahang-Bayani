@@ -108,8 +108,6 @@ public class BattleControl : MonoBehaviour
                 enemy.TakeDamage(damage);
             }
         }
-
-
     }
 
     public void endPlayersTurn()
@@ -270,11 +268,19 @@ public class BattleControl : MonoBehaviour
 
     public void OnEnemyKilled()
     {
-        aliveEnemies--;
+        aliveEnemies = 0;
 
-        Debug.Log("Enemied Left: " + aliveEnemies);
+        foreach (var e in enemies)
+        {
+            if (e != null && e.gameObject.activeInHierarchy)
+            {
+                aliveEnemies++;
+            }
+        }
 
-        if(aliveEnemies <= 0)
+        Debug.Log("Enemies Left: " + aliveEnemies);
+
+        if (aliveEnemies <= 0)
         {
             Debug.Log("Battle Won");
 
