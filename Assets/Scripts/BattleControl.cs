@@ -103,7 +103,7 @@ public class BattleControl : MonoBehaviour
     {
         foreach (EnemyStats enemy in enemies)
         {
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            if (enemy != null && !enemy.isDead)
             {
                 enemy.TakeDamage(damage);
             }
@@ -131,8 +131,10 @@ public class BattleControl : MonoBehaviour
 
         foreach (EnemyStats enemy in enemies)
         {
-            if (!enemy.gameObject.activeInHierarchy)
+            if (enemy == null || enemy.isDead)
+            {
                 continue;
+            }
 
             EnemyAction action;
 
@@ -241,7 +243,7 @@ public class BattleControl : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            if (enemy != null && !enemy.isDead)
             {
                 alive.Add(enemy);
             }
@@ -257,7 +259,7 @@ public class BattleControl : MonoBehaviour
     {
         foreach(var enemy in enemies)
         {
-            if(enemy != null && enemy.gameObject.activeInHierarchy)
+            if(enemy != null && !enemy.isDead)
             {
                 return false;
             }
@@ -272,7 +274,7 @@ public class BattleControl : MonoBehaviour
 
         foreach (var e in enemies)
         {
-            if (e != null && e.gameObject.activeInHierarchy)
+            if (e != null && !e.isDead)
             {
                 aliveEnemies++;
             }
@@ -321,6 +323,11 @@ public class BattleControl : MonoBehaviour
     public void SelectEnemyTarget(EnemyStats enemy)
     {
         Debug.Log("SelectEnemyTarget Called");
+
+        if(enemy == null || enemy.IsDead())
+        {
+            return;
+        }
 
         if (!isSelectingTarget || pendingCard == null)
         {
@@ -386,7 +393,7 @@ public class BattleControl : MonoBehaviour
             {
                 Debug.Log("Hit: " + hit.collider.name);
 
-                EnemyStats enemy = hit.collider.GetComponent<EnemyStats>();
+                EnemyStats enemy = hit.collider.GetComponentInParent<EnemyStats>();
 
                 if(enemy != null)
                 {

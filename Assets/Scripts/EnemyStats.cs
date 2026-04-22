@@ -10,6 +10,7 @@ public class EnemyStats : MonoBehaviour
     public GameObject uiObject;
     public EnemyUI ui;
     public EnemyAction[] action;
+    public Transform model;
 
     private BattleControl battle;
 
@@ -17,6 +18,7 @@ public class EnemyStats : MonoBehaviour
     public int shield;
     public int attack;
     private bool isDying = false;
+    public bool isDead = false;
 
     private void Start()
     {
@@ -33,6 +35,7 @@ public class EnemyStats : MonoBehaviour
         attack = enemyType.damage;
 
         isDying = false;
+        isDead = false;
 
         transform.rotation = Quaternion.identity;
     }
@@ -67,9 +70,10 @@ public class EnemyStats : MonoBehaviour
 
         if(currentHP <= 0 && !isDying)
         {
+            isDead = true;
             Debug.Log(name + " ENTERING DEATH");
             isDying = true;
-            DieImmediate();
+            StartCoroutine(Die());
         }
     }
 
@@ -115,28 +119,36 @@ public class EnemyStats : MonoBehaviour
     {
         Debug.Log(name + " DIE STARTED");
 
-        GetComponent<Collider>().enabled = false;
+        Collider col = GetComponent<Collider>();
+
+        if(col != null)
+        {
+            col.enabled = false;
+        }
 
         if(battle != null)
         {
             battle.OnEnemyKilled();
         }
 
-        Quaternion startRotation = transform.rotation;
-
-        Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
-
-        float elapsed = 0f;
-        float duration = 2f;
-
-        while (elapsed < duration)
+        Transform model = transform.Find("AnimateChild");
+        if (model != null)
         {
-            transform.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
+            Quaternion startRotation = model.rotation;
+            Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
 
-        transform.rotation = targetRotation;
+            float elapsed = 0f;
+            float duration = 2f;
+
+            while (elapsed < duration)
+            {
+                model.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsed / duration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            model.rotation = targetRotation;
+        }
         yield return new WaitForSeconds(0.3f);
 
         gameObject.SetActive(false);
