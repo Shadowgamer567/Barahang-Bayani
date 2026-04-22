@@ -637,6 +637,8 @@ GameObject:
   - component: {fileID: 34122248}
   - component: {fileID: 34122247}
   - component: {fileID: 34122246}
+  - component: {fileID: 34122249}
+  - component: {fileID: 34122250}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -739,6 +741,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 34122244}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!95 &34122249
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34122244}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 60fad22518164794b8158187cef4d360, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &34122250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34122244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b1cd0899feb8648a83dc13ce7f9b95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationRelay
+  parent: {fileID: 953550666}
 --- !u!1 &60217391
 GameObject:
   m_ObjectHideFlags: 0
@@ -5063,6 +5100,7 @@ GameObject:
   - component: {fileID: 657567180}
   - component: {fileID: 657567179}
   - component: {fileID: 657567182}
+  - component: {fileID: 657567183}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -5175,7 +5213,7 @@ Animator:
   m_GameObject: {fileID: 657567177}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 2101c8f78fd408a42a5cbbd76d49dcc8, type: 2}
+  m_Controller: {fileID: 9100000, guid: 60fad22518164794b8158187cef4d360, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -5187,6 +5225,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &657567183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657567177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b1cd0899feb8648a83dc13ce7f9b95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationRelay
+  parent: {fileID: 1049373497}
 --- !u!1 &665691372
 GameObject:
   m_ObjectHideFlags: 0
@@ -5391,7 +5442,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675937663}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -5481,6 +5532,7 @@ MonoBehaviour:
   - actionType: 2
     value: 10
   model: {fileID: 2092994696}
+  animator: {fileID: 2092994700}
   currentHP: 0
   shield: 0
   attack: 0
@@ -6902,7 +6954,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953550661}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -6992,6 +7044,7 @@ MonoBehaviour:
   - actionType: 1
     value: 20
   model: {fileID: 34122245}
+  animator: {fileID: 34122249}
   currentHP: 0
   shield: 0
   attack: 0
@@ -7342,7 +7395,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 965580273}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7432,6 +7485,7 @@ MonoBehaviour:
   - actionType: 3
     value: 4
   model: {fileID: 1149153573}
+  animator: {fileID: 1149153577}
   currentHP: 0
   shield: 0
   attack: 0
@@ -7684,7 +7738,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1049373492}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7774,6 +7828,7 @@ MonoBehaviour:
   - actionType: 2
     value: 3
   model: {fileID: 657567178}
+  animator: {fileID: 657567182}
   currentHP: 0
   shield: 0
   attack: 0
@@ -8708,6 +8763,7 @@ GameObject:
   - component: {fileID: 1149153575}
   - component: {fileID: 1149153574}
   - component: {fileID: 1149153577}
+  - component: {fileID: 1149153578}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -8820,7 +8876,7 @@ Animator:
   m_GameObject: {fileID: 1149153572}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 60fad22518164794b8158187cef4d360, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -8832,6 +8888,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1149153578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1149153572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b1cd0899feb8648a83dc13ce7f9b95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationRelay
+  parent: {fileID: 965580278}
 --- !u!1 &1188681035
 GameObject:
   m_ObjectHideFlags: 0
@@ -16405,6 +16474,8 @@ GameObject:
   - component: {fileID: 2092994699}
   - component: {fileID: 2092994698}
   - component: {fileID: 2092994697}
+  - component: {fileID: 2092994700}
+  - component: {fileID: 2092994701}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -16507,6 +16578,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2092994695}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!95 &2092994700
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092994695}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 60fad22518164794b8158187cef4d360, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2092994701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092994695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b1cd0899feb8648a83dc13ce7f9b95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationRelay
+  parent: {fileID: 675937668}
 --- !u!1 &2093348965
 GameObject:
   m_ObjectHideFlags: 0

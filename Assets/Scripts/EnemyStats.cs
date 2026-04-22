@@ -11,8 +11,8 @@ public class EnemyStats : MonoBehaviour
     public EnemyUI ui;
     public EnemyAction[] action;
     public Transform model;
-
     private BattleControl battle;
+    public Animator animator;
 
     public int currentHP;
     public int shield;
@@ -38,6 +38,29 @@ public class EnemyStats : MonoBehaviour
         isDead = false;
 
         transform.rotation = Quaternion.identity;
+
+        if(animator == null && model != null)
+        {
+            animator = model.GetComponent<Animator>();
+        }
+
+        if (model != null)
+        {
+            model.localPosition = Vector3.zero;
+            model.localRotation = Quaternion.identity;
+        }
+
+        if (animator != null)
+        {
+            animator.Rebind();
+            animator.Update(0f);
+        }
+
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
     }
 
     public void TakeDamage(int amount)
@@ -73,10 +96,30 @@ public class EnemyStats : MonoBehaviour
             isDead = true;
             Debug.Log(name + " ENTERING DEATH");
             isDying = true;
-            StartCoroutine(Die());
+            
+            foreach(var c in GetComponentsInChildren<Collider>())
+            {
+                c.enabled = false;
+            }
+
+            if (battle != null)
+            {
+                battle.OnEnemyKilled();
+            }
+
+            if (animator != null)
+            {
+                animator.SetTrigger("Die");
+            }
+
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 
+    /*
     void DieImmediate()
     {
         isDying = true;
@@ -90,6 +133,7 @@ public class EnemyStats : MonoBehaviour
             battle.OnEnemyKilled();
         }
     }
+    */
 
     public void Heal(int amount)
     {
@@ -114,7 +158,7 @@ public class EnemyStats : MonoBehaviour
         data.enemy_health = this.currentHP;
     }
 
-    
+    /*
     IEnumerator Die()
     {
         Debug.Log(name + " DIE STARTED");
@@ -151,6 +195,12 @@ public class EnemyStats : MonoBehaviour
         }
         yield return new WaitForSeconds(0.3f);
 
+        gameObject.SetActive(false);
+    }
+    */
+
+    public void OnDeathAnimationComplete()
+    {
         gameObject.SetActive(false);
     }
         public bool IsDead()
