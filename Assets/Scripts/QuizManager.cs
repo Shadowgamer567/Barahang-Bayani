@@ -14,10 +14,15 @@ public class QuizManager : MonoBehaviour
     public UnityEngine.UI.Image questionImage;
     public AudioSource audioSource;
     public GameObject audioButton;
+    public GameObject submitButton;
     public GameObject endButton;
+    public GameObject inputPanel;
+    public GameObject truthPanel;
+    public GameObject falsePanel;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] answerText;
+    public TMP_InputField inputField;
 
     private QuizQuestion currentQuestion;
     private BattleControl battleControl;
@@ -45,6 +50,9 @@ public class QuizManager : MonoBehaviour
         questionImage.gameObject.SetActive(false);
         audioButton.SetActive(false);
         imageObject.SetActive(false);
+        inputPanel.SetActive(false);
+        truthPanel.SetActive(false);
+        falsePanel.SetActive(false);
 
         if (audioSource != null)
         {
@@ -55,7 +63,15 @@ public class QuizManager : MonoBehaviour
         
         for(int i = 0; i < answerText.Length; i++)
         {
-            answerText[i].text = question.Answer[i];
+            if (i < question.Answer.Length)
+            {
+                answerText[i].text = question.Answer[i];
+            }
+
+            else
+            {
+                answerText[i].text = "";
+            }
         }
 
         switch (question.type)
@@ -98,6 +114,43 @@ public class QuizManager : MonoBehaviour
                 }
                     break;
         }
+
+        switch (question.inputType)
+        {
+            case InputType.MultipleChoice:
+                inputPanel.SetActive(false);
+
+                for (int i = 0; i < answerText.Length; i++)
+                {
+                    answerText[i].transform.parent.gameObject.SetActive(true);
+                }
+                break;
+
+            case InputType.Identification:
+                inputPanel.SetActive(true);
+
+                inputField.text = "";
+                inputField.ActivateInputField();
+
+                for (int i = 0; i < answerText.Length; i++)
+                {
+                    answerText[i].transform.parent.gameObject.SetActive(false);
+                }
+                break;
+
+            case InputType.TrueOrFalse:
+                inputPanel.SetActive(false);
+
+                for(int i = 0; i < answerText.Length; i++)
+                {
+                    answerText[i].transform.parent.gameObject.SetActive(false);
+                }
+
+                truthPanel.SetActive(true);
+                falsePanel.SetActive(true);
+                break;
+        }
+
     }
 
     public void Answers(int index)
@@ -107,6 +160,37 @@ public class QuizManager : MonoBehaviour
         Debug.Log(correct ? "Correct!" : "Incorrect");
 
         if (correct && battleControl != null)
+        {
+            battleControl.DealDamageToAll(pendingDamage);
+        }
+
+        EndQuiz();
+    }
+
+    public void SubmitIdentification()
+    {
+        string userAnswer = inputField.text.Trim().ToLower();
+        string correct = currentQuestion.correctAnswer.Trim().ToLower();
+
+        bool iscorrect = userAnswer == correct;
+
+        Debug.Log(iscorrect ? "Correct" : "Incorrect");
+
+        if(iscorrect && battleControl != null)
+        {
+            battleControl.DealDamageToAll(pendingDamage);
+        }
+
+        EndQuiz();
+    }
+
+    public void AnswerTrueorFalse(bool playerAnswer)
+    {
+        bool correct = playerAnswer == currentQuestion.correctBool;
+
+        Debug.Log(correct ? "Correct" : "Incorrect");
+
+        if(correct && battleControl != null)
         {
             battleControl.DealDamageToAll(pendingDamage);
         }
@@ -184,26 +268,71 @@ public class QuizManager : MonoBehaviour
                 q.audioPath = typeline.Split(":")[2].Trim();
             }
 
-            q.Answer = new string[4];
-            q.correctIndex = 0;
+            string inputLine = lines[i + 2].Trim();
 
-            for(int j = 0; j < 4; j++)
+            if (inputLine.StartsWith("INPUT:MULTIPLE_CHOICE"))
             {
-                string line = lines[i + 2 + j].Trim();
-
-                string answerText = line.Substring(3).Trim();
-
-                if (answerText.Contains("\"C\""))
-                {
-                    q.correctIndex = j;
-                    answerText = answerText.Replace("\"C\"", "").Trim();
-                }
-
-                q.Answer[j] = answerText;
+                q.inputType = InputType.MultipleChoice;
             }
 
-            questions.Add(q);
-            i += 6;
+            else if (inputLine.StartsWith("INPUT:IDENTIFICATION"))
+            {
+                q.inputType = InputType.Identification;
+            }
+
+            else if (inputLine.StartsWith("INPUT:TRUE_OR_FALSE"))
+            {
+                q.inputType = InputType.TrueOrFalse;
+            }
+
+            if (q.inputType == InputType.TrueOrFalse)
+            {
+                q.Answer = new string[0];
+
+                string answerLine = lines[i + 3].Trim();
+
+                if (answerLine.StartsWith("ANSWER:TRUE"))
+                {
+                    q.correctBool = true;
+                }
+
+                else if (answerLine.StartsWith("ANSWER:FALSE"))
+                {
+                    q.correctBool = false;
+                }
+
+                q.Answer = new string[0];
+
+                questions.Add(q);
+
+                i += 4;
+                continue;
+            }
+
+            else {
+                q.Answer = new string[4];
+                q.correctIndex = 0;
+
+                for (int j = 0; j < 4; j++)
+                {
+                    string line = lines[i + 3 + j];
+
+                    bool isCorrect = line.Contains("\"C\"");
+
+                    string answerText = line.Substring(3).Replace("\"C\"", "").Trim();
+
+                    if (isCorrect)
+                    {
+                        q.correctIndex = j;
+
+                        q.correctAnswer = answerText;
+                    }
+
+                    q.Answer[j] = answerText;
+                }
+                questions.Add(q);
+                i += 7;
+            }
         }
     }
 

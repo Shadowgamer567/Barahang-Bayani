@@ -1,6 +1,7 @@
 //Handles Enemy Statistics
 
 using System.Collections;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
@@ -8,8 +9,16 @@ public class EnemyStats : MonoBehaviour
     public EnemyTypes enemyType;
     public GameObject uiObject;
     public EnemyUI ui;
+    public EnemyAction[] action;
+    public Transform model;
+    private BattleControl battle;
+    public Animator animator;
 
     public int currentHP;
+    public int shield;
+    public int attack;
+    private bool isDying = false;
+    public bool isDead = false;
 
     private void Start()
     {
@@ -18,19 +27,130 @@ public class EnemyStats : MonoBehaviour
 
     void OnEnable()
     {
+       battle = FindFirstObjectByType<BattleControl>();
+
         currentHP = enemyType.maxHp;
+        shield = enemyType.maxShield;
+
+        attack = enemyType.damage;
+
+        isDying = false;
+        isDead = false;
 
         transform.rotation = Quaternion.identity;
+
+        if(animator == null && model != null)
+        {
+            animator = model.GetComponent<Animator>();
+        }
+
+        if (model != null)
+        {
+            model.localPosition = Vector3.zero;
+            model.localRotation = Quaternion.identity;
+        }
+
+        if (animator != null)
+        {
+            animator.Rebind();
+            animator.Update(0f);
+        }
+
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
     }
 
     public void TakeDamage(int amount)
     {
-        currentHP -= amount;
+        Debug.Log(name + " RECEIVED DAMAGE CALL");
 
-        if(currentHP <= 0)
+        if (shield > 0)
         {
-            StartCoroutine(Die());
+            int shieldDamage = Mathf.Min(shield, amount);
+            shield -= shieldDamage;
+
+            int excessDamage = amount - shieldDamage;
+
+            if(excessDamage > 0)
+            {
+                currentHP -= excessDamage;
+            }
         }
+
+        else
+        {
+            currentHP -= amount;
+        }
+        Debug.Log(name + " HP AFTER DAMAGE: " + currentHP);
+
+        currentHP = Mathf.Max(currentHP, 0);
+        shield = Mathf.Max(shield, 0);
+
+        Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
+
+        if(currentHP <= 0 && !isDying)
+        {
+            isDead = true;
+            Debug.Log(name + " ENTERING DEATH");
+            isDying = true;
+            
+            foreach(var c in GetComponentsInChildren<Collider>())
+            {
+                c.enabled = false;
+            }
+
+            if (battle != null)
+            {
+                battle.OnEnemyKilled();
+            }
+
+            if (animator != null)
+            {
+                animator.SetTrigger("Die");
+            }
+
+            else
+            {
+                gameObject.SetActive(false);
+            }
+        }
+    }
+
+    /*
+    void DieImmediate()
+    {
+        isDying = true;
+
+        Debug.Log(name + " IMMEDIATE DEATH");
+
+        gameObject.SetActive(false);
+
+        if (battle != null)
+        {
+            battle.OnEnemyKilled();
+        }
+    }
+    */
+
+    public void Heal(int amount)
+    {
+        currentHP = Mathf.Min(currentHP + amount, enemyType.maxHp);
+        Debug.Log(name + " healed for: " + amount);
+    }
+
+    public void AddShield(int amount)
+    {
+        shield += amount;
+        Debug.Log(name + " gained shield " + amount);
+    }
+
+    public void BuffAttack(int amount)
+    {
+        attack += amount;
+        Debug.Log(name + " attack increased by " + amount);
     }
 
     public void SyncToData(GameData data)
@@ -38,33 +158,59 @@ public class EnemyStats : MonoBehaviour
         data.enemy_health = this.currentHP;
     }
 
+    /*
     IEnumerator Die()
     {
-        Quaternion startRotation = transform.rotation;
+        Debug.Log(name + " DIE STARTED");
 
-        Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
+        Collider col = GetComponent<Collider>();
 
-        float elapsed = 0f;
-        float duration = 2f;
-
-        while (elapsed < duration)
+        if(col != null)
         {
-            transform.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
+            col.enabled = false;
         }
 
-        transform.rotation = targetRotation;
+        if(battle != null)
+        {
+            battle.OnEnemyKilled();
+        }
+
+        Transform model = transform.Find("AnimateChild");
+        if (model != null)
+        {
+            Quaternion startRotation = model.rotation;
+            Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
+
+            float elapsed = 0f;
+            float duration = 2f;
+
+            while (elapsed < duration)
+            {
+                model.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsed / duration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            model.rotation = targetRotation;
+        }
         yield return new WaitForSeconds(0.3f);
+
+        gameObject.SetActive(false);
+    }
+    */
+
+    public void OnDeathAnimationComplete()
+    {
         gameObject.SetActive(false);
     }
         public bool IsDead()
     {
         return currentHP <= 0;
     }
+    
 
     private void Update()
     {
-        
+
     }
 }

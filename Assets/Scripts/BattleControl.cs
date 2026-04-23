@@ -13,11 +13,18 @@ public class BattleControl : MonoBehaviour
     public Transform heroController;
     public GroundLoop groundloop;
     public GameObject endButton;
+    public GameObject cardPanel;
+    public CardType pendingCard;
 
     public float moveduration = 5f;
     public int damage = 5;
     public bool nextbattletriggered = false;
+    public int aliveEnemies = 0;
     public BattleState currentstate;
+    public bool isSelectingTarget = false;
+
+
+    public System.Action OnBattleWon;
 
     EnemyStats[] enemies;
     HeroStats[] heroes;
@@ -46,6 +53,25 @@ public class BattleControl : MonoBehaviour
     void CacheEnemies()
     {
         enemies = GetComponentsInChildren<EnemyStats>(true);
+
+        aliveEnemies = 0;
+        foreach(var e in enemies)
+        {
+            if (e.gameObject.activeInHierarchy)
+            {
+                aliveEnemies++;
+            }
+        }
+
+        Debug.Log("=== ENEMY CACHE START ===");
+
+        foreach (var e in enemies)
+        {
+            Debug.Log("Cached: " + e.name);
+        }
+
+        Debug.Log("=== ENEMY CACHE END ===");
+        Debug.Log("Alive Enemies:" + aliveEnemies);
     }
 
     void CacheHeroes()
@@ -77,13 +103,11 @@ public class BattleControl : MonoBehaviour
     {
         foreach (EnemyStats enemy in enemies)
         {
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            if (enemy != null && !enemy.isDead)
             {
                 enemy.TakeDamage(damage);
             }
         }
-
-        CheckWinCondition();
     }
 
     public void endPlayersTurn()
@@ -93,45 +117,105 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
+        Debug.Log("Starting Enemy Turn");
         StartCoroutine(EnemyTurn());
     }
 
     IEnumerator EnemyTurn()
     {
+        Debug.Log("EnemyTurn Started");
+
         currentstate = BattleState.Busy;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
 
         foreach (EnemyStats enemy in enemies)
         {
-            if (!enemy.gameObject.activeInHierarchy)
+            if (enemy == null || enemy.isDead)
             {
                 continue;
             }
 
-            HeroStats target = GetRandomAliveHero();
+            EnemyAction action;
 
-            if(target != null)
+            if (enemy.action != null && enemy.action.Length > 0)
             {
-                target.TakeDamage(enemy.enemyType.damage);
+                action = enemy.action[Random.Range(0, enemy.action.Length)];
+            }
+            else
+            {
+                action = new EnemyAction
+                {
+                    actionType = EnemyActionType.Attack,
+                    value = enemy.enemyType.damage
+                };
             }
 
-            yield return new WaitForSeconds(0.5f);
+            Debug.Log("Enemy uses: " + action.actionType);
+
+            ExecuteEnemyAction(enemy, action);
+
+            yield return new WaitForSecondsRealtime(0.5f);
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
 
         if (CheckLoseCondition())
         {
             currentstate = BattleState.Lose;
-
             Debug.Log("You Lost");
-
             yield break;
         }
 
         currentstate = BattleState.PlayerTurn;
     }
+
+    void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
+    {
+        switch (action.actionType)
+        {
+            case EnemyActionType.Attack:
+                HeroStats target = GetRandomAliveHero();
+                if(target != null)
+                {
+                    target.TakeDamage(enemy.enemyType.damage);
+                }
+                break;
+
+            case EnemyActionType.Shield:
+                EnemyStats shieldTarget = GetRandomAliveEnemy();
+                if (shieldTarget != null)
+                {
+                    shieldTarget.AddShield(action.value);
+                }
+                break;
+
+            case EnemyActionType.Heal:
+                EnemyStats healTarget = GetRandomAliveEnemy();
+                if (healTarget != null)
+                {
+                    healTarget.Heal(action.value);
+                }
+                break;
+
+            case EnemyActionType.Buff:
+                EnemyStats buffTarget = GetRandomAliveEnemy();
+                if (buffTarget != null)
+                {
+                    buffTarget.BuffAttack(action.value);
+                }
+                break;
+
+            case EnemyActionType.Debuff:
+                HeroStats debuffTarget = GetRandomAliveHero();
+                if (debuffTarget != null)
+                {
+                    debuffTarget.ReduceAttack(action.value);
+                }
+                break;
+        }
+    }
+
 
     HeroStats GetRandomAliveHero()
     {
@@ -153,11 +237,29 @@ public class BattleControl : MonoBehaviour
         return alive[Random.Range(0, alive.Count)];
     }
 
+    EnemyStats GetRandomAliveEnemy()
+    {
+        List<EnemyStats> alive = new List<EnemyStats>();
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null && !enemy.isDead)
+            {
+                alive.Add(enemy);
+            }
+        }
+
+        if (alive.Count == 0)
+            return null;
+
+        return alive[Random.Range(0, alive.Count)];
+    }
+
     bool CheckLoseCondition()
     {
         foreach(var enemy in enemies)
         {
-            if(enemy != null && enemy.gameObject.activeInHierarchy)
+            if(enemy != null && !enemy.isDead)
             {
                 return false;
             }
@@ -166,14 +268,25 @@ public class BattleControl : MonoBehaviour
         return true;
     }
 
-    void CheckWinCondition()
+    public void OnEnemyKilled()
     {
-        foreach (var enemy in enemies)
+        aliveEnemies = 0;
+
+        foreach (var e in enemies)
         {
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            if (e != null && !e.isDead)
             {
-                return;
+                aliveEnemies++;
             }
+        }
+
+        Debug.Log("Enemies Left: " + aliveEnemies);
+
+        if (aliveEnemies <= 0)
+        {
+            Debug.Log("Battle Won");
+
+            OnBattleWon?.Invoke();
 
             if (!nextbattletriggered)
             {
@@ -182,7 +295,67 @@ public class BattleControl : MonoBehaviour
             }
         }
     }
-    bool allEnemiesAreDead()
+
+    public void HandleCardPlay(CardType card, CardUI cardUI)
+    {
+        Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
+
+        if (card.targetType == TargetType.AllEnemies)
+        {
+            DealDamageToAll(card.damage);
+            Destroy(cardUI.gameObject);
+            return;
+        }
+
+        if (card.targetType == TargetType.SingleTarget)
+        {
+            Debug.Log("Select a Target");
+
+            isSelectingTarget = true;
+            pendingCard = card;
+
+            cardPanel.SetActive(false);
+
+            Destroy(cardUI.gameObject);
+        }
+    }
+
+    public void SelectEnemyTarget(EnemyStats enemy)
+    {
+        Debug.Log("SelectEnemyTarget Called");
+
+        if(enemy == null || enemy.IsDead())
+        {
+            return;
+        }
+
+        if (!isSelectingTarget || pendingCard == null)
+        {
+            Debug.Log("Blocked: selecting=" + isSelectingTarget + " pending=" + pendingCard);
+            return;
+        }
+
+        CardType usedCard = pendingCard;
+
+        Debug.Log("Applying Damage: " + pendingCard.damage);
+
+        Debug.Log("TARGET CLICKED: " + enemy.name);
+        Debug.Log("Pending damage: " + pendingCard.damage);
+
+        enemy.TakeDamage(pendingCard.damage);
+
+        isSelectingTarget = false;
+        pendingCard = null;
+
+        if (cardPanel != null)
+        {
+            cardPanel.SetActive(true);
+        }
+    }
+
+    //Depecrated Battle Win function
+    /*
+    bool AllEnemiesAreDead()
     {
         if(enemies == null || enemies.Length == 0)
         {
@@ -196,7 +369,8 @@ public class BattleControl : MonoBehaviour
             }
         }
         return true;
-    } 
+    } */
+
     private void Update()
     {
         //Debug Damage Button
@@ -205,11 +379,35 @@ public class BattleControl : MonoBehaviour
             AttackAllEnemies();
         }*/
 
-        if (!nextbattletriggered && allEnemiesAreDead())
+        //Old Battle Progression Code
+        /* if (!nextbattletriggered && allEnemiesAreDead())
         {
             nextbattletriggered = true;
             StartCoroutine(NextBattle());
+        }*/
+
+        if (Mouse.current.leftButton.wasPressedThisFrame) {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Debug.Log("Hit: " + hit.collider.name);
+
+                EnemyStats enemy = hit.collider.GetComponentInParent<EnemyStats>();
+
+                if(enemy != null)
+                {
+                    SelectEnemyTarget(enemy);
+                }
+            }
+
+            else
+            {
+                Debug.Log("Nothing Hit");
+            }
         }
+
+        UpdateUI();
     }
 
     void UpdateUI()
@@ -239,11 +437,11 @@ public class BattleControl : MonoBehaviour
     {
         currentstate = BattleState.Busy;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSecondsRealtime(2f);
 
         groundloop.isMoving = true;
 
-        yield return new WaitForSeconds(moveduration);
+        yield return new WaitForSecondsRealtime(moveduration);
 
         groundloop.isMoving = false;
 

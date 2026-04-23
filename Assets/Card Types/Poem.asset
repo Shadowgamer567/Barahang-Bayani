@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Poem
   cardDesc: 
+  targetType: 1
   damage: 10
   cost: 1
+  quizCard: 0
