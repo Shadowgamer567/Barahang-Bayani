@@ -39,11 +39,6 @@ public class EnemyStats : MonoBehaviour
 
         transform.rotation = Quaternion.identity;
 
-        if(animator == null && model != null)
-        {
-            animator = model.GetComponent<Animator>();
-        }
-
         if (model != null)
         {
             model.localPosition = Vector3.zero;
@@ -60,6 +55,14 @@ public class EnemyStats : MonoBehaviour
         if (col != null)
         {
             col.enabled = true;
+        }
+    }
+
+    void Awake()
+    {
+        if (model != null && animator == null)
+        {
+            animator = model.GetComponent<Animator>();
         }
     }
 
