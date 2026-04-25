@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Speech
   cardDesc: Vocal outlet meant to inform or inspire
+  targetType: 0
   damage: 5
-  cost: 1
+  cost: 2
+  quizCard: 0

@@ -121,6 +121,8 @@ public class BattleControl : MonoBehaviour
         currentActionPoint = maxActionPoint;
         OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
 
+        Debug.Log("AP reset to Max");
+
         FindFirstObjectByType<CardPanelManager>()?.RefillToMax();
     }
 
@@ -322,6 +324,12 @@ public class BattleControl : MonoBehaviour
         return true;
     }
 
+    void ResetAP()
+    {
+        currentActionPoint = maxActionPoint;
+        Debug.Log("AP reset to Max");
+    }
+
     public void HandleCardPlay(CardType card, CardUI cardUI)
     {
         Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
@@ -474,7 +482,7 @@ public class BattleControl : MonoBehaviour
         SetEnemiesActive(true);
         CacheEnemies();
 
-        currentstate = BattleState.PlayerTurn;
+        StartPlayerTurn();
     }
 
     //Subsequent Battle Sequence
@@ -495,6 +503,6 @@ public class BattleControl : MonoBehaviour
 
         nextbattletriggered = false;
 
-        currentstate = BattleState.PlayerTurn;
+        StartPlayerTurn();
     }
 }

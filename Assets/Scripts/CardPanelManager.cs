@@ -19,6 +19,7 @@ public class CardPanelManager : MonoBehaviour
         RefillToMax();
     }
 
+    /*
     void GenerateCards()
     {
         for(int i = 0; i < cardCount; i++)
@@ -26,6 +27,7 @@ public class CardPanelManager : MonoBehaviour
             DrawCard();
         }
     }
+    */
 
     public void DrawCard()
     {
@@ -51,6 +53,8 @@ public class CardPanelManager : MonoBehaviour
         {
             DrawCard();
         }
+
+        Debug.Log("Hand Refilled to Max. Current: " + cardContainer.childCount);
     }
 
     // Update is called once per frame
