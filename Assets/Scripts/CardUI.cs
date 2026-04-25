@@ -41,15 +41,6 @@ public class CardUI : MonoBehaviour
         Debug.Log("Played Card: " + cardType.cardName);
         Debug.Log("Target Type: " + cardType.targetType);
 
-        if (cardType.quizCard)
-        {
-            QuizQuestion q = quizManager.GetRandomQuestions();
-            quizManager.StartQuiz(q, cardType.damage, battleControl);
-
-            Destroy(gameObject);
-            return;
-        }
-
             battleControl.HandleCardPlay(cardType, this);
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created

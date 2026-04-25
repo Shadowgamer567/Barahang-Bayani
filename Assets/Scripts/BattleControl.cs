@@ -22,6 +22,10 @@ public class BattleControl : MonoBehaviour
     public int aliveEnemies = 0;
     public BattleState currentstate;
     public bool isSelectingTarget = false;
+    public int maxActionPoint = 5;
+    public int currentActionPoint;
+
+    public System.Action<int, int> OnAPChanged;
 
 
     public System.Action OnBattleWon;
@@ -36,7 +40,7 @@ public class BattleControl : MonoBehaviour
         CacheEnemies();
         CacheHeroes();
 
-        currentstate = BattleState.PlayerTurn;
+        StartPlayerTurn();
 
         StartCoroutine(BattleSequence());
         
@@ -110,6 +114,16 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    public void StartPlayerTurn()
+    {
+        currentstate = BattleState.PlayerTurn;
+
+        currentActionPoint = maxActionPoint;
+        OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
+
+        FindFirstObjectByType<CardPanelManager>()?.RefillToMax();
+    }
+
     public void endPlayersTurn()
     {
         if(currentstate != BattleState.PlayerTurn)
@@ -167,7 +181,7 @@ public class BattleControl : MonoBehaviour
             yield break;
         }
 
-        currentstate = BattleState.PlayerTurn;
+        StartPlayerTurn();
     }
 
     void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
@@ -215,7 +229,6 @@ public class BattleControl : MonoBehaviour
                 break;
         }
     }
-
 
     HeroStats GetRandomAliveHero()
     {
@@ -296,9 +309,41 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    public bool TrySpendAP(int cost)
+    {
+        if (currentActionPoint < cost)
+        {
+            Debug.Log("Not Enough AP");
+            return false;
+        }
+
+        currentActionPoint -= cost;
+        OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
+        return true;
+    }
+
     public void HandleCardPlay(CardType card, CardUI cardUI)
     {
         Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
+
+        if (!TrySpendAP(card.cost))
+        {
+            return;
+        }
+
+        if (card.quizCard)
+        {
+            QuizManager quizManager = FindFirstObjectByType<QuizManager>();
+
+            if (quizManager != null) {
+                QuizQuestion q = quizManager.GetRandomQuestions();
+                quizManager.StartQuiz(q, card.damage, this);
+            }
+
+            Destroy(cardUI.gameObject);
+            return;
+        }
+
 
         if (card.targetType == TargetType.AllEnemies)
         {

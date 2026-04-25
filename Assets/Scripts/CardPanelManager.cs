@@ -16,7 +16,7 @@ public class CardPanelManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        GenerateCards();
+        RefillToMax();
     }
 
     void GenerateCards()
@@ -42,30 +42,25 @@ public class CardPanelManager : MonoBehaviour
         ui.Setup(randomCard, battle, this, quizManager);
     }
 
+    public void RefillToMax()
+    {
+        int currentCards = cardContainer.childCount;
+        int needed = cardCount - currentCards;
+
+        for (int i = 0; i < needed; i++)
+        {
+            DrawCard();
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("Cards in hand: " + cardContainer.childCount);
-
-        if(cardContainer.childCount == 0 && !isRefilling)
-        {
-            StartCoroutine(RefillHand());
-        }
+        
     }
 
     public void SyncToData(GameData data)
     {
         data.cards = this.cardCount;
-    }
-
-    IEnumerator RefillHand()
-    {
-        isRefilling = true;
-
-        yield return new WaitForSeconds(0.5f);
-
-        GenerateCards();
-
-        isRefilling = false;
     }
 }
