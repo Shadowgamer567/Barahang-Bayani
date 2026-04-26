@@ -8724,6 +8724,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1141038662}
+  - component: {fileID: 1141038663}
   m_Layer: 0
   m_Name: BackgroundController
   m_TagString: Untagged
@@ -8750,6 +8751,28 @@ Transform:
   - {fileID: 1586355401}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1141038663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141038661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98a1087fa1114b43af46e3ba4d67cdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BackgroundLoop
+  Background1: {fileID: 2106869950}
+  Background2: {fileID: 1123112280}
+  Background3: {fileID: 1202707305}
+  Background4: {fileID: 1586355401}
+  endMarker: {fileID: 1598679239}
+  currentCampaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
+  currentLevel: 1
+  groundLoop: {fileID: 1282649748}
+  speed: 5
+  isMoving: 0
 --- !u!1 &1149153572
 GameObject:
   m_ObjectHideFlags: 0

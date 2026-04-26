@@ -10,7 +10,8 @@ public class BackgroundLoop : MonoBehaviour
     public Transform Background4;
     public Transform endMarker;
 
-    public GameObject[] backgroundPrefab;
+    public BackgroundSet currentCampaign;
+    public int currentLevel = 1;
     private Dictionary<Transform, GameObject> spawnedObject = new Dictionary<Transform, GameObject>();
 
     public GroundLoop groundLoop;
@@ -31,22 +32,39 @@ public class BackgroundLoop : MonoBehaviour
 
     void SpawnOnTiles(Transform tile)
     {
+        GameObject prefab = currentCampaign.GetRandomPrefab(currentLevel);
+
+        Debug.Log("Spawning: " + prefab.name + " | Level: " + currentLevel + " | Campaign: " + currentCampaign.name);
+
         if (spawnedObject.ContainsKey(tile) && spawnedObject[tile] != null)
         {
             Destroy(spawnedObject[tile]);
         }
 
-        if (backgroundPrefab.Length == 0)
+        /*if (backgroundPrefab.Length == 0)
         {
+            return;
+        }*/
+
+
+        if(prefab == null)
+        {
+            Debug.LogWarning("No prefab found for level" + currentLevel);
             return;
         }
 
-        GameObject prefab = backgroundPrefab[Random.Range(0, backgroundPrefab.Length)];
-
         GameObject obj = Instantiate(prefab, tile);
 
-        obj.transform.localPosition = new Vector3(0, 0.5f, 0);
+        obj.transform.localPosition = new Vector3(0, 0f, 0);
         obj.transform.localRotation = Quaternion.identity;
+
+        Vector3 parentScale = tile.lossyScale;
+
+        obj.transform.localScale = new Vector3(
+            1f / parentScale.x,
+            1f / parentScale.y,
+            1f / parentScale.z
+        );
 
         spawnedObject[tile] = obj;
     }

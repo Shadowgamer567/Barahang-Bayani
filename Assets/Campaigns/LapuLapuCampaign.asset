@@ -9,11 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68f159855e55843419fd6ddf7cae3465, type: 3}
-  m_Name: Level1-1
-  m_EditorClassIdentifier: Assembly-CSharp::LevelData
-  levelName: Level1-1
-  sceneName: 
-  battlesRequired: 1
-  previousLevel: {fileID: 0}
-  isBossLevel: 0
+  m_Script: {fileID: 11500000, guid: 13f8bfaa51d6f0d4ebd68fdc0018d966, type: 3}
+  m_Name: LapuLapuCampaign
+  m_EditorClassIdentifier: Assembly-CSharp::BackgroundSet
+  campaignName: 
+  levelsRanges: []

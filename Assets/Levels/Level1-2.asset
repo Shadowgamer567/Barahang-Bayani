@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
   levelName: Level1-2
   sceneName: 
-  battlesRequired: 4
+  battlesRequired: 1
   previousLevel: {fileID: 11400000, guid: 65bd2fba3d61ada42ab3003dd7e49d9b, type: 2}
   isBossLevel: 0
