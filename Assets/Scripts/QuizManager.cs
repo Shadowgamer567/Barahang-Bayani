@@ -151,6 +151,7 @@ public class QuizManager : MonoBehaviour
                 break;
         }
 
+        QuizStats.Instance.RegisterQuestion(question.inputType);
     }
 
     public void Answers(int index)
@@ -158,12 +159,15 @@ public class QuizManager : MonoBehaviour
         bool correct = index == currentQuestion.correctIndex;
 
         Debug.Log(correct ? "Correct!" : "Incorrect");
-
-        if (correct && battleControl != null)
+        if (correct)
         {
-            battleControl.DealDamageToAll(pendingDamage);
-        }
+            QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
 
+            if (correct && battleControl != null)
+            {
+                battleControl.DealDamageToAll(pendingDamage);
+            }
+        }
         EndQuiz();
     }
 
@@ -175,12 +179,15 @@ public class QuizManager : MonoBehaviour
         bool iscorrect = userAnswer == correct;
 
         Debug.Log(iscorrect ? "Correct" : "Incorrect");
-
-        if(iscorrect && battleControl != null)
+        if (iscorrect)
         {
-            battleControl.DealDamageToAll(pendingDamage);
-        }
+            QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
 
+            if (iscorrect && battleControl != null)
+            {
+                battleControl.DealDamageToAll(pendingDamage);
+            }
+        }
         EndQuiz();
     }
 
@@ -190,11 +197,15 @@ public class QuizManager : MonoBehaviour
 
         Debug.Log(correct ? "Correct" : "Incorrect");
 
-        if(correct && battleControl != null)
+        if (correct)
         {
-            battleControl.DealDamageToAll(pendingDamage);
-        }
+            QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
 
+            if (correct && battleControl != null)
+            {
+                battleControl.DealDamageToAll(pendingDamage);
+            }
+        }
         EndQuiz();
     }
 

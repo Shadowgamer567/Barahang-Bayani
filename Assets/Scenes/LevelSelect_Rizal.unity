@@ -498,7 +498,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 138763206}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 138763208}
+        m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &138763206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549,8 +561,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e764338f4fd9c34d8dfe1ce9f700a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelButton
-  levelData: {fileID: 0}
-  button: {fileID: 0}
+  levelData: {fileID: 11400000, guid: c1271031669b81c49963bbb1cee02086, type: 2}
+  button: {fileID: 138763205}
 --- !u!1 &235945189
 GameObject:
   m_ObjectHideFlags: 0
@@ -2207,7 +2219,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1347480915}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1347480917}
+        m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1347480915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2258,8 +2282,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e764338f4fd9c34d8dfe1ce9f700a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelButton
-  levelData: {fileID: 0}
-  button: {fileID: 0}
+  levelData: {fileID: 11400000, guid: eeb29a5c5656dc74f83914808784d172, type: 2}
+  button: {fileID: 1347480914}
 --- !u!1 &1538528268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2995,7 +3019,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1768916470}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1768916472}
+        m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1768916470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3046,8 +3082,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e764338f4fd9c34d8dfe1ce9f700a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelButton
-  levelData: {fileID: 0}
-  button: {fileID: 0}
+  levelData: {fileID: 11400000, guid: 843271006f3f3394884c03c2e7facbdf, type: 2}
+  button: {fileID: 1768916469}
 --- !u!1 &1800353824
 GameObject:
   m_ObjectHideFlags: 0
@@ -3210,7 +3246,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1814776665}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1814776667}
+        m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1814776665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3261,8 +3309,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e764338f4fd9c34d8dfe1ce9f700a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelButton
-  levelData: {fileID: 0}
-  button: {fileID: 0}
+  levelData: {fileID: 11400000, guid: 1104050137475404aa736af3bcaeeb12, type: 2}
+  button: {fileID: 1814776664}
 --- !u!1 &1823128148
 GameObject:
   m_ObjectHideFlags: 0
@@ -3706,7 +3754,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2015579985}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2015579987}
+        m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2015579985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3757,8 +3817,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e764338f4fd9c34d8dfe1ce9f700a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelButton
-  levelData: {fileID: 0}
-  button: {fileID: 0}
+  levelData: {fileID: 11400000, guid: 74af413f1c0e528439ea7a623a6827ba, type: 2}
+  button: {fileID: 2015579984}
 --- !u!1 &2043138697
 GameObject:
   m_ObjectHideFlags: 0
@@ -3842,7 +3902,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2043138700}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2043138702}
+        m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2043138700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3893,8 +3965,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e764338f4fd9c34d8dfe1ce9f700a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelButton
-  levelData: {fileID: 0}
-  button: {fileID: 0}
+  levelData: {fileID: 11400000, guid: 703299e56764a9f4289086de6813f86e, type: 2}
+  button: {fileID: 2043138699}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

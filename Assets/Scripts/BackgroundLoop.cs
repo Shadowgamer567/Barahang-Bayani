@@ -10,6 +10,9 @@ public class BackgroundLoop : MonoBehaviour
     public Transform Background4;
     public Transform endMarker;
 
+    Queue<GameObject> recentPrefabs = new Queue<GameObject>();
+    public int historySize = 2;
+
     public BackgroundSet currentCampaign;
     public int currentLevel = 1;
     private Dictionary<Transform, GameObject> spawnedObject = new Dictionary<Transform, GameObject>();
@@ -23,16 +26,31 @@ public class BackgroundLoop : MonoBehaviour
     void Start()
     {
         BackgroundLength = Background1.GetComponent<Renderer>().bounds.size.x;
-
-        SpawnOnTiles(Background1);
-        SpawnOnTiles(Background2);
-        SpawnOnTiles(Background3);
-        SpawnOnTiles(Background4);
     }
 
     void SpawnOnTiles(Transform tile)
     {
+        if (currentCampaign == null)
+        {
+            Debug.LogError("No campaign assigned");
+            return;
+        }
+
         GameObject prefab = currentCampaign.GetRandomPrefab(currentLevel);
+
+        int safety = 0;
+
+        while(recentPrefabs.Contains(prefab) && safety < 10)
+        {
+            prefab = currentCampaign.GetRandomPrefab(currentLevel);
+            safety++;
+        }
+
+        if (prefab == null)
+        {
+            Debug.LogWarning("No prefab found for level" + currentLevel);
+            return;
+        }
 
         Debug.Log("Spawning: " + prefab.name + " | Level: " + currentLevel + " | Campaign: " + currentCampaign.name);
 
@@ -45,13 +63,6 @@ public class BackgroundLoop : MonoBehaviour
         {
             return;
         }*/
-
-
-        if(prefab == null)
-        {
-            Debug.LogWarning("No prefab found for level" + currentLevel);
-            return;
-        }
 
         GameObject obj = Instantiate(prefab, tile);
 
@@ -67,6 +78,21 @@ public class BackgroundLoop : MonoBehaviour
         );
 
         spawnedObject[tile] = obj;
+
+        recentPrefabs.Enqueue(prefab);
+
+        if (recentPrefabs.Count > historySize)
+        {
+            recentPrefabs.Dequeue();
+        }
+    }
+
+    public void InitializeTiles()
+    {
+        SpawnOnTiles(Background1);
+        SpawnOnTiles(Background2);
+        SpawnOnTiles(Background3);
+        SpawnOnTiles(Background4);
     }
 
     // Update is called once per frame

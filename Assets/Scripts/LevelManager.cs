@@ -27,6 +27,25 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
+        BackgroundLoop bg = FindFirstObjectByType<BackgroundLoop>();
+
+        if (bg != null)
+        {
+            bg.currentLevel = levelData.levelIndex;
+            bg.currentCampaign = levelData.campaign;
+
+            Debug.Log("Background set to level: " + bg.currentLevel + " Campaign set to: " + bg.currentCampaign.name);
+
+            bg.InitializeTiles();
+        }
+
+        else
+        {
+            Debug.LogWarning("BackgroundLoop not found");
+        }
+
+        
+
         battleControl = FindFirstObjectByType<BattleControl>();
 
         if (battleControl == null)
@@ -39,6 +58,14 @@ public class LevelManager : MonoBehaviour
 
         Debug.Log("Loaded Level: " + levelData.levelName);
         Debug.Log("Battles Required: " + levelData.battlesRequired);
+
+        if (QuizStats.Instance != null)
+        {
+            QuizStats.Instance.totalQuestions = 0;
+            QuizStats.Instance.totalCorrect = 0;
+            QuizStats.Instance.typeTotal.Clear();
+            QuizStats.Instance.typeCorrect.Clear();
+        }
     }
 
     void HandleBattleWon()
@@ -86,7 +113,26 @@ public class LevelManager : MonoBehaviour
 
         ProgressManager.Instance.CompleteLevel(levelData.levelName);
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("LevelSelect_Rizal");
+        ShowVictoryScreen();
+    }
+
+    public void ShowVictoryScreen()
+    {
+        Time.timeScale = 0f;
+
+        GameObject mainUI = GameObject.Find("MainUI");
+
+        if (mainUI != null)
+        {
+            mainUI.SetActive(false);
+        }
+
+        GameObject victoryPanel = GameObject.Find("VictoryPanel");
+
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(true);
+        }
     }
 
     // Update is called once per frame

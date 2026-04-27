@@ -12,7 +12,8 @@ public class CardPanelManager : MonoBehaviour
 
     public CardType[] availableCards;
     public int cardCount = 5;
-    private bool isRefilling = false;
+    //private bool isRefilling = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

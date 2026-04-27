@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68f159855e55843419fd6ddf7cae3465, type: 3}
   m_Name: Level1-4
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
-  levelName: 
+  levelName: Level1-4
   sceneName: 
-  battlesRequired: 1
+  battlesRequired: 3
+  levelIndex: 4
+  campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
   previousLevel: {fileID: 11400000, guid: 8342e7902e86d5145a5817a89fcaeef6, type: 2}
+  nextLevel: {fileID: 11400000, guid: c1271031669b81c49963bbb1cee02086, type: 2}
   isBossLevel: 0

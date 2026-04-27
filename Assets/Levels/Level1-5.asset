@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68f159855e55843419fd6ddf7cae3465, type: 3}
-  m_Name: Level1-2
+  m_Name: Level1-5
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
-  levelName: Level1-2
+  levelName: Level1-5
   sceneName: 
-  battlesRequired: 4
-  levelIndex: 2
+  battlesRequired: 5
+  levelIndex: 5
   campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
-  previousLevel: {fileID: 11400000, guid: 65bd2fba3d61ada42ab3003dd7e49d9b, type: 2}
-  nextLevel: {fileID: 11400000, guid: 8342e7902e86d5145a5817a89fcaeef6, type: 2}
+  previousLevel: {fileID: 11400000, guid: 77c8c69dfd5073845a3385ea21384a48, type: 2}
+  nextLevel: {fileID: 11400000, guid: 843271006f3f3394884c03c2e7facbdf, type: 2}
   isBossLevel: 0
