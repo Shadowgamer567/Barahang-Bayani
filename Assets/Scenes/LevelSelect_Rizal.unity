@@ -1553,6 +1553,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bootstrap
   gameManagerPrefab: {fileID: 3848371031013006348, guid: 0211066f4a2b197448cbafb86e334920, type: 3}
   progressManagerPrefab: {fileID: 5069874597372621544, guid: 7482ee1db5b045b4b84102f7bd1e106b, type: 3}
+  quizstatsPrefab: {fileID: 2476203777567967493, guid: 10e031bc42ade8b48a80a1cc7dae7474, type: 3}
 --- !u!4 &576415076
 Transform:
   m_ObjectHideFlags: 0

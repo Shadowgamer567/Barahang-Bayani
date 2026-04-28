@@ -7,6 +7,9 @@ public class LevelManager : MonoBehaviour
     public BattleControl battleControl;
     public LevelData debugLevelData;
 
+    public GameObject mainUI;
+    public GameObject victoryUI;
+
     private int battlesCompleted = 0;
 
     void Start()
@@ -59,13 +62,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Loaded Level: " + levelData.levelName);
         Debug.Log("Battles Required: " + levelData.battlesRequired);
 
-        if (QuizStats.Instance != null)
-        {
-            QuizStats.Instance.totalQuestions = 0;
-            QuizStats.Instance.totalCorrect = 0;
-            QuizStats.Instance.typeTotal.Clear();
-            QuizStats.Instance.typeCorrect.Clear();
-        }
+        QuizStats.Instance?.ResetStats();
     }
 
     void HandleBattleWon()
@@ -120,19 +117,25 @@ public class LevelManager : MonoBehaviour
     {
         Time.timeScale = 0f;
 
-        GameObject mainUI = GameObject.Find("MainUI");
+        battleControl = FindFirstObjectByType<BattleControl>();
+
+        if (battleControl != null)
+        {
+            battleControl.isLevelFinished = true;
+            battleControl.StopAllCoroutines();
+        }
 
         if (mainUI != null)
         {
             mainUI.SetActive(false);
         }
 
-        GameObject victoryPanel = GameObject.Find("VictoryPanel");
-
-        if (victoryPanel != null)
+        if (victoryUI != null)
         {
-            victoryPanel.SetActive(true);
+            victoryUI.SetActive(true);
         }
+
+
     }
 
     // Update is called once per frame

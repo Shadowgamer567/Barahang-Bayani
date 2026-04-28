@@ -24,6 +24,7 @@ public class BattleControl : MonoBehaviour
     public bool isSelectingTarget = false;
     public int maxActionPoint = 5;
     public int currentActionPoint;
+    public bool isLevelFinished = false;
 
     public System.Action<int, int> OnAPChanged;
 
@@ -285,6 +286,11 @@ public class BattleControl : MonoBehaviour
 
     public void OnEnemyKilled()
     {
+        if (isLevelFinished)
+        {
+            return;
+        }
+
         aliveEnemies = 0;
 
         foreach (var e in enemies)
@@ -460,6 +466,11 @@ public class BattleControl : MonoBehaviour
             }
         }
 
+        if (isLevelFinished)
+        {
+            return;
+        }
+
         UpdateUI();
     }
 
@@ -471,6 +482,10 @@ public class BattleControl : MonoBehaviour
     //Starting Battle Sequence
     IEnumerator BattleSequence()
     {
+        if (isLevelFinished)
+        {
+            yield break;
+        }
         currentstate = BattleState.Busy;
 
         groundloop.isMoving = true;
@@ -488,6 +503,11 @@ public class BattleControl : MonoBehaviour
     //Subsequent Battle Sequence
     IEnumerator NextBattle()
     {
+        if (isLevelFinished)
+        {
+            yield break;
+        }
+
         currentstate = BattleState.Busy;
 
         yield return new WaitForSecondsRealtime(2f);

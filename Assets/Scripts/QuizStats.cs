@@ -13,12 +13,26 @@ public class QuizStats : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            foreach (InputType type in System.Enum.GetValues(typeof(InputType)))
+            {
+                typeTotal[type] = 0;
+                typeCorrect[type] = 0;
+            }
+        }
+
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void RegisterQuestion(InputType type)
     {
-        totalQuestions++;
 
         if (!typeTotal.ContainsKey(type))
         {
@@ -26,18 +40,19 @@ public class QuizStats : MonoBehaviour
         }
 
         typeTotal[type]++;
+        totalQuestions++;
     }
 
     public void RegisterCorrect(InputType type)
     {
-        totalCorrect++;
 
         if (!typeCorrect.ContainsKey(type))
         {
-            typeTotal[type] = 0;
+            typeCorrect[type] = 0;
         }
 
         typeCorrect[type]++;
+        totalCorrect++;
     }
 
     public int GetTotalType(InputType type)
@@ -48,6 +63,21 @@ public class QuizStats : MonoBehaviour
     public int GetTypeCorrect(InputType type)
     {
         return typeCorrect.ContainsKey(type) ? typeCorrect[type] : 0;
+    }
+
+    public void ResetStats()
+    {
+        totalQuestions = 0;
+        totalCorrect = 0;
+        typeTotal.Clear();
+        typeCorrect.Clear();
+
+
+        foreach (InputType type in System.Enum.GetValues(typeof(InputType)))
+        {
+            typeTotal[type] = 0;
+            typeCorrect[type] = 0;
+        }
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

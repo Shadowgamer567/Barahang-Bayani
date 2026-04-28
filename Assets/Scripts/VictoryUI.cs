@@ -18,13 +18,13 @@ public class VictoryUI : MonoBehaviour
     {
         var stats = QuizStats.Instance;
 
-        multiplechoiceText.text = $"{stats.GetTypeCorrect(InputType.MultipleChoice)} / {stats.GetTotalType(InputType.MultipleChoice)}";
+        multiplechoiceText.text = $"MultipleChoice: {stats.GetTypeCorrect(InputType.MultipleChoice)} / {stats.GetTotalType(InputType.MultipleChoice)}";
 
-        identificationText.text = $"{stats.GetTypeCorrect(InputType.Identification)} / {stats.GetTotalType(InputType.Identification)}";
+        identificationText.text = $"Identification: {stats.GetTypeCorrect(InputType.Identification)} / {stats.GetTotalType(InputType.Identification)}";
 
-        trueorfalseText.text = $"{stats.GetTypeCorrect(InputType.TrueOrFalse)} / {stats.GetTotalType(InputType.TrueOrFalse)}";
+        trueorfalseText.text = $"True or False{stats.GetTypeCorrect(InputType.TrueOrFalse)} / {stats.GetTotalType(InputType.TrueOrFalse)}";
 
-        totalText.text = $"{stats.totalCorrect} / {stats.totalQuestions}";
+        totalText.text = $"Total: {stats.totalCorrect} / {stats.totalQuestions}";
     }
 
     public void OnReturn()
