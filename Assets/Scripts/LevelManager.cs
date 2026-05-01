@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
 
     public GameObject mainUI;
     public GameObject victoryUI;
+    private CutsceneManager cutsceneManager;
 
     private int battlesCompleted = 0;
 
@@ -47,7 +48,6 @@ public class LevelManager : MonoBehaviour
             Debug.LogWarning("BackgroundLoop not found");
         }
 
-        
 
         battleControl = FindFirstObjectByType<BattleControl>();
 
@@ -63,6 +63,13 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Battles Required: " + levelData.battlesRequired);
 
         QuizStats.Instance?.ResetStats();
+
+        cutsceneManager = FindFirstObjectByType<CutsceneManager>();
+
+        TriggerCutscene(CutsceneTriggerType.Start, 0, () => 
+        { battleControl.StartBattleSequence();
+        
+        });
     }
 
     void HandleBattleWon()
@@ -74,6 +81,7 @@ public class LevelManager : MonoBehaviour
             Debug.LogError("levelData is Null");
             return;
         }
+
         battlesCompleted++;
 
         Debug.Log($"Progress: {battlesCompleted}/{levelData.battlesRequired}");
@@ -81,6 +89,11 @@ public class LevelManager : MonoBehaviour
         if (battlesCompleted >= levelData.battlesRequired)
         {
             LevelComplete();
+        }
+
+        else
+        {
+            TriggerCutscene(CutsceneTriggerType.AfterBattle, battlesCompleted, ResumeNextBattle);
         }
     }
 
@@ -110,7 +123,7 @@ public class LevelManager : MonoBehaviour
 
         ProgressManager.Instance.CompleteLevel(levelData.levelName);
 
-        ShowVictoryScreen();
+        TriggerCutscene(CutsceneTriggerType.End, 0, ShowVictoryScreen);
     }
 
     public void ShowVictoryScreen()
@@ -134,8 +147,56 @@ public class LevelManager : MonoBehaviour
         {
             victoryUI.SetActive(true);
         }
+    }
 
+    void TriggerCutscene(CutsceneTriggerType type, int battleIndex, System.Action onFinished = null)
+    {
+        if (levelData.Cutscenes == null || cutsceneManager == null)
+        {
+            onFinished?.Invoke();
+            return;
+        }
 
+        foreach (var trigger in levelData.Cutscenes)
+        {
+            if (trigger.triggerType == type)
+            {
+                if (type == CutsceneTriggerType.AfterBattle && trigger.battleIndex != battleIndex)
+                {
+                    continue;
+                }
+
+                cutsceneManager.OnCutsceneFinished = () =>
+                {
+                    onFinished?.Invoke();
+                };
+
+                cutsceneManager.PlayCutscene(trigger.Cutscene);
+
+                return;
+            }
+        }
+
+        onFinished?.Invoke();
+    }
+
+    void StartFirstBattle()
+    {
+        Debug.Log("Starting First Battle");
+
+        if (battleControl != null)
+        {
+            battleControl.StartBattleSequence();
+        }
+    }
+    void ResumeNextBattle()
+    {
+        Debug.Log("Cutscene finished => starting next battle");
+
+        if (battleControl != null)
+        {
+            battleControl.StartNextBattleManually();
+        }
     }
 
     // Update is called once per frame

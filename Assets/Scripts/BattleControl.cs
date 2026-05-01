@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -42,8 +43,6 @@ public class BattleControl : MonoBehaviour
         CacheHeroes();
 
         StartPlayerTurn();
-
-        StartCoroutine(BattleSequence());
         
     }
     public enum BattleState
@@ -312,7 +311,6 @@ public class BattleControl : MonoBehaviour
             if (!nextbattletriggered)
             {
                 nextbattletriggered = true;
-                StartCoroutine(NextBattle());
             }
         }
     }
@@ -412,6 +410,16 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    public void StartNextBattleManually()
+    {
+        if (!nextbattletriggered)
+        {
+            return;
+        }
+
+        StartCoroutine(NextBattle());
+    }
+
     //Depecrated Battle Win function
     /*
     bool AllEnemiesAreDead()
@@ -477,6 +485,11 @@ public class BattleControl : MonoBehaviour
     void UpdateUI()
     {
         endButton.SetActive(currentstate == BattleState.PlayerTurn);
+    }
+
+    public void StartBattleSequence()
+    {
+        StartCoroutine(BattleSequence());
     }
 
     //Starting Battle Sequence
