@@ -67,8 +67,8 @@ public class LevelManager : MonoBehaviour
         cutsceneManager = FindFirstObjectByType<CutsceneManager>();
 
         TriggerCutscene(CutsceneTriggerType.Start, 0, () => 
-        { battleControl.StartBattleSequence();
-        
+        { 
+            battleControl.StartBattleSequence();
         });
     }
 
@@ -93,7 +93,10 @@ public class LevelManager : MonoBehaviour
 
         else
         {
-            TriggerCutscene(CutsceneTriggerType.AfterBattle, battlesCompleted, ResumeNextBattle);
+            TriggerCutscene(CutsceneTriggerType.AfterBattle, battlesCompleted, () =>
+            {
+                battleControl.StartBattleSequence();
+            });
         }
     }
 

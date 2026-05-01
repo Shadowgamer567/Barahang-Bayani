@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
   m_Name: End Cutscene Test
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
-  line: []
+  line:
+  - speakerName: 'Lapu-Lapu '
+    characterPrefab: {fileID: 0}
+    Dialogue: Defend this land, Defend out dignity
+    isLeftSide: 1
