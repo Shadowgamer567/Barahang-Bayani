@@ -89,7 +89,9 @@ public class CutsceneManager : MonoBehaviour
 
         GameObject obj = Instantiate(prefabToSpawn, parent);
         obj.transform.localPosition = Vector3.zero;
-        obj.transform.localRotation = Quaternion.identity;
+
+        // Always face forward toward the camera
+        obj.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
 
     public void NextLine()

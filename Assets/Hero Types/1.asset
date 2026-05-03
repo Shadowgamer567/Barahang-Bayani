@@ -16,4 +16,5 @@ MonoBehaviour:
   maxHp: 50
   shield: 0
   maxShield: 0
-  prefab: {fileID: 1400036717508617731, guid: 73315a49d861c184e90939c605f2283b, type: 3}
+  prefab: {fileID: 6605038086459334988, guid: 19713165a2c9b8847b748e3c6c37a5a1, type: 3}
+  modelRotationOffset: {x: 0, y: 0, z: 0}

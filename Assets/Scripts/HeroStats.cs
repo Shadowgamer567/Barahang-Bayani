@@ -5,6 +5,9 @@ public class HeroStats : MonoBehaviour
 {
     public HeroType heroType;
     public GameObject uiObject;
+    public Transform modelRoot;
+    public GameObject currentModel;
+
 
     public int currentHP;
     public int attack;
@@ -15,6 +18,8 @@ public class HeroStats : MonoBehaviour
     {
         currentHP = heroType.maxHp;
         shield = heroType.maxShield;
+
+        LoadModel();
     }
 
     public void TakeDamage(int amount)
@@ -51,6 +56,43 @@ public class HeroStats : MonoBehaviour
     public void SyncToData(GameData data)
     {
         data.hero_health = this.currentHP;
+    }
+
+    void LoadModel()
+    {
+        if (heroType == null || heroType.prefab == null)
+        {
+            Debug.LogWarning("No prefab assigned for hero: " + name);
+            return;
+        }
+
+        if (currentModel != null)
+        {
+            Destroy(currentModel);
+        }
+
+        currentModel = Instantiate(heroType.prefab, modelRoot);
+        currentModel.transform.localPosition = Vector3.zero;
+        currentModel.transform.localRotation = Quaternion.Euler(heroType.modelRotationOffset);
+
+        FaceEnemy();
+    }
+
+    void FaceEnemy()
+    {
+        GameObject enemyGroup = GameObject.Find("EnemyController");
+
+        if (enemyGroup == null) return;
+
+        Transform target = enemyGroup.transform;
+
+        Vector3 direction = (target.position - transform.position).normalized;
+        direction.y = 0;
+
+        if (direction != Vector3.zero)
+        {
+            transform.forward = direction;
+        }
     }
 
     IEnumerator Die()

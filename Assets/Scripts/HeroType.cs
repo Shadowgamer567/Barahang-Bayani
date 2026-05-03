@@ -8,4 +8,5 @@ public class HeroType : ScriptableObject
     public int shield;
     public int maxShield;
     public GameObject prefab;
+    public Vector3 modelRotationOffset;
 }
