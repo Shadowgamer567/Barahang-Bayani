@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   line:
   - speakerName: Andres Bonifacio
-    characterPrefab: {fileID: 0}
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
     Dialogue: Do not shoot Me from behind!!!
     isLeftSide: 1

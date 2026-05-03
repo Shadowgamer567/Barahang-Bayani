@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
   heroName: Jose Rizal
   maxHp: 50
+  shield: 0
+  maxShield: 0
+  prefab: {fileID: 1400036717508617731, guid: 73315a49d861c184e90939c605f2283b, type: 3}

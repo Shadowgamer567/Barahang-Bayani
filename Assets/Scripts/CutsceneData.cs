@@ -8,11 +8,20 @@ public class CutsceneData : ScriptableObject
     public List<CutsceneLine> line;
 }
 
+public enum SpeakerType
+{
+    Hero, 
+    Enemy,
+    Narrator
+}
+
 [System.Serializable]
 public class CutsceneLine
 {
     public string speakerName;
-    public GameObject characterPrefab;
+    public SpeakerType speakerType;
+    public HeroType hero;
+    public EnemyTypes enemy;
     public string Dialogue;
     public bool isLeftSide;
 }

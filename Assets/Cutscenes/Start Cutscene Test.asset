@@ -13,7 +13,21 @@ MonoBehaviour:
   m_Name: Start Cutscene Test
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   line:
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: One day in the nation of the Philippines
+    isLeftSide: 0
   - speakerName: Jose Rizal
-    characterPrefab: {fileID: 0}
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
     Dialogue: Believe in the Filipino Pride
     isLeftSide: 1
+  - speakerName: Spaniard
+    speakerType: 1
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
+    Dialogue: The Philippines will remain ours
+    isLeftSide: 0

@@ -15,7 +15,7 @@ public class APDisplay : MonoBehaviour
 
     void UpdateAP(int current, int max)
     {
-        apText.text = $"AP: {current}";
+        apText.text = $"Action Points: {current}";
     }
 
     // Update is called once per frame

@@ -1,17 +1,20 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CutsceneManager : MonoBehaviour
 {
     public GameObject cutsceneUI;
     public Transform leftSpawn;
     public Transform rightSpawn;
-    public TMPro.TextMeshProUGUI dialogueText;
+    public TextMeshProUGUI dialogueText;
+    public GameObject namePanel;
+    public GameObject mainUI;
+    public TextMeshProUGUI nameText;
 
     private CutsceneData currentCutscene;
     private int currentIndex = 0;
-    private GameObject currentLeft;
-    private GameObject currentRight;
     private float clickCooldown = 0.2f;
     private float lastClickTime = 0;
 
@@ -19,38 +22,74 @@ public class CutsceneManager : MonoBehaviour
 
     public void PlayCutscene(CutsceneData data)
     {
-        currentCutscene = data;
-        currentIndex = 0;
-
-        cutsceneUI.SetActive(true);
-        Time.timeScale = 0f;
-
-        ShowLine();
+        StartCoroutine(PlayCutsceneRoutine(data));
     }
 
     void ShowLine()
     {
-        var line = currentCutscene.line[currentIndex];
+        if (currentCutscene == null || currentCutscene.line.Count == 0)
+        {
+            Debug.LogError("Cutscene is empty or null");
+            EndCutscene();
+            return;
+        }
 
+        var line = currentCutscene.line[currentIndex];
         dialogueText.text = line.Dialogue;
 
-        if (line.isLeftSide)
-        {
-            if (currentLeft != null)
-            {
-                Destroy(currentLeft);
-                currentLeft = Instantiate(line.characterPrefab, leftSpawn);
-            }    
-        }
+        GameObject prefabToSpawn = null;
 
+        //Name
+        if (!string.IsNullOrEmpty(line.speakerName))
+        {
+            namePanel.SetActive(true);
+            nameText.text = line.speakerName;
+        }
+        else if (line.speakerType == SpeakerType.Hero && line.hero != null)
+        {
+            namePanel.SetActive(true);
+            nameText.text = line.hero.heroName;
+        }
+        else if (line.speakerType == SpeakerType.Enemy && line.enemy != null)
+        {
+            namePanel.SetActive(true);
+            nameText.text = line.enemy.enemyName;
+        }
         else
         {
-            if (currentRight != null)
-            {
-                Destroy(currentRight);
-                currentRight = Instantiate(line.characterPrefab, rightSpawn);
-            }
+            namePanel.SetActive(false);
         }
+
+        //Prefabs
+        if (line.speakerType == SpeakerType.Hero && line.hero != null)
+        {
+            prefabToSpawn = line.hero.prefab;
+        }
+        else if (line.speakerType == SpeakerType.Enemy && line.enemy != null)
+        {
+            prefabToSpawn = line.enemy.prefab;
+        }
+
+        if (line.speakerType == SpeakerType.Narrator)
+        {
+            ClearSpawn(leftSpawn);
+            ClearSpawn(rightSpawn);
+            return;
+        }
+
+        if (prefabToSpawn == null && line.speakerType != SpeakerType.Narrator)
+        {
+            Debug.LogWarning("No prefab found for speaker");
+            return;
+        }
+
+        Transform parent = line.isLeftSide ? leftSpawn : rightSpawn;
+
+        ClearSpawn(parent);
+
+        GameObject obj = Instantiate(prefabToSpawn, parent);
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localRotation = Quaternion.identity;
     }
 
     public void NextLine()
@@ -69,9 +108,18 @@ public class CutsceneManager : MonoBehaviour
     void EndCutscene()
     {
         cutsceneUI.SetActive(false);
+        mainUI.SetActive(true);
         Time.timeScale = 1f;
 
         OnCutsceneFinished?.Invoke();
+    }
+
+    void ClearSpawn(Transform parent)
+    {
+        foreach (Transform child in parent) 
+        {
+            Destroy(child.gameObject);
+        }
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -84,11 +132,27 @@ public class CutsceneManager : MonoBehaviour
     {
         if (cutsceneUI.activeSelf)
         {
-            if (Input.GetMouseButtonDown(0) && Time.unscaledTime - lastClickTime > clickCooldown)
+            if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-                lastClickTime = Time.unscaledTime;
-                NextLine();
+                if (Time.unscaledTime - lastClickTime > clickCooldown)
+                {
+                    lastClickTime = Time.unscaledTime;
+                    NextLine();
+                }
             }
         }
+    }
+
+    IEnumerator PlayCutsceneRoutine(CutsceneData data)
+    {
+        yield return new WaitForSecondsRealtime(0.5f);
+        currentCutscene = data;
+        currentIndex = 0;
+
+        cutsceneUI.SetActive(true);
+        mainUI.SetActive(false);
+        Time.timeScale = 0f;
+
+        ShowLine();
     }
 }

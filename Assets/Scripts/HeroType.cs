@@ -7,4 +7,5 @@ public class HeroType : ScriptableObject
     public int maxHp;
     public int shield;
     public int maxShield;
+    public GameObject prefab;
 }

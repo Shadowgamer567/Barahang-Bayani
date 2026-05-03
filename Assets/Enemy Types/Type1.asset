@@ -15,3 +15,5 @@ MonoBehaviour:
   enemyName: 1
   maxHp: 10
   damage: 2
+  maxShield: 0
+  prefab: {fileID: 8261969879240134745, guid: 1a699725cadee4949878ef0793192a49, type: 3}

@@ -7,6 +7,7 @@ public class EnemyTypes : ScriptableObject
     public int maxHp;
     public int damage;
     public int maxShield;
+    public GameObject prefab;
 }
 
 public enum EnemyActionType
