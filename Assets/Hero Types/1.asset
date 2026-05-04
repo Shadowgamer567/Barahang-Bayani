@@ -18,3 +18,4 @@ MonoBehaviour:
   maxShield: 0
   prefab: {fileID: 6605038086459334988, guid: 19713165a2c9b8847b748e3c6c37a5a1, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
+  modelPositionOffset: {x: 0, y: -1.15, z: 0}

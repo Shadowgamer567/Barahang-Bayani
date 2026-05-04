@@ -72,7 +72,7 @@ public class HeroStats : MonoBehaviour
         }
 
         currentModel = Instantiate(heroType.prefab, modelRoot);
-        currentModel.transform.localPosition = Vector3.zero;
+        currentModel.transform.localPosition = heroType.modelPositionOffset;
         currentModel.transform.localRotation = Quaternion.Euler(heroType.modelRotationOffset);
 
         FaceEnemy();
