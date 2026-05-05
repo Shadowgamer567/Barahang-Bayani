@@ -57,6 +57,8 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
+        battleControl.Initialize(levelData);
+
         battleControl.OnBattleWon += HandleBattleWon;
 
         Debug.Log("Loaded Level: " + levelData.levelName);

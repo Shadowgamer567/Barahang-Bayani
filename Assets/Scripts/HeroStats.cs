@@ -58,7 +58,7 @@ public class HeroStats : MonoBehaviour
         data.hero_health = this.currentHP;
     }
 
-    void LoadModel()
+    public  void LoadModel()
     {
         if (heroType == null || heroType.prefab == null)
         {

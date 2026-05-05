@@ -16,7 +16,14 @@ MonoBehaviour:
   sceneName: 
   battlesRequired: 7
   levelIndex: 9
+  Cutscenes: []
   campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
   previousLevel: {fileID: 11400000, guid: 1104050137475404aa736af3bcaeeb12, type: 2}
   nextLevel: {fileID: 11400000}
+  heroesInLevel:
+  - {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+  maxHeroes: 4
+  possibleEnemies: []
+  minEnemies: 1
+  maxEnemies: 4
   isBossLevel: 0

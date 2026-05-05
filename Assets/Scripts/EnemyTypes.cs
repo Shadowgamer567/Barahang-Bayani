@@ -9,6 +9,7 @@ public class EnemyTypes : ScriptableObject
     public int maxShield;
     public GameObject prefab;
     public Vector3 modelRotationOffset;
+    public Vector3 modelPositionOffset;
 }
 
 public enum EnemyActionType

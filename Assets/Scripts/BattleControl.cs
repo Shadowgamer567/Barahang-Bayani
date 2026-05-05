@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.ShaderGraph.Internal;
+using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +17,7 @@ public class BattleControl : MonoBehaviour
     public GameObject endButton;
     public GameObject cardPanel;
     public CardType pendingCard;
+    private LevelData levelData;
 
     public float moveduration = 5f;
     public int damage = 5;
@@ -41,10 +43,16 @@ public class BattleControl : MonoBehaviour
 
         CacheEnemies();
         CacheHeroes();
-
-        StartPlayerTurn();
         
     }
+
+    public void Initialize(LevelData data)
+    {
+        levelData = data;
+
+        StartCoroutine(BattleSequence());
+    }
+
     public enum BattleState
     {
         PlayerTurn,
@@ -81,6 +89,60 @@ public class BattleControl : MonoBehaviour
     void CacheHeroes()
     {
         heroes = GetComponentsInChildren<HeroStats>(true);
+    }
+
+    void SetupHeroes()
+    {
+
+        for(int i = 0; i < heroes.Length; i++)
+        {
+            if (i < levelData.heroesInLevel.Count)
+            {
+                heroes[i].gameObject.SetActive(true);
+                heroes[i].heroType = levelData.heroesInLevel[i];
+                heroes[i].LoadModel();
+            }
+
+            else
+            {
+                heroes[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    void SetupEnemies()
+    {
+
+        int enemyCount = Random.Range(levelData.minEnemies, levelData.maxEnemies + 1);
+
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (i < enemyCount)
+            {
+                enemies[i].gameObject.SetActive(true);
+
+                EnemyTypes type = levelData.possibleEnemies[
+                    Random.Range(0, levelData.possibleEnemies.Count)
+                ];
+
+                enemies[i].enemyType = type;
+                enemies[i].LoadModel();
+            }
+            else
+            {
+                enemies[i].gameObject.SetActive(false);
+            }
+        }
+
+        aliveEnemies = 0;
+
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (enemies[i].gameObject.activeInHierarchy && !enemies[i].isDead)
+            {
+                aliveEnemies++;
+            }
+        }
     }
 
     void SetEnemiesActive(bool state)
@@ -294,7 +356,7 @@ public class BattleControl : MonoBehaviour
 
         foreach (var e in enemies)
         {
-            if (e != null && !e.isDead)
+            if (e != null && e.gameObject.activeInHierarchy && !e.isDead)
             {
                 aliveEnemies++;
             }
@@ -507,8 +569,8 @@ public class BattleControl : MonoBehaviour
 
         groundloop.isMoving = false;
 
-        SetEnemiesActive(true);
-        CacheEnemies();
+        SetupHeroes();
+        SetupEnemies();
 
         StartPlayerTurn();
     }
@@ -531,8 +593,7 @@ public class BattleControl : MonoBehaviour
 
         groundloop.isMoving = false;
 
-        SetEnemiesActive(true);
-        CacheEnemies();
+        SetupEnemies();
 
         nextbattletriggered = false;
 

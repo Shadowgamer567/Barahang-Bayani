@@ -13,6 +13,8 @@ public class EnemyStats : MonoBehaviour
     public Transform model;
     private BattleControl battle;
     public Animator animator;
+    public Transform modelRoot;
+    public GameObject currentModel;
 
     public int currentHP;
     public int shield;
@@ -159,6 +161,38 @@ public class EnemyStats : MonoBehaviour
     public void SyncToData(GameData data)
     {
         data.enemy_health = this.currentHP;
+    }
+
+    public void LoadModel()
+    {
+        if (enemyType == null || enemyType.prefab == null)
+        {
+            Debug.LogWarning("No prefab assigned for hero: " + name);
+            return;
+        }
+
+        if (currentModel != null)
+        {
+            Destroy(currentModel);
+        }
+
+        currentModel = Instantiate(enemyType.prefab, modelRoot);
+        currentModel.transform.localPosition = enemyType.modelPositionOffset;
+        currentModel.transform.localRotation = Quaternion.Euler(enemyType.modelRotationOffset);
+
+        FaceHeroes();
+    }
+
+    void FaceHeroes()
+    {
+        GameObject heroGroup = GameObject.Find("HeroController");
+        if (heroGroup == null) return;
+
+        Vector3 direction = (heroGroup.transform.position - transform.position).normalized;
+        direction.y = 0;
+
+        if (direction != Vector3.zero)
+            transform.forward = direction;
     }
 
     /*
