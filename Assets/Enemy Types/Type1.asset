@@ -16,4 +16,6 @@ MonoBehaviour:
   maxHp: 10
   damage: 2
   maxShield: 0
-  prefab: {fileID: 8261969879240134745, guid: 1a699725cadee4949878ef0793192a49, type: 3}
+  prefab: {fileID: 2446511508103551290, guid: a019c777f267ed243a187c486f2f949f, type: 3}
+  modelRotationOffset: {x: 0, y: 0, z: 0}
+  modelPositionOffset: {x: 0, y: -1, z: 0}

@@ -167,7 +167,7 @@ public class EnemyStats : MonoBehaviour
     {
         if (enemyType == null || enemyType.prefab == null)
         {
-            Debug.LogWarning("No prefab assigned for hero: " + name);
+            Debug.LogWarning("No prefab assigned for enemy: " + name);
             return;
         }
 
@@ -185,14 +185,28 @@ public class EnemyStats : MonoBehaviour
 
     void FaceHeroes()
     {
-        GameObject heroGroup = GameObject.Find("HeroController");
-        if (heroGroup == null) return;
+        HeroStats[] heroes = FindObjectsByType<HeroStats>(FindObjectsSortMode.None);
 
-        Vector3 direction = (heroGroup.transform.position - transform.position).normalized;
+        HeroStats target = null;
+
+        foreach (var h in heroes)
+        {
+            if (h != null && h.gameObject.activeInHierarchy)
+            {
+                target = h;
+                break;
+            }
+        }
+
+        if (target == null) return;
+
+        Vector3 direction = (target.transform.position - transform.position).normalized;
         direction.y = 0;
 
         if (direction != Vector3.zero)
+        {
             transform.forward = direction;
+        }
     }
 
     /*

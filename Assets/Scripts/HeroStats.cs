@@ -80,13 +80,22 @@ public class HeroStats : MonoBehaviour
 
     void FaceEnemy()
     {
-        GameObject enemyGroup = GameObject.Find("EnemyController");
+        EnemyStats[] enemies = FindObjectsByType<EnemyStats>(FindObjectsSortMode.None);
 
-        if (enemyGroup == null) return;
+        EnemyStats target = null;
 
-        Transform target = enemyGroup.transform;
+        foreach (var e in enemies)
+        {
+            if (e != null && e.gameObject.activeInHierarchy && !e.isDead)
+            {
+                target = e;
+                break;
+            }
+        }
 
-        Vector3 direction = (target.position - transform.position).normalized;
+        if (target == null) return;
+
+        Vector3 direction = (target.transform.position - transform.position).normalized;
         direction.y = 0;
 
         if (direction != Vector3.zero)

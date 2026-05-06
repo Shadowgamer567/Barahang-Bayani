@@ -43,14 +43,13 @@ public class BattleControl : MonoBehaviour
 
         CacheEnemies();
         CacheHeroes();
-        
     }
 
     public void Initialize(LevelData data)
     {
         levelData = data;
 
-        StartCoroutine(BattleSequence());
+        SetupHeroes();
     }
 
     public enum BattleState
@@ -569,7 +568,6 @@ public class BattleControl : MonoBehaviour
 
         groundloop.isMoving = false;
 
-        SetupHeroes();
         SetupEnemies();
 
         StartPlayerTurn();
