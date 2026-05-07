@@ -407,6 +407,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RizalBuilding2
       objectReference: {fileID: 0}
+    - target: {fileID: 5057195549992596033, guid: 914f745e2fd06d940b674e121f42dcca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9216590489269447926, guid: 914f745e2fd06d940b674e121f42dcca, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -452,7 +456,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 914f745e2fd06d940b674e121f42dcca, type: 3}
---- !u!1001 &4799212566150425406
+--- !u!1001 &5715824932280505297
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -460,47 +464,47 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 852804249023072663, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 5459741392219997052, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_Name
       value: RizalBuilding1
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2786756497636488949, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
+    - target: {fileID: 7403264031904087070, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
@@ -515,6 +519,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 255796465}
   - {fileID: 1163037201}
-  - {fileID: 4799212566150425406}
+  - {fileID: 5715824932280505297}
   - {fileID: 4352711132574024753}
   - {fileID: 150858691724713531}
