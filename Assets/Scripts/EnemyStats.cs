@@ -60,6 +60,19 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
+    public void InitializeEnemy()
+    {
+        if (enemyType == null)
+        {
+            Debug.LogError("EnemyType is NULL");
+            return;
+        }
+
+        currentHP = enemyType.maxHp;
+        shield = enemyType.maxShield;
+        isDead = false;
+    }
+
     void Awake()
     {
         if (model != null && animator == null)

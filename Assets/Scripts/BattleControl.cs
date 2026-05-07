@@ -40,16 +40,24 @@ public class BattleControl : MonoBehaviour
     void Start()
     {
         SetEnemiesActive(false);
-
-        CacheEnemies();
-        CacheHeroes();
     }
 
     public void Initialize(LevelData data)
     {
         levelData = data;
 
+        CacheEnemies();
+        CacheHeroes();
+
+        if (heroes == null || heroes.Length == 0)
+        {
+            Debug.LogError("Heroes not ready — aborting setup");
+            return;
+        }
+
         SetupHeroes();
+
+        StartCoroutine(BattleSequence());
     }
 
     public enum BattleState
@@ -63,7 +71,7 @@ public class BattleControl : MonoBehaviour
 
     void CacheEnemies()
     {
-        enemies = GetComponentsInChildren<EnemyStats>(true);
+        enemies = enemyController.GetComponentsInChildren<EnemyStats>(true);
 
         aliveEnemies = 0;
         foreach(var e in enemies)
@@ -87,21 +95,27 @@ public class BattleControl : MonoBehaviour
 
     void CacheHeroes()
     {
-        heroes = GetComponentsInChildren<HeroStats>(true);
+        if (heroController == null)
+        {
+            Debug.LogError("heroController is NOT assigned!");
+            return;
+        }
+
+        heroes = heroController.GetComponentsInChildren<HeroStats>(true);
+
+        Debug.Log("Cached Heroes: " + heroes.Length);
     }
 
     void SetupHeroes()
     {
-
-        for(int i = 0; i < heroes.Length; i++)
+        for (int i = 0; i < heroes.Length; i++)
         {
             if (i < levelData.heroesInLevel.Count)
             {
-                heroes[i].gameObject.SetActive(true);
                 heroes[i].heroType = levelData.heroesInLevel[i];
-                heroes[i].LoadModel();
+                heroes[i].gameObject.SetActive(true);
+                heroes[i].InitializeHero();
             }
-
             else
             {
                 heroes[i].gameObject.SetActive(false);
@@ -118,15 +132,14 @@ public class BattleControl : MonoBehaviour
         {
             if (i < enemyCount)
             {
-                enemies[i].gameObject.SetActive(true);
-
-                EnemyTypes type = levelData.possibleEnemies[
-                    Random.Range(0, levelData.possibleEnemies.Count)
-                ];
+                EnemyTypes type = levelData.possibleEnemies[Random.Range(0, levelData.possibleEnemies.Count)];
 
                 enemies[i].enemyType = type;
+                enemies[i].InitializeEnemy();
+                enemies[i].gameObject.SetActive(true);
                 enemies[i].LoadModel();
             }
+
             else
             {
                 enemies[i].gameObject.SetActive(false);

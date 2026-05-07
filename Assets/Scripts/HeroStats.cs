@@ -16,8 +16,19 @@ public class HeroStats : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        
+    }
+
+    public void InitializeHero()
+    {
+        if (heroType == null)
+        {
+            Debug.LogError("Hero type is Null");
+        }
+
         currentHP = heroType.maxHp;
         shield = heroType.maxShield;
+        
 
         LoadModel();
     }
