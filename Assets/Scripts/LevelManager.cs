@@ -15,6 +15,7 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
+
         if (GameManager.Instance != null && GameManager.Instance.selectedLevel != null)
         {
             levelData = GameManager.Instance.selectedLevel;
@@ -23,6 +24,8 @@ public class LevelManager : MonoBehaviour
         {
             Debug.LogWarning("Using DEBUG LevelData");
             levelData = debugLevelData;
+
+            GameManager.Instance.selectedLevel = levelData;
         }
 
         if (levelData == null)

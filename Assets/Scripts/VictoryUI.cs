@@ -41,9 +41,29 @@ public class VictoryUI : MonoBehaviour
 
     public void OnContinue()
     {
+
         Time.timeScale = 1f;
 
         var currentLevel = GameManager.Instance.selectedLevel;
+
+        Debug.Log("Current Level Name: " + currentLevel.levelName);
+        Debug.Log("Current Level Asset: " + currentLevel.name);
+
+        if (currentLevel.nextLevel != null)
+        {
+            Debug.Log("Next Level Asset: " + currentLevel.nextLevel.name);
+        }
+        else
+        {
+            Debug.Log("Next Level is NULL");
+        }
+
+        Debug.Log("Current Level: " + currentLevel);
+
+        if (currentLevel != null)
+        {
+            Debug.Log("Next Level: " + currentLevel.nextLevel);
+        }
 
         if (currentLevel != null && currentLevel.nextLevel != null)
         {
@@ -51,7 +71,6 @@ public class VictoryUI : MonoBehaviour
 
             SceneManager.LoadScene("Level");
         }
-
         else
         {
             Debug.Log("No next level, returning to level select");
