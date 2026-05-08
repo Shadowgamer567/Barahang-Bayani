@@ -15,6 +15,7 @@ public class EnemyStats : MonoBehaviour
     public Animator animator;
     public Transform modelRoot;
     public GameObject currentModel;
+    public GameObject selectionIndicator;
 
     public int currentHP;
     public int shield;
@@ -222,46 +223,13 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
-    /*
-    IEnumerator Die()
+    public void SetHighlighted(bool state)
     {
-        Debug.Log(name + " DIE STARTED");
-
-        Collider col = GetComponent<Collider>();
-
-        if(col != null)
+        if (selectionIndicator != null)
         {
-            col.enabled = false;
+            selectionIndicator.SetActive(state);
         }
-
-        if(battle != null)
-        {
-            battle.OnEnemyKilled();
-        }
-
-        Transform model = transform.Find("AnimateChild");
-        if (model != null)
-        {
-            Quaternion startRotation = model.rotation;
-            Quaternion targetRotation = startRotation * Quaternion.Euler(0f, 0f, 90f);
-
-            float elapsed = 0f;
-            float duration = 2f;
-
-            while (elapsed < duration)
-            {
-                model.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsed / duration);
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            model.rotation = targetRotation;
-        }
-        yield return new WaitForSeconds(0.3f);
-
-        gameObject.SetActive(false);
     }
-    */
 
     public void OnDeathAnimationComplete()
     {

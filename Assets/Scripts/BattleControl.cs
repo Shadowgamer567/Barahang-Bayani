@@ -468,6 +468,14 @@ public class BattleControl : MonoBehaviour
                 selectTargetPanel.SetActive(true);
             }
 
+            foreach (EnemyStats e in enemies)
+            {
+                if (e != null && !e.isDead)
+                {
+                    e.SetHighlighted(true);
+                }
+            }
+
             Destroy(cardUI.gameObject);
         }
     }
@@ -490,6 +498,14 @@ public class BattleControl : MonoBehaviour
         if (selectTargetPanel != null)
         {
             selectTargetPanel.SetActive(false);
+        }
+
+        foreach (EnemyStats e in enemies)
+        {
+            if (e != null)
+            {
+                e.SetHighlighted(false);
+            }
         }
 
         CardType usedCard = pendingCard;
