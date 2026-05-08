@@ -16,7 +16,19 @@ MonoBehaviour:
   sceneName: 
   battlesRequired: 3
   levelIndex: 3
-  Cutscenes: []
+  Cutscenes:
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
   campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
   previousLevel: {fileID: 11400000, guid: 0a041b3313cc6fe4fa2b93270201e0de, type: 2}
   nextLevel: {fileID: 11400000, guid: 77c8c69dfd5073845a3385ea21384a48, type: 2}
