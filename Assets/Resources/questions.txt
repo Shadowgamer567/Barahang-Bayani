@@ -1,28 +1,51 @@
-1. When did the Bataan Death March occur?
+1. When was Jose Rizal born?
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
-A. April 9, 1942 "C"
-B. March 8, 2027
-C. Never, it's fake
-D. Dec 7, 1941
+A. March 9, 1851
+B. June 4, 1850
+C. June 19, 1861 "C"
+D. Dec 30, 1896
 
-2. What is the location in the Image?
-TYPE:IMAGE:Brasilia
-INPUT:MULTIPLE_CHOICE
-A. Rio de Janeiro
-B. Brasilia "C"
-C. Moscow
-D. Washington DC
-
-3. Which of the following makes the sound?
-TYPE:AUDIO:Aud_q1
+2. Which of the following makes the sound?
+TYPE:AUDIO:vowels
 INPUT:IDENTIFICATION
-A. M1 Garand "C"
-B. M249 SAW
-C. Glock 18
-D. Your Mom
+A. Vowels "C"
+B. Consonants
+C. The Alphabet
+D. Letters
 
-4. Was Jose Rizal Shot by the Spaniards during his death
-TYPE:TEXT
+3. Was this Jose Rizal as a child?
+TYPE:IMAGE:rizal-as-a-child
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
+
+4. When did Jose Rizal learn the Alphabet?
+TYPE:TEXT
+INPUT:MULTIPLE_CHOICE
+A. 7
+B. 3 "C"
+C. 5
+D. 8
+
+5. Enter the name of Jose Rizal's Godfather.
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. Pedro Casanas "C"
+B. Rufino Collantes
+C. Leoncio Lopez
+D. Manuel de Quintos Alonzo
+
+6. Was Jose Rizal American?
+TYPE:TEXT
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSE
+
+7. Was this the house of Jose Rizal>
+TYPE:IMAGE:house-of-rizal
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+8. Is this Jose Rizal?
+TYPE:IMAGE:francisco-mercado
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSE
