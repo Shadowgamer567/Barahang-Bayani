@@ -18,14 +18,17 @@ MonoBehaviour:
   levelIndex: 2
   Cutscenes:
   - triggerType: 0
-    battleIndex: 0
-    Cutscene: {fileID: 0}
+    battleIndex: 1
+    Cutscene: {fileID: 11400000, guid: 662a5b1ba3232bd45a473aeb29aa026d, type: 2}
   - triggerType: 0
-    battleIndex: 0
-    Cutscene: {fileID: 0}
-  - triggerType: 0
-    battleIndex: 0
-    Cutscene: {fileID: 0}
+    battleIndex: 1
+    Cutscene: {fileID: 11400000, guid: 662a5b1ba3232bd45a473aeb29aa026d, type: 2}
+  - triggerType: 1
+    battleIndex: 1
+    Cutscene: {fileID: 11400000, guid: c52c837a963a0e44197a5c5ef2f06157, type: 2}
+  - triggerType: 1
+    battleIndex: 1
+    Cutscene: {fileID: 11400000, guid: c52c837a963a0e44197a5c5ef2f06157, type: 2}
   campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
   previousLevel: {fileID: 11400000, guid: 65bd2fba3d61ada42ab3003dd7e49d9b, type: 2}
   nextLevel: {fileID: 11400000, guid: 8342e7902e86d5145a5817a89fcaeef6, type: 2}
