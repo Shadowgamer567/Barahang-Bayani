@@ -15,6 +15,7 @@ public class EnemyPanel
     public TextMeshProUGUI hpText;
     public Image shieldFill;
     public TextMeshProUGUI shieldText;
+
 }
 
 [System.Serializable]
@@ -34,38 +35,157 @@ public class UIMain : MonoBehaviour
     public HeroPanel[] heropanel;
     public HeroStats[] heroes;
 
+    public Transform heroPanelContainer;
+    public Transform enemyPanelContainer;
+
+    public GameObject heroPanelTemplate;
+    public GameObject enemyPanelTemplate;
+
 
     private float[] enemydisplayedHP;
     private float[] herodisplayedHP;
     private float[] enemydisplayedShield;
     private float[] herodisplayedShield;
+
+    private List<EnemyStats> activeEnemies = new List<EnemyStats>();
+    private List<HeroStats> activeHeroes = new List<HeroStats>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        enemydisplayedHP = new float[enemypanel.Length];
-        herodisplayedHP = new float[heropanel.Length];
-        enemydisplayedShield = new float[enemypanel.Length];
-        herodisplayedShield = new float[heropanel.Length];
+       
+    }
 
-        for(int i = 0; i < enemypanel.Length; i++)
+    public void GenerateHeroPanels(HeroStats[] heroArray)
+    {
+        Debug.Log("Spawning Hero Panel");
+
+        heroes = heroArray;
+
+        activeHeroes.Clear();
+
+        List<HeroPanel> generatedPanels = new List<HeroPanel>();
+
+        foreach (Transform child in heroPanelContainer)
         {
-            enemypanel[i].enemyPanel.SetActive(false);
-            enemydisplayedHP[i] = 1f;
-            enemydisplayedShield[i] = 1f;
+            Destroy(child.gameObject);
         }
+
+        for (int i = 0; i < heroes.Length; i++)
+        { 
+
+            activeHeroes.Add(heroes[i]);
+            GameObject panelObj = Instantiate(heroPanelTemplate, heroPanelContainer);
+
+            panelObj.SetActive(true);
+
+            HeroPanel panel = new HeroPanel();
+
+            panel.heroPanel = panelObj;
+
+            panel.HeroName = panelObj.transform.Find("Name")
+                .GetComponent<TextMeshProUGUI>();
+
+            panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill")
+                .GetComponent<Image>();
+
+            panel.hpText = panelObj.transform.Find("HP_Background/HP_Text")
+                .GetComponent<TextMeshProUGUI>();
+
+            panel.shieldFill = panelObj.transform.Find("Shield_Background/Shield_Fill")
+                .GetComponent<Image>();
+
+            panel.shieldText = panelObj.transform.Find("Shield_Background/Shield_Text")
+                .GetComponent<TextMeshProUGUI>();
+
+            generatedPanels.Add(panel);
+        }
+
+        heropanel = generatedPanels.ToArray();
+
+        herodisplayedHP = new float[heropanel.Length];
+        herodisplayedShield = new float[heropanel.Length];
 
         for (int i = 0; i < heropanel.Length; i++)
         {
-            heropanel[i].heroPanel.SetActive(false);
             herodisplayedHP[i] = 1f;
             herodisplayedShield[i] = 1f;
         }
     }
-    void UpdateEnemyUI()
+
+    public void GenerateEnemyPanels(EnemyStats[] enemyArray)
     {
+        Debug.Log("UIMain Object: " + gameObject.name);
+
+        Debug.Log("spawnig Enemy Panel");
+
+        enemies = enemyArray;
+
+        activeEnemies.Clear();
+
+        List<EnemyPanel> generatedPanels = new List<EnemyPanel>();
+
+        foreach (Transform child in enemyPanelContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        for (int i = 0; i < enemies.Length; i++)
+        {
+
+            activeEnemies.Add(enemies[i]);
+
+            GameObject panelObj = Instantiate(enemyPanelTemplate, enemyPanelContainer);
+
+            panelObj.SetActive(true);
+
+            EnemyPanel panel = new EnemyPanel();
+
+            panel.enemyPanel = panelObj;
+
+            panel.EnemyName = panelObj.transform.Find("Name")
+                .GetComponent<TextMeshProUGUI>();
+
+            panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill")
+                .GetComponent<Image>();
+
+            panel.hpText = panelObj.transform.Find("HP_Background/HP_Text")
+                .GetComponent<TextMeshProUGUI>();
+
+            panel.shieldFill = panelObj.transform.Find("Shield_Background/Shield_Fill")
+                .GetComponent<Image>();
+
+            panel.shieldText = panelObj.transform.Find("Shield_Background/Shield_Text")
+                .GetComponent<TextMeshProUGUI>();
+
+            generatedPanels.Add(panel);
+        }
+
+        enemypanel = generatedPanels.ToArray();
+
+        enemydisplayedHP = new float[enemypanel.Length];
+        enemydisplayedShield = new float[enemypanel.Length];
+
         for (int i = 0; i < enemypanel.Length; i++)
         {
-            EnemyStats enemy = (i < enemies.Length) ? enemies[i] : null;
+            enemydisplayedHP[i] = 1f;
+            enemydisplayedShield[i] = 1f;
+        }
+    }
+    void UpdateEnemyUI()
+    {
+        if (enemypanel == null || enemies == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < enemypanel.Length; i++)
+        {
+            if (enemypanel[i] == null)
+            {
+                continue;
+            }
+
+            EnemyStats enemy = activeEnemies[i];
 
             if (enemy != null && enemy.gameObject.activeInHierarchy)
             {
@@ -95,9 +215,19 @@ public class UIMain : MonoBehaviour
 
     void UpdateHeroUI()
     {
+        if (heropanel == null || heroes == null)
+        {
+            return;
+        }
+
         for (int i = 0; i < heropanel.Length; i++)
         {
-            HeroStats hero = (i < heroes.Length) ? heroes[i] : null;
+            if (heropanel[i] == null)
+            {
+                continue;
+            }
+
+            HeroStats hero = activeHeroes[i];
 
             if (hero != null && hero.gameObject.activeInHierarchy)
             {
@@ -129,7 +259,14 @@ public class UIMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdateEnemyUI();
-        UpdateHeroUI();
+        if (enemypanel != null && enemies != null)
+        {
+            UpdateEnemyUI();
+        }
+
+        if (heropanel != null && heroes != null)
+        {
+            UpdateHeroUI();
+        }
     }
 }

@@ -16,6 +16,9 @@ public class BattleControl : MonoBehaviour
     public GroundLoop groundloop;
     public GameObject endButton;
     public GameObject cardPanel;
+    public GameObject selectTargetPanel;
+    public GameObject notEnoughAPPanel;
+    public UIMain uiMain;
     public CardType pendingCard;
     private LevelData levelData;
 
@@ -57,7 +60,7 @@ public class BattleControl : MonoBehaviour
 
         SetupHeroes();
 
-        StartCoroutine(BattleSequence());
+        
     }
 
     public enum BattleState
@@ -121,6 +124,11 @@ public class BattleControl : MonoBehaviour
                 heroes[i].gameObject.SetActive(false);
             }
         }
+
+        if (uiMain != null)
+        {
+            uiMain.GenerateHeroPanels(heroes);
+        }
     }
 
     void SetupEnemies()
@@ -150,10 +158,17 @@ public class BattleControl : MonoBehaviour
 
         for (int i = 0; i < enemies.Length; i++)
         {
-            if (enemies[i].gameObject.activeInHierarchy && !enemies[i].isDead)
-            {
-                aliveEnemies++;
-            }
+            if (i >= enemies.Length)
+                continue;
+
+            EnemyStats enemy = enemies[i];
+        }
+
+        if (uiMain != null)
+        {
+            Debug.Log("Using UI Object: " + uiMain.gameObject.name);
+
+            uiMain.GenerateEnemyPanels(enemies);
         }
     }
 
@@ -394,18 +409,19 @@ public class BattleControl : MonoBehaviour
         if (currentActionPoint < cost)
         {
             Debug.Log("Not Enough AP");
+
+            if (notEnoughAPPanel != null)
+            {
+                StopCoroutine(nameof(ShowAPWarning));
+                StartCoroutine(nameof(ShowAPWarning));
+            }
+
             return false;
         }
 
         currentActionPoint -= cost;
         OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
         return true;
-    }
-
-    void ResetAP()
-    {
-        currentActionPoint = maxActionPoint;
-        Debug.Log("AP reset to Max");
     }
 
     public void HandleCardPlay(CardType card, CardUI cardUI)
@@ -447,6 +463,11 @@ public class BattleControl : MonoBehaviour
 
             cardPanel.SetActive(false);
 
+            if (selectTargetPanel != null)
+            {
+                selectTargetPanel.SetActive(true);
+            }
+
             Destroy(cardUI.gameObject);
         }
     }
@@ -464,6 +485,11 @@ public class BattleControl : MonoBehaviour
         {
             Debug.Log("Blocked: selecting=" + isSelectingTarget + " pending=" + pendingCard);
             return;
+        }
+
+        if (selectTargetPanel != null)
+        {
+            selectTargetPanel.SetActive(false);
         }
 
         CardType usedCard = pendingCard;
@@ -609,5 +635,14 @@ public class BattleControl : MonoBehaviour
         nextbattletriggered = false;
 
         StartPlayerTurn();
+    }
+
+    IEnumerator ShowAPWarning()
+    {
+        notEnoughAPPanel.SetActive(true);
+
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        notEnoughAPPanel.SetActive(false);
     }
 }

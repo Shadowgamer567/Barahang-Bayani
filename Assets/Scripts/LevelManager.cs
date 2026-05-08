@@ -48,6 +48,18 @@ public class LevelManager : MonoBehaviour
             Debug.LogWarning("BackgroundLoop not found");
         }
 
+        GroundLoop gl = FindFirstObjectByType<GroundLoop>();
+
+        if (gl != null)
+        {
+            Material groundMat = levelData.campaign.GetGroundMaterial(levelData.levelIndex);
+
+            if (groundMat != null)
+            {
+                gl.ApplyGroundMaterial(groundMat);
+            }
+        }
+
 
         battleControl = FindFirstObjectByType<BattleControl>();
 

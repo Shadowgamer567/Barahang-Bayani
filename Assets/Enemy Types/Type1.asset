@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cf71bfb80a757c4d9608afd4ca6e2d4, type: 3}
   m_Name: Type1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTypes
-  enemyName: 1
+  enemyName: Spanish Soldier
   maxHp: 10
   damage: 2
   maxShield: 0

@@ -4,6 +4,7 @@ using UnityEngine;
 public class BackgroundSet : ScriptableObject
 {
     public string campaignName;
+    
 
     [System.Serializable]
     public class LevelRange
@@ -11,6 +12,7 @@ public class BackgroundSet : ScriptableObject
         public int startLevel;
         public int endLevel;
         public GameObject[] prefabs;
+        public Material groundMaterial;
     }
 
     public LevelRange[] levelsRanges;
@@ -27,6 +29,19 @@ public class BackgroundSet : ScriptableObject
                 }
 
                 return range.prefabs[Random.Range(0, range.prefabs.Length)];
+            }
+        }
+
+        return null;
+    }
+
+    public Material GetGroundMaterial(int level)
+    {
+        foreach (var range in levelsRanges)
+        {
+            if (level >= range.startLevel && level <= range.endLevel)
+            {
+                return range.groundMaterial;
             }
         }
 

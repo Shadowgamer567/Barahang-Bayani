@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GroundLoop : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public MeshRenderer[] groundRenderer;
     public Transform Ground1;
     public Transform Ground2;
     public Transform Ground3;
@@ -14,9 +14,21 @@ public class GroundLoop : MonoBehaviour
     public float speed = 7f;
     public bool isMoving = false;
 
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         groundLength = Ground1.GetComponent<Renderer>().bounds.size.x;
+    }
+
+    public void ApplyGroundMaterial(Material mat)
+    {
+        foreach (MeshRenderer renderer in groundRenderer)
+        {
+            if (renderer != null)
+            {
+                renderer.material = mat;
+            }
+        }
     }
 
     // Update is called once per frame
