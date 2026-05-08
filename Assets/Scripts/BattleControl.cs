@@ -133,7 +133,6 @@ public class BattleControl : MonoBehaviour
 
     void SetupEnemies()
     {
-
         int enemyCount = Random.Range(levelData.minEnemies, levelData.maxEnemies + 1);
 
         for (int i = 0; i < enemies.Length; i++)

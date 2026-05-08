@@ -35,7 +35,10 @@ MonoBehaviour:
   heroesInLevel:
   - {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
   maxHeroes: 4
-  possibleEnemies: []
+  possibleEnemies:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   minEnemies: 1
   maxEnemies: 4
   isBossLevel: 0
