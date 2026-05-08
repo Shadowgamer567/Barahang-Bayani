@@ -2678,7 +2678,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   levelData: {fileID: 0}
   battleControl: {fileID: 0}
-  debugLevelData: {fileID: 11400000, guid: 65bd2fba3d61ada42ab3003dd7e49d9b, type: 2}
+  debugLevelData: {fileID: 11400000, guid: 0a041b3313cc6fe4fa2b93270201e0de, type: 2}
   mainUI: {fileID: 2020279085}
   victoryUI: {fileID: 190305778}
 --- !u!4 &371324284
