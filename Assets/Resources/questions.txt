@@ -6,7 +6,7 @@ B. June 4, 1850
 C. June 19, 1861 "C"
 D. Dec 30, 1896
 
-2. Which of the following makes the sound?
+2. What type of the Alphabet do you hear?
 TYPE:AUDIO:vowels
 INPUT:IDENTIFICATION
 A. Vowels "C"
