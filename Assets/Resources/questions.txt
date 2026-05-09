@@ -15,7 +15,7 @@ C. The Alphabet
 D. Letters
 
 3. Was this Jose Rizal as a child?
-TYPE:IMAGE:rizal
+TYPE:IMAGE:rizal-as-a-child
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
@@ -40,12 +40,12 @@ TYPE:TEXT
 INPUT:TRUE_OR_FALSE
 ANSWER:FALSE
 
-7. Was this the house of Jose Rizal?
-TYPE:IMAGE:house
+7. Was this the house of Jose Rizal>
+TYPE:IMAGE:house-of-rizal
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
 8. Is this Jose Rizal?
-TYPE:IMAGE:francisco
+TYPE:IMAGE:francisco-mercado
 INPUT:TRUE_OR_FALSE
 ANSWER:FALSE

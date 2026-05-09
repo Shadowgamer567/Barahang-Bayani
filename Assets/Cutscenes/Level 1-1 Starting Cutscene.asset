@@ -51,7 +51,7 @@ MonoBehaviour:
     Dialogue: 'Ate!! Can I please learn what you''re learning? Pretty please? '
     isLeftSide: 1
   - speakerName: Saturnina Rizal
-    speakerType: 2
+    speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
     Dialogue: 'Okay, Jose. You can try and learn what I''m learning. '
