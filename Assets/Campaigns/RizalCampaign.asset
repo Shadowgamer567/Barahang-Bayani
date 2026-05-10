@@ -20,6 +20,7 @@ MonoBehaviour:
     - {fileID: 5459741392219997052, guid: dbda3ed0b3d4d9c42be38a85442405d6, type: 3}
     - {fileID: 5057195549992596033, guid: 914f745e2fd06d940b674e121f42dcca, type: 3}
     - {fileID: 7660662049374254284, guid: 85016b6d2616d6a43b17f33e97ac76c0, type: 3}
+    - {fileID: 8880819021502290935, guid: db5aae6b2f287b046925b98bc6f7b944, type: 3}
     groundMaterial: {fileID: 2100000, guid: 5be5068aad440bd4dadad713f1c8b352, type: 2}
   - startLevel: 4
     endLevel: 7
