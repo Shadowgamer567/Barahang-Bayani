@@ -29,4 +29,9 @@ public class QuizQuestion
 
     public string imagePath;
     public string audioPath;
+
+    public string infoTitle;
+    public Sprite infoImage;
+    [TextArea(5, 10)]
+    public string infoText;
 }

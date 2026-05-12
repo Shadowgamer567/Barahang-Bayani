@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Poem
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Poem
-  cardDesc: 
+  cardShortDesc: Deal 10 Damage to a Single Enemy
+  cardFullDesc: 
   targetType: 1
   damage: 10
   cost: 1

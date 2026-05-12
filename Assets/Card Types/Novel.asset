@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Novel
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Novel
-  cardDesc: 
+  cardShortDesc: Deal 7 Damage to a Single Enemy
+  cardFullDesc: 
   targetType: 1
   damage: 7
   cost: 1

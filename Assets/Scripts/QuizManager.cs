@@ -1,7 +1,8 @@
-using TMPro;
-using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class QuizManager : MonoBehaviour
@@ -20,6 +21,18 @@ public class QuizManager : MonoBehaviour
     public GameObject truthPanel;
     public GameObject falsePanel;
 
+    [Header("Info Panel")]
+    public GameObject quizInfoPanel;
+
+    public TextMeshProUGUI infoName;
+    public Image infoImage;
+    public TextMeshProUGUI infoText;
+
+    public Image[] answerBackgrounds;
+    public Color correctColor = Color.green;
+    public Color wrongColor = Color.red;
+    public Color normalColor = Color.white;
+
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] answerText;
     public TMP_InputField inputField;
@@ -27,9 +40,10 @@ public class QuizManager : MonoBehaviour
     private QuizQuestion currentQuestion;
     private BattleControl battleControl;
 
+    private bool waitingForClick = false;
     private int pendingDamage;
 
-    public List<QuizQuestion> questions = new List<QuizQuestion> ();
+    public List<QuizQuestion> questions = new List<QuizQuestion>();
 
     public void StartQuiz(QuizQuestion question, int damage, BattleControl battle)
     {
@@ -60,8 +74,8 @@ public class QuizManager : MonoBehaviour
         }
 
         questionText.text = question.Question;
-        
-        for(int i = 0; i < answerText.Length; i++)
+
+        for (int i = 0; i < answerText.Length; i++)
         {
             if (i < question.Answer.Length)
             {
@@ -87,7 +101,7 @@ public class QuizManager : MonoBehaviour
                 Debug.Log("Question Type" + question.type);
                 Debug.Log("Image Question Tirggered");
 
-                if(sprite != null)
+                if (sprite != null)
                 {
                     questionImage.sprite = sprite;
                 }
@@ -96,13 +110,13 @@ public class QuizManager : MonoBehaviour
                 {
                     Debug.LogError("Image Not Found " + question.imagePath);
                 }
-                    break;
+                break;
 
             case QuizType.Audio:
                 audioButton.SetActive(true);
                 AudioClip clip = Resources.Load<AudioClip>("Audio/" + question.audioPath);
 
-                if(clip != null)
+                if (clip != null)
                 {
                     audioSource.clip = clip;
                     audioSource.Play();
@@ -112,7 +126,7 @@ public class QuizManager : MonoBehaviour
                 {
                     Debug.LogError("Audio Not Found " + question.audioPath);
                 }
-                    break;
+                break;
         }
 
         switch (question.inputType)
@@ -141,7 +155,7 @@ public class QuizManager : MonoBehaviour
             case InputType.TrueOrFalse:
                 inputPanel.SetActive(false);
 
-                for(int i = 0; i < answerText.Length; i++)
+                for (int i = 0; i < answerText.Length; i++)
                 {
                     answerText[i].transform.parent.gameObject.SetActive(false);
                 }
@@ -241,7 +255,7 @@ public class QuizManager : MonoBehaviour
         Debug.Log(file.text);
         string[] lines = file.text.Split('\n');
 
-        for(int i = 0; i < lines.Length;)
+        for (int i = 0; i < lines.Length;)
         {
 
             if (string.IsNullOrWhiteSpace(lines[i]))
@@ -320,7 +334,8 @@ public class QuizManager : MonoBehaviour
                 continue;
             }
 
-            else {
+            else
+            {
                 q.Answer = new string[4];
                 q.correctIndex = 0;
 
@@ -349,7 +364,7 @@ public class QuizManager : MonoBehaviour
 
     public QuizQuestion GetRandomQuestions()
     {
-        if(questions.Count == 0)
+        if (questions.Count == 0)
         {
             Debug.LogError("No Questions Loaded");
             return null;
@@ -360,17 +375,112 @@ public class QuizManager : MonoBehaviour
 
     public void PlayAudio()
     {
-        if(audioSource != null && audioSource.clip != null)
+        if (audioSource != null && audioSource.clip != null)
         {
             audioSource.Stop();
             audioSource.Play();
         }
     }
 
-
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+
+    IEnumerator ShowAnswerRoutine(bool correct, int selectedIndex = -1)
+    {
+        // ===== MULTIPLE CHOICE =====
+        if (currentQuestion.inputType == InputType.MultipleChoice)
+        {
+            // reset colors first
+            for (int i = 0; i < answerBackgrounds.Length; i++)
+            {
+                answerBackgrounds[i].color = normalColor;
+            }
+
+            if (correct)
+            {
+                answerBackgrounds[selectedIndex].color = correctColor;
+            }
+            else
+            {
+                answerBackgrounds[selectedIndex].color = wrongColor;
+                answerBackgrounds[currentQuestion.correctIndex].color = correctColor;
+            }
+        }
+
+        // ===== IDENTIFICATION =====
+        else if (currentQuestion.inputType == InputType.Identification)
+        {
+            Image inputImage = inputPanel.GetComponent<Image>();
+
+            if (inputImage != null)
+            {
+                inputImage.color = correct ? correctColor : wrongColor;
+            }
+        }
+
+        // ===== TRUE OR FALSE =====
+        else if (currentQuestion.inputType == InputType.TrueOrFalse)
+        {
+            Image trueImage = truthPanel.GetComponent<Image>();
+            Image falseImage = falsePanel.GetComponent<Image>();
+
+            if (currentQuestion.correctBool)
+            {
+                trueImage.color = correctColor;
+                falseImage.color = wrongColor;
+            }
+            else
+            {
+                falseImage.color = correctColor;
+                trueImage.color = wrongColor;
+            }
+        }
+
+        // wait before info panel
+        yield return new WaitForSecondsRealtime(2f);
+
+        // ===== SHOW INFO PANEL =====
+        quizInfoPanel.SetActive(true);
+
+        infoName.text = currentQuestion.infoTitle;
+        infoText.text = currentQuestion.infoText;
+
+        if (!string.IsNullOrEmpty(currentQuestion.infoImagePath))
+        {
+            Sprite infoSprite =
+                Resources.Load<Sprite>("Images/" + currentQuestion.infoImagePath);
+
+            if (infoSprite != null)
+            {
+                infoImage.sprite = infoSprite;
+                infoImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                infoImage.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            infoImage.gameObject.SetActive(false);
+        }
+
+        // wait for LEFT CLICK
+        waitingForClick = true;
+
+        yield return new WaitUntil(() => waitingForClick == false);
+
+        quizInfoPanel.SetActive(false);
+
+        // APPLY DAMAGE AFTER INFO PANEL
+        if (correct && battleControl != null)
+        {
+            battleControl.DealDamageToAll(pendingDamage);
+        }
+
+        EndQuiz();
     }
 }

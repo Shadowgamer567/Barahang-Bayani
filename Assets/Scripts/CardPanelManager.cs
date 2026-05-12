@@ -1,6 +1,7 @@
 //Handles Player hand logic
 
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class CardPanelManager : MonoBehaviour
@@ -9,6 +10,7 @@ public class CardPanelManager : MonoBehaviour
     public Transform cardContainer;
     public BattleControl battle;
     public QuizManager quizManager;
+    public UIMain uiMain;
 
     public CardType[] availableCards;
     public int cardCount = 5;
@@ -42,7 +44,7 @@ public class CardPanelManager : MonoBehaviour
         obj.SetActive(true);
 
         CardUI ui = obj.GetComponent<CardUI>();
-        ui.Setup(randomCard, battle, this, quizManager);
+        ui.Setup(randomCard, battle, this, quizManager, uiMain);
     }
 
     public void RefillToMax()

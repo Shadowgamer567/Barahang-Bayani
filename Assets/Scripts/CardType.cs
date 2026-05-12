@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "NewCard", menuName = "Card")]
 public class CardType : ScriptableObject
 {
     public string cardName;
-    public string cardDesc;
+    public string cardShortDesc;
+    public string cardFullDesc;
     public TargetType targetType;
     public int damage;
     public int cost;

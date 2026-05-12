@@ -8,21 +8,27 @@ public class CardUI : MonoBehaviour
 {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI costText;
+    public TextMeshProUGUI descriptionText;
     public Button button;
 
     private CardType cardType;
     private BattleControl battleControl;
     private CardPanelManager cardManager;
     private QuizManager quizManager;
+    private UIMain uiMain;
 
-    public void Setup(CardType type, BattleControl battle, CardPanelManager manager, QuizManager quiz)
+    public void Setup(CardType type, BattleControl battle, CardPanelManager manager, QuizManager quiz, UIMain ui)
     {
         cardType = type;
         battleControl = battle;
         quizManager = quiz;
+        uiMain = ui;
+        cardManager = manager;
 
         nameText.text = type.cardName;
         costText.text = type.cost.ToString();
+        descriptionText.text = type.cardShortDesc;
+
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnClick);
@@ -38,10 +44,18 @@ public class CardUI : MonoBehaviour
             return;
         }
 
+        if(uiMain != null)
+        {
+            uiMain.ShowFullCard(this, cardType);
+        }
+    }
+
+    public void PlayCard()
+    {
         Debug.Log("Played Card: " + cardType.cardName);
         Debug.Log("Target Type: " + cardType.targetType);
 
-            battleControl.HandleCardPlay(cardType, this);
+        battleControl.HandleCardPlay(cardType, this);
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

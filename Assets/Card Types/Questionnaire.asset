@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Questionnaire
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Questionnaire
-  cardDesc: A written list of questions used to obtain information
+  cardShortDesc: Deal 15 Damage to all Enemies
+  cardFullDesc: 
   targetType: 0
   damage: 15
   cost: 3

@@ -1,5 +1,6 @@
 //Handles Primary UI display and displaly logic
 
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
@@ -28,8 +29,19 @@ public class HeroPanel
     public Image shieldFill;
     public TextMeshProUGUI shieldText;
 }
+
 public class UIMain : MonoBehaviour
 {
+    [Header("Full CardPanel")]
+    public GameObject fullCardPanel;
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI costText;
+    public TextMeshProUGUI descriptionText;
+
+    private CardUI selectedCardUI;
+    private CardType selectedCardType;
+
+    [Header("Stat Panels")]
     public EnemyPanel[] enemypanel;
     public EnemyStats[] enemies;
     public HeroPanel[] heropanel;
@@ -255,6 +267,47 @@ public class UIMain : MonoBehaviour
                 heropanel[i].heroPanel.SetActive(false);
             }
         }
+    }
+
+    public void ShowFullCard(CardUI cardUI, CardType cardType)
+    {
+        selectedCardUI = cardUI;
+        selectedCardType = cardType;
+
+        fullCardPanel.SetActive(true);
+
+        nameText.text = cardType.cardName;
+        costText.text = cardType.cost.ToString();
+        descriptionText.text = cardType.cardFullDesc;
+
+        // hide small card while previewing
+        cardUI.gameObject.SetActive(false);
+    }
+
+    public void ConfirmCardPlay()
+    {
+        if (selectedCardUI == null || selectedCardType == null)
+            return;
+
+        selectedCardUI.PlayCard();
+
+        fullCardPanel.SetActive(false);
+
+        selectedCardUI = null;
+        selectedCardType = null;
+    }
+
+    public void CancelCardPreview()
+    {
+        if (selectedCardUI != null)
+        {
+            selectedCardUI.gameObject.SetActive(true);
+        }
+
+        fullCardPanel.SetActive(false);
+
+        selectedCardUI = null;
+        selectedCardType = null;
     }
     // Update is called once per frame
     void Update()
