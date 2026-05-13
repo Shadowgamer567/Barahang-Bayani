@@ -1,3 +1,4 @@
+ID:RIZAL1
 1. When was Jose Rizal born?
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
@@ -6,6 +7,7 @@ B. June 4, 1850
 C. June 19, 1861 "C"
 D. Dec 30, 1896
 
+ID:RIZAL2
 2. What type of the Alphabet do you hear?
 TYPE:AUDIO:vowels
 INPUT:IDENTIFICATION
@@ -14,11 +16,13 @@ B. Consonants
 C. The Alphabet
 D. Letters
 
+ID:RIZAL3
 3. Was this Jose Rizal as a child?
 TYPE:IMAGE:rizal-as-a-child
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
+ID:RIZAL4
 4. When did Jose Rizal learn the Alphabet?
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
@@ -27,6 +31,7 @@ B. 3 "C"
 C. 5
 D. 8
 
+ID:RIZAL5
 5. Enter the name of Jose Rizal's Godfather.
 TYPE:TEXT
 INPUT:IDENTIFICATION
@@ -35,16 +40,19 @@ B. Rufino Collantes
 C. Leoncio Lopez
 D. Manuel de Quintos Alonzo
 
+ID:RIZAL6
 6. Was Jose Rizal American?
 TYPE:TEXT
 INPUT:TRUE_OR_FALSE
 ANSWER:FALSE
 
+ID:RIZAL7
 7. Was this the house of Jose Rizal>
 TYPE:IMAGE:house-of-rizal
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
+ID:RIZAL8
 8. Is this Jose Rizal?
 TYPE:IMAGE:francisco-mercado
 INPUT:TRUE_OR_FALSE

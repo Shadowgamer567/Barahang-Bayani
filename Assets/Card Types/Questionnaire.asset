@@ -16,6 +16,6 @@ MonoBehaviour:
   cardShortDesc: Deal 15 Damage to all Enemies
   cardFullDesc: 
   targetType: 0
-  damage: 15
-  cost: 3
+  damage: 3
+  cost: 1
   quizCard: 1

@@ -26,12 +26,14 @@ public class QuizQuestion
     public string correctAnswer;
     public int correctIndex;
     public bool correctBool;
+    public string questionID;
 
     public string imagePath;
     public string audioPath;
 
+    [Header("Info Panel")]
     public string infoTitle;
-    public Sprite infoImage;
+    public string infoImagePath;
     [TextArea(5, 10)]
-    public string infoText;
+    public string infoDescription;
 }

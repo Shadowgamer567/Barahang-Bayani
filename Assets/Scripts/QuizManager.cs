@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class QuizManager : MonoBehaviour
 {
@@ -44,6 +47,7 @@ public class QuizManager : MonoBehaviour
     private int pendingDamage;
 
     public List<QuizQuestion> questions = new List<QuizQuestion>();
+    public Dictionary<string, QuizInfoData> infoDatabase = new Dictionary<string, QuizInfoData>();
 
     public void StartQuiz(QuizQuestion question, int damage, BattleControl battle)
     {
@@ -86,6 +90,33 @@ public class QuizManager : MonoBehaviour
             {
                 answerText[i].text = "";
             }
+        }
+
+        quizInfoPanel.SetActive(false);
+
+        foreach (Image bg in answerBackgrounds)
+        {
+            bg.color = normalColor;
+        }
+
+        Image inputImage = inputPanel.GetComponent<Image>();
+
+        if (inputImage != null)
+        {
+            inputImage.color = normalColor;
+        }
+
+        Image trueImage = truthPanel.GetComponent<Image>();
+        Image falseImage = falsePanel.GetComponent<Image>();
+
+        if (trueImage != null)
+        {
+            trueImage.color = normalColor;
+        }
+
+        if (falseImage != null)
+        {
+            falseImage.color = normalColor;
         }
 
         switch (question.type)
@@ -173,16 +204,13 @@ public class QuizManager : MonoBehaviour
         bool correct = index == currentQuestion.correctIndex;
 
         Debug.Log(correct ? "Correct!" : "Incorrect");
+
         if (correct)
         {
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
-
-            if (correct && battleControl != null)
-            {
-                battleControl.DealDamageToAll(pendingDamage);
-            }
         }
-        EndQuiz();
+
+        StartCoroutine(ShowAnswerRoutine(correct, index));
     }
 
     public void SubmitIdentification()
@@ -197,12 +225,9 @@ public class QuizManager : MonoBehaviour
         {
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
 
-            if (iscorrect && battleControl != null)
-            {
-                battleControl.DealDamageToAll(pendingDamage);
-            }
         }
-        EndQuiz();
+
+        StartCoroutine(ShowAnswerRoutine(iscorrect));
     }
 
     public void AnswerTrueorFalse(bool playerAnswer)
@@ -214,13 +239,8 @@ public class QuizManager : MonoBehaviour
         if (correct)
         {
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
-
-            if (correct && battleControl != null)
-            {
-                battleControl.DealDamageToAll(pendingDamage);
-            }
         }
-        EndQuiz();
+        StartCoroutine(ShowAnswerRoutine(correct));
     }
 
     public void EndQuiz()
@@ -235,10 +255,11 @@ public class QuizManager : MonoBehaviour
         Time.timeScale = 1f;
 
     }
-
     void Awake()
     {
         LoadQuestions();
+        Debug.Log("Loaded Quiz Info");
+        LoadQuizInfo();
     }
 
     void LoadQuestions()
@@ -266,7 +287,15 @@ public class QuizManager : MonoBehaviour
 
             QuizQuestion q = new QuizQuestion();
 
+            // READ QUESTION ID
+            q.questionID = lines[i]
+                .Replace("ID:", "")
+                .Trim();
+
+            i++;
+
             q.Question = lines[i].Trim();
+
             int dotIndex = q.Question.IndexOf(".");
 
             if (dotIndex != -1)
@@ -362,6 +391,62 @@ public class QuizManager : MonoBehaviour
         }
     }
 
+    void LoadQuizInfo()
+    {
+        TextAsset file = Resources.Load<TextAsset>("quizinfo");
+        if (file == null) return;
+
+        string[] lines = file.text.Split('\n');
+        QuizInfoData current = null;
+
+        foreach (string rawline in lines)
+        {
+            string line = rawline.Trim();
+
+            // Don't skip empty lines if we are currently recording a description
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                if (current != null) current.description += "\n";
+                continue;
+            }
+
+            if (line.StartsWith("[ID:"))
+            {
+                current = new QuizInfoData();
+                current.id = line.Replace("[ID:", "").Replace("]", "").Trim();
+                current.description = "";
+            }
+            else if (line.StartsWith("TITLE:"))
+            {
+                current.title = line.Substring(6).Trim();
+            }
+            else if (line.StartsWith("IMAGE:"))
+            {
+                current.imagePath = line.Substring(6).Trim();
+            }
+            else if (line.StartsWith("DESC:"))
+            {
+                // Just a marker, we can ignore the "DESC:" line itself
+                continue;
+            }
+            else if (line.StartsWith("[END]")) // Removed colon to match your file
+            {
+                if (current != null)
+                {
+                    infoDatabase[current.id] = current;
+                    Debug.Log("Successfully Loaded Info for: " + current.id);
+                }
+            }
+            else
+            {
+                if (current != null)
+                {
+                    current.description += line + " ";
+                }
+            }
+        }
+    }
+
     public QuizQuestion GetRandomQuestions()
     {
         if (questions.Count == 0)
@@ -385,7 +470,10 @@ public class QuizManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (waitingForClick && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            waitingForClick = false;
+        }
     }
 
     IEnumerator ShowAnswerRoutine(bool correct, int selectedIndex = -1)
@@ -445,28 +533,25 @@ public class QuizManager : MonoBehaviour
         // ===== SHOW INFO PANEL =====
         quizInfoPanel.SetActive(true);
 
-        infoName.text = currentQuestion.infoTitle;
-        infoText.text = currentQuestion.infoText;
+        if (infoDatabase.ContainsKey(currentQuestion.questionID))
+        {
+            QuizInfoData info = infoDatabase[currentQuestion.questionID];
 
-        // if (!string.IsNullOrEmpty(currentQuestion.infoImagePath))
-        // {
-        //     Sprite infoSprite =
-        //         Resources.Load<Sprite>("Images/" + currentQuestion.infoImagePath);
+            infoName.text = info.title;
+            infoText.text = info.description;
 
-        //     if (infoSprite != null)
-        //     {
-        //         infoImage.sprite = infoSprite;
-        //         infoImage.gameObject.SetActive(true);
-        //     }
-        //     else
-        //     {
-        //         infoImage.gameObject.SetActive(false);
-        //     }
-        // }
-        // else
-        // {
-        //     infoImage.gameObject.SetActive(false);
-        // }
+            Sprite infoSprite = Resources.Load<Sprite>("Images/" + info.imagePath);
+
+            if (infoSprite != null)
+            {
+                infoImage.sprite = infoSprite;
+                infoImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                infoImage.gameObject.SetActive(false);
+            }
+        }
 
         // wait for LEFT CLICK
         waitingForClick = true;

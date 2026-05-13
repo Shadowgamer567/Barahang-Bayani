@@ -1,0 +1,63 @@
+[ID:RIZAL1]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL2]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL3]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL4]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL5]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL6]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL7]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]
+
+[ID:RIZAL8]
+TITLE:Jose Rizal's Birthday
+IMAGE:rizal-as-a-child
+DESC:
+Jose Rizal was born June 19, 1861, in a place I can't remember.
+
+[END]

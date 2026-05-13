@@ -32,6 +32,8 @@ public class BattleControl : MonoBehaviour
     public int currentActionPoint;
     public bool isLevelFinished = false;
 
+    private bool battleAlreadyWon = false;
+
     public System.Action<int, int> OnAPChanged;
 
 
@@ -133,6 +135,8 @@ public class BattleControl : MonoBehaviour
 
     void SetupEnemies()
     {
+        battleAlreadyWon = false; 
+
         int enemyCount = Random.Range(levelData.minEnemies, levelData.maxEnemies + 1);
 
         for (int i = 0; i < enemies.Length; i++)
@@ -390,8 +394,9 @@ public class BattleControl : MonoBehaviour
 
         Debug.Log("Enemies Left: " + aliveEnemies);
 
-        if (aliveEnemies <= 0)
+        if (aliveEnemies <= 0 && !battleAlreadyWon)
         {
+            battleAlreadyWon = true;
             Debug.Log("Battle Won");
 
             OnBattleWon?.Invoke();
