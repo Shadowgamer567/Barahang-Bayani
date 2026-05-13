@@ -448,25 +448,25 @@ public class QuizManager : MonoBehaviour
         infoName.text = currentQuestion.infoTitle;
         infoText.text = currentQuestion.infoText;
 
-        if (!string.IsNullOrEmpty(currentQuestion.infoImagePath))
-        {
-            Sprite infoSprite =
-                Resources.Load<Sprite>("Images/" + currentQuestion.infoImagePath);
+        // if (!string.IsNullOrEmpty(currentQuestion.infoImagePath))
+        // {
+        //     Sprite infoSprite =
+        //         Resources.Load<Sprite>("Images/" + currentQuestion.infoImagePath);
 
-            if (infoSprite != null)
-            {
-                infoImage.sprite = infoSprite;
-                infoImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                infoImage.gameObject.SetActive(false);
-            }
-        }
-        else
-        {
-            infoImage.gameObject.SetActive(false);
-        }
+        //     if (infoSprite != null)
+        //     {
+        //         infoImage.sprite = infoSprite;
+        //         infoImage.gameObject.SetActive(true);
+        //     }
+        //     else
+        //     {
+        //         infoImage.gameObject.SetActive(false);
+        //     }
+        // }
+        // else
+        // {
+        //     infoImage.gameObject.SetActive(false);
+        // }
 
         // wait for LEFT CLICK
         waitingForClick = true;
