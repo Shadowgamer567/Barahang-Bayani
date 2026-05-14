@@ -4,6 +4,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class AccountManager : MonoBehaviour
 {
@@ -67,18 +68,14 @@ public class AccountManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+
             DontDestroyOnLoad(gameObject);
         }
 
-        LoadAccount();
-
-        accountSelectPanel.SetActive(false);
-
-        accountManagementPanel.SetActive(false);
-
-        createAccountPanel.SetActive(false);
-
-        accountButton.SetActive(true);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void LoadAccount()
@@ -97,8 +94,6 @@ public class AccountManager : MonoBehaviour
         {
             registry = new AccountRegistry();
         }
-
-        RefreshUI();
     }
 
     public void SaveAccount()
@@ -158,7 +153,15 @@ public class AccountManager : MonoBehaviour
             File.Delete(saveFile);
         }
 
-        registry.accounts.Remove(selectedAccount);
+        registry.accounts.RemoveAll(a => a.id == selectedAccount.id);
+
+        foreach (AccountData account in registry.accounts)
+        {
+            if (account.assignedStudentIDs != null)
+            {
+                account.assignedStudentIDs.Remove(selectedAccount.id);
+            }
+        }
 
         selectedAccount = null;
         selectedCard = null;
@@ -170,36 +173,68 @@ public class AccountManager : MonoBehaviour
 
     public void RefreshUI()
     {
-        foreach (Transform child in studentContainer)
+        Debug.Log("RefreshUI Started");
+
+        if (studentContainer == null)
         {
-            if (child.gameObject != accountCardPrefab)
-            {
-                Destroy(child.gameObject);
-            }
+            Debug.LogError("Student Container NULL");
+            return;
         }
 
-        foreach (Transform child in teacherContainer)
+        if (teacherContainer == null)
         {
-            if (child.gameObject != accountCardPrefab)
-            {
-                Destroy(child.gameObject);
-            }
+            Debug.LogError("Teacher Container NULL");
+            return;
         }
+
+        if (accountCardPrefab == null)
+        {
+            Debug.LogError("Account Card Prefab NULL");
+            return;
+        }
+
+        // Clear old cards
+        for (int i = studentContainer.childCount - 1; i >= 0; i--)
+        {
+            Destroy(studentContainer.GetChild(i).gameObject);
+        }
+
+        for (int i = teacherContainer.childCount - 1; i >= 0; i--)
+        {
+            Destroy(teacherContainer.GetChild(i).gameObject);
+        }
+
+        Debug.Log("Cleared old cards");
 
         foreach (AccountData account in registry.accounts)
         {
-            Transform parent = account.accountType == AccountType.Student ? studentContainer : teacherContainer;
+            Transform parent =
+                account.accountType == AccountType.Student
+                ? studentContainer
+                : teacherContainer;
 
-            GameObject obj = Instantiate(accountCardPrefab, parent);
+            GameObject obj =
+                Instantiate(accountCardPrefab, parent);
 
             obj.SetActive(true);
 
-            AccountCardUI card = obj.GetComponent<AccountCardUI>();
+            Debug.Log("Instantiated card object");
+
+            AccountCardUI card =
+                obj.GetComponent<AccountCardUI>();
+
+            if (card == null)
+            {
+                Debug.LogError("AccountCardUI component missing");
+                continue;
+            }
 
             card.Setup(account);
 
             Debug.Log("Spawned UI Card for: " + account.username);
         }
+
+        Debug.Log("RefreshUI Finished");
     }
 
     public void SubmitUsername()
@@ -321,17 +356,20 @@ public class AccountManager : MonoBehaviour
 
     void HideAllPanels()
     {
-        accountSelectPanel.SetActive(false);
+        if (accountSelectPanel != null)
+            accountSelectPanel.SetActive(false);
 
-        accountManagementPanel.SetActive(false);
+        if (accountManagementPanel != null)
+            accountManagementPanel.SetActive(false);
 
-        createAccountPanel.SetActive(false);
+        if (createAccountPanel != null)
+            createAccountPanel.SetActive(false);
 
-        teacherInfoPanel.SetActive(false);
+        if (teacherInfoPanel != null)
+            teacherInfoPanel.SetActive(false);
 
-        studentInfoPanel.SetActive(false);
-
-        mainMenu.SetActive(false);
+        if (studentInfoPanel != null)
+            studentInfoPanel.SetActive(false);
     }
 
     public void OpenAccountMenu()
@@ -454,6 +492,46 @@ public class AccountManager : MonoBehaviour
     public void SelectTeacherStudent(AccountCardUI card)
     {
         OpenStudentInfo(card.GetAccountData());
+    }
+
+    public void ConnectUI(AccountUIReferences ui)
+    {
+        accountButton = ui.accountButton;
+        backButton = ui.backButton;
+
+        accountSelectPanel = ui.accountSelectPanel;
+        accountManagementPanel = ui.accountManagementPanel;
+        createAccountPanel = ui.createAccountPanel;
+
+        teacherInfoPanel = ui.teacherInfoPanel;
+        studentInfoPanel = ui.studentInfoPanel;
+
+        mainMenu = ui.mainMenu;
+
+        assignStudentsButton = ui.assignStudentsButton;
+        confirmAssignButton = ui.confirmAssignButton;
+
+        studentContainer = ui.studentContainer;
+        teacherContainer = ui.teacherContainer;
+        assignedStudentContainer = ui.assignedStudentContainer;
+
+        usernameInputField = ui.usernameInputField;
+
+        teacherNameText = ui.teacherNameText;
+        completedLevelsText = ui.completedLevelsText;
+        quizStatsText = ui.quizStatsText;
+
+        LoadAccount();
+
+        HideAllPanels();
+
+        accountButton.SetActive(true);
+
+        backButton.SetActive(false);
+
+        RefreshUI();
+
+        Debug.Log("UI Connected Successfully");
     }
 
     // Update is called once per frame

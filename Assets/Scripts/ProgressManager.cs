@@ -74,6 +74,18 @@ public class ProgressManager : MonoBehaviour
         data.completedLevel = completedLevels;
         data.lastCampaignScene = lastCampaignScene;
 
+        data.multipleChoiceCorrect = QuizStats.Instance.GetTypeCorrect(InputType.MultipleChoice);
+
+        data.multipleChoiceTotal = QuizStats.Instance.GetTotalType(InputType.MultipleChoice);
+
+        data.identificationCorrect = QuizStats.Instance.GetTypeCorrect(InputType.Identification);
+
+        data.identificationTotal = QuizStats.Instance.GetTotalType(InputType.Identification);
+
+        data.trueFalseCorrect = QuizStats.Instance.GetTypeCorrect(InputType.TrueOrFalse);
+
+        data.trueFalseTotal = QuizStats.Instance.GetTotalType(InputType.TrueOrFalse);
+
         string json = JsonUtility.ToJson(data, true);
 
         File.WriteAllText(savePath, json);
@@ -100,6 +112,20 @@ public class ProgressManager : MonoBehaviour
                 data.completedLevel ?? new List<string>();
 
             lastCampaignScene = data.lastCampaignScene;
+
+            QuizStats.Instance.ResetStats();
+
+            QuizStats.Instance.typeCorrect[InputType.MultipleChoice] = data.multipleChoiceCorrect;
+
+            QuizStats.Instance.typeTotal[InputType.MultipleChoice] = data.multipleChoiceTotal;
+
+            QuizStats.Instance.typeCorrect[InputType.Identification] = data.identificationCorrect;
+
+            QuizStats.Instance.typeTotal[InputType.Identification] = data.identificationTotal;
+
+            QuizStats.Instance.typeCorrect[InputType.TrueOrFalse] = data.trueFalseCorrect;
+
+            QuizStats.Instance.typeTotal[InputType.TrueOrFalse] = data.trueFalseTotal;
 
             Debug.Log("Loaded Progress For: " + currentAccount.username);
         }

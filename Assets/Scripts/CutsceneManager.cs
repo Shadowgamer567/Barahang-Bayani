@@ -107,7 +107,7 @@ public class CutsceneManager : MonoBehaviour
         ShowLine();
     }
 
-    void EndCutscene()
+    public void EndCutscene()
     {
         cutsceneUI.SetActive(false);
         mainUI.SetActive(true);

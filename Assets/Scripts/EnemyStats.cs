@@ -15,7 +15,7 @@ public class EnemyStats : MonoBehaviour
     public Animator animator;
     public Transform modelRoot;
     public GameObject currentModel;
-    public GameObject selectionIndicator;
+    //public GameObject selectionIndicator;
 
     public int currentHP;
     public int shield;
@@ -223,13 +223,13 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
-    public void SetHighlighted(bool state)
+    /*public void SetHighlighted(bool state)
     {
         if (selectionIndicator != null)
         {
             selectionIndicator.SetActive(state);
         }
-    }
+    }*/
 
     public void OnDeathAnimationComplete()
     {

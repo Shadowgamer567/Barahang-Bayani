@@ -245,6 +245,8 @@ public class QuizManager : MonoBehaviour
 
     public void EndQuiz()
     {
+        ProgressManager.Instance.SaveProgress();
+
         quizPanel.SetActive(false);
 
         enemyPanel.SetActive(true);

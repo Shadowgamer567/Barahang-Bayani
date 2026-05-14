@@ -12,7 +12,7 @@ public class MainMenu : MonoBehaviour
             return;
         }
 
-        ProgressManager.Instance.LoadProgress();
+        ProgressManager.Instance.NewGame();
 
         SceneManager.LoadScene("MapMenu");
     }
