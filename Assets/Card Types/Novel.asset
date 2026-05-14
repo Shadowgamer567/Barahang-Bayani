@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Novel
   cardShortDesc: Deal 7 Damage to a Single Enemy
-  cardFullDesc: 
+  cardFullDesc: The Reign of Greed. -Jose Rizal
   targetType: 1
   damage: 7
   cost: 1

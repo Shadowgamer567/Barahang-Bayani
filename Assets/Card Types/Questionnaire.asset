@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Questionnaire
   cardShortDesc: Deal 15 Damage to all Enemies
-  cardFullDesc: 
+  cardFullDesc: Answer a question, if your answer is correct, deal damage. If the
+    answer is wrong, deal 0 damage and the card is consumed.
   targetType: 0
-  damage: 3
-  cost: 1
+  damage: 15
+  cost: 3
   quizCard: 1

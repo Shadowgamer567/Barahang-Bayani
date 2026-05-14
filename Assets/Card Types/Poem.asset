@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Poem
   cardShortDesc: Deal 10 Damage to a Single Enemy
-  cardFullDesc: 
+  cardFullDesc: "Mi \xDAltimo Adi\xF3s. -Jose Rizal"
   targetType: 1
   damage: 10
   cost: 1
