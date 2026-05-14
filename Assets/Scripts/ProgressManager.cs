@@ -18,7 +18,7 @@ public class ProgressManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            savePath = Application.persistentDataPath + "/progress.json";
+            savePath = Application.persistentDataPath + "/progress_" + CurrentAccount.ActiveAccount.id + ".json" ;
 
             LoadProgress();
         }
