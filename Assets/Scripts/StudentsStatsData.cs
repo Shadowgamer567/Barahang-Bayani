@@ -1,11 +1,12 @@
 using NUnit.Framework;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using System.Collections.Generic;
 
-[System.Serializable]
-public class ProgressData
+[Serializable]
+public class StudentStatsData
 {
-    public List<string> completedLevel = new List<string>();
+    public List<string> completedLevels = new();
 
     public string lastCampaignScene;
 

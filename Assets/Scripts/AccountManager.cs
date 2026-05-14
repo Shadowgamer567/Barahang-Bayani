@@ -1,7 +1,8 @@
 using JetBrains.Annotations;
+using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class AccountManager : MonoBehaviour
@@ -27,6 +28,29 @@ public class AccountManager : MonoBehaviour
     public GameObject accountSelectPanel;
     public GameObject accountManagementPanel;
     public GameObject createAccountPanel;
+    public GameObject mainMenu;
+
+    [Header("Teacher Monitoring")]
+    public GameObject teacherInfoPanel;
+    public GameObject studentInfoPanel;
+
+    public GameObject assignStudentsButton;
+    public GameObject confirmAssignButton;
+
+    private bool assigningStudents = false;
+
+    private AccountData assigningTeacher;
+    private List<AccountData> pendingStudents = new();
+
+    [Header("Teacher Info")]
+    public TextMeshProUGUI teacherNameText;
+
+    public Transform assignedStudentContainer;
+
+    [Header("Student Info")]
+    public TextMeshProUGUI completedLevelsText;
+
+    public TextMeshProUGUI quizStatsText;
 
     public AccountRegistry registry = new();
 
@@ -40,7 +64,11 @@ public class AccountManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
 
         LoadAccount();
 
@@ -123,6 +151,13 @@ public class AccountManager : MonoBehaviour
         if (selectedAccount == null)
             return;
 
+        string saveFile = Application.persistentDataPath + "/progress_" + selectedAccount.id + ".json";
+
+        if (File.Exists(saveFile))
+        {
+            File.Delete(saveFile);
+        }
+
         registry.accounts.Remove(selectedAccount);
 
         selectedAccount = null;
@@ -177,6 +212,8 @@ public class AccountManager : MonoBehaviour
 
         accountManagementPanel.SetActive(true);
 
+        backButton.SetActive(true);
+
         RefreshUI();
     }
 
@@ -189,7 +226,33 @@ public class AccountManager : MonoBehaviour
     }
 
     public void SelectAccount(AccountCardUI card)
-    { 
+    {
+        AccountData clickedAccount = card.GetAccountData();
+
+        if (assigningStudents)
+        {
+            if (clickedAccount.accountType != AccountType.Student)
+            {
+                return;
+            }
+
+            if (pendingStudents.Contains(clickedAccount))
+            {
+                pendingStudents.Remove(clickedAccount);
+
+                card.SetSelected(false);
+            }
+
+            else
+            {
+                pendingStudents.Add(clickedAccount);
+
+                card.SetSelected(true);
+            }
+
+                return;
+        }
+
         if (selectedCard != null)
         {
             selectedCard.SetSelected(false);
@@ -201,20 +264,85 @@ public class AccountManager : MonoBehaviour
 
         CurrentAccount.ActiveAccount = selectedAccount;
 
+        ProgressManager.Instance.SetActiveAccount(selectedAccount);
+
         selectedCard.SetSelected(true);
 
         Debug.Log("Selected Account: " + selectedAccount.username);
     }
 
+    public void StartAssignStudents()
+    {
+        if (selectedAccount == null)
+            return;
+
+        if (selectedAccount.accountType != AccountType.Teacher)
+            return;
+
+        assigningStudents = true;
+
+        assigningTeacher = selectedAccount;
+
+        pendingStudents.Clear();
+
+        assignStudentsButton.SetActive(false);
+
+        confirmAssignButton.SetActive(true);
+
+        Debug.Log("Assignment Mode Started");
+    }
+
+    public void ConfirmAssignStudents()
+    {
+        if (assigningTeacher == null)
+            return;
+
+        assigningTeacher.assignedStudentIDs.Clear();
+
+        foreach (AccountData student in pendingStudents)
+        {
+            assigningTeacher.assignedStudentIDs.Add(student.id);
+        }
+
+        SaveAccount();
+
+        assigningStudents = false;
+
+        assigningTeacher = null;
+
+        pendingStudents.Clear();
+
+        assignStudentsButton.SetActive(true);
+
+        confirmAssignButton.SetActive(false);
+
+        Debug.Log("Students Assigned");
+    }
+
+    void HideAllPanels()
+    {
+        accountSelectPanel.SetActive(false);
+
+        accountManagementPanel.SetActive(false);
+
+        createAccountPanel.SetActive(false);
+
+        teacherInfoPanel.SetActive(false);
+
+        studentInfoPanel.SetActive(false);
+
+        mainMenu.SetActive(false);
+    }
+
     public void OpenAccountMenu()
     {
+        HideAllPanels();
+
         accountButton.SetActive(false);
 
         accountSelectPanel.SetActive(true);
 
         accountManagementPanel.SetActive(true);
-
-        createAccountPanel.SetActive(false);
 
         backButton.SetActive(true);
     }
@@ -245,6 +373,67 @@ public class AccountManager : MonoBehaviour
         backButton.SetActive(false);
     }
 
+    public void OpenTeacherInfo(AccountCardUI card)
+    {
+        AccountData account = card.GetAccountData();
+
+        if (account.accountType != AccountType.Teacher)
+            return;
+
+        HideAllPanels();
+
+        teacherInfoPanel.SetActive(true);
+
+        backButton.SetActive(true);
+
+        teacherNameText.text = account.username;
+        
+        foreach (Transform child in assignedStudentContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (string studentID in account.assignedStudentIDs)
+        {
+            AccountData student = registry.accounts.Find(a => a.id == studentID);
+
+            if (student == null)
+                continue;
+
+            GameObject obj = Instantiate(accountCardPrefab, assignedStudentContainer);
+
+            obj.SetActive(true);
+
+            AccountCardUI ui = obj.GetComponent<AccountCardUI>();
+
+            ui.Setup(student, AccountCardMode.TeacherStudentView);
+        }
+    }
+
+    public void OpenStudentInfo(AccountData student)
+    {
+        studentInfoPanel.SetActive(true);
+
+        string path = Application.persistentDataPath + "/progress_" + student.id + ".json";
+
+        if (!System.IO.File.Exists(path))
+        {
+            return;
+        }    
+
+        string json = System.IO.File.ReadAllText(path);
+
+        ProgressData data = JsonUtility.FromJson<ProgressData>(json);
+
+        completedLevelsText.text = "Completed Levels:\n";
+
+        foreach (string level in data.completedLevel)
+        {
+            completedLevelsText.text += level + "\n";
+        }
+
+        quizStatsText.text = "Multiple Choice: " + data.multipleChoiceCorrect + "/" + data.multipleChoiceTotal + "\n\n" + "Identification: " + data.identificationCorrect + "/" + data.identificationTotal + "\n\n" + "True/False: " + data.trueFalseCorrect + "/" + data.trueFalseTotal;
+    }
     public void CloseAccountMenu()
     {
         accountButton.SetActive(true);
@@ -256,14 +445,20 @@ public class AccountManager : MonoBehaviour
         createAccountPanel.SetActive(false);
 
         backButton.SetActive(false);
+
+        teacherInfoPanel.SetActive(false);
+
+        mainMenu.SetActive(true);
+    }
+
+    public void SelectTeacherStudent(AccountCardUI card)
+    {
+        OpenStudentInfo(card.GetAccountData());
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Mouse.current.leftButton.wasReleasedThisFrame)
-        {
 
-        }
     }
 }

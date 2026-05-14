@@ -5,6 +5,7 @@ public class Bootstrap : MonoBehaviour
     public GameObject gameManagerPrefab;
     public GameObject progressManagerPrefab;
     public GameObject quizstatsPrefab;
+    public GameObject accountManagerPrefab;
 
     void Awake()
     {
@@ -24,6 +25,12 @@ public class Bootstrap : MonoBehaviour
         {
             Instantiate(quizstatsPrefab);
             Debug.Log("QuizStats created by Bootstrap");
+        }
+
+        if (AccountManager.Instance == null)
+        {
+            Instantiate(accountManagerPrefab);
+            Debug.Log("AccountManager created by Bootstrap");
         }
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created

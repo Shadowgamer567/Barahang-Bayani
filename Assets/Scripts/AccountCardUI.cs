@@ -12,10 +12,16 @@ public class AccountCardUI : MonoBehaviour
 
     private Button button;
     private AccountData accountData;
+    private AccountCardMode cardMode;
 
-    public void Setup(AccountData data)
+    private float lastClickTime;
+    private const float doubleClickDelay = 0.25f;
+
+    public void Setup(AccountData data, AccountCardMode mode = AccountCardMode.Normal)
     {
         accountData = data;
+
+        cardMode = mode;
 
         usernameText.text = accountData.username;
 
@@ -28,8 +34,35 @@ public class AccountCardUI : MonoBehaviour
 
     public void OnClick()
     {
-        AccountManager.Instance.SelectAccount(this);
-        Debug.Log("Clicked");
+        if (cardMode == AccountCardMode.TeacherStudentView)
+        {
+            AccountManager.Instance.SelectTeacherStudent(this);
+
+            return;
+        }
+
+        float timeSinceLastClick = Time.time - lastClickTime;
+
+        if (timeSinceLastClick <= doubleClickDelay)
+        {
+            if (accountData.accountType == AccountType.Teacher)
+            {
+                AccountManager.Instance.OpenTeacherInfo(this);
+            }
+        }
+        else
+        {
+            AccountManager.Instance.SelectAccount(this);
+        }
+
+        if (timeSinceLastClick <= doubleClickDelay)
+        {
+            lastClickTime = 0f;
+        }
+        else
+        {
+            lastClickTime = Time.time;
+        }
     }
 
     public AccountData GetAccountData()

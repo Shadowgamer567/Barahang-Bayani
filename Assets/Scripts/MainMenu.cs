@@ -6,7 +6,14 @@ public class MainMenu : MonoBehaviour
     public ProgressManager loadGame;
     public void PlayGame()
     {
-        ProgressManager.Instance.NewGame();
+        if (CurrentAccount.ActiveAccount == null)
+        {
+            Debug.LogError("No account selected!");
+            return;
+        }
+
+        ProgressManager.Instance.LoadProgress();
+
         SceneManager.LoadScene("MapMenu");
     }
     public void LoadGame()

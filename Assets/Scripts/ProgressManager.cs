@@ -6,21 +6,26 @@ public class ProgressManager : MonoBehaviour
 {
     public static ProgressManager Instance;
 
-    public List<string> completedLevels = new List<string>();
+    public List<string> completedLevels = new();
+
+    public string lastCampaignScene = "MapMenu";
 
     private string savePath;
-    public string lastCampaignScene = "MapMenu";
+
+    private AccountData currentAccount;
+
+    private void Start()
+    {
+        
+    }
 
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+
             DontDestroyOnLoad(gameObject);
-
-            savePath = Application.persistentDataPath + "/progress_" + CurrentAccount.ActiveAccount.id + ".json" ;
-
-            LoadProgress();
         }
         else
         {
@@ -28,14 +33,26 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
+    public void SetActiveAccount(AccountData account)
+    {
+        currentAccount = account;
+
+        savePath = Application.persistentDataPath + "/progress_" + account.id + ".json";
+
+        Debug.Log("Active Save File: " + savePath);
+
+        LoadProgress();
+    }
+
     public void CompleteLevel(string levelName)
     {
         if (!completedLevels.Contains(levelName))
         {
             completedLevels.Add(levelName);
-            Debug.Log("Completed: " + levelName);
 
             SaveProgress();
+
+            Debug.Log("Completed: " + levelName);
         }
     }
 
@@ -46,54 +63,76 @@ public class ProgressManager : MonoBehaviour
 
     public void SaveProgress()
     {
+        if (currentAccount == null)
+        {
+            Debug.LogError("No active account selected!");
+            return;
+        }
+
         ProgressData data = new ProgressData();
+
         data.completedLevel = completedLevels;
         data.lastCampaignScene = lastCampaignScene;
 
         string json = JsonUtility.ToJson(data, true);
+
         File.WriteAllText(savePath, json);
 
-        Debug.Log("Progress saved to: " + savePath);
+        Debug.Log("Saved Progress For: " + currentAccount.username);
     }
 
     public void LoadProgress()
     {
+        if (currentAccount == null)
+        {
+            Debug.LogError("No active account selected!");
+            return;
+        }
+
         if (File.Exists(savePath))
         {
             string json = File.ReadAllText(savePath);
-            ProgressData data = JsonUtility.FromJson<ProgressData>(json);
 
-            completedLevels = data.completedLevel ?? new List<string>();
+            ProgressData data =
+                JsonUtility.FromJson<ProgressData>(json);
+
+            completedLevels =
+                data.completedLevel ?? new List<string>();
+
             lastCampaignScene = data.lastCampaignScene;
 
-            Debug.Log("Progress Loaded");
+            Debug.Log("Loaded Progress For: " + currentAccount.username);
         }
-
         else
         {
-            Debug.Log("No save file found, starting fresh");
             completedLevels = new List<string>();
+
+            lastCampaignScene = "MapMenu";
+
+            SaveProgress();
+
+            Debug.Log("Created New Save For: " + currentAccount.username);
         }
     }
 
     public void NewGame()
     {
+        if (currentAccount == null)
+        {
+            Debug.LogError("No active account selected!");
+            return;
+        }
+
         completedLevels.Clear();
+
         lastCampaignScene = "MapMenu";
 
         SaveProgress();
 
-        Debug.Log("Saved Data Cleared");
+        Debug.Log("New Game Started");
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         
     }

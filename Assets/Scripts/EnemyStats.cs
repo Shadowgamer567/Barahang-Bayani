@@ -235,7 +235,7 @@ public class EnemyStats : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-        public bool IsDead()
+    public bool IsDead()
     {
         return currentHP <= 0;
     }
