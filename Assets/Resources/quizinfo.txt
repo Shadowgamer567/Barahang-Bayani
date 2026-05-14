@@ -1,63 +1,63 @@
 [ID:RIZAL1]
 TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+IMAGE:rizal-birthday
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+Jose Rizal was born June 19, 1861.
 
 [END]
 
 [ID:RIZAL2]
-TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+TITLE:Type of Alphabet
+IMAGE:vowels
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+The Type of Alphabet played are Vowels.
 
 [END]
 
 [ID:RIZAL3]
-TITLE:Jose Rizal's Birthday
+TITLE:Is this Jose Rizal?
 IMAGE:rizal-as-a-child
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+Yes! This is Jose Rizal, when he was 3 years old.
 
 [END]
 
 [ID:RIZAL4]
-TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+TITLE:What Age did Rizal Learn the Alphabet?
+IMAGE:three
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+Jose Rizal learned the alphabet at the age of three (3).
 
 [END]
 
 [ID:RIZAL5]
-TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+TITLE:Is this Jose Rizal's Uncle, who was his teacher?
+IMAGE:jose-alberto-alonso
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+Yes! This is Jose Alberto Alonso who is Jose Rizal's uncle and teacher.
 
 [END]
 
 [ID:RIZAL6]
-TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+TITLE:Is Jose Rizal American?
+IMAGE:wrong-answer
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+No, Jose Rizal is Filipino.
 
 [END]
 
 [ID:RIZAL7]
-TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+TITLE:Is this the House of Rizal?
+IMAGE:house-of-rizal
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+Yes! This is the House of Rizal in Calamba, Laguna.
 
 [END]
 
 [ID:RIZAL8]
-TITLE:Jose Rizal's Birthday
-IMAGE:rizal-as-a-child
+TITLE:Is this Jose Rizal?
+IMAGE:wrong-answer
 DESC:
-Jose Rizal was born June 19, 1861, in a place I can't remember.
+No, this  is Jose Rizal's Father, Francisco Mercado. 
 
 [END]

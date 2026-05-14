@@ -23,7 +23,7 @@ INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
 ID:RIZAL4
-4. When did Jose Rizal learn the Alphabet?
+4. At what age did Jose Rizal learn the Alphabet?
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. 7
@@ -32,13 +32,13 @@ C. 5
 D. 8
 
 ID:RIZAL5
-5. Enter the name of Jose Rizal's Godfather.
+5. Who was Jose Rizal's Uncle who was his teacher?
 TYPE:TEXT
 INPUT:IDENTIFICATION
-A. Pedro Casanas "C"
+A. Jose Alberto Alonso "C"
 B. Rufino Collantes
 C. Leoncio Lopez
-D. Manuel de Quintos Alonzo
+D. Manuel de Quintos Alonso
 
 ID:RIZAL6
 6. Was Jose Rizal American?
@@ -47,7 +47,7 @@ INPUT:TRUE_OR_FALSE
 ANSWER:FALSE
 
 ID:RIZAL7
-7. Was this the house of Jose Rizal>
+7. Was this the house of Jose Rizal?
 TYPE:IMAGE:house-of-rizal
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
