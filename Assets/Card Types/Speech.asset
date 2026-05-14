@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Speech
   cardShortDesc: Deal 5 Damage to all Enemies
-  cardFullDesc: 
+  cardFullDesc: If the Filipino oppression is continued, the Filipinos will rebel
+    against the Spanish Government. -Father Burgos
   targetType: 0
   damage: 5
   cost: 2
