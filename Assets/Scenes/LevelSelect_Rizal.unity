@@ -928,7 +928,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &223978637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3300,7 +3300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45edd76371990e34fa1b7881301ed363, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModuleButton
-  moduleData: {fileID: 0}
+  moduleData: {fileID: 11400000, guid: 6b50664d75ea0ed4786b43ae7c5e72c9, type: 2}
 --- !u!1 &1147935986
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 602fc9d0cb2691042970cb01b5041a06, type: 3}
+  m_Name: Jose RIzal Info
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleInfoData
+  moduleTitle: Different Portraits of Rizal
+  moduleDescription: "From left to right and center, details Rizal's different portraits.\n\n-Rizal
+    in Luna\u2019s Home.\r\n-Rizal in 1890.\r\n-The Portrait on the Paper Money.\r\n-Rizal
+    in 1891.\r\n-Rizal in 1892."
+  moduleImage: {fileID: 21300000, guid: a85884a7ffcc88c42af34c190d7312d5, type: 3}

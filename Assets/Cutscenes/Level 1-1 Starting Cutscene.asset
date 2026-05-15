@@ -24,6 +24,14 @@ MonoBehaviour:
       before its usefulness ceased. It was destroyed during World War II, but was
       first confiscated by the Spanish Authorities in 1891.
     isLeftSide: 0
+  - speakerName: Jose RIzal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
+    Dialogue: Hello! My Name is Jose Protacio Rizal Mercado y Alonso Realonda. I
+      usually tell people that my name is Jose Protacio Rizal, as it's a bit long.
+      Everyone calls me Pepe, you should call me that too!
+    isLeftSide: 0
   - speakerName: Narrator
     speakerType: 2
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
