@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Unity.UI;
+using UnityEngine.UI;
 
 public class AccountManager : MonoBehaviour
 {
@@ -520,6 +522,74 @@ public class AccountManager : MonoBehaviour
         teacherNameText = ui.teacherNameText;
         completedLevelsText = ui.completedLevelsText;
         quizStatsText = ui.quizStatsText;
+
+        // Accounts Button
+        Button accountBtn = accountButton.GetComponent<Button>();
+
+        accountBtn.onClick.RemoveAllListeners();
+
+        accountBtn.onClick.AddListener(OpenAccountMenu);
+
+
+        // Back Button
+        Button backBtn = backButton.GetComponent<Button>();
+
+        backBtn.onClick.RemoveAllListeners();
+
+        backBtn.onClick.AddListener(CloseAccountMenu);
+
+
+        // Create Student Button
+        Button createStudentBtn = ui.createStudentButton.GetComponent<Button>();
+
+        createStudentBtn.onClick.RemoveAllListeners();
+
+        createStudentBtn.onClick.AddListener(OpenCreateStudentMenu);
+
+
+        // Create Teacher Button
+        Button createTeacherBtn =
+            ui.createTeacherButton.GetComponent<Button>();
+
+        createTeacherBtn.onClick.RemoveAllListeners();
+
+        createTeacherBtn.onClick.AddListener(OpenCreateTeacherMenu);
+
+
+        // Submit Username Button
+        Button submitBtn =
+            ui.submitUsernameButton.GetComponent<Button>();
+
+        submitBtn.onClick.RemoveAllListeners();
+
+        submitBtn.onClick.AddListener(SubmitUsername);
+
+
+        // Delete Account Button
+        Button deleteBtn =
+            ui.deleteAccountButton.GetComponent<Button>();
+
+        deleteBtn.onClick.RemoveAllListeners();
+
+        deleteBtn.onClick.AddListener(DeleteSelected);
+
+
+        // Assign Students Button
+        Button assignBtn =
+            assignStudentsButton.GetComponent<Button>();
+
+        assignBtn.onClick.RemoveAllListeners();
+
+        assignBtn.onClick.AddListener(StartAssignStudents);
+
+
+        // Confirm Assign Button
+        Button confirmBtn =
+            confirmAssignButton.GetComponent<Button>();
+
+        confirmBtn.onClick.RemoveAllListeners();
+
+        confirmBtn.onClick.AddListener(ConfirmAssignStudents);
 
         LoadAccount();
 

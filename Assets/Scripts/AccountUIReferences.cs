@@ -29,6 +29,15 @@ public class AccountUIReferences : MonoBehaviour
     public TextMeshProUGUI completedLevelsText;
     public TextMeshProUGUI quizStatsText;
 
+    [Header("Buttons")]
+    public GameObject createStudentButton;
+
+    public GameObject createTeacherButton;
+
+    public GameObject submitUsernameButton;
+
+    public GameObject deleteAccountButton;
+
     void Start()
     {
         Debug.Log("AccountUIReference started");
