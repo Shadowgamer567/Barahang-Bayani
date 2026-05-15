@@ -38,9 +38,12 @@ MonoBehaviour:
   - triggerType: 0
     battleIndex: 0
     Cutscene: {fileID: 11400000, guid: d8449b4fa9af9324cb8a982b196a32bb, type: 2}
-  - triggerType: 1
+  - triggerType: 0
     battleIndex: 0
     Cutscene: {fileID: 11400000, guid: d8449b4fa9af9324cb8a982b196a32bb, type: 2}
+  - triggerType: 1
+    battleIndex: 1
+    Cutscene: {fileID: 11400000, guid: a59c5a74e33cebd489ee0f3865a33010, type: 2}
   - triggerType: 1
     battleIndex: 1
     Cutscene: {fileID: 11400000, guid: a59c5a74e33cebd489ee0f3865a33010, type: 2}
