@@ -8,7 +8,9 @@ public class MainMenu : MonoBehaviour
     {
         if (CurrentAccount.ActiveAccount == null)
         {
-            Debug.LogError("No account selected!");
+            Debug.LogError("Select or Create an Account");
+
+            AccountManager.Instance.PromptForAccountThenStartGame();
             return;
         }
 

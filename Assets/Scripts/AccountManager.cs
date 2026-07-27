@@ -41,6 +41,7 @@ public class AccountManager : MonoBehaviour
     public GameObject confirmAssignButton;
 
     private bool assigningStudents = false;
+    private bool waitingToStartGame = false;
 
     private AccountData assigningTeacher;
     private List<AccountData> pendingStudents = new();
@@ -306,6 +307,15 @@ public class AccountManager : MonoBehaviour
         selectedCard.SetSelected(true);
 
         Debug.Log("Selected Account: " + selectedAccount.username);
+
+        if (waitingToStartGame)
+        {
+            waitingToStartGame = false;
+
+            ProgressManager.Instance.NewGame();
+
+            SceneManager.LoadScene("MapMenu");
+        }
     }
 
     public void StartAssignStudents()
@@ -354,6 +364,13 @@ public class AccountManager : MonoBehaviour
         confirmAssignButton.SetActive(false);
 
         Debug.Log("Students Assigned");
+    }
+
+    public void PromptForAccountThenStartGame()
+    {
+        waitingToStartGame = true;
+
+        OpenAccountMenu();
     }
 
     void HideAllPanels()
