@@ -184,8 +184,60 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: c1cec97f80e65fc419b45b045084f5f1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 465487920800276509}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c1cec97f80e65fc419b45b045084f5f1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -321250056480404804}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c1cec97f80e65fc419b45b045084f5f1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4515876207751669992}
   m_SourcePrefab: {fileID: 100100000, guid: c1cec97f80e65fc419b45b045084f5f1, type: 3}
+--- !u!1 &3825038894137292323 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c1cec97f80e65fc419b45b045084f5f1, type: 3}
+  m_PrefabInstance: {fileID: 4167005352637107058}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &-321250056480404804
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3825038894137292323}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c60f28e72d1c32245873cb5907ef6918, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4515876207751669992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3825038894137292323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
+  animator: {fileID: 0}
+  neutralState: Idle
+  moveState: Move
+  attackState: Attack
+  actionState: Action
+  damagedState: Hit
+  deathState: Death
 --- !u!4 &4494192442704882841 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c1cec97f80e65fc419b45b045084f5f1, type: 3}

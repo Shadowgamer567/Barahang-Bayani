@@ -10,11 +10,12 @@ public class EnemyStats : MonoBehaviour
     public GameObject uiObject;
     public EnemyUI ui;
     public EnemyAction[] action;
-    public Transform model;
     private BattleControl battle;
-    public Animator animator;
-    public Transform modelRoot;
+
+    public Transform animateChild;
+    public Transform visualRoot;
     public GameObject currentModel;
+    private CharacterAnimationRelay animationRelay;
     //public GameObject selectionIndicator;
 
     public int currentHP;
@@ -42,16 +43,9 @@ public class EnemyStats : MonoBehaviour
 
         transform.rotation = Quaternion.identity;
 
-        if (model != null)
+        if(animationRelay != null)
         {
-            model.localPosition = Vector3.zero;
-            model.localRotation = Quaternion.identity;
-        }
-
-        if (animator != null)
-        {
-            animator.Rebind();
-            animator.Update(0f);
+            animationRelay.Play(CharacterAnimationType.Neutral);
         }
 
         Collider col = GetComponent<Collider>();
@@ -76,10 +70,7 @@ public class EnemyStats : MonoBehaviour
 
     void Awake()
     {
-        if (model != null && animator == null)
-        {
-            animator = model.GetComponent<Animator>();
-        }
+        animationRelay = GetComponentInChildren<CharacterAnimationRelay>();
     }
 
     public void TakeDamage(int amount)
@@ -110,7 +101,12 @@ public class EnemyStats : MonoBehaviour
 
         Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
 
-        if(currentHP <= 0 && !isDying)
+        if (animationRelay != null && currentHP > 0)
+        {
+            animationRelay.Play(CharacterAnimationType.Damaged);
+        }
+
+        if (currentHP <= 0 && !isDying)
         {
             isDead = true;
             Debug.Log(name + " ENTERING DEATH");
@@ -126,9 +122,9 @@ public class EnemyStats : MonoBehaviour
                 battle.OnEnemyKilled();
             }
 
-            if (animator != null)
+            if (animationRelay != null)
             {
-                animator.SetTrigger("Die");
+                animationRelay.Play(CharacterAnimationType.Death);
             }
 
             else
@@ -190,11 +186,20 @@ public class EnemyStats : MonoBehaviour
             Destroy(currentModel);
         }
 
-        currentModel = Instantiate(enemyType.prefab, modelRoot);
+        currentModel = Instantiate(enemyType.prefab, visualRoot);
         currentModel.transform.localPosition = enemyType.modelPositionOffset;
         currentModel.transform.localRotation = Quaternion.Euler(enemyType.modelRotationOffset);
 
+        animationRelay = currentModel.GetComponentInChildren<CharacterAnimationRelay>();
+
+        if(animationRelay == null)
+        {
+            animationRelay = currentModel.AddComponent<CharacterAnimationRelay>();
+        }
+
         FaceHeroes();
+
+        animationRelay.Play(CharacterAnimationType.Neutral);
     }
 
     void FaceHeroes()
@@ -230,6 +235,14 @@ public class EnemyStats : MonoBehaviour
             selectionIndicator.SetActive(state);
         }
     }*/
+
+    public void PlayAnimation(CharacterAnimationType type)
+    {
+        if(animationRelay != null)
+        {
+            animationRelay.Play(type);
+        }
+    }
 
     public void OnDeathAnimationComplete()
     {

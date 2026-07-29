@@ -428,13 +428,13 @@ public class BattleControl : MonoBehaviour
         return true;
     }
 
-    public void HandleCardPlay(CardType card, CardUI cardUI)
+    public bool HandleCardPlay(CardType card, CardUI cardUI)
     {
         Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
 
         if (!TrySpendAP(card.cost))
         {
-            return;
+            return false;
         }
 
         if (card.quizCard)
@@ -447,7 +447,7 @@ public class BattleControl : MonoBehaviour
             }
 
             Destroy(cardUI.gameObject);
-            return;
+            return true;
         }
 
 
@@ -455,7 +455,7 @@ public class BattleControl : MonoBehaviour
         {
             DealDamageToAll(card.damage);
             Destroy(cardUI.gameObject);
-            return;
+            return true;
         }
 
         if (card.targetType == TargetType.SingleTarget)
@@ -481,7 +481,10 @@ public class BattleControl : MonoBehaviour
             }*/
 
             Destroy(cardUI.gameObject);
+            return true;
         }
+
+        return false;
     }
 
     public void SelectEnemyTarget(EnemyStats enemy)
@@ -612,6 +615,28 @@ public class BattleControl : MonoBehaviour
         StartCoroutine(BattleSequence());
     }
 
+    void SetHeroesAnimation(CharacterAnimationType type)
+    {
+        foreach (HeroStats hero in heroes)
+        {
+            if (hero != null && hero.gameObject.activeInHierarchy)
+            {
+                hero.PlayAnimation(type);
+            }
+        }
+    }
+
+    void SetEnemiesAnimation(CharacterAnimationType type)
+    {
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead)
+            {
+                enemy.PlayAnimation(type);
+            }
+        }
+    }
+
     //Starting Battle Sequence
     IEnumerator BattleSequence()
     {
@@ -623,7 +648,11 @@ public class BattleControl : MonoBehaviour
 
         groundloop.isMoving = true;
 
+        SetHeroesAnimation(CharacterAnimationType.Moving);
+
         yield return new WaitForSeconds(moveduration);
+
+        SetHeroesAnimation(CharacterAnimationType.Neutral);
 
         groundloop.isMoving = false;
 

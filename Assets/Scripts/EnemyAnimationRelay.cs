@@ -1,3 +1,5 @@
+//Deprecated, should not be used
+
 using UnityEngine;
 
 public class EnemyAnimationRelay : MonoBehaviour

@@ -5,9 +5,11 @@ public class HeroStats : MonoBehaviour
 {
     public HeroType heroType;
     public GameObject uiObject;
-    public Transform modelRoot;
-    public GameObject currentModel;
 
+    public Transform animateChild;
+    public Transform visualRoot;
+    public GameObject currentModel;
+    private CharacterAnimationRelay animationRelay;
 
     public int currentHP;
     public int attack;
@@ -52,9 +54,22 @@ public class HeroStats : MonoBehaviour
             currentHP -= amount;
         }
 
+        if (animationRelay != null && currentHP > 0)
+        {
+            animationRelay.Play(CharacterAnimationType.Damaged);
+        }
+
         if (currentHP <= 0)
         {
-            StartCoroutine(Die());
+            if(animationRelay != null)
+            {
+                animationRelay.Play(CharacterAnimationType.Death);
+            }
+
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 
@@ -82,11 +97,21 @@ public class HeroStats : MonoBehaviour
             Destroy(currentModel);
         }
 
-        currentModel = Instantiate(heroType.prefab, modelRoot);
+        currentModel = Instantiate(heroType.prefab, visualRoot);
         currentModel.transform.localPosition = heroType.modelPositionOffset;
         currentModel.transform.localRotation = Quaternion.Euler(heroType.modelRotationOffset);
 
+        animationRelay = currentModel.GetComponentInChildren<CharacterAnimationRelay>();
+
+        if (animationRelay == null)
+        {
+            Debug.LogError("CharacterAnimationRelay missing on hero prefab: " + heroType.heroName);
+            return;
+        }
+
         FaceEnemy();
+
+        animationRelay.Play(CharacterAnimationType.Neutral);
     }
 
     void FaceEnemy()
@@ -115,6 +140,8 @@ public class HeroStats : MonoBehaviour
         }
     }
 
+    //deprecated Local Death Anim.
+    /*
     IEnumerator Die()
     {
         Quaternion startRotation = transform.rotation;
@@ -135,6 +162,21 @@ public class HeroStats : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         gameObject.SetActive(false);
     }
+    */
+
+    public void PlayAnimation(CharacterAnimationType type)
+    {
+        if (animationRelay != null)
+        {
+            animationRelay.Play(type);
+        }
+    }
+
+    public void OnDeathAnimationComplete()
+    {
+        gameObject.SetActive(false);
+    }
+
     public bool IsDead()
     {
         return currentHP <= 0;

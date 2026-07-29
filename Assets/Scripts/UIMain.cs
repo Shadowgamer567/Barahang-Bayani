@@ -289,10 +289,14 @@ public class UIMain : MonoBehaviour
         if (selectedCardUI == null || selectedCardType == null)
             return;
 
-        selectedCardUI.PlayCard();
+        bool played = selectedCardUI.PlayCard();
 
         fullCardPanel.SetActive(false);
 
+        if (!played && selectedCardUI != null)
+        {
+            selectedCardUI.gameObject.SetActive(true);
+        }
         selectedCardUI = null;
         selectedCardType = null;
     }

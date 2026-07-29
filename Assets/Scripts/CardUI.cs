@@ -50,12 +50,12 @@ public class CardUI : MonoBehaviour
         }
     }
 
-    public void PlayCard()
+    public bool PlayCard()
     {
         Debug.Log("Played Card: " + cardType.cardName);
         Debug.Log("Target Type: " + cardType.targetType);
 
-        battleControl.HandleCardPlay(cardType, this);
+        return battleControl.HandleCardPlay(cardType, this);
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
