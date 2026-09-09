@@ -286,6 +286,7 @@ public class BattleControl : MonoBehaviour
                 HeroStats target = GetRandomAliveHero();
                 if(target != null)
                 {
+                    enemy.PlayAnimation(CharacterAnimationType.Attack);
                     target.TakeDamage(enemy.enemyType.damage);
                 }
                 break;
@@ -294,6 +295,7 @@ public class BattleControl : MonoBehaviour
                 EnemyStats shieldTarget = GetRandomAliveEnemy();
                 if (shieldTarget != null)
                 {
+                    enemy.PlayAnimation(CharacterAnimationType.Action);
                     shieldTarget.AddShield(action.value);
                 }
                 break;
@@ -302,6 +304,7 @@ public class BattleControl : MonoBehaviour
                 EnemyStats healTarget = GetRandomAliveEnemy();
                 if (healTarget != null)
                 {
+                    enemy.PlayAnimation(CharacterAnimationType.Action);
                     healTarget.Heal(action.value);
                 }
                 break;
@@ -310,6 +313,7 @@ public class BattleControl : MonoBehaviour
                 EnemyStats buffTarget = GetRandomAliveEnemy();
                 if (buffTarget != null)
                 {
+                    enemy.PlayAnimation(CharacterAnimationType.Action);
                     buffTarget.BuffAttack(action.value);
                 }
                 break;
@@ -318,6 +322,7 @@ public class BattleControl : MonoBehaviour
                 HeroStats debuffTarget = GetRandomAliveHero();
                 if (debuffTarget != null)
                 {
+                    enemy.PlayAnimation(CharacterAnimationType.Action);
                     debuffTarget.ReduceAttack(action.value);
                 }
                 break;
@@ -453,6 +458,7 @@ public class BattleControl : MonoBehaviour
 
         if (card.targetType == TargetType.AllEnemies)
         {
+            heroes[0].PlayAnimation(CharacterAnimationType.Attack);
             DealDamageToAll(card.damage);
             Destroy(cardUI.gameObject);
             return true;
@@ -521,6 +527,11 @@ public class BattleControl : MonoBehaviour
 
         Debug.Log("TARGET CLICKED: " + enemy.name);
         Debug.Log("Pending damage: " + pendingCard.damage);
+
+        if (heroes.Length > 0 && heroes[0] != null)
+        {
+            heroes[0].PlayAnimation(CharacterAnimationType.Attack);
+        }
 
         enemy.TakeDamage(pendingCard.damage);
 
