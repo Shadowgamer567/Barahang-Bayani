@@ -117,11 +117,6 @@ public class EnemyStats : MonoBehaviour
                 c.enabled = false;
             }
 
-            if (battle != null)
-            {
-                battle.OnEnemyKilled();
-            }
-
             if (animationRelay != null)
             {
                 animationRelay.Play(CharacterAnimationType.Death);
@@ -246,6 +241,11 @@ public class EnemyStats : MonoBehaviour
 
     public void OnDeathAnimationComplete()
     {
+        if (battle != null)
+        {
+            battle.OnEnemyKilled();
+        }
+
         gameObject.SetActive(false);
     }
     public bool IsDead()
