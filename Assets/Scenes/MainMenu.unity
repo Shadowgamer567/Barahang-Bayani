@@ -879,7 +879,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 119104398}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1230108114}
+        m_TargetAssemblyTypeName: QuizMakerManager, Assembly-CSharp
+        m_MethodName: OpenNewQuizPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &119104398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1134,15 +1146,27 @@ MonoBehaviour:
     - m_Text: Text
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Audio
+    - m_Text: Image
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Image
+    - m_Text: Audio
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1230108114}
+        m_TargetAssemblyTypeName: QuizMakerManager, Assembly-CSharp
+        m_MethodName: OnQuestionTypeChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &130430927
 MonoBehaviour:
@@ -1795,7 +1819,19 @@ MonoBehaviour:
       m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1230108114}
+        m_TargetAssemblyTypeName: QuizMakerManager, Assembly-CSharp
+        m_MethodName: OnInputTypeChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &176330013
 MonoBehaviour:
@@ -5985,8 +6021,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 334861116}
   - {fileID: 1985096754}
+  - {fileID: 334861116}
   - {fileID: 2108919492}
   m_Father: {fileID: 1230108111}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10519,7 +10555,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &935855711
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12950,6 +12986,7 @@ GameObject:
   - component: {fileID: 1230108111}
   - component: {fileID: 1230108113}
   - component: {fileID: 1230108112}
+  - component: {fileID: 1230108114}
   m_Layer: 5
   m_Name: QuizMakerPanel
   m_TagString: Untagged
@@ -13027,6 +13064,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1230108110}
   m_CullTransparentMesh: 1
+--- !u!114 &1230108114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230108110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f003725aefe77fe48b5d8e7bb691c53e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuizMakerManager
+  currentQuizPanel: {fileID: 389140858}
+  currentQuizText: {fileID: 2140467919}
+  nameQuizPanel: {fileID: 935855710}
+  quizNameInputField: {fileID: 570436425}
+  quizQuestionInputField: {fileID: 831782519}
+  questionTypeDropdown: {fileID: 130430926}
+  inputTypeDropdown: {fileID: 176330012}
+  identificationPanel: {fileID: 1985096753}
+  multipleChoicePanel: {fileID: 334861115}
+  trueFalsePanel: {fileID: 2108919491}
+  imageButton: {fileID: 1918624761}
+  audioButton: {fileID: 747477043}
+  AnswerA: {fileID: 2102980834}
+  AnswerB: {fileID: 1188403335}
+  AnswerC: {fileID: 1736152884}
+  AnswerD: {fileID: 219120902}
+  identificationAnswer: {fileID: 244587020}
 --- !u!1 &1248735245
 GameObject:
   m_ObjectHideFlags: 0
@@ -14472,7 +14538,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1446183776}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1230108114}
+        m_TargetAssemblyTypeName: QuizMakerManager, Assembly-CSharp
+        m_MethodName: ConfirmNewQuiz
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1446183776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17347,7 +17425,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1799203639}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1230108114}
+        m_TargetAssemblyTypeName: QuizMakerManager, Assembly-CSharp
+        m_MethodName: CancelNewQuiz
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1799203639
 MonoBehaviour:
   m_ObjectHideFlags: 0
