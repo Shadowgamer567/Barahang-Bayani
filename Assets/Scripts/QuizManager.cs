@@ -266,7 +266,7 @@ public class QuizManager : MonoBehaviour
 
     void LoadQuestions()
     {
-        TextAsset file = Resources.Load<TextAsset>("questions");
+        TextAsset file = Resources.Load<TextAsset>(QuizMakerManager.SelectedQuizName);
 
         if (file == null)
         {
