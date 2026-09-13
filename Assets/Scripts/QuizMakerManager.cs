@@ -37,13 +37,16 @@ public class QuizMakerManager : MonoBehaviour
     public TMP_InputField identificationAnswer;
 
     private bool trueFalseAnswer = true;
+    private int correctAnswerIndex = 0;
 
     private string selectedImagePath;
     private string selectedAudioPath;
 
     private string selectedQuizPath;
 
+    public static string SelectedQuizName = "questions";
     public string SelectedQuizPath => selectedQuizPath;
+
 
     public void OpenNewQuizPanel()
     {
@@ -95,6 +98,8 @@ public class QuizMakerManager : MonoBehaviour
 
         currentQuizText.text = fileName;
 
+        SelectedQuizName = fileName;
+
         Debug.Log("Selected Quiz:" + fileName);
     }
 
@@ -140,6 +145,127 @@ public class QuizMakerManager : MonoBehaviour
                 audioButton.SetActive(true);
                 break;
         }
+    }
+
+    private string BuildQuestionEntry(string id, int number)
+    {
+        string entry = "";
+
+        entry += "ID:" + id + "\n";
+        entry += number + ". " + quizQuestionInputField.text.Trim() + "\n";
+
+        //Question Types
+        switch (questionTypeDropdown.value)
+        {
+            case 0:
+                entry += "TYPE:TEXT\n";
+                break;
+
+            case 1:
+                entry += "TYPE:IMAGE\n" + selectedImagePath + "\n";
+                break;
+
+            case 2:
+                entry += "TYPE:AUDIO" + selectedAudioPath + "\n";
+                break;
+        }
+
+        //Input Types
+        switch (inputTypeDropdown.value)
+        {
+            case 0: //Indentification
+                entry += "INPUT:IDENTIFICATION\n";
+
+                entry += "A. " + AnswerA.text + " \"C\"\n";
+                entry += "B. " + AnswerB.text + "\n";
+                entry += "C. " + AnswerC.text + "\n";
+                entry += "D. " + AnswerD.text + "\n";
+                break;
+
+            case 1: //Multiple Choice
+                entry += "INPUT:MULTIPLE_CHOICE\n";
+
+                string[] answers =
+                {
+                    AnswerA.text,
+                    AnswerB.text,
+                    AnswerC.text,
+                    AnswerD.text,
+                };
+
+                char letter = 'A';
+
+                for(int i = 0; i < answers.Length; i++)
+                {
+                    entry += letter + ". " + answers[i];
+                    if(i == correctAnswerIndex)
+                    {
+                        entry += " \"C\"";
+                    }
+
+                    entry += "\n";
+                    letter++;
+                }
+                break;
+
+            case 2: //True or False
+                entry += "INPUT:TRUE_OR_FALSE\n";
+
+                entry += "ANSWER:" + (trueFalseAnswer ? "TRUE" : "FALSE") + "\n";
+                break;
+        }
+
+        entry += "\n";
+
+        return entry;
+    }
+
+    public void SetCorrectAnswer(int index)
+    {
+        correctAnswerIndex = index;
+
+        Debug.Log("Correct Answer Set To: " + index);
+    }
+
+    public void SetTrueAnswer()
+    {
+        trueFalseAnswer = true;
+    }
+
+    public void SetFalseAnswer()
+    {
+        trueFalseAnswer = false;
+    }
+
+    public void AddQuestion()
+    {
+        if (string.IsNullOrEmpty(SelectedQuizPath))
+        {
+            Debug.LogWarning("No Quiz Selected");
+            return;
+        }
+
+        string[] lines = File.ReadAllLines(selectedQuizPath);
+
+        int questionCount = 0;
+
+        foreach(string line in lines)
+        {
+            if (line.StartsWith("ID:"))
+            {
+                questionCount++;
+            }
+        }
+
+        int newNumber = questionCount + 1;
+
+        string quizName = Path.GetFileNameWithoutExtension(selectedQuizPath).ToUpper();
+
+        string id = quizName + newNumber;
+
+        string entry = BuildQuestionEntry(id, newNumber);
+
+        File.AppendAllText(selectedQuizPath, "\n" + entry + "\n");
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
