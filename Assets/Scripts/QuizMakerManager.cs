@@ -105,7 +105,7 @@ public class QuizMakerManager : MonoBehaviour
         multipleChoicePanel.SetActive(false);
         trueFalsePanel.SetActive(false);
 
-        switch (questionTypeDropdown.value)
+        switch (inputTypeDropdown.value)
         {
             case 0: //Identification
                 identificationPanel.SetActive(true);
@@ -127,7 +127,7 @@ public class QuizMakerManager : MonoBehaviour
         imageButton.SetActive(false);
         audioButton.SetActive(false);
 
-        switch (inputTypeDropdown.value)
+        switch (questionTypeDropdown.value)
         {
             case 0: //Text
                 break;
