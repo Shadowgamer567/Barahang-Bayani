@@ -6,6 +6,12 @@ using SFB;
 
 public class QuizMakerManager : MonoBehaviour
 {
+    [Header("UI")]
+    public GameObject QuizMakerPanel;
+    public GameObject backButton;
+    public GameObject accountButton;
+    public GameObject mainMenuImage;
+
     [Header("Quiz Selection")]
     public GameObject currentQuizPanel;
     public TMP_Text currentQuizText;
@@ -66,6 +72,13 @@ public class QuizMakerManager : MonoBehaviour
     public static string SelectedQuizName = "questions";
     public string SelectedQuizPath => selectedQuizPath;
 
+    public void OpenQuizMakerPanel()
+    {
+        QuizMakerPanel.SetActive(true);
+        accountButton.SetActive(false);
+        backButton.SetActive(true);
+        mainMenuImage.SetActive(false);
+    }
 
     public void OpenNewQuizPanel()
     {
@@ -76,6 +89,21 @@ public class QuizMakerManager : MonoBehaviour
     public void CancelNewQuiz()
     {
         nameQuizPanel.SetActive(false);
+    }
+    
+    public void CancelRemoveQuestion()
+    {
+        selectedQuestion.Clear();
+
+        removeQuestionPanel.SetActive(false);
+    }
+
+    public void CloseQuizMakerPanel()
+    {
+        QuizMakerPanel.SetActive(false);
+        accountButton.SetActive(true);
+        backButton.SetActive(false);
+        mainMenuImage.SetActive(true);
     }
 
     public void ConfirmNewQuiz()
@@ -137,6 +165,131 @@ public class QuizMakerManager : MonoBehaviour
         currentQuizText.text = "No quiz selected";
 
         Debug.Log("Quiz deleted: " + fileName);
+    }
+
+    public void ConfirmRemoveQuestion()
+    {
+        if(selectedQuestion.Count == 0)
+        {
+            Debug.LogWarning("No questions selected for deletion");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(selectedQuizPath))
+        {
+            Debug.LogWarning("Selected Quiz File Does Not Exist");
+            return;
+        }
+
+        string[] lines = File.ReadAllLines(selectedQuizPath);
+
+        System.Collections.Generic.List<string> newLines = new System.Collections.Generic.List<string>();
+
+        int questionsIndex = 0;
+        int i = 0;
+
+        while (i < lines.Length)
+        {
+            //Skip Blank Lines
+            if (string.IsNullOrWhiteSpace(lines[i]))
+            {
+                i++;
+                continue;
+            }
+
+            //Check if ID line, if not, skip
+            if (!lines[i].StartsWith("ID:"))
+            {
+                i++;
+                continue;
+            }
+
+            //Find End of Question
+            int questionstart = i;
+
+            i++;
+
+            //Question
+            i++;
+
+            //Question Type
+            i++;
+
+            //Input Type
+            string inputType = lines[i].Trim();
+            i++;
+
+            if (inputType.StartsWith("INPUT:TRUE_OR_FALSE"))
+            {
+                //True or False only has one Answer line
+                i++;
+            }
+
+            else
+            {
+                //Multiple Choice & Identification have four Answer lines
+                i += 4;
+            }
+
+            int quesetionend = i;
+
+            //Keep this question if not selected
+            if (!selectedQuestion.Contains(questionsIndex))
+            {
+                for(int j = questionstart; j < quesetionend; j++)
+                {
+                    newLines.Add(lines[j]);
+                }
+
+                //Add Spaces between questions
+                newLines.Add("");
+            }
+
+            questionsIndex++;
+        }
+
+        //Renumber the remaning questions
+        int newQuestionNumber = 1;
+
+        for (int j = 0; j < newLines.Count; j++)
+        {
+            if (newLines[j].StartsWith("ID:"))
+            {
+                //Change Old ID
+                string oldID = newLines[j].Substring(3).Trim();
+
+                string quizName = Path.GetFileNameWithoutExtension(selectedQuizPath).ToUpper();
+
+                newLines[j] = "ID:" + quizName + newQuestionNumber;
+
+                //Change question number
+                if(j + 1 < newLines.Count)
+                {
+                    string questionText = newLines[j + 1];
+
+                    int dotIndex = questionText.IndexOf(".");
+
+                    if(dotIndex != -1)
+                    {
+                        string actualQuestion = questionText.Substring(dotIndex + 1).Trim();
+
+                        newLines[j + 1] = newQuestionNumber + ". " + actualQuestion;
+                    }
+                }
+
+                newQuestionNumber++;
+            }
+        }
+
+        File.WriteAllLines(selectedQuizPath, newLines);
+
+        Debug.Log("Deleted " + selectedQuestion.Count + " question(s).");
+
+        selectedQuestion.Clear();
+
+        removeQuestionPanel.SetActive(false);
+
+        RefreshRemoveQuestionPanel();
     }
 
     public void OpenFileExplorer()
@@ -224,7 +377,7 @@ public class QuizMakerManager : MonoBehaviour
     public void OpenRemoveQuestionPanel()
     {
         Debug.Log("Remove Question using quiz: " + selectedQuizPath);
-
+        
         removeQuestionPanel.SetActive(true);
 
         RefreshRemoveQuestionPanel();
@@ -601,10 +754,14 @@ public class QuizMakerManager : MonoBehaviour
 
     private void RefreshRemoveQuestionPanel()
     {
+        Debug.Log("REFRESH REMOVE QUESTION PANEL");
+        Debug.Log("Children before cleanup: " + questionGridContent.childCount);
+        Debug.Log("Selected quiz: " + selectedQuizPath);
+
         //Remove Old Templates
-        while (questionGridContent.childCount > 0)
+        for (int i = questionGridContent.childCount - 1; i >= 0; i--)
         {
-            Destroy(questionGridContent.GetChild(0).gameObject);
+            Destroy(questionGridContent.GetChild(i).gameObject);
         }
 
         selectedQuestion.Clear();
