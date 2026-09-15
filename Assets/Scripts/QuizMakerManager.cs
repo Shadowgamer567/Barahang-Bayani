@@ -1,6 +1,8 @@
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using SFB;
 
 public class QuizMakerManager : MonoBehaviour
 {
@@ -35,6 +37,23 @@ public class QuizMakerManager : MonoBehaviour
 
     [Header("Identification")]
     public TMP_InputField identificationAnswer;
+
+    [Header("Multiple Choice Correct Answer Buttons")]
+    public Image[] correctAnswerButtons;
+
+    [Header("True or False Buttons")]
+    public Image trueButtonImage;
+    public Image falseButtonImage;
+
+    [Header("Remove Question Panel")]
+    public GameObject removeQuestionPanel;
+
+    public Transform questionGridContent;
+
+    public GameObject multipleChoiceQuestionTemplate;
+    public GameObject trueFalseQuestionTemplate;
+
+    private System.Collections.Generic.List<int> selectedQuestion = new System.Collections.Generic.List<int>();
 
     private bool trueFalseAnswer = true;
     private int correctAnswerIndex = 0;
@@ -88,6 +107,127 @@ public class QuizMakerManager : MonoBehaviour
         nameQuizPanel.SetActive(false);
 
         Debug.Log("Successfully created new quiz");
+    }
+
+    public void RemoveQuiz()
+    {
+        if (string.IsNullOrEmpty(selectedQuizPath))
+        {
+            Debug.LogWarning("No Quiz Selected");
+            return;
+        }
+
+        string fileName = Path.GetFileNameWithoutExtension(selectedQuizPath);
+
+        // Don't allow the default quiz to be deleted
+        if (fileName.ToLower() == "questions")
+        {
+            Debug.LogWarning("Questions.txt cannot be deleted.");
+            return;
+        }
+
+        if (File.Exists(selectedQuizPath))
+        {
+            File.Delete(selectedQuizPath);
+        }
+
+        selectedQuizPath = null;
+        SelectedQuizName = "";
+
+        currentQuizText.text = "No quiz selected";
+
+        Debug.Log("Quiz deleted: " + fileName);
+    }
+
+    public void OpenFileExplorer()
+    {
+        string folderPath = Path.Combine(Application.dataPath, "Resources");
+
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        Debug.Log("Opening Quiz File Explorer");
+        Debug.Log("Starting Folder: " + folderPath);
+
+        ExtensionFilter[] extensions =
+        {
+        new ExtensionFilter("Quiz Files", "txt")
+    };
+
+        string[] paths = StandaloneFileBrowser.OpenFilePanel(
+            "Select Quiz",
+            folderPath,
+            extensions,
+            false
+        );
+
+        Debug.Log("Number of paths returned: " + paths.Length);
+
+        if (paths.Length > 0)
+        {
+            Debug.Log("Selected file path: " + paths[0]);
+
+            SelectQuiz(paths[0]);
+        }
+        else
+        {
+            Debug.LogWarning("No file was selected.");
+        }
+    }
+
+    public void OpenImageFileExplorer()
+    {
+        ExtensionFilter[] extensions =
+        {
+        new ExtensionFilter("Image Files", "png", "jpg", "jpeg")
+    };
+
+        string[] paths = StandaloneFileBrowser.OpenFilePanel(
+            "Select Image",
+            "",
+            extensions,
+            false
+        );
+
+        if (paths.Length > 0)
+        {
+            selectedImagePath = Path.GetFileNameWithoutExtension(paths[0]);
+
+            Debug.Log("Selected Image: " + selectedImagePath);
+        }
+    }
+
+    public void OpenAudioFileExplorer()
+    {
+        ExtensionFilter[] extensions =
+        {
+        new ExtensionFilter("Audio Files", "mp3", "wav", "ogg")
+    };
+
+        string[] paths = StandaloneFileBrowser.OpenFilePanel(
+            "Select Audio",
+            "",
+            extensions,
+            false
+        );
+
+        if (paths.Length > 0)
+        {
+            selectedAudioPath = Path.GetFileNameWithoutExtension(paths[0]);
+
+            Debug.Log("Selected Audio: " + selectedAudioPath);
+        }
+    }
+
+    public void OpenRemoveQuestionPanel()
+    {
+        Debug.Log("Remove Question using quiz: " + selectedQuizPath);
+
+        removeQuestionPanel.SetActive(true);
+
+        RefreshRemoveQuestionPanel();
     }
 
     public void SelectQuiz(string path)
@@ -151,7 +291,10 @@ public class QuizMakerManager : MonoBehaviour
     {
         string entry = "";
 
+        //ID
         entry += "ID:" + id + "\n";
+        
+        //Question
         entry += number + ". " + quizQuestionInputField.text.Trim() + "\n";
 
         //Question Types
@@ -162,11 +305,11 @@ public class QuizMakerManager : MonoBehaviour
                 break;
 
             case 1:
-                entry += "TYPE:IMAGE\n" + selectedImagePath + "\n";
+                entry += "TYPE:IMAGE:" + selectedImagePath + "\n";
                 break;
 
             case 2:
-                entry += "TYPE:AUDIO" + selectedAudioPath + "\n";
+                entry += "TYPE:AUDIO:" + selectedAudioPath + "\n";
                 break;
         }
 
@@ -176,10 +319,10 @@ public class QuizMakerManager : MonoBehaviour
             case 0: //Indentification
                 entry += "INPUT:IDENTIFICATION\n";
 
-                entry += "A. " + AnswerA.text + " \"C\"\n";
-                entry += "B. " + AnswerB.text + "\n";
-                entry += "C. " + AnswerC.text + "\n";
-                entry += "D. " + AnswerD.text + "\n";
+                entry += "A. " + identificationAnswer.text.Trim() + " \"C\"\n";
+                entry += "B.\n";
+                entry += "C.\n";
+                entry += "D.\n";
                 break;
 
             case 1: //Multiple Choice
@@ -187,10 +330,10 @@ public class QuizMakerManager : MonoBehaviour
 
                 string[] answers =
                 {
-                    AnswerA.text,
-                    AnswerB.text,
-                    AnswerC.text,
-                    AnswerD.text,
+                    AnswerA.text.Trim(),
+                    AnswerB.text.Trim(),
+                    AnswerC.text.Trim(),
+                    AnswerD.text.Trim(),
                 };
 
                 char letter = 'A';
@@ -224,30 +367,98 @@ public class QuizMakerManager : MonoBehaviour
     {
         correctAnswerIndex = index;
 
+        for(int i = 0; i < correctAnswerButtons.Length; i++)
+        {
+            if(i == index)
+            {
+                correctAnswerButtons[i].color = Color.green;
+            }
+
+            else
+            {
+                correctAnswerButtons[i].color = Color.white;
+            }
+        }
+
         Debug.Log("Correct Answer Set To: " + index);
     }
 
     public void SetTrueAnswer()
     {
+        Debug.Log("True Selected");
+
         trueFalseAnswer = true;
+
+        trueButtonImage.color = Color.green;
+        falseButtonImage.color = Color.red;
     }
 
     public void SetFalseAnswer()
     {
+        Debug.Log("False Selected");
+
         trueFalseAnswer = false;
+
+        falseButtonImage.color = Color.green;
+        trueButtonImage.color = Color.red;
     }
 
     public void AddQuestion()
     {
+        //Validate Quiz file is selected
         if (string.IsNullOrEmpty(SelectedQuizPath))
         {
             Debug.LogWarning("No Quiz Selected");
             return;
         }
 
-        string[] lines = File.ReadAllLines(selectedQuizPath);
+        //Validate Quiz file exists
+        if (!File.Exists(selectedQuizPath))
+        {
+            Debug.LogWarning("Selected Quiz File Does not exist");
+            return;
+        }
+
+        string question = quizQuestionInputField.text.Trim();
+
+        //Check if Question is empty or null
+        if (string.IsNullOrEmpty(question))
+        {
+            Debug.LogWarning("Question is Empty");
+            return;
+        }
+
+        switch (inputTypeDropdown.value)
+        {
+            case 0: //Identification
+                if (string.IsNullOrEmpty(identificationAnswer.text.Trim()))
+                {
+                    Debug.LogWarning("Identification Answer is empty or Null");
+                    return;
+                }
+
+                break;
+
+            case 1: // Multiple Choice
+
+                if (string.IsNullOrEmpty(AnswerA.text.Trim()) ||
+                    string.IsNullOrEmpty(AnswerB.text.Trim()) ||
+                    string.IsNullOrEmpty(AnswerC.text.Trim()) ||
+                    string.IsNullOrEmpty(AnswerD.text.Trim()))
+                {
+                    Debug.LogWarning("All multiple choice answers must be filled.");
+                    return;
+                }
+
+                break;
+
+            case 2: // True or False
+                break;
+        }
 
         int questionCount = 0;
+
+        string[] lines = File.ReadAllLines(selectedQuizPath);
 
         foreach(string line in lines)
         {
@@ -257,26 +468,233 @@ public class QuizMakerManager : MonoBehaviour
             }
         }
 
-        int newNumber = questionCount + 1;
+        //Question Number is the next following number
+        int questionNumber = questionCount + 1;
 
+        //ID line is QuizName + ID Number together
         string quizName = Path.GetFileNameWithoutExtension(selectedQuizPath).ToUpper();
+        string id = quizName + questionNumber;
 
-        string id = quizName + newNumber;
+        //Build the Question based on the format
+        string entry = BuildQuestionEntry(id, questionNumber);
 
-        string entry = BuildQuestionEntry(id, newNumber);
+        //separeate previous question from new question
+        if(new FileInfo(selectedQuizPath).Length > 0)
+        {
+            File.AppendAllText(selectedQuizPath, "");
+        }
 
-        File.AppendAllText(selectedQuizPath, "\n" + entry + "\n");
+        //Add question to the file
+        File.AppendAllText(selectedQuizPath, entry);
+    }
+
+    private class RemoveQuestionData
+    {
+        public string id;
+        public string question;
+        public string questionType;
+        public string inputType;
+
+        public string answerA;
+        public string answerB;
+        public string answerC;
+        public string answerD;
+
+        public string trueFalseAnswer;
+
+
+    }
+    private System.Collections.Generic.List<RemoveQuestionData> ParseQuestionsForRemoval()
+    {
+        System.Collections.Generic.List<RemoveQuestionData> result = new System.Collections.Generic.List<RemoveQuestionData>();
+
+        if (string.IsNullOrEmpty(selectedQuizPath))
+        {
+            return result;
+        }
+
+        if (!File.Exists(selectedQuizPath))
+        {
+            return result;
+        }
+
+        string[] lines = File.ReadAllLines(selectedQuizPath);
+
+        int i = 0;
+
+        while (i < lines.Length)
+        {
+            // Skip blank lines
+            if (string.IsNullOrWhiteSpace(lines[i]))
+            {
+                i++;
+                continue;
+            }
+
+            // Every question must begin with ID:
+            if (!lines[i].StartsWith("ID:"))
+            {
+                i++;
+                continue;
+            }
+
+            RemoveQuestionData data = new RemoveQuestionData();
+
+            //ID
+            data.id = lines[i].Trim();
+            i++;
+
+            //Question
+            data.question = lines[i].Trim();
+
+            int dotIndex = data.question.IndexOf(".");
+
+            if (dotIndex != -1)
+            {
+                data.question =
+                    data.question.Substring(dotIndex + 1).Trim();
+            }
+
+            i++;
+
+            //QUestion Type
+            data.questionType = lines[i].Trim();
+            i++;
+
+            //Input Type
+            data.inputType = lines[i].Trim();
+            i++;
+
+            //True or False
+            if (data.inputType.StartsWith("INPUT:TRUE_OR_FALSE"))
+            {
+                data.trueFalseAnswer = lines[i].Trim();
+
+                i++;
+            }
+            else
+            {
+
+                //A
+                data.answerA = lines[i].Trim();
+                i++;
+
+                //B
+                data.answerB = lines[i].Trim();
+                i++;
+
+                //C
+                data.answerC = lines[i].Trim();
+                i++;
+
+                //D
+                data.answerD = lines[i].Trim();
+                i++;
+            }
+
+            result.Add(data);
+        }
+
+        return result;
+    }
+
+
+    private void RefreshRemoveQuestionPanel()
+    {
+        //Remove Old Templates
+        while (questionGridContent.childCount > 0)
+        {
+            Destroy(questionGridContent.GetChild(0).gameObject);
+        }
+
+        selectedQuestion.Clear();
+
+        System.Collections.Generic.List<RemoveQuestionData> question = ParseQuestionsForRemoval();
+
+        for(int i = 0; i < question.Count; i++)
+        {
+            RemoveQuestionData data = question[i];
+
+            GameObject template;
+
+            //True or False template
+            if (data.inputType.StartsWith("INPUT:TRUE_OR_FALSE"))
+            {
+                template = trueFalseQuestionTemplate;
+            }
+
+            //Multiple Choice / Identification
+            else
+            {
+                template = multipleChoiceQuestionTemplate;
+            }
+
+            GameObject questionObject = Instantiate(template, questionGridContent);
+
+            questionObject.SetActive(true);
+
+            QuestionPlaceholderTemplate item = questionObject.GetComponent<QuestionPlaceholderTemplate>();
+
+            item.Setup(
+                this,
+                i,
+                data.id,
+                data.question,
+                data.questionType,
+                data.inputType,
+                data.answerA,
+                data.answerB,
+                data.answerC,
+                data.answerD,
+                data.trueFalseAnswer
+            );
+        }
+    }
+
+    public void ToggleQuestionSelection(int index, bool selected)
+    {
+        if (selected)
+        {
+            if (!selectedQuestion.Contains(index))
+            {
+                selectedQuestion.Add(index);
+            }
+        }
+
+        else
+        {
+            selectedQuestion.Remove(index);
+        }
+
+        Debug.Log("Selected Question: " + selectedQuestion.Count);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        string defaultQuizPath = Path.Combine(
+            Application.dataPath,
+            "Resources",
+            "questions.txt"
+        );
+
+        if (File.Exists(defaultQuizPath))
+        {
+            SelectQuiz(defaultQuizPath);
+        }
+        else
+        {
+            Debug.LogWarning("Default Questions.txt was not found.");
+        }
+
+        SetCorrectAnswer(0);
+        SetTrueAnswer();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
+
