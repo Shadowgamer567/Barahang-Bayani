@@ -12,6 +12,7 @@ public class EnemyStats : MonoBehaviour
     public EnemyAction[] action;
     private BattleControl battle;
 
+    public Transform uiAnchor;
     public Transform animateChild;
     public Transform visualRoot;
     public GameObject currentModel;
