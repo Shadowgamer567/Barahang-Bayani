@@ -1,0 +1,18 @@
+ID:TEST QUIZ1
+1. HAha Funny
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. Yes "C"
+B.
+C.
+D.
+
+ID:TEST QUIZ2
+2. asdhfashfdlajdfjlsaadfa
+TYPE:TEXT
+INPUT:MULTIPLE_CHOICE
+A. vv "C"
+B. cc
+C. aa
+D. dd
+
