@@ -32,7 +32,7 @@ public class EnemyUI : MonoBehaviour
             return;
         }
 
-        transform.position = enemy.transform.position + Vector3.up * 2f;
+        transform.position = enemy.transform.position + Vector3.up * 3.15f;
 
         transform.forward = Camera.main.transform.forward;
 
