@@ -1,80 +1,55 @@
 using UnityEngine;
 
-public class SimpleSway : MonoBehaviour
+public class SimpleBushSwayDeformRotation : MonoBehaviour
 {
+    public enum Axis { X, Y, Z }
+
     [Header("Orientation Settings")]
-    [Tooltip("If true, picks a random Y-rotation on start so bushes don't all face the same way")]
-    public bool randomizeFacingDirection = true;
+    [Tooltip("Base offset added to the initial rotation")]
+    public Vector3 baseRotation = Vector3.zero;
 
-    [Header("Sway Direction")]
-    [Tooltip("If true, picks a random direction vector on the X/Z plane to sway towards on start")]
-    public bool randomizeSwayAxis = true;
+    [Header("Sway Settings")]
+    [Tooltip("Which axis the model sways back and forth on")]
+    public Axis swayAxis = Axis.Z;
 
-    [Tooltip("Manual sway axis if randomizeSwayAxis is false")]
-    public Vector3 customSwayAxis = new Vector3(0, 0, 1);
-
-    [Header("Speed Range")]
-    [Tooltip("Minimum and maximum speed multiplier for the sway")]
-    public float minSwaySpeed = 1.2f;
-    public float maxSwaySpeed = 3.0f;
-
-    [Header("Angle Range")]
-    [Tooltip("Minimum and maximum angle of sway in degrees")]
-    public float minSwayAngle = 3.0f;
-    public float maxSwayAngle = 8.0f;
+    public float swaySpeed = 2.0f;
+    public float swayAngle = 5.0f;
 
     [Header("Deformation Settings")]
-    [Tooltip("How much the model stretches/squashes (0.05 = 5% change)")]
+    [Tooltip("How much the model stretches/squashes (e.g., 0.05 = 5% change)")]
     public float deformAmount = 0.05f;
 
     private Quaternion initialRotation;
     private Vector3 initialScale;
-    private Vector3 activeSwayAxis;
-    private float activeSwaySpeed;
-    private float activeSwayAngle;
     private float randomOffset;
 
     void Start()
     {
-        // 1. Randomize facing direction (Y-axis rotation)
-        if (randomizeFacingDirection)
-        {
-            transform.Rotate(0f, Random.Range(0f, 360f), 0f, Space.Self);
-        }
-
         initialRotation = transform.localRotation;
         initialScale = transform.localScale;
-
-        // 2. Randomize sway direction (360 degrees on X/Z plane)
-        if (randomizeSwayAxis)
-        {
-            float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-            activeSwayAxis = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle));
-        }
-        else
-        {
-            activeSwayAxis = customSwayAxis.normalized;
-        }
-
-        // 3. Pick random speed and angle for this bush instance
-        activeSwaySpeed = Random.Range(minSwaySpeed, maxSwaySpeed);
-        activeSwayAngle = Random.Range(minSwayAngle, maxSwayAngle);
-
-        // 4. Randomize starting wave offset
+        
         randomOffset = Random.Range(0f, 100f);
     }
 
     void Update()
     {
-        float time = (Time.time + randomOffset) * activeSwaySpeed;
+        float time = (Time.time + randomOffset) * swaySpeed;
 
-        // 1. Calculate Sway along the random axis using the randomized angle
-        float swayFactor = Mathf.Sin(time) * activeSwayAngle;
-        Vector3 currentSwayEuler = activeSwayAxis * swayFactor;
+        // 1. Calculate Sway Rotation
+        float swayFactor = Mathf.Sin(time) * swayAngle;
+        Vector3 swayEuler = Vector3.zero;
 
-        transform.localRotation = initialRotation * Quaternion.Euler(currentSwayEuler);
+        switch (swayAxis)
+        {
+            case Axis.X: swayEuler.x = swayFactor; break;
+            case Axis.Y: swayEuler.y = swayFactor; break;
+            case Axis.Z: swayEuler.z = swayFactor; break;
+        }
 
-        // 2. Squash & Stretch Deformation
+        // Apply Base Rotation offset + Dynamic Sway
+        transform.localRotation = initialRotation * Quaternion.Euler(baseRotation) * Quaternion.Euler(swayEuler);
+
+        // 2. Calculate Squash & Stretch Deformation
         float deformFactor = Mathf.Sin(time * 2.0f) * deformAmount;
 
         Vector3 newScale = initialScale;
