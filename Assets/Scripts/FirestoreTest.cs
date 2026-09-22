@@ -1,19 +1,23 @@
 using UnityEngine;
 using Firebase.Firestore;
+using System.Collections.Generic;
 
 public class FirestoreTest : MonoBehaviour
 {
     private FirebaseFirestore db;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private async void Start()
+    async void Start()
     {
-        db = FirebaseFirestore.DefaultInstance;
+        Dictionary<string, object> data = new Dictionary<string, object>();
 
-        DocumentReference docRef = db.Collection("test").Document("unity");
+        data["created"] = true;
 
-        await docRef.SetAsync(new { messsage = "Hello Firestore", score = 100 });
+        await FirestoreManager.Instance.DB
+            .Collection("Classroom")
+            .Document(DatabaseManager.Instance.CurrentDatabase)
+            .SetAsync(data);
 
-        Debug.Log("Firestore Write Successful");
+        Debug.Log("Classroom Created");
     }
 
     // Update is called once per frame
