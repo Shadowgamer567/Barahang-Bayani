@@ -19,9 +19,15 @@ public class AccountData
 {
     public string id;
     public string username;
+    public string passwordHash;
     public AccountType accountType;
 
     public List<string> assignedStudentIDs = new();
+
+    public AccountData()
+    {
+
+    }
 }
 
 public static class CurrentAccount

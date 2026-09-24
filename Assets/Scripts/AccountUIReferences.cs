@@ -24,6 +24,7 @@ public class AccountUIReferences : MonoBehaviour
 
     [Header("TMP")]
     public TMP_InputField usernameInputField;
+    public TMP_InputField passwordInputField;
 
     public TextMeshProUGUI teacherNameText;
     public TextMeshProUGUI completedLevelsText;

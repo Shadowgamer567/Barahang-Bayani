@@ -1,6 +1,8 @@
 using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -20,6 +22,7 @@ public class AccountManager : MonoBehaviour
     public GameObject accountCardPrefab;
 
     public TMP_InputField usernameInputField;
+    public TMP_InputField passwordInputField;
 
     private AccountType pendingAccountType;
 
@@ -121,7 +124,7 @@ public class AccountManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(username))
         {
-            Debug.Log("UsernameEmpty");
+            Debug.LogWarning("No Username Entered");
             return;
         }
 
@@ -131,15 +134,28 @@ public class AccountManager : MonoBehaviour
 
         newAccount.username = username;
 
+        string password = passwordInputField.text.Trim();
+
+        if (string.IsNullOrEmpty(password))
+        {
+            Debug.LogWarning("No Password Entered");
+            return;
+        }
+
+        newAccount.passwordHash = HashPassword(password);
+
         newAccount.accountType = type;
 
         registry.accounts.Add(newAccount);
 
         SaveAccount();
 
+        _ = FirestoreAccountManager.UploadAccount(newAccount);
+
         Debug.Log("Created Account");
 
         usernameInputField.text = "";
+        passwordInputField.text = "";
 
         RefreshUI();
     }
@@ -535,6 +551,7 @@ public class AccountManager : MonoBehaviour
         assignedStudentContainer = ui.assignedStudentContainer;
 
         usernameInputField = ui.usernameInputField;
+        passwordInputField = ui.passwordInputField;
 
         teacherNameText = ui.teacherNameText;
         completedLevelsText = ui.completedLevelsText;
@@ -619,6 +636,23 @@ public class AccountManager : MonoBehaviour
         RefreshUI();
 
         Debug.Log("UI Connected Successfully");
+    }
+
+    private string HashPassword(string password)
+    {
+        SHA256 sha = SHA256.Create();
+
+        byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+        StringBuilder builder = new StringBuilder();
+
+        foreach (byte b in bytes)
+        {
+            builder.Append(b.ToString("x2"));
+        }
+
+        return builder.ToString();
+
     }
 
     // Update is called once per frame

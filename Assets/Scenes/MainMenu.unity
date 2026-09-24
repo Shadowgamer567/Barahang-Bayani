@@ -10355,6 +10355,7 @@ MonoBehaviour:
   teacherContainer: {fileID: 473501726}
   assignedStudentContainer: {fileID: 361507323}
   usernameInputField: {fileID: 831125649}
+  passwordInputField: {fileID: 669469103}
   teacherNameText: {fileID: 0}
   completedLevelsText: {fileID: 274579588}
   quizStatsText: {fileID: 1411589224}
@@ -24680,6 +24681,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 160699160}
     - target: {fileID: 182808123288889623, guid: 863e9b00ae706454d863f64f9ac391ac, type: 3}
+      propertyPath: passwordInputField
+      value: 
+      objectReference: {fileID: 669469103}
+    - target: {fileID: 182808123288889623, guid: 863e9b00ae706454d863f64f9ac391ac, type: 3}
       propertyPath: usernameInputField
       value: 
       objectReference: {fileID: 831125649}
@@ -24746,6 +24751,10 @@ PrefabInstance:
     - target: {fileID: 1373110047420499876, guid: 863e9b00ae706454d863f64f9ac391ac, type: 3}
       propertyPath: m_Name
       value: AccountManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 1373110047420499876, guid: 863e9b00ae706454d863f64f9ac391ac, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
