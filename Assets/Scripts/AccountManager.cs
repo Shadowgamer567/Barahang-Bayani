@@ -66,7 +66,7 @@ public class AccountManager : MonoBehaviour
     public TMP_InputField loginPasswordInput;
     public TMP_Text loginUsernameText;
 
-    //public GameObject cardDeck;
+    public GameObject cardDeck;
     private string registryPath => Application.persistentDataPath + "/accounts.json";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -340,7 +340,7 @@ public class AccountManager : MonoBehaviour
 
         string enteredPassword = loginPasswordInput.text.Trim();
 
-        string enteredHash = "";//AccountManager.HashPassword(enteredPassword);
+        string enteredHash = AccountManager.HashPassword(enteredPassword);
 
         if (enteredHash != pendingLoginAccount.passwordHash)
         {
@@ -453,7 +453,7 @@ public class AccountManager : MonoBehaviour
     {
         HideAllPanels();
 
-        //cardDeck.SetActive(false);
+        cardDeck.SetActive(false);
 
         accountButton.SetActive(false);
 
@@ -569,7 +569,7 @@ public class AccountManager : MonoBehaviour
 
         mainMenu.SetActive(true);
 
-        //cardDeck.SetActive(true);
+        cardDeck.SetActive(true);
     }
 
     public void SelectTeacherStudent(AccountCardUI card)
