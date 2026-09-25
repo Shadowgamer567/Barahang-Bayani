@@ -11825,11 +11825,11 @@ MonoBehaviour:
   createTeacherButton: {fileID: 2067894430}
   submitUsernameButton: {fileID: 280942423}
   deleteAccountButton: {fileID: 1225676020}
-  loginPanel: {fileID: 0}
-  loginPasswordInput: {fileID: 0}
-  loginUsernameText: {fileID: 0}
-  confirmLoginButton: {fileID: 0}
-  cancelLoginButton: {fileID: 0}
+  loginPanel: {fileID: 1850879821}
+  loginPasswordInput: {fileID: 1044254558}
+  loginUsernameText: {fileID: 1729157013}
+  confirmLoginButton: {fileID: 145305453}
+  cancelLoginButton: {fileID: 539625365}
 --- !u!4 &768472865
 Transform:
   m_ObjectHideFlags: 0
@@ -17670,7 +17670,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1230108111
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22791,7 +22791,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1733781958
 RectTransform:
   m_ObjectHideFlags: 0
@@ -27092,7 +27092,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1009758044}
   m_HandleRect: {fileID: 1009758043}
   m_Direction: 3
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -28902,6 +28902,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 182808123288889623, guid: 863e9b00ae706454d863f64f9ac391ac, type: 3}
+      propertyPath: cardDeck
+      value: 
+      objectReference: {fileID: 1393368431}
     - target: {fileID: 182808123288889623, guid: 863e9b00ae706454d863f64f9ac391ac, type: 3}
       propertyPath: mainMenu
       value: 

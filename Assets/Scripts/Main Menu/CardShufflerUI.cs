@@ -64,6 +64,19 @@ public class CardShufflerUI : MonoBehaviour
         }
     }
 
+    private void RotateDeckOrder()
+    {
+        if (cardTransforms.Count <= 1)
+            return;
+
+        RectTransform lastCard = cardTransforms[cardTransforms.Count - 1];
+
+        cardTransforms.RemoveAt(cardTransforms.Count - 1);
+        cardTransforms.Insert(0, lastCard);
+
+        lastCard.SetAsFirstSibling();
+    }
+
     private IEnumerator ShuffleRoutine()
     {
         isShuffling = true;
@@ -115,6 +128,7 @@ public class CardShufflerUI : MonoBehaviour
                 yield return null;
             }
 
+            RotateDeckOrder();
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -123,8 +137,7 @@ public class CardShufflerUI : MonoBehaviour
             cardTransforms[i].anchoredPosition = originalPositions[i];
         }
 
-        topCardIndex = 0;
-        cardTransforms[topCardIndex].SetAsLastSibling();
+        RotateDeckOrder();
 
         isShuffling = false;
     }

@@ -66,6 +66,7 @@ public class AccountManager : MonoBehaviour
     public TMP_InputField loginPasswordInput;
     public TMP_Text loginUsernameText;
 
+    public GameObject cardDeck;
     private string registryPath => Application.persistentDataPath + "/accounts.json";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -339,7 +340,7 @@ public class AccountManager : MonoBehaviour
 
         string enteredPassword = loginPasswordInput.text.Trim();
 
-        string enteredHash = ""; //FirestoreAccountManager.HashPassword(enteredPassword);
+        string enteredHash = AccountManager.HashPassword(enteredPassword);
 
         if (enteredHash != pendingLoginAccount.passwordHash)
         {
@@ -452,6 +453,8 @@ public class AccountManager : MonoBehaviour
     {
         HideAllPanels();
 
+        cardDeck.SetActive(false);
+
         accountButton.SetActive(false);
 
         accountSelectPanel.SetActive(true);
@@ -459,6 +462,8 @@ public class AccountManager : MonoBehaviour
         accountManagementPanel.SetActive(true);
 
         backButton.SetActive(true);
+
+        
     }
 
     public void OpenCreateStudentMenu()
@@ -563,6 +568,8 @@ public class AccountManager : MonoBehaviour
         teacherInfoPanel.SetActive(false);
 
         mainMenu.SetActive(true);
+
+        cardDeck.SetActive(true);
     }
 
     public void SelectTeacherStudent(AccountCardUI card)
@@ -699,7 +706,7 @@ public class AccountManager : MonoBehaviour
         Debug.Log("UI Connected Successfully");
     }
 
-    private string HashPassword(string password)
+    private static string HashPassword(string password)
     {
         SHA256 sha = SHA256.Create();
 
