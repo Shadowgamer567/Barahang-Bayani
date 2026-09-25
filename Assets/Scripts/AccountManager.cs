@@ -61,6 +61,11 @@ public class AccountManager : MonoBehaviour
 
     public AccountRegistry registry = new();
 
+    private AccountData pendingLoginAccount;
+    public GameObject loginPanel;
+    public TMP_InputField loginPasswordInput;
+    public TMP_Text loginUsernameText;
+
     private string registryPath => Application.persistentDataPath + "/accounts.json";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -314,15 +319,43 @@ public class AccountManager : MonoBehaviour
 
         selectedCard = card;
 
-        selectedAccount = card.GetAccountData();
+        selectedCard.SetSelected(true);
+
+        pendingLoginAccount = card.GetAccountData();
+
+        loginUsernameText.text = "Login: " + pendingLoginAccount.username;
+
+        loginPasswordInput.text = "";
+
+        loginPanel.SetActive(true);
+    }
+
+    public void ConfirmLogin()
+    {
+        if (pendingLoginAccount == null)
+        {
+            return;
+        }
+
+        string enteredPassword = loginPasswordInput.text.Trim();
+
+        string enteredHash = ""; //FirestoreAccountManager.HashPassword(enteredPassword);
+
+        if (enteredHash != pendingLoginAccount.passwordHash)
+        {
+            Debug.Log("Incorrect Password");
+            return;
+        }
+
+        selectedAccount = pendingLoginAccount;
 
         CurrentAccount.ActiveAccount = selectedAccount;
 
         ProgressManager.Instance.SetActiveAccount(selectedAccount);
 
-        selectedCard.SetSelected(true);
+        loginPanel.SetActive(false);
 
-        Debug.Log("Selected Account: " + selectedAccount.username);
+        Debug.Log("Logged in as: " + selectedAccount.username);
 
         if (waitingToStartGame)
         {
@@ -334,6 +367,14 @@ public class AccountManager : MonoBehaviour
         }
     }
 
+    public void CancelLogin()
+    {
+        pendingLoginAccount = null;
+
+        loginPasswordInput.text = "";
+
+        loginPanel.SetActive(false);
+    }
     public void StartAssignStudents()
     {
         if (selectedAccount == null)
@@ -557,6 +598,10 @@ public class AccountManager : MonoBehaviour
         completedLevelsText = ui.completedLevelsText;
         quizStatsText = ui.quizStatsText;
 
+        loginPanel = ui.loginPanel;
+        loginPasswordInput = ui.loginPasswordInput;
+        loginUsernameText = ui.loginUsernameText;
+
         // Accounts Button
         Button accountBtn = accountButton.GetComponent<Button>();
 
@@ -624,6 +669,22 @@ public class AccountManager : MonoBehaviour
         confirmBtn.onClick.RemoveAllListeners();
 
         confirmBtn.onClick.AddListener(ConfirmAssignStudents);
+
+        //Confirm Login Button
+        Button loginBtn = 
+            ui.confirmLoginButton.GetComponent<Button>();
+
+        loginBtn.onClick.RemoveAllListeners();
+
+        loginBtn.onClick.AddListener(ConfirmLogin);
+
+        //Cancel Login Button
+        Button cancelBtn =
+            ui.cancelLoginButton.GetComponent<Button>();
+
+        cancelBtn.onClick.RemoveAllListeners();
+
+        cancelBtn.onClick.AddListener(CancelLogin);
 
         LoadAccount();
 

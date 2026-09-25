@@ -11,7 +11,7 @@ public class FirestoreAccountManager : MonoBehaviour
 
         data["id"] = account.id;
         data["usename"] = account.username;
-        data["password"] = account.passwordHash;
+        data["passwordHash"] = account.passwordHash;
         data["accountType"] = account.accountType.ToString();
         data["assignedStudentIDs"] = account.assignedStudentIDs;
 

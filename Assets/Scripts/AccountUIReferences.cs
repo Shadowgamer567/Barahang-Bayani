@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AccountUIReferences : MonoBehaviour
 {
@@ -38,6 +39,13 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject submitUsernameButton;
 
     public GameObject deleteAccountButton;
+
+    [Header("Login")]
+    public GameObject loginPanel;
+    public TMP_InputField loginPasswordInput;
+    public TMP_Text loginUsernameText;
+    public GameObject confirmLoginButton;
+    public GameObject cancelLoginButton;
 
     void Start()
     {
