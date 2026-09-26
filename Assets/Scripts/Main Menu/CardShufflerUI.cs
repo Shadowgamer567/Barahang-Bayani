@@ -26,6 +26,17 @@ public class CardShufflerUI : MonoBehaviour
         StartShuffle();
     }
 
+    private void OnDisable()
+    {
+        isShuffling = false;
+
+        for (int i = 0; i < cardTransforms.Count; i++)
+        {
+            if (cardTransforms[i] != null)
+                cardTransforms[i].anchoredPosition = originalPositions[i];
+        }
+    }
+
     private void InitializeDeck()
     {
         cardTransforms.Clear();
