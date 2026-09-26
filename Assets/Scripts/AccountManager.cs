@@ -455,6 +455,8 @@ public class AccountManager : MonoBehaviour
     {
         HideAllPanels();
 
+        mainMenu.SetActive(false);
+
         cardDeck.SetActive(false);
 
         accountButton.SetActive(false);
@@ -558,6 +560,8 @@ public class AccountManager : MonoBehaviour
     public void CloseAccountMenu()
     {
         accountButton.SetActive(true);
+
+        mainMenu.SetActive(true);
 
         accountSelectPanel.SetActive(false);
 
