@@ -35,7 +35,7 @@ public class DatabaseManager : MonoBehaviour
         Debug.Log("Current Database: " + CurrentDatabase);
     }
 
-    void SaveDatabaseConfig()
+    public void SaveDatabaseConfig()
     {
         DatabaseConfig config = new DatabaseConfig();
 
@@ -46,7 +46,7 @@ public class DatabaseManager : MonoBehaviour
         File.WriteAllText(ConfigPath, json);
     }
 
-    void LoadDatabaseConfig()
+    public void LoadDatabaseConfig()
     {
         if (!File.Exists(ConfigPath))
         {

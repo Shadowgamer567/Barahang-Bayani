@@ -1,4 +1,5 @@
 using Firebase.Auth;
+using Firebase.Firestore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class FirestoreAccountManager : MonoBehaviour
         Dictionary<string, object> data = new Dictionary<string, object>();
 
         data["id"] = account.id;
-        data["usename"] = account.username;
+        data["username"] = account.username;
         data["passwordHash"] = account.passwordHash;
         data["accountType"] = account.accountType.ToString();
         data["assignedStudentIDs"] = account.assignedStudentIDs;
@@ -21,6 +22,11 @@ public class FirestoreAccountManager : MonoBehaviour
             .SetAsync(data);
 
         Debug.Log("Uploaded Account: " + account.username);
+    }
+
+    public async Task DownloadAccounts()
+    {
+        string classroomID = DatabaseManager.Instance.CurrentDatabase;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
