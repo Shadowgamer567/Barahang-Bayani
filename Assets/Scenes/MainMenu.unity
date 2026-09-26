@@ -4542,7 +4542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 258, y: -95}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 330.9681, y: 483.4404}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &266588391
@@ -6886,7 +6886,6 @@ RectTransform:
   - {fileID: 1106862944}
   - {fileID: 1394666939}
   - {fileID: 1637935357}
-  - {fileID: 1393368432}
   - {fileID: 511295896}
   - {fileID: 2079705724}
   - {fileID: 257266065}
@@ -6898,6 +6897,7 @@ RectTransform:
   - {fileID: 1248735246}
   - {fileID: 1230108111}
   - {fileID: 1850879822}
+  - {fileID: 1393368432}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -11829,6 +11829,7 @@ MonoBehaviour:
   teacherInfoPanel: {fileID: 1248735245}
   studentInfoPanel: {fileID: 427045787}
   mainMenu: {fileID: 2079705723}
+  cardDeck: {fileID: 1393368431}
   assignStudentsButton: {fileID: 294260215}
   confirmAssignButton: {fileID: 62431299}
   studentContainer: {fileID: 679171761}
@@ -17927,7 +17928,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 258, y: -95}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 330.9681, y: 483.4404}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1259925773
@@ -18892,7 +18893,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 242, y: -112}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1393368433
@@ -23274,7 +23275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 258, y: -95}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 330.9681, y: 483.4404}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1755071312

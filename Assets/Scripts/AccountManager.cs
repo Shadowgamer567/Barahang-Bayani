@@ -611,6 +611,7 @@ public class AccountManager : MonoBehaviour
         loginPasswordInput = ui.loginPasswordInput;
         loginUsernameText = ui.loginUsernameText;
 
+        cardDeck = ui.cardDeck;
         // Accounts Button
         Button accountBtn = accountButton.GetComponent<Button>();
 

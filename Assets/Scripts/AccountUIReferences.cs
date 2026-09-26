@@ -13,6 +13,7 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject teacherInfoPanel;
     public GameObject studentInfoPanel;
     public GameObject mainMenu;
+    public GameObject cardDeck;
 
     [Header("Teacher Monitoring")]
     public GameObject assignStudentsButton;
@@ -46,6 +47,8 @@ public class AccountUIReferences : MonoBehaviour
     public TMP_Text loginUsernameText;
     public GameObject confirmLoginButton;
     public GameObject cancelLoginButton;
+
+    
 
     void Start()
     {
