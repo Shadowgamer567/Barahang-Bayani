@@ -82,6 +82,8 @@ public class AccountManager : MonoBehaviour
             Instance = this;
 
             DontDestroyOnLoad(gameObject);
+
+            EnsureAccountsFileExists();
         }
 
         else
@@ -721,6 +723,18 @@ public class AccountManager : MonoBehaviour
 
         return builder.ToString();
 
+    }
+
+    private void EnsureAccountsFileExists()
+    {
+        if (!File.Exists(registryPath))
+        {
+            registry = new AccountRegistry();
+
+            SaveAccount();
+
+            Debug.Log("accounts.json created");
+        }
     }
 
     // Update is called once per frame
