@@ -16,7 +16,7 @@ public class MainMenu : MonoBehaviour
 
         ProgressManager.Instance.NewGame();
 
-        SceneManager.LoadScene("MapMenu");
+        SceneTransitionManager.Instance.SwitchScene("MapMenu");
     }
     public void LoadGame()
     {
@@ -26,7 +26,7 @@ public class MainMenu : MonoBehaviour
 
         Debug.Log("Loading last Campaign" + sceneToLoad);
 
-        SceneManager.LoadScene(sceneToLoad);
+        SceneTransitionManager.Instance.SwitchScene(sceneToLoad);
     }
 
     public void Options()
@@ -40,11 +40,11 @@ public class MainMenu : MonoBehaviour
 
     public void RegionSelect_Back()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneTransitionManager.Instance.SwitchScene("MainMenu");
     }
 
     public void SelectRegion1()
     {
-        SceneManager.LoadScene("LevelSelect_Rizal");
+        SceneTransitionManager.Instance.SwitchScene("LevelSelect_Rizal");
     }
 }
