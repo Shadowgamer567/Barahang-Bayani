@@ -71,6 +71,9 @@ public class ProgressManager : MonoBehaviour
 
         ProgressData data = new ProgressData();
 
+        data.username = currentAccount.username;
+        data.accountType = currentAccount.accountType.ToString();
+
         data.completedLevel = completedLevels;
         data.lastCampaignScene = lastCampaignScene;
 
@@ -89,6 +92,8 @@ public class ProgressManager : MonoBehaviour
         string json = JsonUtility.ToJson(data, true);
 
         File.WriteAllText(savePath, json);
+
+        _ = FirestoreProgressManager.UploadProgress(currentAccount.id, data);
 
         Debug.Log("Saved Progress For: " + currentAccount.username);
     }

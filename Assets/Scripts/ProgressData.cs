@@ -7,6 +7,9 @@ public class ProgressData
 {
     public List<string> completedLevel = new List<string>();
 
+    public string username;
+    public string accountType;
+
     public string lastCampaignScene;
 
     public int multipleChoiceCorrect;
