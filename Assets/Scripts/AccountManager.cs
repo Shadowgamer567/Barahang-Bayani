@@ -7,7 +7,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using Unity.UI;
 using UnityEngine.UI;
 
 public class AccountManager : MonoBehaviour

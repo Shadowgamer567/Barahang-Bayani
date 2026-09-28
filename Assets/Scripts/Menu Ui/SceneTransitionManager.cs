@@ -5,13 +5,24 @@ using UnityEngine.SceneManagement;
 
 public class SceneTransitionManager : MonoBehaviour
 {
+    private enum TransitionMode
+    {
+        FadeOutBeforeLoad,
+        FadeInAfterLoad,
+        FadeOutAndIn
+    }
+
     public static SceneTransitionManager Instance;
     private static bool sceneTransitionPending;
+    private static TransitionMode activeTransitionMode;
+    public static bool IsSceneTransitionPending => sceneTransitionPending;
+    public static event System.Action SceneTransitionStarted;
 
     [Header("UI References")]
     [SerializeField] private CanvasGroup fadeCanvasGroup;
 
     [Header("Settings")]
+    [SerializeField] private TransitionMode transitionMode = TransitionMode.FadeOutAndIn;
     [SerializeField] private float fadeDuration = 0.5f;
 
     private bool isTransitioning;
@@ -37,17 +48,31 @@ public class SceneTransitionManager : MonoBehaviour
 
         if (sceneTransitionPending)
         {
-            fadeCanvasGroup.alpha = 0f;
-            fadeCanvasGroup.interactable = false;
-            fadeCanvasGroup.blocksRaycasts = false;
+            bool fadeInAfterLoad = activeTransitionMode != TransitionMode.FadeOutBeforeLoad;
+            fadeCanvasGroup.alpha = fadeInAfterLoad ? 0f : 1f;
+            fadeCanvasGroup.interactable = !fadeInAfterLoad;
+            fadeCanvasGroup.blocksRaycasts = !fadeInAfterLoad;
         }
     }
 
     private void Start()
     {
-        if (sceneTransitionPending)
+        if (!sceneTransitionPending)
+        {
+            return;
+        }
+
+        if (activeTransitionMode == TransitionMode.FadeOutBeforeLoad)
+        {
+            CompleteTransition();
+        }
+        else if (fadeCanvasGroup != null)
         {
             StartCoroutine(FadeIn());
+        }
+        else
+        {
+            CompleteTransition();
         }
     }
 
@@ -65,28 +90,31 @@ public class SceneTransitionManager : MonoBehaviour
         }
 
         isTransitioning = true;
-    sceneTransitionPending = true;
+        activeTransitionMode = transitionMode;
+        sceneTransitionPending = true;
+        SceneTransitionStarted?.Invoke();
         StartCoroutine(TransitionRoutine(sceneName));
     }
 
     private IEnumerator TransitionRoutine(string sceneName)
     {
-        // 1. Fade to Black
-        if (fadeCanvasGroup != null)
+        bool shouldFadeOut = activeTransitionMode != TransitionMode.FadeInAfterLoad;
+        if (shouldFadeOut && fadeCanvasGroup != null)
         {
             yield return StartCoroutine(FadeOut());
         }
 
-        // 2. Load the scene asynchronously
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         if (asyncLoad == null)
         {
             Debug.LogError($"Failed to start loading scene '{sceneName}'.");
             if (fadeCanvasGroup != null)
             {
-                yield return StartCoroutine(FadeIn());
+                fadeCanvasGroup.alpha = 1f;
+                fadeCanvasGroup.interactable = true;
+                fadeCanvasGroup.blocksRaycasts = true;
             }
-            isTransitioning = false;
+            CompleteTransition();
             yield break;
         }
 
@@ -101,7 +129,7 @@ public class SceneTransitionManager : MonoBehaviour
         float timer = 0f;
         float startAlpha = fadeCanvasGroup.alpha;
         fadeCanvasGroup.interactable = false;
-        fadeCanvasGroup.blocksRaycasts = false;
+        fadeCanvasGroup.blocksRaycasts = true;
         while (timer < fadeDuration)
         {
             timer += Time.deltaTime;
@@ -114,15 +142,23 @@ public class SceneTransitionManager : MonoBehaviour
     private IEnumerator FadeIn()
     {
         float timer = 0f;
+        float startAlpha = fadeCanvasGroup.alpha;
+        fadeCanvasGroup.interactable = false;
+        fadeCanvasGroup.blocksRaycasts = true;
         while (timer < fadeDuration)
         {
             timer += Time.deltaTime;
-            fadeCanvasGroup.alpha = Mathf.Clamp01(timer / fadeDuration);
+            fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, 1f, Mathf.Clamp01(timer / fadeDuration));
             yield return null;
         }
         fadeCanvasGroup.alpha = 1f;
         fadeCanvasGroup.interactable = true;
         fadeCanvasGroup.blocksRaycasts = true;
+        CompleteTransition();
+    }
+
+    private void CompleteTransition()
+    {
         sceneTransitionPending = false;
         isTransitioning = false;
     }
