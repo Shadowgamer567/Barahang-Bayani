@@ -1,14 +1,14 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class ProgressData
 {
-    public List<string> completedLevel = new List<string>();
-
+    public string accountId;
     public string username;
     public string accountType;
+
+    public List<string> completedLevel = new List<string>();
 
     public string lastCampaignScene;
 
