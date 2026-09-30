@@ -52,7 +52,10 @@ public class PullStudentProgress : MonoBehaviour
             Dictionary<string, object> data =
                 snapshot.ToDictionary();
 
-            Debug.Log("Progress data pulled from Firestore for: " + account.username);
+            Debug.Log(
+                "Progress data '" + snapshot.Id +
+                "' pulled from Firestore for: " + account.username
+            );
 
             ProgressData progress = new ProgressData();
 
@@ -116,7 +119,7 @@ public class PullStudentProgress : MonoBehaviour
             );
 
             // Apply the downloaded progress to ProgressManager
-            ApplyProgress(progress);
+            ApplyProgress(progress, data, account.id);
         }
         catch (System.Exception e)
         {
@@ -127,7 +130,10 @@ public class PullStudentProgress : MonoBehaviour
         }
     }
 
-    private void ApplyProgress(ProgressData data)
+    private void ApplyProgress(
+        ProgressData data,
+        Dictionary<string, object> firebaseData,
+        string accountId)
     {
         if (ProgressManager.Instance == null)
         {
@@ -144,7 +150,42 @@ public class PullStudentProgress : MonoBehaviour
         progressManager.lastCampaignScene =
             data.lastCampaignScene;
 
-        Debug.Log("Firestore progress applied locally.");
+        Debug.Log(
+            "Firestore progress applied locally for account '" +
+            accountId + "'. Firebase data: " +
+            FormatFirestoreData(firebaseData)
+        );
+    }
+
+    private string FormatFirestoreData(
+        Dictionary<string, object> data)
+    {
+        List<string> entries = new List<string>();
+
+        foreach (KeyValuePair<string, object> entry in data)
+        {
+            string value;
+
+            if (entry.Value is List<object> list)
+            {
+                List<string> items = new List<string>();
+
+                foreach (object item in list)
+                {
+                    items.Add(item == null ? "null" : item.ToString());
+                }
+
+                value = "[" + string.Join(", ", items) + "]";
+            }
+            else
+            {
+                value = entry.Value == null ? "null" : entry.Value.ToString();
+            }
+
+            entries.Add(entry.Key + "=" + value);
+        }
+
+        return "{" + string.Join(", ", entries) + "}";
     }
 
     private string GetString(
