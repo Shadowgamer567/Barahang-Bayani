@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class ProgressManager : MonoBehaviour
 {
@@ -119,24 +120,7 @@ public class ProgressManager : MonoBehaviour
             ProgressData data =
                 JsonUtility.FromJson<ProgressData>(json);
 
-            completedLevels =
-                data.completedLevel ?? new List<string>();
-
-            lastCampaignScene = data.lastCampaignScene;
-
-            QuizStats.Instance.ResetStats();
-
-            QuizStats.Instance.typeCorrect[InputType.MultipleChoice] = data.multipleChoiceCorrect;
-
-            QuizStats.Instance.typeTotal[InputType.MultipleChoice] = data.multipleChoiceTotal;
-
-            QuizStats.Instance.typeCorrect[InputType.Identification] = data.identificationCorrect;
-
-            QuizStats.Instance.typeTotal[InputType.Identification] = data.identificationTotal;
-
-            QuizStats.Instance.typeCorrect[InputType.TrueOrFalse] = data.trueFalseCorrect;
-
-            QuizStats.Instance.typeTotal[InputType.TrueOrFalse] = data.trueFalseTotal;
+            ApplyProgress(data);
 
             Debug.Log("Loaded Progress For: " + currentAccount.username);
         }
@@ -150,6 +134,66 @@ public class ProgressManager : MonoBehaviour
 
             Debug.Log("Created New Save For: " + currentAccount.username);
         }
+    }
+
+    public async Task<bool> LoadProgressForActiveAccount()
+    {
+        if (currentAccount == null)
+        {
+            Debug.LogError("No active account selected!");
+            return false;
+        }
+
+        string accountId = currentAccount.id;
+
+        try
+        {
+            ProgressData cloudProgress =
+                await FirestoreProgressManager.DownloadProgress(accountId);
+
+            if (currentAccount == null || currentAccount.id != accountId)
+            {
+                Debug.Log("Discarding progress for an inactive account.");
+                return false;
+            }
+
+            if (cloudProgress != null)
+            {
+                ApplyProgress(cloudProgress);
+                SaveProgress(false);
+
+                Debug.Log("Loaded progress from Firestore for: " + currentAccount.username);
+                return true;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to load progress from Firestore: " + e.Message);
+        }
+
+        if (currentAccount == null || currentAccount.id != accountId)
+        {
+            return false;
+        }
+
+        LoadProgress();
+        return true;
+    }
+
+    private void ApplyProgress(ProgressData data)
+    {
+        completedLevels = data.completedLevel ?? new List<string>();
+        lastCampaignScene = string.IsNullOrEmpty(data.lastCampaignScene)
+            ? "MapMenu"
+            : data.lastCampaignScene;
+
+        QuizStats.Instance.ResetStats();
+        QuizStats.Instance.typeCorrect[InputType.MultipleChoice] = data.multipleChoiceCorrect;
+        QuizStats.Instance.typeTotal[InputType.MultipleChoice] = data.multipleChoiceTotal;
+        QuizStats.Instance.typeCorrect[InputType.Identification] = data.identificationCorrect;
+        QuizStats.Instance.typeTotal[InputType.Identification] = data.identificationTotal;
+        QuizStats.Instance.typeCorrect[InputType.TrueOrFalse] = data.trueFalseCorrect;
+        QuizStats.Instance.typeTotal[InputType.TrueOrFalse] = data.trueFalseTotal;
     }
 
     public void NewGame(bool uploadToFirestore = true)
@@ -197,38 +241,8 @@ public class ProgressManager : MonoBehaviour
             return;
         }
 
-        completedLevels =
-            cloudProgress.completedLevel ??
-            new List<string>();
-
-        lastCampaignScene =
-            cloudProgress.lastCampaignScene;
-
-        QuizStats.Instance.ResetStats();
-
-        QuizStats.Instance.typeCorrect[
-            InputType.MultipleChoice] =
-            cloudProgress.multipleChoiceCorrect;
-
-        QuizStats.Instance.typeTotal[
-            InputType.MultipleChoice] =
-            cloudProgress.multipleChoiceTotal;
-
-        QuizStats.Instance.typeCorrect[
-            InputType.Identification] =
-            cloudProgress.identificationCorrect;
-
-        QuizStats.Instance.typeTotal[
-            InputType.Identification] =
-            cloudProgress.identificationTotal;
-
-        QuizStats.Instance.typeCorrect[
-            InputType.TrueOrFalse] =
-            cloudProgress.trueFalseCorrect;
-
-        QuizStats.Instance.typeTotal[
-            InputType.TrueOrFalse] =
-            cloudProgress.trueFalseTotal;
+        ApplyProgress(cloudProgress);
+        SaveProgress(false);
 
         Debug.Log(
             "Progress successfully synced from Firestore."

@@ -18,9 +18,15 @@ public class MainMenu : MonoBehaviour
 
         SceneTransitionManager.Instance.SwitchScene("MapMenu");
     }
-    public void LoadGame()
+    public async void LoadGame()
     {
-        ProgressManager.Instance.LoadProgress();
+        bool progressLoaded =
+            await ProgressManager.Instance.LoadProgressForActiveAccount();
+
+        if (!progressLoaded)
+        {
+            return;
+        }
 
         string sceneToLoad = ProgressManager.Instance.lastCampaignScene;
 
