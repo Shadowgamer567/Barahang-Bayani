@@ -5,20 +5,11 @@ using UnityEngine;
 
 public class PullStudentProgress : MonoBehaviour
 {
-    public static async Task PullProgress()
+    public static async Task PullProgress(AccountData account)
     {
-        // Make sure an account is selected
-        if (AccountManager.Instance == null)
-        {
-            Debug.LogError("AccountManager instance not found.");
-            return;
-        }
-
-        AccountData account = AccountManager.Instance.selectedAccount;
-
         if (account == null)
         {
-            Debug.LogError("No account is currently selected.");
+            Debug.LogError("No account was provided for progress sync.");
             return;
         }
 
@@ -38,6 +29,17 @@ public class PullStudentProgress : MonoBehaviour
                     .ProgressCollection()
                     .Document(account.id)
                     .GetSnapshotAsync();
+
+            if (AccountManager.Instance == null ||
+                AccountManager.Instance.selectedAccount == null ||
+                AccountManager.Instance.selectedAccount.id != account.id)
+            {
+                Debug.Log(
+                    "Discarding progress for inactive account: " +
+                    account.username
+                );
+                return;
+            }
 
             if (!snapshot.Exists)
             {

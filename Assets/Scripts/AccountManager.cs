@@ -361,7 +361,7 @@ public class AccountManager : MonoBehaviour
         
         if (selectedAccount.accountType == AccountType.Student)
         {
-            await PullStudentProgress.PullProgress();
+            await PullStudentProgress.PullProgress(selectedAccount);
         }
 
         if (waitingToStartGame)
