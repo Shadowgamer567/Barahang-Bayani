@@ -1,0 +1,61 @@
+ID:RIZAL1
+1. When was Jose Rizal born?
+TYPE:TEXT
+INPUT:MULTIPLE_CHOICE
+A. March 9, 1851
+B. June 4, 1850
+C. June 19, 1861 "C"
+D. Dec 30, 1896
+
+ID:RIZAL2
+2. What type of the Alphabet do you hear?
+TYPE:AUDIO:vowels
+INPUT:IDENTIFICATION
+A. Vowels "C"
+B. Consonants
+C. The Alphabet
+D. Letters
+
+ID:RIZAL3
+3. Was this Jose Rizal as a child?
+TYPE:IMAGE:rizal-as-a-child
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+ID:RIZAL4
+4. At what age did Jose Rizal learn the Alphabet?
+TYPE:TEXT
+INPUT:MULTIPLE_CHOICE
+A. 7
+B. 3 "C"
+C. 5
+D. 8
+
+ID:RIZAL5
+5. Who was Jose Rizal's Uncle who was his teacher?
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. Jose Alberto Alonso "C"
+B. Rufino Collantes
+C. Leoncio Lopez
+D. Manuel de Quintos Alonso
+
+ID:RIZAL6
+6. Was Jose Rizal American?
+TYPE:TEXT
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSE
+
+ID:RIZAL7
+7. Was this the house of Jose Rizal?
+TYPE:IMAGE:house-of-rizal
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+ID:RIZAL8
+8. Is this Jose Rizal?
+TYPE:IMAGE:francisco-mercado
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSEID:QUESTIONS9
+
+

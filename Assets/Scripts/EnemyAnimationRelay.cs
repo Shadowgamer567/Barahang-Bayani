@@ -1,0 +1,27 @@
+//Deprecated, should not be used
+
+using UnityEngine;
+
+public class EnemyAnimationRelay : MonoBehaviour
+{
+    public EnemyStats parent;
+
+    public void OnDeathAnimationComplete()
+    {
+        if (parent != null)
+        {
+            parent.OnDeathAnimationComplete();
+        }
+    }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}

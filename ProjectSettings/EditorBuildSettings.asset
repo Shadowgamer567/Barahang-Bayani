@@ -8,6 +8,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Level.unity
+    guid: dba600969c1df2c4097b7d0bde316c55
+  - enabled: 1
+    path: Assets/Scenes/LevelSelect_Rizal.unity
+    guid: 44ec0b6ea47f483409cfffc8e2d7f9b3
+  - enabled: 1
+    path: Assets/Scenes/MapMenu.unity
+    guid: d9e2697d488929c4fa20fc36b725d0f2
+  - enabled: 1
+    path: Assets/Scenes/BackgroundTemplates.unity
+    guid: da4b55017b3afc24e82afed7bf0f3a6f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

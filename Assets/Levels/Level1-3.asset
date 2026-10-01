@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68f159855e55843419fd6ddf7cae3465, type: 3}
+  m_Name: Level1-3
+  m_EditorClassIdentifier: Assembly-CSharp::LevelData
+  levelName: Level1-3
+  sceneName: 
+  battlesRequired: 3
+  levelIndex: 3
+  Cutscenes:
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  - triggerType: 0
+    battleIndex: 0
+    Cutscene: {fileID: 0}
+  campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
+  previousLevel: {fileID: 11400000, guid: 0a041b3313cc6fe4fa2b93270201e0de, type: 2}
+  nextLevel: {fileID: 11400000, guid: 77c8c69dfd5073845a3385ea21384a48, type: 2}
+  heroesInLevel:
+  - {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+  maxHeroes: 4
+  possibleEnemies:
+  - {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
+  - {fileID: 11400000, guid: 9f05b8be591ccc24e973b97f234410b1, type: 2}
+  - {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
+  minEnemies: 1
+  maxEnemies: 4
+  isBossLevel: 0

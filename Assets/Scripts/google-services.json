@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "98228933206",
+    "project_id": "barahangbayani",
+    "storage_bucket": "barahangbayani.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:98228933206:android:03049203b222a8d8d2e1f7",
+        "android_client_info": {
+          "package_name": "com.DefaultCompnay.BarahangBayani"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfkxw8AYVAfZAv31jwvVxW5Kz5p5Eoz-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
