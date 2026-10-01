@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PullStudentProgress : MonoBehaviour
 {
-    public async void PullProgress()
+    public static async Task PullProgress()
     {
         // Make sure an account is selected
         if (AccountManager.Instance == null)
@@ -130,7 +130,7 @@ public class PullStudentProgress : MonoBehaviour
         }
     }
 
-    private void ApplyProgress(
+    private static void ApplyProgress(
         ProgressData data,
         Dictionary<string, object> firebaseData,
         string accountId)
@@ -150,6 +150,22 @@ public class PullStudentProgress : MonoBehaviour
         progressManager.lastCampaignScene =
             data.lastCampaignScene;
 
+        QuizStats.Instance.ResetStats();
+        QuizStats.Instance.typeCorrect[InputType.MultipleChoice] =
+            data.multipleChoiceCorrect;
+        QuizStats.Instance.typeTotal[InputType.MultipleChoice] =
+            data.multipleChoiceTotal;
+        QuizStats.Instance.typeCorrect[InputType.Identification] =
+            data.identificationCorrect;
+        QuizStats.Instance.typeTotal[InputType.Identification] =
+            data.identificationTotal;
+        QuizStats.Instance.typeCorrect[InputType.TrueOrFalse] =
+            data.trueFalseCorrect;
+        QuizStats.Instance.typeTotal[InputType.TrueOrFalse] =
+            data.trueFalseTotal;
+
+        progressManager.SaveProgress(false);
+
         Debug.Log(
             "Firestore progress applied locally for account '" +
             accountId + "'. Firebase data: " +
@@ -157,7 +173,7 @@ public class PullStudentProgress : MonoBehaviour
         );
     }
 
-    private string FormatFirestoreData(
+    private static string FormatFirestoreData(
         Dictionary<string, object> data)
     {
         List<string> entries = new List<string>();
@@ -188,7 +204,7 @@ public class PullStudentProgress : MonoBehaviour
         return "{" + string.Join(", ", entries) + "}";
     }
 
-    private string GetString(
+    private static string GetString(
         Dictionary<string, object> data,
         string key)
     {
@@ -200,7 +216,7 @@ public class PullStudentProgress : MonoBehaviour
         return "";
     }
 
-    private int GetInt(
+    private static int GetInt(
         Dictionary<string, object> data,
         string key)
     {
@@ -212,7 +228,7 @@ public class PullStudentProgress : MonoBehaviour
         return 0;
     }
 
-    private List<string> GetStringList(
+    private static List<string> GetStringList(
         Dictionary<string, object> data,
         string key)
     {

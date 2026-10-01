@@ -45,8 +45,6 @@ public class ProgressManager : MonoBehaviour
        // Load local progress first
        LoadProgress();
 
-       // Then pull the latest shared progress
-       SyncProgressFromFirestore();
     }
     public void CompleteLevel(string levelName)
     {
@@ -65,7 +63,7 @@ public class ProgressManager : MonoBehaviour
         return completedLevels.Contains(levelName);
     }
 
-    public void SaveProgress()
+    public void SaveProgress(bool uploadToFirestore = true)
     {
         if (currentAccount == null)
         {
@@ -97,7 +95,10 @@ public class ProgressManager : MonoBehaviour
 
         File.WriteAllText(savePath, json);
 
-        _ = FirestoreProgressManager.UploadProgress(currentAccount.id, data);
+        if (uploadToFirestore)
+        {
+            _ = FirestoreProgressManager.UploadProgress(currentAccount.id, data);
+        }
 
         Debug.Log("Saved Progress For: " + currentAccount.username);
     }
@@ -144,13 +145,13 @@ public class ProgressManager : MonoBehaviour
 
             lastCampaignScene = "MapMenu";
 
-            SaveProgress();
+            SaveProgress(false);
 
             Debug.Log("Created New Save For: " + currentAccount.username);
         }
     }
 
-    public void NewGame()
+    public void NewGame(bool uploadToFirestore = true)
     {
         if (currentAccount == null)
         {
@@ -162,7 +163,7 @@ public class ProgressManager : MonoBehaviour
 
         lastCampaignScene = "MapMenu";
 
-        SaveProgress();
+        SaveProgress(uploadToFirestore);
 
         Debug.Log("New Game Started");
     }
@@ -228,7 +229,7 @@ public class ProgressManager : MonoBehaviour
             InputType.TrueOrFalse] =
             cloudProgress.trueFalseTotal;
 
-        SaveProgress();
+        SaveProgress(false);
 
         Debug.Log(
             "Progress successfully synced from Firestore."

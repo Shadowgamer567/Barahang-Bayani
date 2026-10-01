@@ -332,7 +332,7 @@ public class AccountManager : MonoBehaviour
         loginPanel.SetActive(true);
     }
 
-    public void ConfirmLogin()
+    public async void ConfirmLogin()
     {
         if (pendingLoginAccount == null)
         {
@@ -358,12 +358,17 @@ public class AccountManager : MonoBehaviour
         loginPanel.SetActive(false);
 
         Debug.Log("Logged in as: " + selectedAccount.username);
+        
+        if (selectedAccount.accountType == AccountType.Student)
+        {
+            await PullStudentProgress.PullProgress();
+        }
 
         if (waitingToStartGame)
         {
             waitingToStartGame = false;
 
-            ProgressManager.Instance.NewGame();
+            ProgressManager.Instance.NewGame(false);
 
             SceneManager.LoadScene("MapMenu");
         }
