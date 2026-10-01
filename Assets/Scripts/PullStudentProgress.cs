@@ -166,8 +166,6 @@ public class PullStudentProgress : MonoBehaviour
         QuizStats.Instance.typeTotal[InputType.TrueOrFalse] =
             data.trueFalseTotal;
 
-        progressManager.SaveProgress(false);
-
         Debug.Log(
             "Firestore progress applied locally for account '" +
             accountId + "'. Firebase data: " +

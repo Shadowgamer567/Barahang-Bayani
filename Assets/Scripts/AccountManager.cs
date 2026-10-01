@@ -368,8 +368,6 @@ public class AccountManager : MonoBehaviour
         {
             waitingToStartGame = false;
 
-            ProgressManager.Instance.NewGame(false);
-
             SceneManager.LoadScene("MapMenu");
         }
     }

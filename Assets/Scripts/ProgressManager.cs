@@ -42,8 +42,9 @@ public class ProgressManager : MonoBehaviour
 
        Debug.Log("Active Save File: " + savePath);
 
-       // Load local progress first
-       LoadProgress();
+    completedLevels = new List<string>();
+    lastCampaignScene = "MapMenu";
+    QuizStats.Instance.ResetStats();
 
     }
     public void CompleteLevel(string levelName)
@@ -228,8 +229,6 @@ public class ProgressManager : MonoBehaviour
         QuizStats.Instance.typeTotal[
             InputType.TrueOrFalse] =
             cloudProgress.trueFalseTotal;
-
-        SaveProgress(false);
 
         Debug.Log(
             "Progress successfully synced from Firestore."
