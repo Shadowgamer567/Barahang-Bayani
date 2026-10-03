@@ -12,5 +12,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8d7f6106dbc1f241bc27c2944886440, type: 3}
   m_Name: NewContentData
   m_EditorClassIdentifier: Assembly-CSharp::ScrollableContentData
-  bodyText: 
-  displayImage: {fileID: 0}
+  titleText: "Jos\xE9 Rizal"
+  titleColor: {r: 0, g: 0, b: 0, a: 1}
+  titleFontSize: 36
+  titleAlignment: 258
+  bodyText: "Jos\xE9 Protasio Rizal Mercado y Alonso Realonda[7] (Spanish: [xo\u02C8se
+    ri\u02C8sal, -\u02C8\u03B8al], Tagalog: [ho\u02C8se \u027Ei\u02C8sal]; June 19,
+    1861 \u2013 December 30, 1896) was a Filipino nationalist, writer, and polymath
+    active at the end of the Spanish colonial period of the Philippines. He is popularly
+    considered to be a national hero of the Philippines.[8] An ophthalmologist by
+    profession, Rizal became a writer and a key member of the Filipino Propaganda
+    Movement in the 1880s, which advocated political reforms for the colony under
+    Spain.\r\n\r\nBy the early 1890s, amidst the Calamba land dispute, Rizal grew
+    more separatist in his stance, conflicting with several colleagues in the Propaganda
+    Movement.[9] On July 6, 1892, a few days after establishing the secret society
+    La Liga Filipina within Manila, Rizal was arrested by Spanish authorities for
+    alleged possession of a seditious document, being banished to Dapitan in the
+    island of Mindanao. During his exile, Rizal met Josephine Bracken, an Irish woman
+    who later became his common-law wife.\r\n\r\nAfter four years in exile, Rizal
+    left Dapitan for Cuba in August 1896 with the permission of Governor General
+    Ram\xF3n Blanco, intending to serve as a doctor in the Spanish territory. At
+    a stopover in Barcelona, he was arrested on October 6, 1896 after the Philippine
+    Revolution broke out; the revolution was inspired by his writings. In December
+    1896, he was executed by the Spanish colonial government for the crime of rebellion.
+    Though he was not actively involved in its planning or conduct, he ultimately
+    approved of its goals, which eventually resulted in Philippine independence.\r\n\r\nRizal
+    is widely considered one of the greatest and most influential figures in the
+    Philippines, and has been recommended to be so honored by an officially empaneled
+    National Heroes Committee. However, no law, executive order or proclamation has
+    been enacted or issued officially proclaiming any Filipino historical figure
+    as a national hero.[10][11] He wrote the novels Noli Me T\xE1ngere (1887) and
+    El filibusterismo (1891), which together are taken as a national epic, in addition
+    to numerous poems and essays.[12][13]"
+  bodyTextColor: {r: 0, g: 0, b: 0, a: 1}
+  bodyFontSize: 48
+  bodyAlignment: 257
+  displayImage: {fileID: 21300000, guid: 3c280f2ac08bc834f984cacd96fd95da, type: 3}
+  imagePosition: 0
+  imageTint: {r: 1, g: 1, b: 1, a: 1}
+  sizeMode: 0
+  customImageSize: {x: 600, y: 600}
+  preserveAspectRatio: 1
+  panelBackgroundColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.8}
+  panelPadding:
+    m_Left: 15
+    m_Right: 15
+    m_Top: 15
+    m_Bottom: 15
+  elementSpacing: 10
