@@ -12,38 +12,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8d7f6106dbc1f241bc27c2944886440, type: 3}
   m_Name: NewContentData
   m_EditorClassIdentifier: Assembly-CSharp::ScrollableContentData
-  titleText: "Jos\xE9 Rizal"
+  titleText: Jose Rizal
   titleColor: {r: 0, g: 0, b: 0, a: 1}
   titleFontSize: 36
   titleAlignment: 258
-  bodyText: "Jos\xE9 Protasio Rizal Mercado y Alonso Realonda[7] (Spanish: [xo\u02C8se
-    ri\u02C8sal, -\u02C8\u03B8al], Tagalog: [ho\u02C8se \u027Ei\u02C8sal]; June 19,
-    1861 \u2013 December 30, 1896) was a Filipino nationalist, writer, and polymath
-    active at the end of the Spanish colonial period of the Philippines. He is popularly
-    considered to be a national hero of the Philippines.[8] An ophthalmologist by
-    profession, Rizal became a writer and a key member of the Filipino Propaganda
-    Movement in the 1880s, which advocated political reforms for the colony under
-    Spain.\r\n\r\nBy the early 1890s, amidst the Calamba land dispute, Rizal grew
-    more separatist in his stance, conflicting with several colleagues in the Propaganda
-    Movement.[9] On July 6, 1892, a few days after establishing the secret society
-    La Liga Filipina within Manila, Rizal was arrested by Spanish authorities for
-    alleged possession of a seditious document, being banished to Dapitan in the
-    island of Mindanao. During his exile, Rizal met Josephine Bracken, an Irish woman
-    who later became his common-law wife.\r\n\r\nAfter four years in exile, Rizal
-    left Dapitan for Cuba in August 1896 with the permission of Governor General
-    Ram\xF3n Blanco, intending to serve as a doctor in the Spanish territory. At
-    a stopover in Barcelona, he was arrested on October 6, 1896 after the Philippine
-    Revolution broke out; the revolution was inspired by his writings. In December
-    1896, he was executed by the Spanish colonial government for the crime of rebellion.
-    Though he was not actively involved in its planning or conduct, he ultimately
-    approved of its goals, which eventually resulted in Philippine independence.\r\n\r\nRizal
-    is widely considered one of the greatest and most influential figures in the
-    Philippines, and has been recommended to be so honored by an officially empaneled
-    National Heroes Committee. However, no law, executive order or proclamation has
-    been enacted or issued officially proclaiming any Filipino historical figure
-    as a national hero.[10][11] He wrote the novels Noli Me T\xE1ngere (1887) and
-    El filibusterismo (1891), which together are taken as a national epic, in addition
-    to numerous poems and essays.[12][13]"
+  bodyText: "Jose Rizal (born June 19, 1861, Calamba, Philippines\u2014died December
+    30, 1896, Manila) was a patriot, physician, and man of letters who was an inspiration
+    to the Philippine nationalist movement.\r\nEarly life and education\r\n\r\nThe
+    son of a prosperous landowner, Rizal was educated in Manila and at the University
+    of Madrid. A brilliant medical student, he soon committed himself to the reform
+    of Spanish rule in his home country, though he never advocated Philippine independence.
+    Most of his writing was done in Europe, where he resided between 1882 and 1892.\r\nLiterary
+    and political efforts\r\n\r\nIn 1887 Rizal published his first novel, Noli me
+    tangere (1886; Eng. trans. The Social Cancer), a passionate exposure of the evils
+    of Spanish rule in the Philippines. A sequel, El filibusterismo (1891; Eng. trans.
+    The Reign of Greed), established his reputation as the leading spokesman of the
+    Philippine reform movement. He published an annotated edition (1890; reprinted
+    1958) of Antonio Morga\u2019s Sucesos de las Islas Filipinas, hoping to show
+    that the native people of the Philippines had a long history before the coming
+    of the Spaniards. He became the leader of the Propaganda Movement, contributing
+    numerous articles to its newspaper, La Solidaridad, published in Barcelona. Rizal\u2019s
+    political program included integration of the Philippines as a province of Spain,
+    representation in the Cortes (the Spanish parliament), the replacement of Spanish
+    friars by Filipino priests, freedom of assembly and expression, and equality
+    of Filipinos and Spaniards before the law.\n\nLater years, exile, and execution\nRizal
+    returned to the Philippines in 1892. He founded a nonviolent-reform society,
+    the Liga Filipina, in Manila, and was deported to Dapitan in northwest Mindanao.
+    He remained in exile for the next four years. In 1896 the Katipunan, a Filipino
+    nationalist secret society, revolted against Spain. Although he had no connections
+    with that organization and he had had no part in the insurrection, Rizal was
+    arrested and tried for sedition by the military. Found guilty, he was publicly
+    executed by a firing squad in Manila. His martyrdom convinced Filipinos that
+    there was no alternative to independence from Spain. On the eve of his execution,
+    while confined in Fort Santiago, Rizal wrote \u201C\xDAltimo adi\xF3s\u201D (\u201CLast
+    Farewell\u201D), a masterpiece of 19th-century Spanish verse.\n"
   bodyTextColor: {r: 0, g: 0, b: 0, a: 1}
   bodyFontSize: 48
   bodyAlignment: 257

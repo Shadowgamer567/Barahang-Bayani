@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,6 +8,9 @@ public class LevelButton : MonoBehaviour
 {
     public LevelData levelData;
     public Button button;
+
+    private TMP_Text[] buttonTexts;
+    private Color[] originalTextColors;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,20 +26,33 @@ public class LevelButton : MonoBehaviour
             return;
         }
 
-        if (levelData.previousLevel == null)
+        buttonTexts = button.GetComponentsInChildren<TMP_Text>(true);
+        originalTextColors = new Color[buttonTexts.Length];
+        for (int i = 0; i < buttonTexts.Length; i++)
         {
-            button.interactable = true;
-            return;
+            originalTextColors[i] = buttonTexts[i].color;
         }
 
-        if (ProgressManager.Instance == null)
+        bool isUnlocked = levelData.previousLevel == null;
+
+        if (!isUnlocked && ProgressManager.Instance == null)
         {
             Debug.LogWarning("ProgressManager not found, defaulting to locked");
-            button.interactable = false;
-            return;
+        }
+        else if (!isUnlocked)
+        {
+            isUnlocked = ProgressManager.Instance.IsLevelCompleted(levelData.previousLevel.levelName);
         }
 
-        button.interactable = ProgressManager.Instance.IsLevelCompleted(levelData.previousLevel.levelName);
+        button.interactable = isUnlocked;
+
+        for (int i = 0; i < buttonTexts.Length; i++)
+        {
+            Color textColor = originalTextColors[i];
+            textColor.a *= isUnlocked ? 1f : 0.5f;
+            buttonTexts[i].color = textColor;
+        }
+
     }
 
     public void OnClick()
