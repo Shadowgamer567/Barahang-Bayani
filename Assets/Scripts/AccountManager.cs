@@ -34,6 +34,7 @@ public class AccountManager : MonoBehaviour
     public GameObject accountManagementPanel;
     public GameObject createAccountPanel;
     public GameObject mainMenu;
+    public GameObject classroomPanel;
 
     [Header("Teacher Monitoring")]
     public GameObject teacherInfoPanel;
@@ -451,6 +452,9 @@ public class AccountManager : MonoBehaviour
 
         if (studentInfoPanel != null)
             studentInfoPanel.SetActive(false);
+
+        if (classroomPanel != null)
+            classroomPanel.SetActive(false);
     }
 
     public void OpenAccountMenu()
@@ -469,7 +473,7 @@ public class AccountManager : MonoBehaviour
 
         backButton.SetActive(true);
 
-        
+        classroomPanel.SetActive(true);
     }
 
     public void OpenCreateStudentMenu()
@@ -578,6 +582,8 @@ public class AccountManager : MonoBehaviour
         mainMenu.SetActive(true);
 
         cardDeck.SetActive(true);
+
+        classroomPanel.SetActive(false);
     }
 
     public void SelectTeacherStudent(AccountCardUI card)
@@ -598,6 +604,8 @@ public class AccountManager : MonoBehaviour
         studentInfoPanel = ui.studentInfoPanel;
 
         mainMenu = ui.mainMenu;
+
+        classroomPanel = ui.classroomPanel;
 
         assignStudentsButton = ui.assignStudentsButton;
         confirmAssignButton = ui.confirmAssignButton;

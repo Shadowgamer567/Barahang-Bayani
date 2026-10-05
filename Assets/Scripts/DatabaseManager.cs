@@ -26,13 +26,34 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-    void SetDatabase(string databaseName)
+    public void SetDatabase(string databaseName)
     {
-        CurrentDatabase = databaseName;
+        if (string.IsNullOrWhiteSpace(databaseName))
+        {
+            Debug.LogError("Cannot set database: database name is empty.");
+            return;
+        }
+
+        CurrentDatabase = databaseName.Trim();
 
         SaveDatabaseConfig();
 
         Debug.Log("Current Database: " + CurrentDatabase);
+    }
+
+    public void CreateDatabase(string databaseName)
+    {
+        if (string.IsNullOrWhiteSpace(databaseName))
+        {
+            Debug.LogError("Cannot create database: database name is empty.");
+            return;
+        }
+
+        databaseName = databaseName.Trim();
+
+        SetDatabase(databaseName);
+
+        Debug.Log("Created/selected classroom database: " + CurrentDatabase);
     }
 
     public void SaveDatabaseConfig()
@@ -44,6 +65,8 @@ public class DatabaseManager : MonoBehaviour
         string json = JsonUtility.ToJson(config, true);
 
         File.WriteAllText(ConfigPath, json);
+
+        Debug.Log("Saved database config: " + CurrentDatabase);
     }
 
     public void LoadDatabaseConfig()
@@ -54,15 +77,31 @@ public class DatabaseManager : MonoBehaviour
 
             SaveDatabaseConfig();
 
+            Debug.Log("No database config found. Using DefaultDatabase.");
+
             return;
         }
 
         string json = File.ReadAllText(ConfigPath);
 
-        DatabaseConfig config = JsonUtility.FromJson<DatabaseConfig>(json);
+        DatabaseConfig config =
+            JsonUtility.FromJson<DatabaseConfig>(json);
 
-        CurrentDatabase = config.currentDatabase;
+        if (config == null ||
+            string.IsNullOrWhiteSpace(config.currentDatabase))
+        {
+            CurrentDatabase = "DefaultDatabase";
+
+            SaveDatabaseConfig();
+        }
+        else
+        {
+            CurrentDatabase = config.currentDatabase;
+        }
+
+        Debug.Log("Loaded database: " + CurrentDatabase);
     }
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

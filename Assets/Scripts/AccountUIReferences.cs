@@ -14,6 +14,7 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject studentInfoPanel;
     public GameObject mainMenu;
     public GameObject cardDeck;
+    public GameObject classroomPanel;
 
     [Header("Teacher Monitoring")]
     public GameObject assignStudentsButton;

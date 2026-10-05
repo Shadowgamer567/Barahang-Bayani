@@ -7,6 +7,20 @@ using UnityEngine;
 
 public class FirestoreAccountManager : MonoBehaviour
 {
+    public static FirestoreAccountManager Instance;
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     public static async Task UploadAccount(AccountData account)
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
