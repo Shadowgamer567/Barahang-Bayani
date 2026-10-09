@@ -23,6 +23,8 @@ public class AccountManager : MonoBehaviour
     public TMP_InputField usernameInputField;
     public TMP_InputField passwordInputField;
 
+    public TMP_InputField classroomNameInput;
+
     private AccountType pendingAccountType;
 
     public static AccountManager Instance;
@@ -35,6 +37,8 @@ public class AccountManager : MonoBehaviour
     public GameObject createAccountPanel;
     public GameObject mainMenu;
     public GameObject classroomPanel;
+    public GameObject classroomSelectionPanel;
+    public GameObject classroomCreationPanel;
 
     [Header("Teacher Monitoring")]
     public GameObject teacherInfoPanel;
@@ -602,6 +606,12 @@ public class AccountManager : MonoBehaviour
 
         teacherInfoPanel = ui.teacherInfoPanel;
         studentInfoPanel = ui.studentInfoPanel;
+
+        classroomPanel = ui.classroomPanel;
+
+        classroomSelectionPanel = ui.classroomSelectionPanel;
+        classroomCreationPanel = ui.classroomCreationPanel;
+        classroomNameInput = ui.classroomNameInput;
 
         mainMenu = ui.mainMenu;
 

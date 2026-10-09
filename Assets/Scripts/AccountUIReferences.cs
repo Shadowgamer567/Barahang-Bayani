@@ -14,7 +14,6 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject studentInfoPanel;
     public GameObject mainMenu;
     public GameObject cardDeck;
-    public GameObject classroomPanel;
 
     [Header("Teacher Monitoring")]
     public GameObject assignStudentsButton;
@@ -49,7 +48,23 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject confirmLoginButton;
     public GameObject cancelLoginButton;
 
-    
+    [Header("ClassroomPanel")]
+    public GameObject classroomPanel;
+    public GameObject openClassroomSelectionButton;
+
+    [Header("Classroom Selection")]
+    public GameObject classroomSelectionPanel;
+    public Transform classroomContainer;
+    public GameObject classroomCardPrefab;
+    public GameObject openClassroomCreationButton;
+    public GameObject cancelClassroomSelectionButton;
+    public TMP_Text currentClassroomNameText;
+
+    [Header("Classroom Creation")]
+    public GameObject classroomCreationPanel;
+    public TMP_InputField classroomNameInput;
+    public GameObject confirmCreationButton;
+    public GameObject cancelCreationButton;
 
     void Start()
     {
@@ -65,5 +80,14 @@ public class AccountUIReferences : MonoBehaviour
             Debug.LogError("AccountManager.Instance is Null");
         }
 
+        if (FirestoreClassroomManager.Instance != null)
+        {
+            FirestoreClassroomManager.Instance.ConnectUI(this);
+            FirestoreClassroomManager.Instance.ConnectClassroomButtons(this);
+        }
+        else
+        {
+            Debug.LogError("FirestoreClassroomManager.Instance is Null");
+        }
     }
 }
