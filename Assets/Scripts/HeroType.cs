@@ -10,4 +10,7 @@ public class HeroType : ScriptableObject
     public GameObject prefab;
     public Vector3 modelRotationOffset;
     public Vector3 modelPositionOffset;
+
+    [Header("Custom Cards")]
+    public CardType[] customCards;
 }

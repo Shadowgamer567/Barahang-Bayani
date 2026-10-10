@@ -20,6 +20,7 @@ public class LevelManager : MonoBehaviour
         {
             levelData = GameManager.Instance.selectedLevel;
         }
+
         else
         {
             Debug.LogWarning("Using DEBUG LevelData");
@@ -27,6 +28,8 @@ public class LevelManager : MonoBehaviour
 
             GameManager.Instance.selectedLevel = levelData;
         }
+
+        Debug.Log("LevelManager ID: " + GetInstanceID() + " | Loaded LevelData: " + (levelData != null ? levelData.name : "NULL"));
 
         if (levelData == null)
         {

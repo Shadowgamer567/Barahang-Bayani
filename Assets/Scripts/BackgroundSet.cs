@@ -4,6 +4,9 @@ using UnityEngine;
 public class BackgroundSet : ScriptableObject
 {
     public string campaignName;
+
+    [Header("General Use Cards")]
+    public CardType[] generalCards;
     
 
     [System.Serializable]

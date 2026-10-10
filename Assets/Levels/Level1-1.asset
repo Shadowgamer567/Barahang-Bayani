@@ -55,6 +55,7 @@ MonoBehaviour:
   nextLevel: {fileID: 11400000, guid: 0a041b3313cc6fe4fa2b93270201e0de, type: 2}
   heroesInLevel:
   - {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+  - {fileID: 11400000, guid: b97cd3ef43f3e25458a7f7e62bfc8b96, type: 2}
   maxHeroes: 4
   possibleEnemies:
   - {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
