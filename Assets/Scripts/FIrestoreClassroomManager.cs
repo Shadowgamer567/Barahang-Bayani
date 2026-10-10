@@ -57,11 +57,8 @@ public class FirestoreClassroomManager : MonoBehaviour
             if (snapshot.Exists)
             {
                 Debug.LogWarning("Classroom Already Exists:" + classroomID);
+                return false;
             }
-
-            return false;
-
-
 
             Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -198,16 +195,23 @@ public class FirestoreClassroomManager : MonoBehaviour
             return;
         }
 
-        await CreateClassroom(classroomID);
+        bool created = await CreateClassroom(classroomID);
+
+        if (!created)
+        {
+            Debug.LogWarning("Classroom creation unsuccesful. Please try another name");
+            return;
+        }
 
         classroomNameInput.text = "";
 
         if (classroomCreationPanel != null) 
         {
-            classroomSelectionPanel.SetActive(true);
+            classroomCreationPanel.SetActive(false);
+            Debug.Log("Closing Creation Panel");
         }
 
-        LoadClassrooms();
+        SelectClassroom(classroomID);
     }
 
     public void OpenClassroomCreation()
