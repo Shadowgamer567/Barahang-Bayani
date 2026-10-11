@@ -13,9 +13,27 @@ MonoBehaviour:
   m_Name: Level 1-2 Starting Cutscene
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   line:
-  - speakerName: Spanish Priest
-    speakerType: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: You should stay in school!
+    Dialogue: "When I first woke up as a baby, I found myself in a village. I felt
+      the sun and heard the voices of my parents. After that, I don\u2019t remember
+      much from my baby days."
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: In my time when I was a child, is probably where I formed my habits.
+      I remember the gloomy nights that passed by on the roof of our house. On moonlit
+      nights, I took my supper at the roof of the house. My nurse, who was very fond
+      of me, used to threaten to leave me to terrible but imaginary beings if I did
+      not eat.
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: My memories of that time... I'm remembering some of them.
     isLeftSide: 0

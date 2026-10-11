@@ -12,16 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
   m_Name: Level 1-2 After Battle Cutscene
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
-  line:
-  - speakerName: Spanish Priest
-    speakerType: 1
-    hero: {fileID: 0}
-    enemy: {fileID: 0}
-    Dialogue: I've been schooled...
-    isLeftSide: 0
-  - speakerName: Jose Rizal
-    speakerType: 0
-    hero: {fileID: 0}
-    enemy: {fileID: 0}
-    Dialogue: I will stay in school!
-    isLeftSide: 0
+  line: []
