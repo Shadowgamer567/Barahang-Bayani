@@ -940,7 +940,7 @@ GameObject:
   - component: {fileID: 1014764914}
   - component: {fileID: 1014764917}
   m_Layer: 5
-  m_Name: Button
+  m_Name: RizalCampaignButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
