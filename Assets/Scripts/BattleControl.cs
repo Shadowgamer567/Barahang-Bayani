@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class BattleControl : MonoBehaviour
 {
@@ -20,6 +21,9 @@ public class BattleControl : MonoBehaviour
     public CardType pendingCard;
     public HeroStats pendingHero;
     private LevelData levelData;
+
+    [Header("Player Team Modifier")]
+    public ActionModifier playerModifier;
 
     public float moveduration = 5f;
     public int damage = 5;
@@ -49,6 +53,11 @@ public class BattleControl : MonoBehaviour
     public void Initialize(LevelData data)
     {
         levelData = data;
+
+        if (playerModifier != null)
+        {
+            playerModifier.ClearModifier();
+        }
 
         CacheEnemies();
         CacheHeroes();
@@ -145,8 +154,8 @@ public class BattleControl : MonoBehaviour
                 EnemyTypes type = levelData.possibleEnemies[Random.Range(0, levelData.possibleEnemies.Count)];
 
                 enemies[i].enemyType = type;
-                enemies[i].InitializeEnemy();
                 enemies[i].gameObject.SetActive(true);
+                enemies[i].InitializeEnemy();
                 enemies[i].LoadModel();
             }
 
@@ -154,16 +163,6 @@ public class BattleControl : MonoBehaviour
             {
                 enemies[i].gameObject.SetActive(false);
             }
-        }
-
-        aliveEnemies = 0;
-
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            if (i >= enemies.Length)
-                continue;
-
-            EnemyStats enemy = enemies[i];
         }
 
         if (uiMain != null)
@@ -238,8 +237,9 @@ public class BattleControl : MonoBehaviour
 
         foreach (EnemyStats enemy in enemies)
         {
-            if (enemy == null || enemy.isDead)
+            if (enemy == null)
             {
+                
                 continue;
             }
 
@@ -297,8 +297,9 @@ public class BattleControl : MonoBehaviour
                 EnemyStats shieldTarget = GetRandomAliveEnemy();
                 if (shieldTarget != null)
                 {
+                    int finalShield = enemy.GetModifiedActionValue(action.value);
                     enemy.PlayAnimation(CharacterAnimationType.Action);
-                    shieldTarget.AddShield(action.value);
+                    shieldTarget.AddShield(finalShield);
                 }
                 break;
 
@@ -306,8 +307,9 @@ public class BattleControl : MonoBehaviour
                 EnemyStats healTarget = GetRandomAliveEnemy();
                 if (healTarget != null)
                 {
+                    int finalHeal = enemy.GetModifiedActionValue(action.value);
                     enemy.PlayAnimation(CharacterAnimationType.Action);
-                    healTarget.Heal(action.value);
+                    healTarget.Heal(finalHeal);
                 }
                 break;
 
@@ -316,17 +318,17 @@ public class BattleControl : MonoBehaviour
                 if (buffTarget != null)
                 {
                     enemy.PlayAnimation(CharacterAnimationType.Action);
-                    buffTarget.BuffAttack(action.value);
+                    buffTarget.AddActionModifier(Mathf.Abs(action.value));
+                    Debug.Log(enemy.name + " buffed " + buffTarget.name + " by " + action.value);
                 }
                 break;
 
             case EnemyActionType.Debuff:
-                HeroStats debuffTarget = GetRandomAliveHero();
-                if (debuffTarget != null)
-                {
-                    enemy.PlayAnimation(CharacterAnimationType.Action);
-                    debuffTarget.ReduceAttack(action.value);
-                }
+                enemy.PlayAnimation(CharacterAnimationType.Action);
+
+                AddPlayerModifier(-Mathf.Abs(action.value));
+
+                Debug.Log(enemy.name + " debuffed the player team by " + action.value);
                 break;
         }
     }
@@ -393,7 +395,7 @@ public class BattleControl : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
-            if (enemy != null && !enemy.isDead)
+            if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead && enemy.currentHP > 0)
             {
                 alive.Add(enemy);
             }
@@ -471,6 +473,145 @@ public class BattleControl : MonoBehaviour
         return true;
     }
 
+    public void AddPlayerModifier(int amount)
+    {
+        if (playerModifier != null)
+        {
+            playerModifier.AddModifier(amount);
+        }
+    }
+
+    public int GetModifiedPlayerValue(int baseValue)
+    {
+        if (playerModifier != null)
+        {
+            return playerModifier.ConsumedModifier(baseValue);
+        }
+
+        return Mathf.Max(0, baseValue);
+    }
+
+    private void ExecuteCardEffect(CardType card, HeroStats actingHero, HeroStats targetHero = null, EnemyStats targetEnemy = null, int? calculatedValue = null)
+    {
+        if (card == null || actingHero == null)
+        {
+            Debug.LogWarning("Cannot Execute card effect: Missing Card or Acting Hero");
+            return;
+        }
+
+        int value = calculatedValue ?? Mathf.Max(0, card.damage);
+
+        switch (card.effectType)
+        {
+            case CardEffectType.Damage:
+                if (targetEnemy != null && !targetEnemy.isDead)
+                {
+                    int finalDamage = calculatedValue ?? GetModifiedPlayerValue(value);
+                    targetEnemy.TakeDamage(finalDamage);
+
+                    Debug.Log(actingHero.name + " dealt " + finalDamage + " damage to " + targetEnemy.name);
+                }
+                break;
+
+            case CardEffectType.Heal:
+                if (targetHero != null && !targetHero.IsDead())
+                {
+                    int finalHeal = calculatedValue ?? GetModifiedPlayerValue(value);
+                    targetHero.Heal(finalHeal);
+                }
+                break;
+
+            case CardEffectType.Shield:
+                if (targetHero != null && !targetHero.IsDead())
+                {
+                    int finalShield = calculatedValue ?? GetModifiedPlayerValue(value);
+                    targetHero.Shield(finalShield);
+                }
+                break;
+
+            case CardEffectType.Buff:
+                AddPlayerModifier(Mathf.Abs(value));
+                break;
+
+            case CardEffectType.Debuff:
+                if (targetEnemy != null && !targetEnemy.isDead)
+                {
+                    targetEnemy.AddActionModifier(-Mathf.Abs(value));
+                }
+                break;
+        }
+    }
+
+    //Handles Modifier Usage for all 3 Targeting Types 
+    private void ModifierEffectHandler(CardType card, HeroStats actingHero)
+    {
+        if (card == null || actingHero == null)
+        {
+            return;
+        }
+
+        if (card.effectType == CardEffectType.Buff)
+        {
+            actingHero.PlayAnimation(CharacterAnimationType.Action);
+
+            AddPlayerModifier(Mathf.Abs(card.damage));
+
+            return;
+        }
+
+        bool consumeModifier =
+            card.effectType == CardEffectType.Damage ||
+            card.effectType == CardEffectType.Heal ||
+            card.effectType == CardEffectType.Shield;
+
+        int finalValue = Mathf.Max(0, card.damage);
+
+        //Consume the acting Hero's Modifier only for numerical values
+        //Buff and Debuff cards do not consume the buffed values
+        if (consumeModifier)
+        {
+            finalValue = GetModifiedPlayerValue(finalValue);
+        }
+
+        CharacterAnimationType animation =
+            card.effectType == CardEffectType.Damage ||
+            card.effectType == CardEffectType.Debuff ?
+            CharacterAnimationType.Attack : CharacterAnimationType.Action;
+
+        switch (card.targetType)
+        {
+            case TargetType.AllEnemies:
+                actingHero.PlayAnimation(animation);
+
+                foreach(EnemyStats enemy in enemies)
+                {
+                    if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead)
+                    {
+                        ExecuteCardEffect(card, actingHero, targetEnemy: enemy, calculatedValue: finalValue);
+                    }
+                }
+                break;
+
+            case TargetType.AllHeroes:
+                actingHero.PlayAnimation(animation);
+
+                foreach (HeroStats hero in heroes)
+                {
+                    if(hero != null && hero.gameObject.activeInHierarchy && !hero.IsDead())
+                    {
+                        ExecuteCardEffect(card, actingHero, targetHero: hero, calculatedValue: finalValue);
+                    }
+                }
+                break;
+
+            case TargetType.Self:
+                actingHero.PlayAnimation(animation);
+
+                ExecuteCardEffect(card, actingHero, targetHero: actingHero, calculatedValue: finalValue);
+
+                break;
+        }
+    }
     public bool HandleCardPlay(CardType card, CardUI cardUI)
     {
         Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
@@ -494,16 +635,12 @@ public class BattleControl : MonoBehaviour
         }
 
 
-        if (card.targetType == TargetType.AllEnemies)
+        if (card.targetType == TargetType.AllEnemies || card.targetType == TargetType.AllHeroes || card.targetType == TargetType.Self)
         {
             HeroStats selectedHero = GetHeroForCard(card);
 
-            if (selectedHero != null)
-            {
-                selectedHero.PlayAnimation(CharacterAnimationType.Attack);
-            }
+            ModifierEffectHandler(card, selectedHero);
 
-            DealDamageToAll(card.damage);
             Destroy(cardUI.gameObject);
             return true;
         }
@@ -545,16 +682,11 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
-        if(card.targetType == TargetType.AllEnemies)
+        if(card.targetType == TargetType.AllEnemies || card.targetType == TargetType.AllHeroes || card.targetType == TargetType.Self)
         {
             HeroStats selectedHero = GetHeroForCard(card);
 
-            if(selectedHero != null)
-            {
-                selectedHero.PlayAnimation(CharacterAnimationType.Attack);
-            }
-
-            DealDamageToAll(card.damage);
+            ModifierEffectHandler(card, selectedHero);
         }
 
         else if (card.targetType == TargetType.SingleTarget)

@@ -1319,6 +1319,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   costText: {fileID: 0}
   descriptionText: {fileID: 0}
+  fullCardImage: {fileID: 0}
   enemypanel: []
   enemies: []
   heropanel: []
@@ -6677,7 +6678,6 @@ GameObject:
   - component: {fileID: 850095593}
   - component: {fileID: 850095592}
   - component: {fileID: 850095596}
-  - component: {fileID: 850095597}
   m_Layer: 0
   m_Name: Hero 3
   m_TagString: Untagged
@@ -6801,19 +6801,6 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
---- !u!114 &850095597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 850095591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
-  pendingModifier: 0
 --- !u!1 &850475598
 GameObject:
   m_ObjectHideFlags: 0
@@ -7623,6 +7610,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   costText: {fileID: 0}
   descriptionText: {fileID: 0}
+  fullCardImage: {fileID: 0}
   enemypanel: []
   enemies: []
   heropanel: []
@@ -8517,6 +8505,7 @@ MonoBehaviour:
   nameText: {fileID: 902827345}
   costText: {fileID: 655908285}
   descriptionText: {fileID: 1268910196}
+  cardImage: {fileID: 346130140}
   button: {fileID: 961083224}
 --- !u!114 &961083222
 MonoBehaviour:
@@ -13095,7 +13084,6 @@ GameObject:
   - component: {fileID: 1433324746}
   - component: {fileID: 1433324745}
   - component: {fileID: 1433324749}
-  - component: {fileID: 1433324750}
   m_Layer: 0
   m_Name: Hero 2
   m_TagString: Untagged
@@ -13219,19 +13207,6 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
---- !u!114 &1433324750
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1433324744}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
-  pendingModifier: 0
 --- !u!1 &1440590691
 GameObject:
   m_ObjectHideFlags: 0
@@ -14770,7 +14745,6 @@ GameObject:
   - component: {fileID: 1569326353}
   - component: {fileID: 1569326352}
   - component: {fileID: 1569326356}
-  - component: {fileID: 1569326357}
   m_Layer: 0
   m_Name: Hero 1
   m_TagString: Untagged
@@ -14894,19 +14868,6 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
---- !u!114 &1569326357
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1569326351}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
-  pendingModifier: 0
 --- !u!1 &1575330450
 GameObject:
   m_ObjectHideFlags: 0
@@ -16254,7 +16215,6 @@ GameObject:
   - component: {fileID: 1734102754}
   - component: {fileID: 1734102753}
   - component: {fileID: 1734102757}
-  - component: {fileID: 1734102758}
   m_Layer: 0
   m_Name: Hero 4
   m_TagString: Untagged
@@ -16378,19 +16338,6 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
---- !u!114 &1734102758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734102752}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
-  pendingModifier: 0
 --- !u!1 &1753385359
 GameObject:
   m_ObjectHideFlags: 0
@@ -16934,6 +16881,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1839832273}
   - component: {fileID: 1839832272}
+  - component: {fileID: 1839832274}
   m_Layer: 0
   m_Name: BattleController
   m_TagString: Untagged
@@ -16963,6 +16911,7 @@ MonoBehaviour:
   uiMain: {fileID: 2020279090}
   pendingCard: {fileID: 0}
   pendingHero: {fileID: 0}
+  playerModifier: {fileID: 1839832274}
   moveduration: 5
   damage: 5
   nextbattletriggered: 0
@@ -16989,6 +16938,19 @@ Transform:
   - {fileID: 217764674}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1839832274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1839832271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &1854606181
 GameObject:
   m_ObjectHideFlags: 0
@@ -18165,6 +18127,7 @@ MonoBehaviour:
   nameText: {fileID: 863406606}
   costText: {fileID: 29364446}
   descriptionText: {fileID: 1660257586}
+  fullCardImage: {fileID: 959217827}
   enemypanel: []
   enemies: []
   heropanel: []

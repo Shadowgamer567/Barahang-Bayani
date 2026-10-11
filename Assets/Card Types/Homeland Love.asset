@@ -15,6 +15,8 @@ MonoBehaviour:
   cardName: Love for the Homeland
   cardShortDesc: Deal 30 Damage to All Enemies
   cardFullDesc: 
+  cardImage: {fileID: 21300000, guid: f187843a44a8f704992a53a29d73f438, type: 3}
+  effectType: 0
   targetType: 0
   damage: 30
   cost: 5

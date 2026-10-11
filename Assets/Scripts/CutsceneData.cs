@@ -22,6 +22,9 @@ public class CutsceneLine
     public SpeakerType speakerType;
     public HeroType hero;
     public EnemyTypes enemy;
+
+    [TextArea(10, 15)]
     public string Dialogue;
+
     public bool isLeftSide;
 }

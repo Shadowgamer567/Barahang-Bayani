@@ -10,7 +10,6 @@ public class HeroStats : MonoBehaviour
     public Transform visualRoot;
     public GameObject currentModel;
     private CharacterAnimationRelay animationRelay;
-    private ActionModifier actionModifier;
 
     public int currentHP;
     public int attack;
@@ -32,19 +31,7 @@ public class HeroStats : MonoBehaviour
         currentHP = heroType.maxHp;
         shield = heroType.maxShield;
 
-        actionModifier = GetComponent<ActionModifier>();
-
-        if (actionModifier != null)
-        {
-            actionModifier.ClearModifier();
-        }
-
-        else
-        {
-            Debug.LogWarning("ActionModifier missing on hero: " + name);
-        }
-
-            LoadModel();
+        LoadModel();
     }
 
     public void TakeDamage(int amount)
@@ -85,29 +72,41 @@ public class HeroStats : MonoBehaviour
         }
     }
 
+    public void Heal(int amount)
+    {
+        if (IsDead())
+        {
+            return;
+        }
+
+        amount = Mathf.Max(0, amount);
+
+        currentHP = Mathf.Min(currentHP + amount, heroType.maxHp);
+
+        Debug.Log(name + " Healed for" + amount + " | Current HP: " + currentHP);
+    }
+
+    public void Shield(int amount)
+    {
+        if (IsDead())
+        {
+            return;
+        }
+
+        amount = Mathf.Max(0, amount);
+
+        shield += amount;
+
+        Debug.Log(name + " gained " + amount + " shield | Total Shield: " + shield);
+    }
+
+    /*
     public void ReduceAttack(int amount)
     {
         attack -= amount;
         Debug.Log(name + " reduced " + amount);
     }
-
-    public void AddActionModifier(int amount)
-    {
-        if (actionModifier != null)
-        {
-            actionModifier.AddModifier(amount);
-        }
-    }
-
-    public int GetModifiedActionValue(int baseValue)
-    {
-        if (actionModifier != null)
-        {
-            return actionModifier.ConsumedModifier(baseValue);
-        }
-
-        return baseValue;
-    }
+    */
 
     public void SyncToData(GameData data)
     {

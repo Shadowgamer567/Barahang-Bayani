@@ -9,6 +9,7 @@ public class CardUI : MonoBehaviour
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI costText;
     public TextMeshProUGUI descriptionText;
+    public Image cardImage;
     public Button button;
 
     private CardType cardType;
@@ -28,6 +29,12 @@ public class CardUI : MonoBehaviour
         nameText.text = type.cardName;
         costText.text = type.cost.ToString();
         descriptionText.text = type.cardShortDesc;
+        
+        if (cardImage != null)
+        {
+            cardImage.sprite = type.cardImage;
+            cardImage.enabled = type.cardImage != null;
+        }
 
 
         button.onClick.RemoveAllListeners();
