@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-4 Starting Cutscene
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Bi\xF1an is a town near my hometown in Kalamba. My father was born
+      in Bi\xF1an, and wished for me to continue studying Latin there. He sent me
+      there on Sunday under the care of my brother. Parting from my family was both
+      hard and sad for all of us; I managed to hide my own tears, even though I was
+      only nine. "
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "We reached Bi\xF1an by nightfall, and went to an aunt\u2019s house
+      where I was to live. When the moon came up, a cousin took me around the town.
+      Bi\xF1an appeared to me large and wealthy but neither attractive nor cheerful. "
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'My brother left me to the schoolmaster. I was a bit nervous at first,
+      until he talked to me. '
+    isLeftSide: 0
+  - speakerName: Schoolmaster
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'You, do you speak Spanish? '
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'A little, sir. '
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "These answers got the teacher\u2019s son to start making fun of me.
+      Somehow or another, we ended up fighting. "
+    isLeftSide: 0

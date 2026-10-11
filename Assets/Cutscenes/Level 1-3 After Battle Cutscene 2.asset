@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Level 1-3 After Battle Cutscene 2
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   line:
-  - speakerName: Spanish Priest
-    speakerType: 1
+  - speakerName: Narrator
+    speakerType: 2
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: Looks like I got taught a history lesson...
+    Dialogue: And with Chapter 1 finished, now we go to the next Chapter.
     isLeftSide: 0
-  - speakerName: Jose Rizal
-    speakerType: 0
+  - speakerName: Narrator
+    speakerType: 2
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: I have been studying my history!
+    Dialogue: "Chapter II: My Schooling and Daily Life in Bi\xF1an"
     isLeftSide: 0

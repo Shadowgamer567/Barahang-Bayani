@@ -25,15 +25,23 @@ MonoBehaviour:
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: In my time when I was a child, is probably where I formed my habits.
-      I remember the gloomy nights that passed by on the roof of our house. On moonlit
-      nights, I took my supper at the roof of the house. My nurse, who was very fond
-      of me, used to threaten to leave me to terrible but imaginary beings if I did
-      not eat.
+    Dialogue: I had nine sisters and a brother. Our father was a model parent. He
+      gave us the education that was suitable in a family that was neither rich nor
+      poor. He was creative and careful with saving money, which allowed him to build
+      two houses. One of the two became the house that I lived in with a nipa hut
+      nearby, shaded with banana trees, where I had fond memories of.
     isLeftSide: 0
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: My memories of that time... I'm remembering some of them.
+    Dialogue: When I was four years of age, my little sister Concha died, and for
+      the first time I cried because of love and regret. Until then I had shed tears
+      only for my own mistakes, which my loving, wise mother knew how to correct.
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Ah... those memories give me grief.
     isLeftSide: 0

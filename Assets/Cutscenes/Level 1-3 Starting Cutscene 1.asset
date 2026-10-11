@@ -17,5 +17,24 @@ MonoBehaviour:
     speakerType: 1
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: I hope you've been learning history!
+    Dialogue: When I was four years of age, my little sister Concha died, and for
+      the first time I cried because of love and regret. Until then I had shed tears
+      only for my own mistakes, which my loving, wise mother knew how to correct.
+    isLeftSide: 0
+  - speakerName: Spanish Priest
+    speakerType: 1
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: In June of 1868, I went to Manila with my father. We went and rode
+      a boat, and I cannot tell how happy I was at each new stop on the banks of
+      the Pasig. A few years later, we went to Cainta, Taytay, and Antipolo, and
+      then to Manila. In Santa Ana I visited my eldest sister, Saturnina, who at
+      that time was a student in La Concordia College. Then I returned to my village
+      and remained until 1870.
+    isLeftSide: 0
+  - speakerName: Spanish Priest
+    speakerType: 1
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Now it's time to go to Bi\xF1an."
     isLeftSide: 0
