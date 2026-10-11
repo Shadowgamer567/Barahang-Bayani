@@ -33,7 +33,9 @@ public class CardUI : MonoBehaviour
         if (cardImage != null)
         {
             cardImage.sprite = type.cardImage;
-            cardImage.enabled = type.cardImage != null;
+            cardImage.color = type.cardImage != null ? Color.white : Color.clear;
+
+            cardImage.enabled = true;
         }
 
 

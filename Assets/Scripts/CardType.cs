@@ -6,7 +6,10 @@ public class CardType : ScriptableObject
 {
     [Header("Card Information")]
     public string cardName;
+
+    [TextArea(3, 10)]
     public string cardShortDesc;
+    [TextArea(3, 10)]
     public string cardFullDesc;
 
     [Header("Card Artwork")]
