@@ -2009,7 +2009,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 229822353}
-  - component: {fileID: 229822354}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -2033,25 +2032,6 @@ Transform:
   - {fileID: 843588967}
   m_Father: {fileID: 1734102756}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &229822354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 229822352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &232316291
 GameObject:
   m_ObjectHideFlags: 0
@@ -2410,7 +2390,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 270374040}
-  - component: {fileID: 270374041}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -2434,25 +2413,6 @@ Transform:
   - {fileID: 561254549}
   m_Father: {fileID: 850095595}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &270374041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 270374039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &304699675
 GameObject:
   m_ObjectHideFlags: 0
@@ -4648,7 +4608,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.75, y: 1.75, z: 1.75}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 270374040}
@@ -4894,7 +4854,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.75, y: 1.75, z: 1.75}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1247549727}
@@ -5635,6 +5595,7 @@ GameObject:
   - component: {fileID: 675937665}
   - component: {fileID: 675937664}
   - component: {fileID: 675937668}
+  - component: {fileID: 675937669}
   m_Layer: 0
   m_Name: Enemy 2
   m_TagString: Untagged
@@ -5769,6 +5730,19 @@ MonoBehaviour:
   shield: 0
   attack: 0
   isDead: 0
+--- !u!114 &675937669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675937663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &681259668
 GameObject:
   m_ObjectHideFlags: 0
@@ -6685,7 +6659,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.000015258789, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.75, y: 1.75, z: 1.75}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 229822353}
@@ -6703,6 +6677,7 @@ GameObject:
   - component: {fileID: 850095593}
   - component: {fileID: 850095592}
   - component: {fileID: 850095596}
+  - component: {fileID: 850095597}
   m_Layer: 0
   m_Name: Hero 3
   m_TagString: Untagged
@@ -6826,6 +6801,19 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
+--- !u!114 &850095597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850095591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &850475598
 GameObject:
   m_ObjectHideFlags: 0
@@ -7482,7 +7470,7 @@ MonoBehaviour:
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 15
+  m_fontSizeMin: 14
   m_fontSizeMax: 26
   m_fontStyle: 1
   m_HorizontalAlignment: 2
@@ -7517,7 +7505,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -0.11262512, y: 0.23163219, z: 0.5626869, w: -0.06687832}
+  m_margin: {x: -2.0872192, y: 0.23163219, z: -0.95472336, w: -0.054667477}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -8110,6 +8098,7 @@ GameObject:
   - component: {fileID: 953550663}
   - component: {fileID: 953550662}
   - component: {fileID: 953550666}
+  - component: {fileID: 953550667}
   m_Layer: 0
   m_Name: Enemy 4
   m_TagString: Untagged
@@ -8244,6 +8233,19 @@ MonoBehaviour:
   shield: 0
   attack: 0
   isDead: 0
+--- !u!114 &953550667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953550661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &956434552
 GameObject:
   m_ObjectHideFlags: 0
@@ -8476,7 +8478,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &961083220
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8613,8 +8615,8 @@ MonoBehaviour:
   m_IgnoreLayout: 0
   m_MinWidth: -1
   m_MinHeight: -1
-  m_PreferredWidth: 190
-  m_PreferredHeight: 240
+  m_PreferredWidth: 197.8631
+  m_PreferredHeight: 273.9641
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
@@ -8631,6 +8633,7 @@ GameObject:
   - component: {fileID: 965580275}
   - component: {fileID: 965580274}
   - component: {fileID: 965580278}
+  - component: {fileID: 965580279}
   m_Layer: 0
   m_Name: Enemy 3
   m_TagString: Untagged
@@ -8765,6 +8768,19 @@ MonoBehaviour:
   shield: 0
   attack: 0
   isDead: 0
+--- !u!114 &965580279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965580273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &977701558
 GameObject:
   m_ObjectHideFlags: 0
@@ -9094,6 +9110,7 @@ GameObject:
   - component: {fileID: 1049373494}
   - component: {fileID: 1049373493}
   - component: {fileID: 1049373497}
+  - component: {fileID: 1049373498}
   m_Layer: 0
   m_Name: Enemy 1
   m_TagString: Untagged
@@ -9228,6 +9245,19 @@ MonoBehaviour:
   shield: 0
   attack: 0
   isDead: 0
+--- !u!114 &1049373498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049373492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &1050678498
 GameObject:
   m_ObjectHideFlags: 0
@@ -11696,7 +11726,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1247549727}
-  - component: {fileID: 1247549728}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -11720,25 +11749,6 @@ Transform:
   - {fileID: 574616743}
   m_Father: {fileID: 1433324748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1247549728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1247549726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &1258905455
 GameObject:
   m_ObjectHideFlags: 0
@@ -13085,6 +13095,7 @@ GameObject:
   - component: {fileID: 1433324746}
   - component: {fileID: 1433324745}
   - component: {fileID: 1433324749}
+  - component: {fileID: 1433324750}
   m_Layer: 0
   m_Name: Hero 2
   m_TagString: Untagged
@@ -13208,6 +13219,19 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
+--- !u!114 &1433324750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433324744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &1440590691
 GameObject:
   m_ObjectHideFlags: 0
@@ -14746,6 +14770,7 @@ GameObject:
   - component: {fileID: 1569326353}
   - component: {fileID: 1569326352}
   - component: {fileID: 1569326356}
+  - component: {fileID: 1569326357}
   m_Layer: 0
   m_Name: Hero 1
   m_TagString: Untagged
@@ -14869,6 +14894,19 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
+--- !u!114 &1569326357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569326351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &1575330450
 GameObject:
   m_ObjectHideFlags: 0
@@ -16216,6 +16254,7 @@ GameObject:
   - component: {fileID: 1734102754}
   - component: {fileID: 1734102753}
   - component: {fileID: 1734102757}
+  - component: {fileID: 1734102758}
   m_Layer: 0
   m_Name: Hero 4
   m_TagString: Untagged
@@ -16339,6 +16378,19 @@ MonoBehaviour:
   currentHP: 0
   attack: 0
   shield: 0
+--- !u!114 &1734102758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734102752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8696214ecf5e7ad41afea3e72ade7d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionModifier
+  pendingModifier: 0
 --- !u!1 &1753385359
 GameObject:
   m_ObjectHideFlags: 0
@@ -16910,6 +16962,7 @@ MonoBehaviour:
   notEnoughAPPanel: {fileID: 1675589415}
   uiMain: {fileID: 2020279090}
   pendingCard: {fileID: 0}
+  pendingHero: {fileID: 0}
   moveduration: 5
   damage: 5
   nextbattletriggered: 0

@@ -18,6 +18,7 @@ public class BattleControl : MonoBehaviour
     public GameObject notEnoughAPPanel;
     public UIMain uiMain;
     public CardType pendingCard;
+    public HeroStats pendingHero;
     private LevelData levelData;
 
     public float moveduration = 5f;
@@ -284,8 +285,11 @@ public class BattleControl : MonoBehaviour
                 HeroStats target = GetRandomAliveHero();
                 if(target != null)
                 {
+                    int finalDamage = enemy.GetModifiedActionValue(enemy.enemyType.damage);
+
                     enemy.PlayAnimation(CharacterAnimationType.Attack);
-                    target.TakeDamage(enemy.enemyType.damage);
+                    target.TakeDamage(finalDamage);
+                    Debug.Log(enemy.name + " attacked for " + finalDamage + " damage");
                 }
                 break;
 
@@ -345,6 +349,42 @@ public class BattleControl : MonoBehaviour
         }
 
         return alive[Random.Range(0, alive.Count)];
+    }
+
+    private HeroStats GetHeroForCard(CardType card)
+    {
+        if (card == null || heroes == null)
+        {
+            return null;
+        }
+
+        //Checks whether this is a Custom or General Card
+        foreach (HeroStats hero in heroes)
+        {
+            if(hero == null || !hero.gameObject.activeInHierarchy || hero.heroType == null || hero.heroType.customCards == null)
+            {
+                continue;
+            }
+
+            foreach (CardType customCard in hero.heroType.customCards)
+            {
+                if (customCard == card)
+                {
+                    Debug.Log("CUSTOM CARD: " + card.cardName + " | Assigned Hero: " + hero.heroType.name);
+                    return hero;
+                }
+            }
+        }
+
+        //Generals cards use one randomly selected active hero
+        HeroStats randomHero = GetRandomAliveHero();
+
+        if (randomHero != null)
+        {
+            Debug.Log("GENERAL CARD: " + card.cardName + " | Random Hero: " + randomHero.heroType.name);
+        }
+
+        return randomHero;
     }
 
     EnemyStats GetRandomAliveEnemy()
@@ -446,7 +486,7 @@ public class BattleControl : MonoBehaviour
 
             if (quizManager != null) {
                 QuizQuestion q = quizManager.GetRandomQuestions();
-                quizManager.StartQuiz(q, card.damage, this);
+                quizManager.StartQuiz(q, card, this);
             }
 
             Destroy(cardUI.gameObject);
@@ -456,7 +496,13 @@ public class BattleControl : MonoBehaviour
 
         if (card.targetType == TargetType.AllEnemies)
         {
-            heroes[0].PlayAnimation(CharacterAnimationType.Attack);
+            HeroStats selectedHero = GetHeroForCard(card);
+
+            if (selectedHero != null)
+            {
+                selectedHero.PlayAnimation(CharacterAnimationType.Attack);
+            }
+
             DealDamageToAll(card.damage);
             Destroy(cardUI.gameObject);
             return true;
@@ -468,6 +514,7 @@ public class BattleControl : MonoBehaviour
 
             isSelectingTarget = true;
             pendingCard = card;
+            pendingHero = GetHeroForCard(card);
 
             cardPanel.SetActive(false);
 
@@ -489,6 +536,45 @@ public class BattleControl : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void ResolveQuizCard(CardType card)
+    {
+        if(card == null)
+        {
+            return;
+        }
+
+        if(card.targetType == TargetType.AllEnemies)
+        {
+            HeroStats selectedHero = GetHeroForCard(card);
+
+            if(selectedHero != null)
+            {
+                selectedHero.PlayAnimation(CharacterAnimationType.Attack);
+            }
+
+            DealDamageToAll(card.damage);
+        }
+
+        else if (card.targetType == TargetType.SingleTarget)
+        {
+            Debug.Log("Quiz Completed! Select an enemy target.");
+
+            pendingCard = card;
+            pendingHero = GetHeroForCard(card);
+            isSelectingTarget = true;
+
+            if (cardPanel != null)
+            {
+                cardPanel.SetActive(false);
+            }
+
+            if (selectTargetPanel != null)
+            {
+                selectTargetPanel.SetActive(true);
+            }
+        }
     }
 
     public void SelectEnemyTarget(EnemyStats enemy)
@@ -526,15 +612,16 @@ public class BattleControl : MonoBehaviour
         Debug.Log("TARGET CLICKED: " + enemy.name);
         Debug.Log("Pending damage: " + pendingCard.damage);
 
-        if (heroes.Length > 0 && heroes[0] != null)
+        if (pendingHero != null && pendingHero.gameObject.activeInHierarchy)
         {
-            heroes[0].PlayAnimation(CharacterAnimationType.Attack);
+            pendingHero.PlayAnimation(CharacterAnimationType.Attack);
         }
 
         enemy.TakeDamage(pendingCard.damage);
 
         isSelectingTarget = false;
         pendingCard = null;
+        pendingHero = null;
 
         if (cardPanel != null)
         {

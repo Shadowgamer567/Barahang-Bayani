@@ -20,6 +20,4 @@ MonoBehaviour:
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: -0.75, z: 0}
   customCards:
-  - {fileID: 11400000, guid: 7741d72f5abc6364ba18096d38f1f377, type: 2}
   - {fileID: 11400000, guid: 46c339b0c0ff6614ead07d08b73471a5, type: 2}
-  - {fileID: 11400000, guid: 6b96cb37517ca8d4a9c9dc1617fd7877, type: 2}

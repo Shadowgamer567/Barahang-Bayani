@@ -10,6 +10,7 @@ public class HeroStats : MonoBehaviour
     public Transform visualRoot;
     public GameObject currentModel;
     private CharacterAnimationRelay animationRelay;
+    private ActionModifier actionModifier;
 
     public int currentHP;
     public int attack;
@@ -30,9 +31,20 @@ public class HeroStats : MonoBehaviour
 
         currentHP = heroType.maxHp;
         shield = heroType.maxShield;
-        
 
-        LoadModel();
+        actionModifier = GetComponent<ActionModifier>();
+
+        if (actionModifier != null)
+        {
+            actionModifier.ClearModifier();
+        }
+
+        else
+        {
+            Debug.LogWarning("ActionModifier missing on hero: " + name);
+        }
+
+            LoadModel();
     }
 
     public void TakeDamage(int amount)
@@ -77,6 +89,24 @@ public class HeroStats : MonoBehaviour
     {
         attack -= amount;
         Debug.Log(name + " reduced " + amount);
+    }
+
+    public void AddActionModifier(int amount)
+    {
+        if (actionModifier != null)
+        {
+            actionModifier.AddModifier(amount);
+        }
+    }
+
+    public int GetModifiedActionValue(int baseValue)
+    {
+        if (actionModifier != null)
+        {
+            return actionModifier.ConsumedModifier(baseValue);
+        }
+
+        return baseValue;
     }
 
     public void SyncToData(GameData data)
@@ -168,7 +198,23 @@ public class HeroStats : MonoBehaviour
     {
         if (animationRelay != null)
         {
+            Debug.Log(
+            "HERO ANIMATION CHECK | " +
+            "Hero Object: " + gameObject.name +
+            " | Hero Type: " + heroType.heroName +
+            " | Model: " + currentModel.name +
+            " | Animator: " + animationRelay.animator.name +
+            " | Animation: " + type
+        );
+
             animationRelay.Play(type);
+        }
+        
+        else
+        {
+            Debug.LogWarning(
+                "No animation relay found for: " + gameObject.name
+            );
         }
     }
 

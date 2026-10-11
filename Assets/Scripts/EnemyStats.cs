@@ -16,6 +16,7 @@ public class EnemyStats : MonoBehaviour
     public Transform visualRoot;
     public GameObject currentModel;
     private CharacterAnimationRelay animationRelay;
+    private ActionModifier actionModifier;
     //public GameObject selectionIndicator;
 
     public int currentHP;
@@ -31,7 +32,13 @@ public class EnemyStats : MonoBehaviour
 
     void OnEnable()
     {
-       battle = FindFirstObjectByType<BattleControl>();
+        if (enemyType == null)
+        {
+            Debug.LogWarning("EnemyType not assigned yet: " + name);
+            return;
+        }
+
+        battle = FindFirstObjectByType<BattleControl>();
 
         currentHP = enemyType.maxHp;
         shield = enemyType.maxShield;
@@ -65,7 +72,22 @@ public class EnemyStats : MonoBehaviour
 
         currentHP = enemyType.maxHp;
         shield = enemyType.maxShield;
+        attack = enemyType.damage;
+
+        isDying = false;
         isDead = false;
+
+        actionModifier = GetComponent<ActionModifier>();
+
+        if (actionModifier != null) 
+        {
+            actionModifier.ClearModifier();
+        }
+
+        else
+        {
+            Debug.LogWarning("ActionModifier missing on enemy: " + name);
+        }
     }
 
     void Awake()
@@ -163,6 +185,23 @@ public class EnemyStats : MonoBehaviour
         Debug.Log(name + " attack increased by " + amount);
     }
 
+    public void AddActionModifier(int amount)
+    {
+        if (actionModifier != null)
+        {
+            actionModifier.AddModifier(amount);
+        }
+    }
+
+    public int GetModifiedActionValue(int baseValue)
+    {
+        if (actionModifier != null)
+        {
+            return actionModifier.ConsumedModifier(baseValue);
+        }
+
+        return baseValue;
+    }
     public void SyncToData(GameData data)
     {
         data.enemy_health = this.currentHP;

@@ -45,14 +45,16 @@ public class QuizManager : MonoBehaviour
 
     private bool waitingForClick = false;
     private int pendingDamage;
+    private CardType pendingQuizCard;
 
     public List<QuizQuestion> questions = new List<QuizQuestion>();
     public Dictionary<string, QuizInfoData> infoDatabase = new Dictionary<string, QuizInfoData>();
 
-    public void StartQuiz(QuizQuestion question, int damage, BattleControl battle)
+    public void StartQuiz(QuizQuestion question, CardType card, BattleControl battle)
     {
         currentQuestion = question;
-        pendingDamage = damage;
+        pendingQuizCard = card;
+        pendingDamage = card.damage;
         battleControl = battle;
 
         quizPanel.SetActive(true);
@@ -563,11 +565,15 @@ public class QuizManager : MonoBehaviour
         quizInfoPanel.SetActive(false);
 
         // APPLY DAMAGE AFTER INFO PANEL
-        if (correct && battleControl != null)
+        // Close the quiz and restore normal gameplay first
+        EndQuiz();
+
+        // Apply the card effect only if the answer was correct
+        if (correct && battleControl != null && pendingQuizCard != null)
         {
-            battleControl.DealDamageToAll(pendingDamage);
+            battleControl.ResolveQuizCard(pendingQuizCard);
         }
 
-        EndQuiz();
+        pendingQuizCard = null;
     }
 }
