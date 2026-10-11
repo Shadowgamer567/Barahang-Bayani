@@ -9,6 +9,9 @@ public class CardType : ScriptableObject
     public string cardShortDesc;
     public string cardFullDesc;
 
+    [Header("Card Artwork")]
+    public Sprite cardImage;
+
     [Header("Card Effect")]
     public CardEffectType effectType = CardEffectType.Damage;
     public TargetType targetType = TargetType.AllEnemies;

@@ -169,6 +169,12 @@ public class EnemyStats : MonoBehaviour
 
     public void Heal(int amount)
     {
+        if (!gameObject.activeInHierarchy || isDead || currentHP <= 0)
+        {
+            return;
+        }
+
+        amount = Mathf.Max(0, amount);
         currentHP = Mathf.Min(currentHP + amount, enemyType.maxHp);
         Debug.Log(name + " healed for: " + amount);
     }
@@ -179,11 +185,13 @@ public class EnemyStats : MonoBehaviour
         Debug.Log(name + " gained shield " + amount);
     }
 
+    /*
     public void BuffAttack(int amount)
     {
         attack += amount;
         Debug.Log(name + " attack increased by " + amount);
     }
+    */
 
     public void AddActionModifier(int amount)
     {

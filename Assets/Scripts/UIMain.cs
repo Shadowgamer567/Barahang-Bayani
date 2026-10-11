@@ -37,6 +37,7 @@ public class UIMain : MonoBehaviour
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI costText;
     public TextMeshProUGUI descriptionText;
+    public Image fullCardImage;
 
     private CardUI selectedCardUI;
     private CardType selectedCardType;
@@ -279,6 +280,12 @@ public class UIMain : MonoBehaviour
         nameText.text = cardType.cardName;
         costText.text = cardType.cost.ToString();
         descriptionText.text = cardType.cardFullDesc;
+
+        if (fullCardImage != null)
+        {
+            fullCardImage.sprite = cardType.cardImage;
+            fullCardImage.enabled = cardType.cardImage != null;
+        }
 
         // hide small card while previewing
         cardUI.gameObject.SetActive(false);
