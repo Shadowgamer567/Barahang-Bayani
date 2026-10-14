@@ -373,7 +373,7 @@ public class AccountManager : MonoBehaviour
         {
             waitingToStartGame = false;
 
-            SceneManager.LoadScene("MapMenu");
+            MainMenu.StartNewGame();
         }
     }
 

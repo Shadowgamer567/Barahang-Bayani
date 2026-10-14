@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: NewCustomContentData
   m_EditorClassIdentifier: Assembly-CSharp::ScrollableContentData
   titleText: Tutorial
-  titleColor: {r: 1, g: 1, b: 1, a: 1}
-  titleFontSize: 28
-  titleAlignment: 257
+  titleColor: {r: 0, g: 0, b: 0, a: 1}
+  titleFontSize: 36
+  titleAlignment: 258
   bodyText: This is the Campaign's Module, Important information is displayed here
     that will help you answer questions later.
-  bodyTextColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
+  bodyTextColor: {r: 0, g: 0, b: 0, a: 1}
   bodyFontSize: 48
   bodyAlignment: 257
   displayImage: {fileID: 21300000, guid: 43323ffeb961a2348a3452becc3ce220, type: 3}
