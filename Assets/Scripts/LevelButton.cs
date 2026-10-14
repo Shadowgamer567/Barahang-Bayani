@@ -1,5 +1,3 @@
-using System;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,8 +7,8 @@ public class LevelButton : MonoBehaviour
     public LevelData levelData;
     public Button button;
 
-    private TMP_Text[] buttonTexts;
-    private Color[] originalTextColors;
+    private Graphic[] graphics;
+    private Color[] originalGraphicColors;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,13 +24,6 @@ public class LevelButton : MonoBehaviour
             return;
         }
 
-        buttonTexts = button.GetComponentsInChildren<TMP_Text>(true);
-        originalTextColors = new Color[buttonTexts.Length];
-        for (int i = 0; i < buttonTexts.Length; i++)
-        {
-            originalTextColors[i] = buttonTexts[i].color;
-        }
-
         bool isUnlocked = levelData.previousLevel == null;
 
         if (!isUnlocked && ProgressManager.Instance == null)
@@ -46,11 +37,16 @@ public class LevelButton : MonoBehaviour
 
         button.interactable = isUnlocked;
 
-        for (int i = 0; i < buttonTexts.Length; i++)
+        graphics = GetComponentsInChildren<Graphic>(true);
+        originalGraphicColors = new Color[graphics.Length];
+
+        for (int i = 0; i < graphics.Length; i++)
         {
-            Color textColor = originalTextColors[i];
-            textColor.a *= isUnlocked ? 1f : 0.5f;
-            buttonTexts[i].color = textColor;
+            originalGraphicColors[i] = graphics[i].color;
+
+            Color color = originalGraphicColors[i];
+            color.a *= isUnlocked ? 1f : 0.5f;
+            graphics[i].color = color;
         }
 
     }
