@@ -16,6 +16,8 @@ public class MainMenu : MonoBehaviour
 
         ProgressManager.Instance.NewGame();
 
+        TutorialManager.Instance.StartTutorial();
+
         SceneTransitionManager.Instance.SwitchScene("MapMenu");
     }
     public async void LoadGame()
