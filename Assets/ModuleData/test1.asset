@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8d7f6106dbc1f241bc27c2944886440, type: 3}
+  m_Name: test1
+  m_EditorClassIdentifier: Assembly-CSharp::ScrollableContentData
+  titleText: 'TEST1 '
+  titleColor: {r: 0, g: 0, b: 0, a: 1}
+  titleFontSize: 36
+  titleAlignment: 257
+  bodyText: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+    eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+    in culpa qui officia deserunt mollit anim id est laborum.
+  bodyTextColor: {r: 0, g: 0, b: 0, a: 1}
+  bodyFontSize: 48
+  bodyAlignment: 257
+  displayImage: {fileID: 21300000, guid: bf1f8a74c64e15a469a66fd0663a2126, type: 3}
+  imagePosition: 0
+  imageTint: {r: 1, g: 0.9724513, b: 0.0047169924, a: 1}
+  sizeMode: 0
+  customImageSize: {x: 600, y: 600}
+  preserveAspectRatio: 1
+  panelBackgroundColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.8}
+  panelPadding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  elementSpacing: 0

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Globalization;
+using System.Collections.Generic;
 
 public class ScrollablePanelDisplay : MonoBehaviour
 {
@@ -14,30 +15,59 @@ public class ScrollablePanelDisplay : MonoBehaviour
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField, Min(1f)] private float scrollSensitivity = 20f;
 
-    [Header("Default Content")]
-    [SerializeField] private ScrollableContentData currentContent;
+    [Header("Content Data")]
+    [SerializeField] private List<ScrollableContentData> contentItems =
+        new List<ScrollableContentData>();
+
+    public int ContentCount => contentItems.Count;
+    public int CurrentContentIndex { get; private set; } = -1;
+    public ScrollRect ScrollRect => scrollRect;
 
     private void Awake()
     {
         if (scrollRect != null)
         {
+            scrollRect.horizontal = false;
+            scrollRect.vertical = true;
             scrollRect.scrollSensitivity = scrollSensitivity;
+        }
+
+        if (verticalLayoutGroup != null)
+        {
+            verticalLayoutGroup.childForceExpandHeight = false;
         }
     }
 
     private void Start()
     {
-        if (currentContent != null)
+        if (contentItems.Count > 0)
         {
-            DisplayContent(currentContent);
+            DisplayContentAt(0);
         }
+    }
+
+    public void DisplayContentAt(int index)
+    {
+        if (index < 0 || index >= contentItems.Count)
+        {
+            Debug.LogWarning($"Content index {index} is out of range.", this);
+            return;
+        }
+
+        if (contentItems[index] == null)
+        {
+            Debug.LogWarning($"Content item {index} is not assigned.", this);
+            return;
+        }
+
+        DisplayContent(contentItems[index]);
     }
 
     public void DisplayContent(ScrollableContentData data)
     {
         if (data == null) return;
 
-        currentContent = data;
+        CurrentContentIndex = contentItems.IndexOf(data);
 
         // 1. Text Setup
         bool hasTitle = !string.IsNullOrEmpty(data.titleText);

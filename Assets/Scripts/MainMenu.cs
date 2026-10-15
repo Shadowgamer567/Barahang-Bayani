@@ -14,7 +14,14 @@ public class MainMenu : MonoBehaviour
             return;
         }
 
+        StartNewGame();
+    }
+
+    public static void StartNewGame()
+    {
         ProgressManager.Instance.NewGame();
+
+        TutorialManager.Instance.StartTutorial();
 
         SceneTransitionManager.Instance.SwitchScene("MapMenu");
     }
@@ -52,5 +59,10 @@ public class MainMenu : MonoBehaviour
     public void SelectRegion1()
     {
         SceneTransitionManager.Instance.SwitchScene("LevelSelect_Rizal");
+    }
+
+    public void SelectTutorial()
+    {
+        SceneTransitionManager.Instance.SwitchScene("LevelSelect_Tutorial");
     }
 }
