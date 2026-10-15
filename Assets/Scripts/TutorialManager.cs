@@ -50,6 +50,11 @@ public class TutorialManager : MonoBehaviour
             return;
         }
 
+        Debug.Log(
+            $"Tutorial advancing from {currentStage} to {nextStage}\n" +
+            System.Environment.StackTrace
+        );
+
         currentStage = nextStage;
 
         Debug.Log("Tutorial advanced to: " + currentStage);

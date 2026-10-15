@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -9,6 +10,13 @@ public class TutorialSceneController : MonoBehaviour
     public GameObject tutorialOverlay;
     public GameObject tutorialSpotlight;
     public Button tutorialClickZoneButton;
+
+    [Header("Tutorial Configuration")]
+    public TutorialStage introductionStage = TutorialStage.MapIntroduction;
+    public TutorialStage nextStage = TutorialStage.SelectTutorialCampaign;
+
+    [Header("Panel-Specific Spotlights")]
+    public GameObject[] panelSpotlights;
 
 
     private int currentPanelIndex = 0;
@@ -26,7 +34,20 @@ public class TutorialSceneController : MonoBehaviour
         }
 
         tutorialOverlay.SetActive(false);
-        tutorialSpotlight.SetActive(false);
+        if (tutorialSpotlight != null)
+        {
+            tutorialSpotlight.SetActive(false);
+        }
+
+        if (panelSpotlights != null)
+        {
+            foreach (GameObject spotlight in panelSpotlights)
+            {
+                if (spotlight != null)
+                    spotlight.SetActive(false);
+            }
+        }
+
         tutorialClickZoneButton.gameObject.SetActive(false);
 
         if (TutorialManager.Instance == null)
@@ -34,7 +55,14 @@ public class TutorialSceneController : MonoBehaviour
             return;
         }
 
-        if (TutorialManager.Instance.tutorialActive && TutorialManager.Instance.currentStage == TutorialStage.MapIntroduction)
+        Debug.Log(
+        $"[{gameObject.scene.name}] " +
+        $"Tutorial Active: {TutorialManager.Instance.tutorialActive}, " +
+        $"Current Stage: {TutorialManager.Instance.currentStage}, " +
+        $"Expected Stage: {introductionStage}"
+);
+
+        if (TutorialManager.Instance.tutorialActive && TutorialManager.Instance.currentStage == introductionStage)
         {
             showingTutorial = true;
             currentPanelIndex = 0;
@@ -55,17 +83,7 @@ public class TutorialSceneController : MonoBehaviour
     {
         tutorialPanels[currentPanelIndex].SetActive(true);
 
-        if (currentPanelIndex < 2)
-        {
-            tutorialOverlay.SetActive(true);
-            tutorialSpotlight.SetActive(false);
-        }
-
-        else
-        {
-            tutorialOverlay.SetActive(false);
-            tutorialSpotlight.SetActive(true);
-        }
+        UpdateSpotlight();
 
         if (currentPanelIndex == tutorialPanels.Length - 1)
         {
@@ -74,7 +92,7 @@ public class TutorialSceneController : MonoBehaviour
             // Allow the player to click the campaign button.
             tutorialClickZoneButton.gameObject.SetActive(false);
 
-            TutorialManager.Instance.AdvanceStage(TutorialStage.SelectTutorialCampaign);
+            TutorialManager.Instance.AdvanceStage(nextStage);
 
             Debug.Log("Tutorial: Select the Tutorial Campaign.");
         }
@@ -102,6 +120,44 @@ public class TutorialSceneController : MonoBehaviour
         if (tutorialClickZoneButton != null)
         {
             tutorialClickZoneButton.onClick.RemoveListener(NextPanel);
+        }
+    }
+
+    void UpdateSpotlight()
+    {
+        if (tutorialSpotlight != null)
+        {
+            tutorialSpotlight.SetActive(false);
+        }
+
+        if (panelSpotlights != null)
+        {
+            foreach(GameObject spotlight in panelSpotlights)
+            {
+                if(spotlight != null)
+                {
+                    spotlight.SetActive(false);
+                }
+            }
+        }
+
+        if (panelSpotlights != null &&
+        currentPanelIndex < panelSpotlights.Length &&
+        panelSpotlights[currentPanelIndex] != null)
+        {
+            tutorialOverlay.SetActive(false);
+            panelSpotlights[currentPanelIndex].SetActive(true);
+        }
+       
+
+        else if (tutorialSpotlight != null && currentPanelIndex >= 2)
+        {
+            tutorialOverlay.SetActive(false);
+            tutorialSpotlight.SetActive(true);
+        }
+        else
+        {
+            tutorialOverlay.SetActive(true);
         }
     }
 }

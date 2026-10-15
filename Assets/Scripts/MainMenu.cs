@@ -63,6 +63,14 @@ public class MainMenu : MonoBehaviour
 
     public void SelectTutorial()
     {
+        if (TutorialManager.Instance != null &&
+        TutorialManager.Instance.tutorialActive &&
+        TutorialManager.Instance.currentStage ==
+            TutorialStage.SelectTutorialCampaign)
+        {
+            TutorialManager.Instance.AdvanceStage(TutorialStage.LevelSelectIntroduction);
+        }
+
         SceneTransitionManager.Instance.SwitchScene("LevelSelect_Tutorial");
     }
 }
