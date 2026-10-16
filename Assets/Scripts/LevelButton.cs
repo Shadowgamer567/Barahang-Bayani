@@ -55,7 +55,14 @@ public class LevelButton : MonoBehaviour
     {
         GameManager.Instance.selectedLevel = levelData;
 
-        ProgressManager.Instance.lastCampaignScene = "LevelSelect_Rizal";
+        if (TutorialManager.Instance != null && TutorialManager.Instance.tutorialActive && TutorialManager.Instance.currentStage == TutorialStage.ExploreScrollableContent && SceneManager.GetActiveScene().name == "LevelSelect_Tutorial")
+        {
+            TutorialManager.Instance.AdvanceStage(TutorialStage.BattleTutorial);
+        }
+
+        ProgressManager.Instance.lastCampaignScene = SceneManager.GetActiveScene().name;
+
+        Debug.Log("Last Campaign Scene: " + ProgressManager.Instance.lastCampaignScene);
 
         ProgressManager.Instance.SaveProgress();
         SceneManager.LoadScene("Level");

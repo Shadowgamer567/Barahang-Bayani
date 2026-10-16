@@ -39,8 +39,9 @@ public class BattleControl : MonoBehaviour
 
     public System.Action<int, int> OnAPChanged;
 
-
     public System.Action OnBattleWon;
+
+    public System.Action OnFirstBattleStarted;
 
     EnemyStats[] enemies;
     HeroStats[] heroes;
@@ -887,6 +888,8 @@ public class BattleControl : MonoBehaviour
         SetupEnemies();
 
         StartPlayerTurn();
+
+        OnFirstBattleStarted?.Invoke();
     }
 
     //Subsequent Battle Sequence
