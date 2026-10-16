@@ -1,7 +1,10 @@
 using UnityEngine;
+using System;
 
 public class CharacterAnimationRelay : MonoBehaviour
 {
+    public event Action OnActionAnimationComplete;
+
     [Header("Animator")]
     public Animator animator;
 
@@ -63,6 +66,13 @@ public class CharacterAnimationRelay : MonoBehaviour
                 animator.Play(deathState);
                 break;
         }
+    }
+
+    public void OnCardAnimationComplete()
+    {
+        Debug.Log(name + " completed card animation.");
+
+        OnActionAnimationComplete?.Invoke();
     }
 
     public void OnDeathAnimationComplete()

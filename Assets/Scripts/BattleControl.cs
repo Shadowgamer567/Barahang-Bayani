@@ -9,7 +9,6 @@ using UnityEngine.Rendering;
 
 public class BattleControl : MonoBehaviour
 {
-
     public Transform enemyController;
     public Transform heroController;
     public GroundLoop groundloop;
@@ -42,6 +41,11 @@ public class BattleControl : MonoBehaviour
     public System.Action OnBattleWon;
 
     public System.Action OnFirstBattleStarted;
+
+    public System.Action OnCardPlayAccepted;
+    public System.Action OnCardResolutionComplete;
+
+    private CharacterAnimationRelay activeCardAnimationRelay;
 
     EnemyStats[] enemies;
     HeroStats[] heroes;
@@ -553,7 +557,7 @@ public class BattleControl : MonoBehaviour
 
         if (card.effectType == CardEffectType.Buff)
         {
-            actingHero.PlayAnimation(CharacterAnimationType.Action);
+            BeginCardAnimation(actingHero, CharacterAnimationType.Action);
 
             AddPlayerModifier(Mathf.Abs(card.damage));
 
@@ -582,9 +586,9 @@ public class BattleControl : MonoBehaviour
         switch (card.targetType)
         {
             case TargetType.AllEnemies:
-                actingHero.PlayAnimation(animation);
+                BeginCardAnimation(actingHero, animation);
 
-                foreach(EnemyStats enemy in enemies)
+                foreach (EnemyStats enemy in enemies)
                 {
                     if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead)
                     {
@@ -594,7 +598,7 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case TargetType.AllHeroes:
-                actingHero.PlayAnimation(animation);
+                BeginCardAnimation(actingHero, animation);
 
                 foreach (HeroStats hero in heroes)
                 {
@@ -606,7 +610,7 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case TargetType.Self:
-                actingHero.PlayAnimation(animation);
+                BeginCardAnimation(actingHero, animation);
 
                 ExecuteCardEffect(card, actingHero, targetHero: actingHero, calculatedValue: finalValue);
 
@@ -621,6 +625,8 @@ public class BattleControl : MonoBehaviour
         {
             return false;
         }
+
+        OnCardPlayAccepted?.Invoke();
 
         if (card.quizCard)
         {
@@ -747,7 +753,7 @@ public class BattleControl : MonoBehaviour
 
         if (pendingHero != null && pendingHero.gameObject.activeInHierarchy)
         {
-            pendingHero.PlayAnimation(CharacterAnimationType.Attack);
+            BeginCardAnimation(pendingHero, CharacterAnimationType.Attack);
         }
 
         enemy.TakeDamage(pendingCard.damage);
@@ -863,6 +869,56 @@ public class BattleControl : MonoBehaviour
             {
                 enemy.PlayAnimation(type);
             }
+        }
+    }
+
+    private void BeginCardAnimation(HeroStats hero, CharacterAnimationType animation)
+    {
+        if (hero == null)
+        {
+            Debug.LogWarning("Card animation: No acting hero found.");
+            return;
+        }
+
+        // Stop listening to any previous card animation.
+        if (activeCardAnimationRelay != null)
+        {
+            activeCardAnimationRelay.OnActionAnimationComplete -= HandleCardAnimationComplete;
+        }
+
+        activeCardAnimationRelay =
+            hero.GetComponentInChildren<CharacterAnimationRelay>(true);
+
+        if (activeCardAnimationRelay != null)
+        {
+            activeCardAnimationRelay.OnActionAnimationComplete += HandleCardAnimationComplete;
+        }
+        else
+        {
+            Debug.LogWarning("Card animation: CharacterAnimationRelay not found.");
+        }
+
+        hero.PlayAnimation(animation);
+    }
+
+    private void HandleCardAnimationComplete()
+    {
+        if (activeCardAnimationRelay == null)
+            return;
+
+        activeCardAnimationRelay.OnActionAnimationComplete -= HandleCardAnimationComplete;
+        activeCardAnimationRelay = null;
+
+        Debug.Log("BattleControl: Card animation completed.");
+
+        OnCardResolutionComplete?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+        if (activeCardAnimationRelay != null)
+        {
+            activeCardAnimationRelay.OnActionAnimationComplete -= HandleCardAnimationComplete;
         }
     }
 

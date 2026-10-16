@@ -6,6 +6,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 [System.Serializable]
 public class EnemyPanel
@@ -32,6 +33,8 @@ public class HeroPanel
 
 public class UIMain : MonoBehaviour
 {
+    public event Action OnFullCardOpened;
+
     [Header("Full CardPanel")]
     public GameObject fullCardPanel;
     public TextMeshProUGUI nameText;
@@ -289,6 +292,9 @@ public class UIMain : MonoBehaviour
 
         // hide small card while previewing
         cardUI.gameObject.SetActive(false);
+
+        //Notify Listeners that Full Card is ready
+        OnFullCardOpened?.Invoke();
     }
 
     public void ConfirmCardPlay()

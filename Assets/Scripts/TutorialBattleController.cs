@@ -6,6 +6,9 @@ public class TutorialBattleController : MonoBehaviour
     [Header("Battle Reference")]
     public BattleControl battleControl;
 
+    [Header("UI Main Reference")]
+    public UIMain uiMain;
+
     [Header("Tutorial UI")]
     public GameObject[] tutorialPanels;
     public GameObject tutorialOverlay;
@@ -16,6 +19,12 @@ public class TutorialBattleController : MonoBehaviour
 
     private int currentPanelIndex = 0;
     private bool showingTutorial = false;
+    private bool waitingForCardSelection = false;
+    private bool showingFullCardTutorial = false;
+    private bool waitingForCardToBePlayed = false;
+    private bool waitingForCardResolution = false;
+    private bool quizTutorialCompleted = false;
+    private bool waitingForQuizCard = false;
 
     private void Start()
     {
@@ -41,6 +50,14 @@ public class TutorialBattleController : MonoBehaviour
         if (battleControl != null)
         {
             battleControl.OnFirstBattleStarted += OnFirstBattleStarted;
+
+            battleControl.OnCardPlayAccepted += OnCardPlayAccepted;
+            battleControl.OnCardResolutionComplete += OnCardResolutionComplete;
+        }
+
+        if (uiMain != null)
+        {
+            uiMain.OnFullCardOpened += OnFullCardOpened;
         }
     }
 
@@ -74,9 +91,11 @@ public class TutorialBattleController : MonoBehaviour
 
         UpdateSpotlight();
 
-        if (currentPanelIndex == tutorialPanels.Length - 1)
+        // Panel 12: Wait for the player to select a card.
+        if (currentPanelIndex == 12)
         {
             showingTutorial = false;
+            waitingForCardSelection = true;
 
             tutorialClickZoneButton.gameObject.SetActive(false);
 
@@ -84,12 +103,33 @@ public class TutorialBattleController : MonoBehaviour
 
             Debug.Log("Battle Tutorial: Waiting for card selection.");
         }
+
+        // Panel 14: Allow the player to interact with the Full Card.
+        else if (currentPanelIndex == 15)
+        {
+            showingTutorial = false;
+            showingFullCardTutorial = false;
+            waitingForCardToBePlayed = true;
+
+            tutorialClickZoneButton.gameObject.SetActive(false);
+
+            Time.timeScale = 1f;
+
+            Debug.Log("Battle Tutorial: Waiting for card to be played.");
+        }
     }
 
     private void NextPanel()
     {
         if (!showingTutorial)
             return;
+
+        // Panel 17 is the final panel of the card explanation.
+        if (currentPanelIndex == 17)
+        {
+            FinishCardExplanation();
+            return;
+        }
 
         tutorialPanels[currentPanelIndex].SetActive(false);
 
@@ -101,11 +141,93 @@ public class TutorialBattleController : MonoBehaviour
         }
     }
 
+    private void OnFullCardOpened()
+    {
+        if (!waitingForCardSelection)
+            return;
+
+        if (TutorialManager.Instance == null ||
+            !TutorialManager.Instance.tutorialActive ||
+            TutorialManager.Instance.currentStage != TutorialStage.BattleTutorial)
+            return;
+
+        waitingForCardSelection = false;
+        showingFullCardTutorial = true;
+        showingTutorial = true;
+
+        // Hide Panel 12.
+        tutorialPanels[currentPanelIndex].SetActive(false);
+
+        // Begin Full Card explanation at Panel 13.
+        currentPanelIndex = 13;
+
+        // Pause gameplay.
+        Time.timeScale = 0f;
+
+        // Enable the tutorial click zone.
+        tutorialClickZoneButton.gameObject.SetActive(true);
+
+        ShowCurrentPanel();
+
+        Debug.Log("Battle Tutorial: Full Card explanation started.");
+    }
+
+    private void OnCardPlayAccepted()
+    {
+        if (!waitingForCardToBePlayed)
+            return;
+
+        waitingForCardToBePlayed = false;
+        waitingForCardResolution = true;
+
+        // Hide Panel 15.
+        tutorialPanels[currentPanelIndex].SetActive(false);
+
+        // Hide all spotlights.
+        foreach (GameObject spotlight in panelSpotlights)
+        {
+            if (spotlight != null)
+                spotlight.SetActive(false);
+        }
+
+        tutorialOverlay.SetActive(false);
+        tutorialClickZoneButton.gameObject.SetActive(false);
+
+        Debug.Log("Battle Tutorial: Card accepted, waiting for resolution.");
+    }
+
+    private void OnCardResolutionComplete()
+    {
+        if (!waitingForCardResolution)
+            return;
+
+        waitingForCardResolution = false;
+
+        // Avoid interrupting the level victory sequence.
+        if (battleControl.isLevelFinished)
+            return;
+
+        Debug.Log("Battle Tutorial: Card resolved.");
+
+        // Pause before showing the next explanation.
+        Time.timeScale = 0f;
+
+        showingTutorial = true;
+        currentPanelIndex = 16;
+
+        tutorialClickZoneButton.gameObject.SetActive(true);
+
+        ShowCurrentPanel();
+    }
+
     private void OnDestroy()
     {
         if (battleControl != null)
         {
-            battleControl.OnFirstBattleStarted -= OnFirstBattleStarted;
+            battleControl.OnFirstBattleStarted += OnFirstBattleStarted;
+
+            battleControl.OnCardPlayAccepted -= OnCardPlayAccepted;
+            battleControl.OnCardResolutionComplete -= OnCardResolutionComplete;
         }
 
         if (tutorialClickZoneButton != null)
@@ -113,9 +235,14 @@ public class TutorialBattleController : MonoBehaviour
             tutorialClickZoneButton.onClick.RemoveListener(NextPanel);
         }
 
+        if (uiMain != null)
+        {
+            uiMain.OnFullCardOpened -= OnFullCardOpened;
+        }
+
         // Avoid leaving the game paused if this controller is destroyed
         // while its introduction is active.
-        if (showingTutorial)
+        if (showingTutorial || showingFullCardTutorial)
         {
             Time.timeScale = 1f;
         }
@@ -139,5 +266,27 @@ public class TutorialBattleController : MonoBehaviour
         {
             tutorialOverlay.SetActive(true);
         }
+    }
+
+    private void FinishCardExplanation()
+    {
+        showingTutorial = false;
+
+        tutorialPanels[currentPanelIndex].SetActive(false);
+
+        tutorialOverlay.SetActive(false);
+        tutorialClickZoneButton.gameObject.SetActive(false);
+
+        foreach (GameObject spotlight in panelSpotlights)
+        {
+            if (spotlight != null)
+                spotlight.SetActive(false);
+        }
+
+        waitingForQuizCard = !quizTutorialCompleted;
+
+        Time.timeScale = 1f;
+
+        Debug.Log("Battle Tutorial: Card explanation finished. Waiting for Quiz Card.");
     }
 }
