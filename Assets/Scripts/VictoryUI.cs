@@ -30,7 +30,10 @@ public class VictoryUI : MonoBehaviour
     public void OnReturn()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("LevelSelect_Rizal");
+
+        Debug.Log("VictoryUI: Returning to " + LevelSelectTracker.lastLevelSelectScene);
+
+        SceneManager.LoadScene(LevelSelectTracker.lastLevelSelectScene);
     }
 
     public void OnRetry()

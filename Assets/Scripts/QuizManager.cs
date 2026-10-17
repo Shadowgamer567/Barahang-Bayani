@@ -10,6 +10,9 @@ using Random = UnityEngine.Random;
 
 public class QuizManager : MonoBehaviour
 {
+    public event Action OnQuizOpened;
+    public event Action OnQuizInfoOpened;
+
     public GameObject quizPanel;
     public GameObject cardPanel;
     public GameObject enemyPanel;
@@ -44,6 +47,7 @@ public class QuizManager : MonoBehaviour
     private BattleControl battleControl;
 
     private bool waitingForClick = false;
+    public bool blockInfoPanelDismissal = false;
     private int pendingDamage;
     private CardType pendingQuizCard;
 
@@ -199,6 +203,8 @@ public class QuizManager : MonoBehaviour
         }
 
         QuizStats.Instance.RegisterQuestion(question.inputType);
+
+        OnQuizOpened?.Invoke();
     }
 
     public void Answers(int index)
@@ -474,7 +480,7 @@ public class QuizManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (waitingForClick && Mouse.current.leftButton.wasPressedThisFrame)
+        if (waitingForClick && !blockInfoPanelDismissal && Mouse.current.leftButton.wasPressedThisFrame)
         {
             waitingForClick = false;
         }
@@ -536,6 +542,8 @@ public class QuizManager : MonoBehaviour
 
         // ===== SHOW INFO PANEL =====
         quizInfoPanel.SetActive(true);
+
+        OnQuizInfoOpened?.Invoke();
 
         if (infoDatabase.ContainsKey(currentQuestion.questionID))
         {

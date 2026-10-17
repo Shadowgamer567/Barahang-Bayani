@@ -13,6 +13,8 @@ public class LevelManager : MonoBehaviour
 
     private int battlesCompleted = 0;
 
+    public event Action OnVictoryScreenOpened;
+
     void Start()
     {
 
@@ -170,6 +172,10 @@ public class LevelManager : MonoBehaviour
         {
             victoryUI.SetActive(true);
         }
+
+        OnVictoryScreenOpened?.Invoke();
+
+        Debug.Log("LevelManager: Victory Screen opened.");
     }
 
     void TriggerCutscene(CutsceneTriggerType type, int battleIndex, System.Action onFinished = null)

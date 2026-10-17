@@ -33,6 +33,8 @@ public class BattleControl : MonoBehaviour
     public int maxActionPoint = 5;
     public int currentActionPoint;
     public bool isLevelFinished = false;
+    private int battleNumber = 0;
+    private bool battleSequenceRunning = false;
 
     private bool battleAlreadyWon = false;
 
@@ -41,6 +43,7 @@ public class BattleControl : MonoBehaviour
     public System.Action OnBattleWon;
 
     public System.Action OnFirstBattleStarted;
+    public System.Action OnSecondBattleStarted;
 
     public System.Action OnCardPlayAccepted;
     public System.Action OnCardResolutionComplete;
@@ -223,10 +226,13 @@ public class BattleControl : MonoBehaviour
 
     public void endPlayersTurn()
     {
-        if(currentstate != BattleState.PlayerTurn)
+        if (currentstate != BattleState.PlayerTurn)
         {
             return;
         }
+
+        // Prevent another enemy turn from being started.
+        currentstate = BattleState.Busy;
 
         Debug.Log("Starting Enemy Turn");
         StartCoroutine(EnemyTurn());
@@ -242,10 +248,19 @@ public class BattleControl : MonoBehaviour
 
         foreach (EnemyStats enemy in enemies)
         {
-            if (enemy == null)
+            if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead || enemy.currentHP <= 0)
             {
-                
                 continue;
+            }
+
+            if (enemy != null)
+            {
+                Debug.Log(
+                    enemy.name +
+                    " | Active: " + enemy.gameObject.activeInHierarchy +
+                    " | Dead: " + enemy.isDead +
+                    " | HP: " + enemy.currentHP
+                );
             }
 
             EnemyAction action;
@@ -263,7 +278,7 @@ public class BattleControl : MonoBehaviour
                 };
             }
 
-            Debug.Log("Enemy uses: " + action.actionType);
+            Debug.Log("Enemy " + enemy.name + " uses: " + action.actionType);
 
             ExecuteEnemyAction(enemy, action);
 
@@ -448,6 +463,8 @@ public class BattleControl : MonoBehaviour
         {
             battleAlreadyWon = true;
             Debug.Log("Battle Won");
+
+            nextbattletriggered = true;
 
             OnBattleWon?.Invoke();
 
@@ -770,6 +787,8 @@ public class BattleControl : MonoBehaviour
 
     public void StartNextBattleManually()
     {
+        Debug.Log("StartNextBattleManually called. nextbattletriggered = " + nextbattletriggered);
+
         if (!nextbattletriggered)
         {
             return;
@@ -847,6 +866,12 @@ public class BattleControl : MonoBehaviour
 
     public void StartBattleSequence()
     {
+        if (battleSequenceRunning || isLevelFinished)
+        {
+            return;
+        }
+
+        battleSequenceRunning = true;
         StartCoroutine(BattleSequence());
     }
 
@@ -943,9 +968,23 @@ public class BattleControl : MonoBehaviour
 
         SetupEnemies();
 
+        battleNumber++;
+
+        Debug.Log("BattleControl: Current battle number = " + battleNumber);
+
         StartPlayerTurn();
 
-        OnFirstBattleStarted?.Invoke();
+        if (battleNumber == 1)
+        {
+            OnFirstBattleStarted?.Invoke();
+        }
+        else if (battleNumber == 2)
+        {
+            Debug.Log("BattleControl: Second battle started.");
+            OnSecondBattleStarted?.Invoke();
+        }
+
+        battleSequenceRunning = false;
     }
 
     //Subsequent Battle Sequence
@@ -962,7 +1001,11 @@ public class BattleControl : MonoBehaviour
 
         groundloop.isMoving = true;
 
+        SetHeroesAnimation(CharacterAnimationType.Moving);
+
         yield return new WaitForSecondsRealtime(moveduration);
+
+        SetHeroesAnimation(CharacterAnimationType.Neutral);
 
         groundloop.isMoving = false;
 
@@ -970,7 +1013,17 @@ public class BattleControl : MonoBehaviour
 
         nextbattletriggered = false;
 
+        battleNumber++;
+
+        Debug.Log("BattleControl: Current battle number = " + battleNumber);
+
         StartPlayerTurn();
+
+        if(battleNumber == 2)
+        {
+            Debug.Log("BattleControl: Second battle started.");
+            OnSecondBattleStarted?.Invoke();
+        }
     }
 
     IEnumerator ShowAPWarning()

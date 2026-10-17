@@ -64,6 +64,101 @@ public class CardPanelManager : MonoBehaviour
         ui.Setup(randomCard, battle, this, quizManager, uiMain);
     }
 
+    //THis is for Tutorial
+    // Ensures the first tutorial battle starts with non-Quiz Cards.
+    public bool ForceNonQuizStartingHand()
+    {
+        List<CardType> nonQuizCards = new List<CardType>();
+
+        // Find all available non-Quiz Cards.
+        foreach (CardType card in availableCards)
+        {
+            if (card != null && !card.quizCard)
+            {
+                nonQuizCards.Add(card);
+            }
+        }
+
+        if (nonQuizCards.Count == 0)
+        {
+            Debug.LogWarning("CardPanelManager: No non-Quiz Cards available!");
+            return false;
+        }
+
+        // Ensure the hand contains five cards.
+        RefillToMax();
+
+        // Replace each card with a randomly selected non-Quiz Card.
+        for (int i = 0; i < cardContainer.childCount && i < cardCount; i++)
+        {
+            CardUI cardUI = cardContainer.GetChild(i).GetComponent<CardUI>();
+
+            if (cardUI == null)
+            {
+                Debug.LogError("CardPanelManager: Card slot " + i + " has no CardUI!");
+                return false;
+            }
+
+            CardType selectedCard =
+                nonQuizCards[Random.Range(0, nonQuizCards.Count)];
+
+            cardUI.Setup(selectedCard, battle, this, quizManager, uiMain);
+        }
+
+        Debug.Log("CardPanelManager: First tutorial hand contains only non-Quiz Cards.");
+
+        return true;
+    }
+
+    //This if fot the Tutorial
+    public bool ForceQuizCardInFifthSlot()
+    {
+        // Find the first available Quiz Card.
+        CardType quizCard = null;
+
+        foreach (CardType card in availableCards)
+        {
+            if (card != null && card.quizCard)
+            {
+                quizCard = card;
+                break;
+            }
+        }
+
+        if (quizCard == null)
+        {
+            Debug.LogWarning("CardPanelManager: No Quiz Card found!");
+            return false;
+        }
+
+        // Make sure the hand contains five cards.
+        RefillToMax();
+
+        if (cardContainer.childCount < 5)
+        {
+            Debug.LogWarning("CardPanelManager: Hand has fewer than five slots!");
+            return false;
+        }
+
+        // Get the fifth card (index 4).
+        Transform fifthSlot = cardContainer.GetChild(4);
+
+        CardUI cardUI = fifthSlot.GetComponent<CardUI>();
+
+        if (cardUI == null)
+        {
+            Debug.LogError("CardPanelManager: Fifth card has no CardUI!");
+            return false;
+        }
+
+        // Replace its card data with the scripted Quiz Card.
+        cardUI.Setup(quizCard, battle, this, quizManager, uiMain);
+
+        Debug.Log("CardPanelManager: Scripted Quiz Card loaded into slot 5.");
+
+        return true;
+    }
+
     public void RefillToMax()
     {
         int currentCards = cardContainer.childCount;
