@@ -71,6 +71,16 @@ public class AccountUIReferences : MonoBehaviour
     public TMP_Text recoveryCodeText;
     public Button confirmRecoveryCodeButton;
 
+    [Header("Account Recovery")]
+    public GameObject accountRecoveryPanel;
+    public Button accountRecoveryButton;
+    public Button cancelAccountRecoveryButton;
+    public TMP_InputField recoveryCodeInputField;
+    public TMP_InputField newPasswordInputField;
+    public TMP_InputField confirmPasswordInputField;
+    public Button confirmAccountRecoveryButton;
+
+
     void Start()
     {
         Debug.Log("AccountUIReference started");

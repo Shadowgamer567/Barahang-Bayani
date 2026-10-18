@@ -79,6 +79,16 @@ public class AccountManager : MonoBehaviour
     public TMP_Text recoveryCodeText;
     public Button confirmRecoveryCodeButton;
 
+    [Header("Account Recovery")]
+    public GameObject accountRecoveryPanel;
+    public Button accountRecoveryButton;
+    public Button cancelAccountRecoveryButton;
+    public TMP_InputField recoveryCodeInputField;
+    public TMP_InputField newPasswordInputField;
+    public TMP_InputField confirmPasswordInputField;
+    public Button confirmAccountRecoveryButton;
+
+
     private string pendingRecoveryCode;
     private bool creatingAccount = false;
 
@@ -487,6 +497,119 @@ public class AccountManager : MonoBehaviour
 
         loginPanel.SetActive(false);
     }
+
+    public void OpenAccountRecovery()
+    {
+        if (pendingLoginAccount == null)
+        {
+            Debug.LogWarning("AccountManager: No account selected for recovery.");
+            return;
+        }
+
+        loginPanel.SetActive(false);
+        accountRecoveryPanel.SetActive(true);
+
+        Debug.Log("Opening recovery for: " + pendingLoginAccount.username);
+    }
+
+    public void CancelAccountRecovery()
+    {
+        accountRecoveryPanel.SetActive(false);
+        loginPanel.SetActive(true);
+    }
+
+
+    private bool resettingPassword = false;
+
+    public async void ConfirmAccountRecovery()
+    {
+        if (resettingPassword)
+            return;
+
+        if (pendingLoginAccount == null)
+        {
+            Debug.LogWarning("No account selected for recovery.");
+            return;
+        }
+
+        string enteredCode = recoveryCodeInputField.text.Trim().ToUpperInvariant();
+        string newPassword = newPasswordInputField.text.Trim();
+        string confirmPassword = confirmPasswordInputField.text.Trim();
+
+        // Reject missing fields.
+        if (string.IsNullOrWhiteSpace(enteredCode) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            Debug.LogWarning("Account Recovery: All fields are required.");
+            return;
+        }
+
+        // Check password confirmation.
+        if (newPassword != confirmPassword)
+        {
+            Debug.LogWarning("Account Recovery: Passwords do not match.");
+            return;
+        }
+
+        // Check whether this account supports recovery.
+        if (!pendingLoginAccount.recoveryCodeEnabled ||
+            string.IsNullOrEmpty(pendingLoginAccount.recoveryCodeHash))
+        {
+            Debug.LogWarning("Account Recovery: No recovery code configured.");
+            return;
+        }
+
+        // Verify the recovery code.
+        string enteredCodeHash = HashRecoveryCode(enteredCode);
+
+        if (enteredCodeHash != pendingLoginAccount.recoveryCodeHash)
+        {
+            Debug.LogWarning("Account Recovery: Incorrect recovery code.");
+            return;
+        }
+
+        resettingPassword = true;
+        confirmAccountRecoveryButton.interactable = false;
+
+        string previousPasswordHash = pendingLoginAccount.passwordHash;
+
+        try
+        {
+            // Update the selected account's password hash.
+            pendingLoginAccount.passwordHash = HashPassword(newPassword);
+
+            // Save the updated account to Firestore.
+            await FirestoreAccountManager.UploadAccount(pendingLoginAccount);
+
+            // Update local account storage.
+            SaveAccount();
+
+            Debug.Log("Account Recovery: Password successfully reset.");
+
+            // Clear sensitive inputs.
+            recoveryCodeInputField.text = "";
+            newPasswordInputField.text = "";
+            confirmPasswordInputField.text = "";
+            loginPasswordInput.text = "";
+
+            // Return to the login panel.
+            accountRecoveryPanel.SetActive(false);
+            loginPanel.SetActive(true);
+        }
+        catch (System.Exception ex)
+        {
+            // Restore the previous password if uploading failed.
+            pendingLoginAccount.passwordHash = previousPasswordHash;
+
+            Debug.LogError("Account Recovery failed: " + ex.Message);
+        }
+        finally
+        {
+            resettingPassword = false;
+            confirmAccountRecoveryButton.interactable = true;
+        }
+    }
+
+
     public void StartAssignStudents()
     {
         if (selectedAccount == null)
@@ -757,7 +880,21 @@ public class AccountManager : MonoBehaviour
         recoveryCodeText = ui.recoveryCodeText;
         confirmRecoveryCodeButton = ui.confirmRecoveryCodeButton;
 
+        // Account Recovery Panel
+        accountRecoveryPanel = ui.accountRecoveryPanel;
+        accountRecoveryButton = ui.accountRecoveryButton;
+        cancelAccountRecoveryButton = ui.cancelAccountRecoveryButton;
+        recoveryCodeInputField = ui.recoveryCodeInputField;
+        newPasswordInputField = ui.newPasswordInputField;
+        confirmPasswordInputField = ui.confirmPasswordInputField;
+        confirmAccountRecoveryButton = ui.confirmAccountRecoveryButton;
+
         cardDeck = ui.cardDeck;
+
+        confirmAccountRecoveryButton.onClick.RemoveAllListeners();
+        confirmAccountRecoveryButton.onClick.AddListener(ConfirmAccountRecovery);
+
+
         // Accounts Button
         Button accountBtn = accountButton.GetComponent<Button>();
 
@@ -773,6 +910,13 @@ public class AccountManager : MonoBehaviour
 
         backBtn.onClick.AddListener(CloseAccountMenu);
 
+        // Open Account Recovery
+        accountRecoveryButton.onClick.RemoveAllListeners();
+        accountRecoveryButton.onClick.AddListener(OpenAccountRecovery);
+
+        // Cancel Account Recovery
+        cancelAccountRecoveryButton.onClick.RemoveAllListeners();
+        cancelAccountRecoveryButton.onClick.AddListener(CancelAccountRecovery);
 
         // Create Student Button
         Button createStudentBtn = ui.createStudentButton.GetComponent<Button>();
