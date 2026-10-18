@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class AccountCardUI : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class AccountCardUI : MonoBehaviour
     private AccountCardMode cardMode;
 
     private float lastClickTime;
+    private Coroutine pendingSingleClick;
     private const float doubleClickDelay = 0.25f;
 
     public void Setup(AccountData data, AccountCardMode mode = AccountCardMode.Normal)
@@ -32,38 +34,71 @@ public class AccountCardUI : MonoBehaviour
         button.onClick.AddListener(OnClick);
     }
 
+
     public void OnClick()
     {
+        AccountManager manager = AccountManager.Instance;
+
+        // Student cards inside the teacher viewer.
         if (cardMode == AccountCardMode.TeacherStudentView)
         {
-            AccountManager.Instance.SelectTeacherStudent(this);
+            manager.SelectTeacherStudent(this);
+            return;
+        }
 
+        // Assignment mode takes priority over login and double-clicking.
+        if (manager.IsAssigningStudents)
+        {
+            manager.SelectAccount(this);
             return;
         }
 
         float timeSinceLastClick = Time.time - lastClickTime;
 
-        if (timeSinceLastClick <= doubleClickDelay)
+        if (pendingSingleClick != null &&
+            timeSinceLastClick <= doubleClickDelay)
         {
-            if (accountData.accountType == AccountType.Teacher)
+            StopCoroutine(pendingSingleClick);
+            pendingSingleClick = null;
+            lastClickTime = 0f;
+
+            // Only logged-in teachers can open the teacher viewer.
+            if (accountData.accountType == AccountType.Teacher &&
+                CurrentAccount.ActiveAccount != null &&
+                CurrentAccount.ActiveAccount.accountType == AccountType.Teacher)
             {
-                AccountManager.Instance.OpenTeacherInfo(this);
+                manager.OpenTeacherInfo(this);
             }
-        }
-        else
-        {
-            AccountManager.Instance.SelectAccount(this);
+
+            return;
         }
 
-        if (timeSinceLastClick <= doubleClickDelay)
-        {
-            lastClickTime = 0f;
-        }
-        else
-        {
-            lastClickTime = Time.time;
-        }
+        lastClickTime = Time.time;
+        pendingSingleClick = StartCoroutine(DelayedSingleClick());
     }
+
+    private IEnumerator DelayedSingleClick()
+    {
+        yield return new WaitForSecondsRealtime(doubleClickDelay);
+
+        pendingSingleClick = null;
+        lastClickTime = 0f;
+
+        // Normal account selection works regardless of login state.
+        AccountManager.Instance.SelectAccount(this);
+    }
+
+    private void OnDisable()
+    {
+        if (pendingSingleClick != null)
+        {
+            StopCoroutine(pendingSingleClick);
+            pendingSingleClick = null;
+        }
+
+        lastClickTime = 0f;
+    }
+
 
     public AccountData GetAccountData()
     {

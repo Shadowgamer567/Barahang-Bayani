@@ -49,6 +49,8 @@ public class AccountManager : MonoBehaviour
     public GameObject confirmAssignButton;
 
     private bool assigningStudents = false;
+    public bool IsAssigningStudents => assigningStudents;
+
     private bool waitingToStartGame = false;
     private bool waitingToLoadGame = false;
 
