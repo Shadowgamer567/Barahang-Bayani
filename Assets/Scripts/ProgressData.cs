@@ -9,6 +9,7 @@ public class ProgressData
     public string accountType;
 
     public List<string> completedLevel = new List<string>();
+    public bool tutorialCompleted = false;
 
     public string lastCampaignScene;
 

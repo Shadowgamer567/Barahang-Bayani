@@ -49,6 +49,7 @@ public class AccountManager : MonoBehaviour
 
     private bool assigningStudents = false;
     private bool waitingToStartGame = false;
+    private bool waitingToLoadGame = false;
 
     private AccountData assigningTeacher;
     private List<AccountData> pendingStudents = new();
@@ -375,6 +376,22 @@ public class AccountManager : MonoBehaviour
 
             MainMenu.StartNewGame();
         }
+
+        else if (waitingToLoadGame)
+        {
+            waitingToLoadGame = false;
+
+            MainMenu mainMenuScript = FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
+
+            if (mainMenuScript != null)
+            {
+                mainMenuScript.LoadGame();
+            }
+            else
+            {
+                Debug.LogError("AccountManager: MainMenu script not found!");
+            }
+        }
     }
 
     public void CancelLogin()
@@ -436,6 +453,14 @@ public class AccountManager : MonoBehaviour
     public void PromptForAccountThenStartGame()
     {
         waitingToStartGame = true;
+
+        OpenAccountMenu();
+    }
+
+    public void PromptForAccountThenLoadGame()
+    {
+        waitingToLoadGame = true;
+        waitingToStartGame = false;
 
         OpenAccountMenu();
     }
@@ -569,6 +594,9 @@ public class AccountManager : MonoBehaviour
     }
     public void CloseAccountMenu()
     {
+        waitingToStartGame = false;
+        waitingToLoadGame = false;
+
         accountButton.SetActive(true);
 
         mainMenu.SetActive(true);

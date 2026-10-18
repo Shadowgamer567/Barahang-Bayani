@@ -65,6 +65,10 @@ public class PullStudentProgress : MonoBehaviour
             progress.username = GetString(data, "username");
             progress.accountType = GetString(data, "accountType");
 
+            progress.tutorialCompleted =
+                data.ContainsKey("tutorialCompleted") &&
+                System.Convert.ToBoolean(data["tutorialCompleted"]);
+
             progress.lastCampaignScene =
                 GetString(data, "lastCampaignScene");
 
@@ -145,6 +149,8 @@ public class PullStudentProgress : MonoBehaviour
 
         ProgressManager progressManager =
             ProgressManager.Instance;
+
+        progressManager.tutorialCompleted = data.tutorialCompleted;
 
         progressManager.completedLevels =
             data.completedLevel ?? new List<string>();

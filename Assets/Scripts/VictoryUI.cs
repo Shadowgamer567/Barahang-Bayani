@@ -31,6 +31,18 @@ public class VictoryUI : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        // Advance to the final tutorial when returning
+        // from the tutorial level's victory screen.
+        if (TutorialManager.Instance != null &&
+            TutorialManager.Instance.tutorialActive &&
+            (TutorialManager.Instance.currentStage == TutorialStage.BattleTutorial ||
+             TutorialManager.Instance.currentStage == TutorialStage.VictoryTutorial))
+        {
+            TutorialManager.Instance.AdvanceStage(TutorialStage.FinalExplanation);
+
+            Debug.Log("VictoryUI: Advancing tutorial to FinalExplanation.");
+        }
+
         Debug.Log("VictoryUI: Returning to " + LevelSelectTracker.lastLevelSelectScene);
 
         SceneManager.LoadScene(LevelSelectTracker.lastLevelSelectScene);

@@ -8,6 +8,7 @@ public class ProgressManager : MonoBehaviour
     public static ProgressManager Instance;
 
     public List<string> completedLevels = new();
+    public bool tutorialCompleted = false;
 
     public string lastCampaignScene = "MapMenu";
 
@@ -43,9 +44,10 @@ public class ProgressManager : MonoBehaviour
 
        Debug.Log("Active Save File: " + savePath);
 
-    completedLevels = new List<string>();
-    lastCampaignScene = "MapMenu";
-    QuizStats.Instance.ResetStats();
+        completedLevels = new List<string>();
+        lastCampaignScene = "MapMenu";
+        QuizStats.Instance.ResetStats();
+        tutorialCompleted = false;
 
     }
     public void CompleteLevel(string levelName)
@@ -74,6 +76,8 @@ public class ProgressManager : MonoBehaviour
         }
 
         ProgressData data = new ProgressData();
+        
+        data.tutorialCompleted = tutorialCompleted;
 
         data.username = currentAccount.username;
         data.accountType = currentAccount.accountType.ToString();
@@ -194,6 +198,7 @@ public class ProgressManager : MonoBehaviour
         QuizStats.Instance.typeTotal[InputType.Identification] = data.identificationTotal;
         QuizStats.Instance.typeCorrect[InputType.TrueOrFalse] = data.trueFalseCorrect;
         QuizStats.Instance.typeTotal[InputType.TrueOrFalse] = data.trueFalseTotal;
+        tutorialCompleted = data.tutorialCompleted;
     }
 
     public void NewGame(bool uploadToFirestore = true)
@@ -205,6 +210,7 @@ public class ProgressManager : MonoBehaviour
         }
 
         completedLevels.Clear();
+        tutorialCompleted = false;
 
         lastCampaignScene = "MapMenu";
 

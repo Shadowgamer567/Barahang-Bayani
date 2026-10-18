@@ -64,6 +64,8 @@ public class TutorialSceneController : MonoBehaviour
 
         if (TutorialManager.Instance.tutorialActive && TutorialManager.Instance.currentStage == introductionStage)
         {
+            Debug.Log($"TutorialSceneController ACTIVATED: {gameObject.name} | Stage: {introductionStage}");
+
             showingTutorial = true;
             currentPanelIndex = 0;
 
@@ -87,9 +89,17 @@ public class TutorialSceneController : MonoBehaviour
 
         if (currentPanelIndex == tutorialPanels.Length - 1)
         {
+            // FinalTutorial must wait for the player to click
+            // through the last panel before completing.
+            if (introductionStage == TutorialStage.FinalExplanation)
+            {
+                Debug.Log("Final Tutorial: Last panel displayed. Waiting for final click.");
+                return;
+            }
+
+            // Preserve the existing behavior of other tutorials.
             showingTutorial = false;
 
-            // Allow the player to click the campaign button.
             tutorialClickZoneButton.gameObject.SetActive(false);
 
             TutorialManager.Instance.AdvanceStage(nextStage);
@@ -113,6 +123,40 @@ public class TutorialSceneController : MonoBehaviour
         {
             ShowCurrentPanel();
         }
+
+        else if (introductionStage == TutorialStage.FinalExplanation)
+        {
+            FinishFinalTutorial();
+        }
+    }
+
+    void FinishFinalTutorial()
+    {
+        showingTutorial = false;
+
+        tutorialOverlay.SetActive(false);
+        tutorialClickZoneButton.gameObject.SetActive(false);
+
+        // Mark the tutorial as completed.
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.CompleteTutorial();
+        }
+
+        // Save completion to the current account's progress.
+        if (ProgressManager.Instance != null)
+        {
+            ProgressManager.Instance.tutorialCompleted = true;
+            ProgressManager.Instance.SaveProgress();
+
+            Debug.Log("Final Tutorial: Completion saved to progress.");
+        }
+        else
+        {
+            Debug.LogError("Final Tutorial: ProgressManager not found!");
+        }
+
+        Debug.Log("Final Tutorial: All tutorial sections completed.");
     }
 
     void OnDestroy()

@@ -39,6 +39,9 @@ public class FirestoreProgressManager : MonoBehaviour
         data["trueFalseTotal"] =
             progress.trueFalseTotal;
 
+        data["tutorialCompleted"] = 
+            progress.tutorialCompleted;
+
         Debug.Log(
             "Uploading Progress | Account ID: " +
             accountID +
@@ -139,6 +142,12 @@ public class FirestoreProgressManager : MonoBehaviour
         {
             progress.trueFalseTotal =
                 snapshot.GetValue<int>("trueFalseTotal");
+        }
+
+        if (snapshot.ContainsField("tutorialCompleted"))
+        {
+            progress.tutorialCompleted =
+                snapshot.GetValue<bool>("tutorialCompleted");
         }
 
         Debug.Log(
