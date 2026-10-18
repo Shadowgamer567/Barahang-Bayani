@@ -20,7 +20,10 @@ public class AccountData
     public string id;
     public string username;
     public string passwordHash;
+    public string recoveryCodeHash = "";
+    public bool recoveryCodeEnabled = false;
     public AccountType accountType;
+
 
     public List<string> assignedStudentIDs = new();
 

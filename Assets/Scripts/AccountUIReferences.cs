@@ -66,6 +66,11 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject confirmCreationButton;
     public GameObject cancelCreationButton;
 
+    [Header("Recovery Code Display")]
+    public GameObject accountRecoveryDisplay;
+    public TMP_Text recoveryCodeText;
+    public Button confirmRecoveryCodeButton;
+
     void Start()
     {
         Debug.Log("AccountUIReference started");

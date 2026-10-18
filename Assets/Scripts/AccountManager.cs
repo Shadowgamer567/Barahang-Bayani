@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class AccountManager : MonoBehaviour
 {
@@ -72,6 +73,15 @@ public class AccountManager : MonoBehaviour
     public TMP_Text loginUsernameText;
 
     public GameObject cardDeck;
+
+    [Header("Recovery Code Display")]
+    public GameObject accountRecoveryDisplay;
+    public TMP_Text recoveryCodeText;
+    public Button confirmRecoveryCodeButton;
+
+    private string pendingRecoveryCode;
+    private bool creatingAccount = false;
+
     private string registryPath => Application.persistentDataPath + "/accounts.json";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -121,24 +131,34 @@ public class AccountManager : MonoBehaviour
 
         File.WriteAllText(registryPath, json);
     }
-    public void CreateStudentAccount()
+    public async void CreateStudentAccount()
     {
-        CreateAccount(AccountType.Student);
+        bool success = await CreateAccount(AccountType.Student);
+
+        if (!success)
+        {
+            Debug.LogWarning("Student account creation failed.");
+        }
     }
 
-    public void CreateTeacherAccount()
+    public async void CreateTeacherAccount()
     {
-        CreateAccount(AccountType.Teacher);
+        bool success = await CreateAccount(AccountType.Teacher);
+
+        if (!success)
+        {
+            Debug.LogWarning("Teacher account creation failed.");
+        }
     }
 
-    public void CreateAccount(AccountType type)
+    public async Task<bool> CreateAccount(AccountType type)
     {
         string username = usernameInputField.text.Trim();
 
-        if (string.IsNullOrEmpty(username))
+        if (string.IsNullOrWhiteSpace(username))
         {
             Debug.LogWarning("No Username Entered");
-            return;
+            return false;
         }
 
         AccountData newAccount = new AccountData();
@@ -149,28 +169,52 @@ public class AccountManager : MonoBehaviour
 
         string password = passwordInputField.text.Trim();
 
-        if (string.IsNullOrEmpty(password))
+        if (string.IsNullOrWhiteSpace(password))
         {
             Debug.LogWarning("No Password Entered");
-            return;
+            return false;
         }
 
         newAccount.passwordHash = HashPassword(password);
 
         newAccount.accountType = type;
 
-        registry.accounts.Add(newAccount);
+        // Generate recovery code.
+        string recoveryCode = GenerateRecoveryCode();
 
-        SaveAccount();
+        //Temp store the readeable code for display 
+        pendingRecoveryCode = recoveryCode;
 
-        _ = FirestoreAccountManager.UploadAccount(newAccount);
+        //store hashed code in account 
+        newAccount.recoveryCodeHash = HashRecoveryCode(recoveryCode);
+        newAccount.recoveryCodeEnabled = true;
 
-        Debug.Log("Created Account");
+        try
+        {
+            // Wait for Firestore to save the account successfully.
+            await FirestoreAccountManager.UploadAccount(newAccount);
+
+            // Only register the account locally after a successful upload.
+            registry.accounts.Add(newAccount);
+
+            SaveAccount();
+
+            Debug.Log("Created Account: " + newAccount.username);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Account creation failed during saving: " + ex.Message);
+
+            pendingRecoveryCode = null;
+
+            return false;
+        }
 
         usernameInputField.text = "";
         passwordInputField.text = "";
 
         RefreshUI();
+        return true;
     }
 
     public void DeleteSelected()
@@ -269,9 +313,50 @@ public class AccountManager : MonoBehaviour
         Debug.Log("RefreshUI Finished");
     }
 
-    public void SubmitUsername()
+    public async void SubmitUsername()
     {
-        CreateAccount(pendingAccountType);
+        // Prevent multiple submissions.
+        if (creatingAccount)
+        {
+            return;
+        }
+
+        creatingAccount = true;
+
+        try
+        {
+            bool accountCreated = await CreateAccount(pendingAccountType);
+
+            if (!accountCreated)
+            {
+                Debug.LogWarning("Account creation failed.");
+                return;
+            }
+
+            // Display the generated recovery code.
+            recoveryCodeText.text = pendingRecoveryCode;
+
+            accountRecoveryDisplay.SetActive(true);
+
+            Debug.Log("Account created. Recovery code displayed.");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Unexpected account creation error: " + ex.Message);
+        }
+        finally
+        {
+            creatingAccount = false;
+        }
+    }
+
+    public void ConfirmRecoveryCode()
+    {
+        pendingRecoveryCode = null;
+
+        recoveryCodeText.text = "";
+
+        accountRecoveryDisplay.SetActive(false);
 
         createAccountPanel.SetActive(false);
 
@@ -513,6 +598,8 @@ public class AccountManager : MonoBehaviour
 
         accountManagementPanel.SetActive(false);
 
+        accountRecoveryDisplay.SetActive(false);
+
         createAccountPanel.SetActive(true);
 
         backButton.SetActive(false);
@@ -525,6 +612,8 @@ public class AccountManager : MonoBehaviour
         accountSelectPanel.SetActive(false);
 
         accountManagementPanel.SetActive(false);
+
+        accountRecoveryDisplay.SetActive(false);
 
         createAccountPanel.SetActive(true);
 
@@ -663,6 +752,11 @@ public class AccountManager : MonoBehaviour
         loginPasswordInput = ui.loginPasswordInput;
         loginUsernameText = ui.loginUsernameText;
 
+        // Recovery Code Display
+        accountRecoveryDisplay = ui.accountRecoveryDisplay;
+        recoveryCodeText = ui.recoveryCodeText;
+        confirmRecoveryCodeButton = ui.confirmRecoveryCodeButton;
+
         cardDeck = ui.cardDeck;
         // Accounts Button
         Button accountBtn = accountButton.GetComponent<Button>();
@@ -704,6 +798,11 @@ public class AccountManager : MonoBehaviour
         submitBtn.onClick.RemoveAllListeners();
 
         submitBtn.onClick.AddListener(SubmitUsername);
+
+        // Confirm Recovery Code Button
+        confirmRecoveryCodeButton.onClick.RemoveAllListeners();
+
+        confirmRecoveryCodeButton.onClick.AddListener(ConfirmRecoveryCode);
 
 
         // Delete Account Button
@@ -776,6 +875,51 @@ public class AccountManager : MonoBehaviour
 
         return builder.ToString();
 
+    }
+
+    private static string GenerateRecoveryCode()
+    {
+        const string characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+        byte[] randomBytes = new byte[24];
+
+        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomBytes);
+        }
+
+        StringBuilder code = new StringBuilder();
+
+        for (int i = 0; i < randomBytes.Length; i++)
+        {
+            if (i > 0 && i % 4 == 0)
+            {
+                code.Append("-");
+            }
+
+            code.Append(characters[randomBytes[i] % characters.Length]);
+        }
+
+        return code.ToString();
+    }
+
+    private static string HashRecoveryCode(string code)
+    {
+        using (SHA256 sha = SHA256.Create())
+        {
+            byte[] bytes = sha.ComputeHash(
+                Encoding.UTF8.GetBytes(code)
+            );
+
+            StringBuilder builder = new StringBuilder();
+
+            foreach (byte b in bytes)
+            {
+                builder.Append(b.ToString("x2"));
+            }
+
+            return builder.ToString();
+        }
     }
 
     private void EnsureAccountsFileExists()

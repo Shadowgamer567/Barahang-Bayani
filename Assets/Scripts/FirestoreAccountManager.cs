@@ -28,6 +28,8 @@ public class FirestoreAccountManager : MonoBehaviour
         data["id"] = account.id;
         data["username"] = account.username;
         data["passwordHash"] = account.passwordHash;
+        data["recoveryCodeHash"] = account.recoveryCodeHash ?? "";
+        data["recoveryCodeEnabled"] = account.recoveryCodeEnabled;
         data["accountType"] = account.accountType.ToString();
         data["assignedStudentIDs"] = account.assignedStudentIDs;
 
@@ -60,6 +62,13 @@ public class FirestoreAccountManager : MonoBehaviour
             account.username = data["username"].ToString();
 
             account.passwordHash = data["passwordHash"].ToString();
+
+            // Load recovery information, supporting older accounts.
+            account.recoveryCodeHash = data.ContainsKey("recoveryCodeHash") ? data["recoveryCodeHash"]?.ToString() ?? "" : "";
+
+            account.recoveryCodeEnabled =
+                data.ContainsKey("recoveryCodeEnabled") &&
+                System.Convert.ToBoolean(data["recoveryCodeEnabled"]);
 
             account.accountType = (AccountType)System.Enum.Parse(typeof(AccountType), data["accountType"].ToString());
 
