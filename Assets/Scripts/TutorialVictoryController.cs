@@ -51,8 +51,18 @@ public class TutorialVictoryController : MonoBehaviour
         }
     }
 
+
     private void OnVictoryScreenOpened()
     {
+        if (TutorialManager.Instance == null ||
+            !TutorialManager.Instance.tutorialActive ||
+            (TutorialManager.Instance.currentStage != TutorialStage.BattleTutorial &&
+             TutorialManager.Instance.currentStage != TutorialStage.VictoryTutorial))
+        {
+            Debug.Log("Victory Tutorial: Skipping because tutorial is not at the Victory stage.");
+            return;
+        }
+
         Debug.Log("Victory Tutorial: Victory Screen detected.");
 
         showingTutorial = true;
@@ -64,6 +74,7 @@ public class TutorialVictoryController : MonoBehaviour
 
         Debug.Log("Victory Tutorial: Started.");
     }
+
 
     private void ShowCurrentPanel()
     {

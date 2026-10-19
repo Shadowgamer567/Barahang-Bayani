@@ -13,6 +13,8 @@ public class ProgressData
 
     public string lastCampaignScene;
 
+    public string playthroughId;
+
     public int multipleChoiceCorrect;
     public int multipleChoiceTotal;
 
@@ -21,4 +23,6 @@ public class ProgressData
 
     public int trueFalseCorrect;
     public int trueFalseTotal;
+
+    public List<QuizResultData> pendingQuizResults = new List<QuizResultData>();
 }

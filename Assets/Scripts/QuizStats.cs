@@ -41,6 +41,8 @@ public class QuizStats : MonoBehaviour
 
         typeTotal[type]++;
         totalQuestions++;
+
+        ProgressManager.Instance?.RegisterLifetimeQuestion(type);
     }
 
     public void RegisterCorrect(InputType type)
@@ -53,6 +55,8 @@ public class QuizStats : MonoBehaviour
 
         typeCorrect[type]++;
         totalCorrect++;
+
+        ProgressManager.Instance?.RegisterLifetimeCorrect(type);
     }
 
     public int GetTotalType(InputType type)

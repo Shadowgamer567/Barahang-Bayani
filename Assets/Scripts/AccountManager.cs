@@ -59,6 +59,9 @@ public class AccountManager : MonoBehaviour
 
     [Header("Teacher Info")]
     public TextMeshProUGUI teacherNameText;
+    public TextMeshProUGUI teacherSectionText;
+    public TMP_Text teacherProgressText;
+    public TMP_Text teacherMetricsText;
 
     public Transform assignedStudentContainer;
 
@@ -461,11 +464,14 @@ public class AccountManager : MonoBehaviour
         loginPanel.SetActive(false);
 
         Debug.Log("Logged in as: " + selectedAccount.username);
-        
-        if (selectedAccount.accountType == AccountType.Student)
+
+
+        if (selectedAccount.accountType == AccountType.Student ||
+            selectedAccount.accountType == AccountType.Teacher)
         {
-            await PullStudentProgress.PullProgress(selectedAccount);
+            await ProgressManager.Instance.LoadProgressForActiveAccount();
         }
+
 
         if (waitingToStartGame)
         {
@@ -758,8 +764,20 @@ public class AccountManager : MonoBehaviour
 
         backButton.SetActive(true);
 
-        teacherNameText.text = account.username;
-        
+        teacherNameText.text = "Name: " + account.username;
+
+        string section = "No Classroom Selected";
+
+        if (DatabaseManager.Instance != null &&
+            !string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase))
+        {
+            section = DatabaseManager.Instance.CurrentDatabase;
+        }
+
+        teacherSectionText.text = "Section: " + section;
+
+        LoadTeacherStats(account);
+
         foreach (Transform child in assignedStudentContainer)
         {
             Destroy(child.gameObject);
@@ -781,6 +799,83 @@ public class AccountManager : MonoBehaviour
             ui.Setup(student, AccountCardMode.TeacherStudentView);
         }
     }
+
+
+    private void LoadTeacherStats(AccountData teacher)
+    {
+        string path = Application.persistentDataPath + "/progress_" + teacher.id + ".json";
+
+        if (!System.IO.File.Exists(path))
+        {
+            teacherProgressText.text = "No Progress has been made on this Account";
+
+            teacherMetricsText.text = "No Progress has been made on this Account";
+
+            return;
+        }
+
+        string json = System.IO.File.ReadAllText(path);
+        ProgressData data = JsonUtility.FromJson<ProgressData>(json);
+
+        if (data == null)
+        {
+            teacherProgressText.text = "No Progress has been made on this Account";
+
+            teacherMetricsText.text = "No Progress has been made on this Account";
+
+            return;
+        }
+
+        // Completed Levels
+        if (data.completedLevel == null || data.completedLevel.Count == 0)
+        {
+            teacherProgressText.text = "No Completed Levels";
+        }
+
+        else
+        {
+            teacherProgressText.text = "Completed Levels:\n";
+
+            foreach (string level in data.completedLevel)
+            {
+                teacherProgressText.text += level + "\n";
+            }
+        }
+
+        // Question Metrics
+        int totalAnswered =
+            data.multipleChoiceTotal +
+            data.identificationTotal +
+            data.trueFalseTotal;
+
+        int totalCorrect =
+            data.multipleChoiceCorrect +
+            data.identificationCorrect +
+            data.trueFalseCorrect;
+
+        if (totalAnswered == 0)
+        {
+            teacherMetricsText.text = "No Progress has been made on this Account";
+
+            return;
+        }
+
+        teacherMetricsText.text =
+            "Multiple Choice: " +
+            data.multipleChoiceCorrect + "/" +
+            data.multipleChoiceTotal + "\n\n" +
+
+            "Identification: " +
+            data.identificationCorrect + "/" +
+            data.identificationTotal + "\n\n" +
+
+            "True/False: " +
+            data.trueFalseCorrect + "/" +
+            data.trueFalseTotal + "\n\n" +
+
+            "Total: " + totalCorrect + "/" + totalAnswered;
+    }
+
 
     public void OpenStudentInfo(AccountData student)
     {
@@ -870,6 +965,10 @@ public class AccountManager : MonoBehaviour
         passwordInputField = ui.passwordInputField;
 
         teacherNameText = ui.teacherNameText;
+        teacherSectionText = ui.teacherSectionText;
+        teacherProgressText = ui.teacherProgressText;
+        teacherMetricsText = ui.teacherMetricsText;
+
         completedLevelsText = ui.completedLevelsText;
         quizStatsText = ui.quizStatsText;
 

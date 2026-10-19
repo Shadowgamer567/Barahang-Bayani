@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FirestoreProgressManager : MonoBehaviour
 {
-    public static async Task UploadProgress(
+    public static async Task UploadProgressForNewGame(
         string accountID,
         ProgressData progress)
     {
@@ -20,6 +20,9 @@ public class FirestoreProgressManager : MonoBehaviour
 
         data["lastCampaignScene"] =
             progress.lastCampaignScene;
+
+        data["playthroughId"] =
+            progress.playthroughId ?? "";
 
         data["multipleChoiceCorrect"] =
             progress.multipleChoiceCorrect;
@@ -60,6 +63,72 @@ public class FirestoreProgressManager : MonoBehaviour
         );
     }
 
+    public static async Task<bool> UploadProgressIfCurrent(
+        string accountID,
+        ProgressData progress)
+    {
+        DocumentReference document =
+            FirestoreManager.Instance
+                .ProgressCollection()
+                .Document(accountID);
+
+        return await FirestoreManager.Instance
+            .ProgressCollection()
+            .Firestore
+            .RunTransactionAsync(async transaction =>
+            {
+                DocumentSnapshot snapshot =
+                    await transaction.GetSnapshotAsync(document);
+
+                if (!snapshot.Exists)
+                {
+                    Debug.LogWarning(
+                        "No cloud progress exists yet. " +
+                        "Guarded upload was not performed."
+                    );
+
+                    return false;
+                }
+
+                string cloudPlaythroughId = "";
+
+                if (snapshot.ContainsField("playthroughId"))
+                {
+                    cloudPlaythroughId =
+                        snapshot.GetValue<string>("playthroughId");
+                }
+
+                if (cloudPlaythroughId != progress.playthroughId)
+                {
+                    Debug.LogWarning(
+                        "Upload rejected: Playthrough ID mismatch."
+                    );
+
+                    return false;
+                }
+
+                Dictionary<string, object> data =
+                    new Dictionary<string, object>
+                    {
+                    { "username", progress.username },
+                    { "accountType", progress.accountType },
+                    { "completedLevels", progress.completedLevel },
+                    { "lastCampaignScene", progress.lastCampaignScene },
+                    { "playthroughId", progress.playthroughId },
+                    { "multipleChoiceCorrect", progress.multipleChoiceCorrect },
+                    { "multipleChoiceTotal", progress.multipleChoiceTotal },
+                    { "identificationCorrect", progress.identificationCorrect },
+                    { "identificationTotal", progress.identificationTotal },
+                    { "trueFalseCorrect", progress.trueFalseCorrect },
+                    { "trueFalseTotal", progress.trueFalseTotal },
+                    { "tutorialCompleted", progress.tutorialCompleted }
+                    };
+
+                transaction.Set(document, data);
+
+                return true;
+            });
+    }
 
     public static async Task<ProgressData> DownloadProgress(
         string accountID)
@@ -106,6 +175,12 @@ public class FirestoreProgressManager : MonoBehaviour
         {
             progress.lastCampaignScene =
                 snapshot.GetValue<string>("lastCampaignScene");
+        }
+
+        if (snapshot.ContainsField("playthroughId"))
+        {
+            progress.playthroughId =
+                snapshot.GetValue<string>("playthroughId");
         }
 
         if (snapshot.ContainsField("multipleChoiceCorrect"))

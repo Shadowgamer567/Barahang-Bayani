@@ -47,6 +47,7 @@ public class QuizManager : MonoBehaviour
     private BattleControl battleControl;
 
     private bool waitingForClick = false;
+    private bool answerSubmitted = false;
     public bool blockInfoPanelDismissal = false;
     private int pendingDamage;
     private CardType pendingQuizCard;
@@ -57,6 +58,7 @@ public class QuizManager : MonoBehaviour
     public void StartQuiz(QuizQuestion question, CardType card, BattleControl battle)
     {
         currentQuestion = question;
+        answerSubmitted = false;
         pendingQuizCard = card;
         pendingDamage = card.damage;
         battleControl = battle;
@@ -209,6 +211,13 @@ public class QuizManager : MonoBehaviour
 
     public void Answers(int index)
     {
+        if (answerSubmitted || currentQuestion == null)
+        {
+            return;
+        }
+
+        answerSubmitted = true;
+
         bool correct = index == currentQuestion.correctIndex;
 
         Debug.Log(correct ? "Correct!" : "Incorrect");
@@ -218,28 +227,41 @@ public class QuizManager : MonoBehaviour
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
         }
 
+        ProgressManager.Instance.RecordQuizResult(currentQuestion.inputType, correct);
+
         StartCoroutine(ShowAnswerRoutine(correct, index));
     }
 
     public void SubmitIdentification()
     {
+        if (answerSubmitted || currentQuestion == null)
+            return;
+
+        answerSubmitted = true;
+
         string userAnswer = inputField.text.Trim().ToLower();
         string correct = currentQuestion.correctAnswer.Trim().ToLower();
 
-        bool iscorrect = userAnswer == correct;
+        bool isCorrect = userAnswer == correct;
 
-        Debug.Log(iscorrect ? "Correct" : "Incorrect");
-        if (iscorrect)
+        Debug.Log(isCorrect ? "Correct" : "Incorrect");
+        if (isCorrect)
         {
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
-
         }
 
-        StartCoroutine(ShowAnswerRoutine(iscorrect));
+        ProgressManager.Instance.RecordQuizResult(currentQuestion.inputType, isCorrect);
+
+        StartCoroutine(ShowAnswerRoutine(isCorrect));
     }
 
     public void AnswerTrueorFalse(bool playerAnswer)
     {
+        if (answerSubmitted || currentQuestion == null)
+            return;
+
+        answerSubmitted = true;
+
         bool correct = playerAnswer == currentQuestion.correctBool;
 
         Debug.Log(correct ? "Correct" : "Incorrect");
@@ -248,6 +270,9 @@ public class QuizManager : MonoBehaviour
         {
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
         }
+
+        ProgressManager.Instance.RecordQuizResult(currentQuestion.inputType, correct);
+        
         StartCoroutine(ShowAnswerRoutine(correct));
     }
 

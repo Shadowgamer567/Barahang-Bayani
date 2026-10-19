@@ -29,7 +29,10 @@ public class AccountUIReferences : MonoBehaviour
     public TMP_InputField passwordInputField;
 
     public TextMeshProUGUI teacherNameText;
+    public TextMeshProUGUI teacherSectionText;
     public TextMeshProUGUI completedLevelsText;
+    public TMP_Text teacherProgressText;
+    public TMP_Text teacherMetricsText;
     public TextMeshProUGUI quizStatsText;
 
     [Header("Buttons")]

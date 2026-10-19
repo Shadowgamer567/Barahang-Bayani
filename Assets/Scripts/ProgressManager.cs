@@ -2,6 +2,7 @@ using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine.SocialPlatforms;
 
 public class ProgressManager : MonoBehaviour
 {
@@ -9,6 +10,23 @@ public class ProgressManager : MonoBehaviour
 
     public List<string> completedLevels = new();
     public bool tutorialCompleted = false;
+
+    [Header("Playthrough Tracking")]
+    public string playthroughId = "";
+
+    [Header("Lifetime Quiz Statistics")]
+    public int multipleChoiceCorrect = 0;
+    public int multipleChoiceTotal = 0;
+
+    public int identificationCorrect = 0;
+    public int identificationTotal = 0;
+
+    public int trueFalseCorrect = 0;
+    public int trueFalseTotal = 0;
+
+    [Header("Pending Quiz Synchronization")]
+    public List<QuizResultData> pendingQuizResults = new();
+
 
     public string lastCampaignScene = "MapMenu";
 
@@ -39,17 +57,32 @@ public class ProgressManager : MonoBehaviour
     {
         currentAccount = account;
 
-       savePath = Application.persistentDataPath +
-           "/progress_" + account.id + ".json";
+        // Clear temporary statistics from the previous account/level.
+        QuizStats.Instance?.ResetStats();
+
+        // Clear lifetime statistics from the previous account.
+        // The selected account's saved values will be loaded afterward.
+        multipleChoiceCorrect = 0;
+        multipleChoiceTotal = 0;
+
+        identificationCorrect = 0;
+        identificationTotal = 0;
+
+        trueFalseCorrect = 0;
+        trueFalseTotal = 0;
+
+        savePath = Application.persistentDataPath + "/progress_" + account.id + ".json";
 
        Debug.Log("Active Save File: " + savePath);
 
         completedLevels = new List<string>();
         lastCampaignScene = "MapMenu";
-        QuizStats.Instance.ResetStats();
         tutorialCompleted = false;
+        playthroughId = "";
+        pendingQuizResults = new List<QuizResultData>();
 
     }
+
     public void CompleteLevel(string levelName)
     {
         if (!completedLevels.Contains(levelName))
@@ -66,6 +99,50 @@ public class ProgressManager : MonoBehaviour
     {
         return completedLevels.Contains(levelName);
     }
+
+
+    public void RegisterLifetimeQuestion(InputType type)
+    {
+        if (currentAccount == null)
+            return;
+
+        switch (type)
+        {
+            case InputType.MultipleChoice:
+                multipleChoiceTotal++;
+                break;
+
+            case InputType.Identification:
+                identificationTotal++;
+                break;
+
+            case InputType.TrueOrFalse:
+                trueFalseTotal++;
+                break;
+        }
+    }
+
+    public void RegisterLifetimeCorrect(InputType type)
+    {
+        if (currentAccount == null)
+            return;
+
+        switch (type)
+        {
+            case InputType.MultipleChoice:
+                multipleChoiceCorrect++;
+                break;
+
+            case InputType.Identification:
+                identificationCorrect++;
+                break;
+
+            case InputType.TrueOrFalse:
+                trueFalseCorrect++;
+                break;
+        }
+    }
+
 
     public void SaveProgress(bool uploadToFirestore = true)
     {
@@ -85,17 +162,18 @@ public class ProgressManager : MonoBehaviour
         data.completedLevel = completedLevels;
         data.lastCampaignScene = lastCampaignScene;
 
-        data.multipleChoiceCorrect = QuizStats.Instance.GetTypeCorrect(InputType.MultipleChoice);
+        data.playthroughId = playthroughId;
 
-        data.multipleChoiceTotal = QuizStats.Instance.GetTotalType(InputType.MultipleChoice);
+        data.pendingQuizResults = new List<QuizResultData>(pendingQuizResults);
 
-        data.identificationCorrect = QuizStats.Instance.GetTypeCorrect(InputType.Identification);
+        data.multipleChoiceCorrect = multipleChoiceCorrect;
+        data.multipleChoiceTotal = multipleChoiceTotal;
 
-        data.identificationTotal = QuizStats.Instance.GetTotalType(InputType.Identification);
+        data.identificationCorrect = identificationCorrect;
+        data.identificationTotal = identificationTotal;
 
-        data.trueFalseCorrect = QuizStats.Instance.GetTypeCorrect(InputType.TrueOrFalse);
-
-        data.trueFalseTotal = QuizStats.Instance.GetTotalType(InputType.TrueOrFalse);
+        data.trueFalseCorrect = trueFalseCorrect;
+        data.trueFalseTotal = trueFalseTotal;
 
         string json = JsonUtility.ToJson(data, true);
 
@@ -103,7 +181,7 @@ public class ProgressManager : MonoBehaviour
 
         if (uploadToFirestore)
         {
-            _ = FirestoreProgressManager.UploadProgress(currentAccount.id, data);
+            Debug.Log("Local progress saved. Automatic Firestore upload " + "is temporarily disabled until safe synchronization is implemented.");
         }
 
         Debug.Log("Saved Progress For: " + currentAccount.username);
@@ -163,10 +241,16 @@ public class ProgressManager : MonoBehaviour
 
             if (cloudProgress != null)
             {
+                ProgressData localProgress = ReadLocalProgress();
+
                 ApplyProgress(cloudProgress);
+
+                RestorePendingQuizResults(localProgress, cloudProgress);
+
                 SaveProgress(false);
 
-                Debug.Log("Loaded progress from Firestore for: " + currentAccount.username);
+                Debug.Log("Loaded progress from Firestore and restored local " + "pending results for: " + currentAccount.username);
+
                 return true;
             }
         }
@@ -191,15 +275,22 @@ public class ProgressManager : MonoBehaviour
             ? "MapMenu"
             : data.lastCampaignScene;
 
-        QuizStats.Instance.ResetStats();
-        QuizStats.Instance.typeCorrect[InputType.MultipleChoice] = data.multipleChoiceCorrect;
-        QuizStats.Instance.typeTotal[InputType.MultipleChoice] = data.multipleChoiceTotal;
-        QuizStats.Instance.typeCorrect[InputType.Identification] = data.identificationCorrect;
-        QuizStats.Instance.typeTotal[InputType.Identification] = data.identificationTotal;
-        QuizStats.Instance.typeCorrect[InputType.TrueOrFalse] = data.trueFalseCorrect;
-        QuizStats.Instance.typeTotal[InputType.TrueOrFalse] = data.trueFalseTotal;
+        playthroughId = data.playthroughId;
+
+        pendingQuizResults = data.pendingQuizResults ?? new List<QuizResultData>();
+
+        multipleChoiceCorrect = data.multipleChoiceCorrect;
+        multipleChoiceTotal = data.multipleChoiceTotal;
+
+        identificationCorrect = data.identificationCorrect;
+        identificationTotal = data.identificationTotal;
+
+        trueFalseCorrect = data.trueFalseCorrect;
+        trueFalseTotal = data.trueFalseTotal;
+
         tutorialCompleted = data.tutorialCompleted;
     }
+
 
     public void NewGame(bool uploadToFirestore = true)
     {
@@ -209,63 +300,198 @@ public class ProgressManager : MonoBehaviour
             return;
         }
 
+        //Generate New ID for this playthrough
+        playthroughId = System.Guid.NewGuid().ToString();
+
+        // Reset completed levels and tutorial progress.
         completedLevels.Clear();
         tutorialCompleted = false;
-
         lastCampaignScene = "MapMenu";
 
+        // Reset account quiz metrics for the new playthrough.
+        multipleChoiceCorrect = 0;
+        multipleChoiceTotal = 0;
+
+        identificationCorrect = 0;
+        identificationTotal = 0;
+
+        trueFalseCorrect = 0;
+        trueFalseTotal = 0;
+
+        // Reset current-level quiz statistics.
+        QuizStats.Instance?.ResetStats();
+
+        // Prevents bleeing of old Quiz Data into new Playthroughs
+        pendingQuizResults.Clear();
+
+        // Save the new playthrough's starting progress.
         SaveProgress(uploadToFirestore);
 
-        Debug.Log("New Game Started");
+        Debug.Log("New Game Started. Progress and quiz metrics reset.");
     }
+
+
+    public async Task<bool> UploadNewGameProgress()
+    {
+        if (currentAccount == null)
+        {
+            Debug.LogError("Cannot upload New Game: No active account.");
+            return false;
+        }
+
+        string accountId = currentAccount.id;
+        string expectedPlaythroughId = playthroughId;
+
+        ProgressData data = ReadLocalProgress();
+
+        if (data == null ||
+            data.playthroughId != expectedPlaythroughId)
+        {
+            Debug.LogError(
+                "Cannot upload New Game: Local playthrough does not match.");
+            return false;
+        }
+
+        try
+        {
+            await FirestoreProgressManager.UploadProgressForNewGame(accountId, data);
+
+            Debug.Log("New Game progress uploaded for playthrough: " + expectedPlaythroughId);
+
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to upload New Game progress: " + e.Message);
+
+            return false;
+        }
+    }
+
 
     public async void SyncProgressFromFirestore()
-{
-    if (currentAccount == null)
     {
-        Debug.LogError(
-            "Cannot sync progress: No active account."
-        );
-
-        return;
-    }
-
-    try
-    {
-        ProgressData cloudProgress =
-            await FirestoreProgressManager.DownloadProgress(
-                currentAccount.id
-            );
-
-        if (cloudProgress == null)
+        if (currentAccount == null)
         {
-            Debug.Log(
-                "No cloud progress found. " +
-                "Keeping local progress."
-            );
+            Debug.LogError("Cannot sync progress: No active account.");
 
             return;
         }
 
-        ApplyProgress(cloudProgress);
-        SaveProgress(false);
+        try
+        {
+            ProgressData cloudProgress =
+                await FirestoreProgressManager.DownloadProgress(
+                    currentAccount.id);
 
-        Debug.Log(
-            "Progress successfully synced from Firestore."
-        );
+            if (cloudProgress == null)
+            {
+                Debug.Log("No cloud progress found. " + "Keeping local progress.");
+
+                return;
+            }
+
+            ApplyProgress(cloudProgress);
+            SaveProgress(false);
+
+            Debug.Log("Progress successfully synced from Firestore.");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to download progress: " + e.Message);
+
+            Debug.Log("Keeping local progress.");
+        }
     }
-    catch (System.Exception e)
+
+    public void RecordQuizResult(InputType type, bool isCorrect)
     {
-        Debug.LogError(
-            "Failed to download progress: " +
-            e.Message
-        );
+        if (currentAccount == null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(playthroughId))
+        {
+            Debug.LogWarning("Quiz Result not recorded: No Active Playthrough ID");
+            return;
+        }
+
+        QuizResultData result = new QuizResultData()
+        {
+            resultId = System.Guid.NewGuid().ToString(),
+            playthroughId = playthroughId,
+            questionType = type.ToString(),
+            isCorrect = isCorrect
+        };
+
+        pendingQuizResults.Add(result);
+
+        Debug.Log($"Pending quiz result recorded: {type}, Correct: {isCorrect}");
+    }
+
+    private ProgressData ReadLocalProgress()
+    {
+        if (string.IsNullOrEmpty(savePath) || !File.Exists(savePath))
+            return null;
+
+        try
+        {
+            string json = File.ReadAllText(savePath);
+            return JsonUtility.FromJson<ProgressData>(json);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(
+                "Failed to read local progress: " + e.Message);
+            return null;
+        }
+    }
+
+
+    private void RestorePendingQuizResults(
+        ProgressData localProgress,
+        ProgressData cloudProgress)
+    {
+        if (localProgress == null || cloudProgress == null)
+            return;
+
+        // Only restore results from the same playthrough.
+        if (string.IsNullOrEmpty(localProgress.playthroughId) ||
+            localProgress.playthroughId != cloudProgress.playthroughId)
+        {
+            Debug.Log("Local pending results belong to a different playthrough.");
+            return;
+        }
+
+        if (localProgress.pendingQuizResults == null)
+            return;
+
+        HashSet<string> existingIds = new HashSet<string>();
+
+        foreach (QuizResultData result in pendingQuizResults)
+        {
+            if (result != null && !string.IsNullOrEmpty(result.resultId))
+                existingIds.Add(result.resultId);
+        }
+
+        foreach (QuizResultData result in localProgress.pendingQuizResults)
+        {
+            if (result == null ||
+                string.IsNullOrEmpty(result.resultId) ||
+                result.playthroughId != cloudProgress.playthroughId)
+                continue;
+
+            if (existingIds.Add(result.resultId))
+            {
+                pendingQuizResults.Add(result);
+            }
+        }
 
         Debug.Log(
-            "Keeping local progress."
-        );
+            "Pending quiz results after local restoration: " + pendingQuizResults.Count);
     }
-}
+
 
     private void Update()
     {
