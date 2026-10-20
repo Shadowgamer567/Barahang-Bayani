@@ -1,11 +1,14 @@
 //Handles Card effect logic
 
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CardUI : MonoBehaviour
 {
+    public static event Action OnCardClicked;
+
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI costText;
     public TextMeshProUGUI descriptionText;
@@ -45,6 +48,7 @@ public class CardUI : MonoBehaviour
 
     void OnClick()
     {
+        OnCardClicked?.Invoke();
         Debug.Log("Card clicked -> sending to BattleControl");
 
         if (battleControl.currentstate != BattleControl.BattleState.PlayerTurn)

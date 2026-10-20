@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 public class CardPanelManager : MonoBehaviour
 {
+    public static event System.Action OnHandRefilled;
+
     public GameObject cardTemplate;
     public Transform cardContainer;
     public BattleControl battle;
@@ -167,6 +169,11 @@ public class CardPanelManager : MonoBehaviour
         for (int i = 0; i < needed; i++)
         {
             DrawCard();
+        }
+
+        if (cardContainer.childCount > currentCards)
+        {
+            OnHandRefilled?.Invoke();
         }
 
         Debug.Log("Hand Refilled to Max. Current: " + cardContainer.childCount);

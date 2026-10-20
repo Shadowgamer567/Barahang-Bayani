@@ -1,35 +1,66 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
-[RequireComponent(typeof(AudioSource))]
 public class SoundHandlerBtn : MonoBehaviour
 {
     [SerializeField] private AudioClip clickSound;
 
-    private Button button;
-    private AudioSource audioSource;
+    private readonly HashSet<Button> registeredButtons = new HashSet<Button>();
 
-    private void Awake()
+    private void OnEnable()
     {
-        button = GetComponent<Button>();
-        audioSource = GetComponent<AudioSource>();
-        button.onClick.AddListener(PlayClickSound);
+        InvokeRepeating(nameof(RefreshButtonListeners), 0.1f, 0.25f);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
-        if (button != null)
+        CancelInvoke(nameof(RefreshButtonListeners));
+
+        foreach (Button button in registeredButtons)
         {
-            button.onClick.RemoveListener(PlayClickSound);
+            if (button != null)
+            {
+                button.onClick.RemoveListener(PlayClickSound);
+            }
         }
+
+        registeredButtons.Clear();
+    }
+
+    private void RefreshButtonListeners()
+    {
+        Button[] buttons = FindObjectsByType<Button>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        foreach (Button button in buttons)
+        {
+            if (button == null)
+            {
+                continue;
+            }
+
+            button.onClick.RemoveListener(PlayClickSound);
+            button.onClick.AddListener(PlayClickSound);
+            registeredButtons.Add(button);
+        }
+
+        registeredButtons.RemoveWhere(button => button == null);
     }
 
     private void PlayClickSound()
     {
-        if (clickSound != null)
+        if (clickSound == null)
         {
-            audioSource.PlayOneShot(clickSound);
+            return;
         }
+
+        GameObject playbackObject = new GameObject("UI Click Sound");
+        AudioSource playbackSource = playbackObject.AddComponent<AudioSource>();
+        playbackSource.spatialBlend = 0f;
+        playbackSource.PlayOneShot(clickSound);
+        DontDestroyOnLoad(playbackObject);
+        Destroy(playbackObject, clickSound.length);
     }
 }
