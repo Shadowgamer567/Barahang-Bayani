@@ -50,10 +50,22 @@ MonoBehaviour:
     enemy: {fileID: 0}
     Dialogue: 'A little, sir. '
     isLeftSide: 0
+  - speakerName: Schoolmaster
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'Do you know Latin? '
+    isLeftSide: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'A little, sir. '
+    isLeftSide: 0
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: "These answers got the teacher\u2019s son to start making fun of me.
-      Somehow or another, we ended up fighting. "
+      Somehow or another, we ended up fighting."
     isLeftSide: 0
