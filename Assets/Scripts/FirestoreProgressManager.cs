@@ -131,6 +131,88 @@ public class FirestoreProgressManager : MonoBehaviour
             });
     }
 
+    public static async Task<bool> UploadCampaignProgress(
+        string accountID,
+        string expectedPlaythroughId,
+        List<string> completedLevels,
+        bool tutorialCompleted,
+        string lastCampaignScene)
+    {
+        DocumentReference document =
+            FirestoreManager.Instance
+                .ProgressCollection()
+                .Document(accountID);
+
+        return await document.Firestore.RunTransactionAsync(
+            async transaction =>
+            {
+                DocumentSnapshot snapshot =
+                    await transaction.GetSnapshotAsync(document);
+
+                if (!snapshot.Exists)
+                {
+                    Debug.LogWarning(
+                        "Campaign upload skipped: Cloud progress does not exist."
+                    );
+                    return false;
+                }
+
+                string cloudPlaythroughId =
+                    snapshot.ContainsField("playthroughId")
+                        ? snapshot.GetValue<string>("playthroughId")
+                        : "";
+
+                if (cloudPlaythroughId != expectedPlaythroughId)
+                {
+                    Debug.LogWarning(
+                        "Campaign upload rejected: Playthrough ID mismatch."
+                    );
+                    return false;
+                }
+
+                List<string> mergedLevels = new List<string>();
+
+                if (snapshot.ContainsField("completedLevels"))
+                {
+                    List<string> cloudLevels =
+                        snapshot.GetValue<List<string>>("completedLevels");
+
+                    if (cloudLevels != null)
+                        mergedLevels.AddRange(cloudLevels);
+                }
+
+                if (completedLevels != null)
+                {
+                    foreach (string level in completedLevels)
+                    {
+                        if (!mergedLevels.Contains(level))
+                            mergedLevels.Add(level);
+                    }
+                }
+
+                bool mergedTutorialCompleted = tutorialCompleted;
+
+                if (snapshot.ContainsField("tutorialCompleted"))
+                {
+                    mergedTutorialCompleted |=
+                        snapshot.GetValue<bool>("tutorialCompleted");
+                }
+
+                // Update campaign fields only.
+                // Do not overwrite quiz counters or result ledger data.
+                Dictionary<string, object> updates =
+                    new Dictionary<string, object>
+                    {
+                    { "completedLevels", mergedLevels },
+                    { "tutorialCompleted", mergedTutorialCompleted }
+                    };
+
+                transaction.Update(document, updates);
+
+                return true;
+            });
+    }
+
     public static async Task<ProgressData> DownloadProgress(
         string accountID)
     {

@@ -39,6 +39,7 @@ public class ProgressManager : MonoBehaviour
     private bool isSyncingQuizResults = false;
     private bool isReconcilingProgress = false;
     private bool isResettingPlaythrough = false;
+    private bool isAutomaticallySynchronizing = false;
     private int progressGeneration = 0;
 
 
@@ -200,11 +201,103 @@ public class ProgressManager : MonoBehaviour
 
         if (uploadToFirestore)
         {
-            Debug.Log("Local progress saved. Automatic Firestore upload " + "is temporarily disabled until safe synchronization is implemented.");
+            _ = SyncCampaignProgress();
         }
 
         Debug.Log("Saved Progress For: " + currentAccount.username);
     }
+
+    private async Task SyncCampaignProgress()
+    {
+        if (currentAccount == null ||
+            pendingNewGameReset ||
+            isResettingPlaythrough ||
+            string.IsNullOrEmpty(playthroughId))
+        {
+            return;
+        }
+
+        string accountId = currentAccount.id;
+        string expectedPlaythroughId = playthroughId;
+        int operationGeneration = progressGeneration;
+
+        List<string> levelsToUpload =
+            new List<string>(completedLevels);
+
+        bool tutorialToUpload = tutorialCompleted;
+        string sceneToUpload = lastCampaignScene;
+
+        try
+        {
+            bool success =
+                await FirestoreProgressManager.UploadCampaignProgress(
+                    accountId,
+                    expectedPlaythroughId,
+                    levelsToUpload,
+                    tutorialToUpload,
+                    sceneToUpload
+                );
+
+            if (currentAccount == null ||
+                currentAccount.id != accountId ||
+                playthroughId != expectedPlaythroughId ||
+                progressGeneration != operationGeneration)
+            {
+                return;
+            }
+
+            if (success)
+            {
+                Debug.Log(
+                    "Campaign progress synchronized successfully."
+                );
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "Campaign progress was not synchronized. " +
+                    "Local progress remains saved."
+                );
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning(
+                "Campaign synchronization failed: " + e.Message
+            );
+        }
+    }
+
+
+    private void MergeLocalCampaignProgress(
+        ProgressData localProgress,
+        ProgressData cloudProgress)
+    {
+        if (localProgress == null || cloudProgress == null)
+            return;
+
+        // Never merge progress from different playthroughs.
+        if (string.IsNullOrEmpty(localProgress.playthroughId) ||
+            localProgress.playthroughId != cloudProgress.playthroughId)
+        {
+            return;
+        }
+
+        if (localProgress.completedLevel != null)
+        {
+            foreach (string level in localProgress.completedLevel)
+            {
+                if (!completedLevels.Contains(level))
+                {
+                    completedLevels.Add(level);
+                }
+            }
+        }
+
+        // Tutorial completion should never revert within a playthrough.
+        tutorialCompleted |= localProgress.tutorialCompleted;
+    }
+
 
     public void LoadProgress()
     {
@@ -275,6 +368,7 @@ public class ProgressManager : MonoBehaviour
                 );
 
                 ApplyProgress(localProgress);
+                StartAutomaticQuizSynchronization();
                 return true;
             }
 
@@ -295,14 +389,47 @@ public class ProgressManager : MonoBehaviour
                     );
 
                     ApplyProgress(localProgress);
+
+                    // Preserve campaign progress from Firestore as well.
+                    if (cloudProgress.completedLevel != null)
+                    {
+                        foreach (string level in cloudProgress.completedLevel)
+                        {
+                            if (!completedLevels.Contains(level))
+                            {
+                                completedLevels.Add(level);
+                            }
+                        }
+                    }
+
+                    tutorialCompleted |= cloudProgress.tutorialCompleted;
+
+                    SaveProgress(false);
+
+                    // Upload the merged campaign progress without touching quiz counters.
+                    _ = SyncCampaignProgress();
+
+                    StartAutomaticQuizSynchronization();
                     return true;
                 }
 
                 ApplyProgress(cloudProgress);
 
+                // Restore locally completed levels and tutorial progress,
+                // but only when both saves belong to the same playthrough.
+                MergeLocalCampaignProgress(localProgress, cloudProgress);
+
+                // Preserve locally recorded quiz answers.
                 RestorePendingQuizResults(localProgress, cloudProgress);
 
+                // Save the merged progress locally.
                 SaveProgress(false);
+
+                // Upload the merged campaign progress to Firestore.
+                // Quiz statistics remain managed by their separate synchronization system.
+                _ = SyncCampaignProgress();
+
+                StartAutomaticQuizSynchronization();
 
                 Debug.Log("Loaded progress from Firestore and restored local " + "pending results for: " + currentAccount.username);
 
@@ -322,6 +449,7 @@ public class ProgressManager : MonoBehaviour
             }
 
         LoadProgress();
+        StartAutomaticQuizSynchronization();
         return true;
     }
 
@@ -359,6 +487,23 @@ public class ProgressManager : MonoBehaviour
         if (currentAccount == null)
         {
             Debug.LogError("No active account selected!");
+            return;
+        }
+
+        if (isResettingPlaythrough)
+        {
+            Debug.LogWarning(
+                "Cannot start New Game while a reset is synchronizing."
+            );
+            return;
+        }
+
+        if (pendingNewGameReset)
+        {
+            Debug.LogWarning(
+                "Cannot start another New Game while the previous reset " +
+                "is awaiting Firestore confirmation."
+            );
             return;
         }
 
@@ -433,21 +578,41 @@ public class ProgressManager : MonoBehaviour
         );
     }
 
+
     private async Task UploadNewGameProgress(
         string accountId,
         string oldPlaythroughId,
         string newPlaythroughId,
         int operationGeneration)
     {
+        if (isResettingPlaythrough)
+        {
+            Debug.LogWarning(
+                "New Game upload skipped: Another reset is running."
+            );
+            return;
+        }
+
+        if (currentAccount == null ||
+            currentAccount.id != accountId ||
+            playthroughId != newPlaythroughId ||
+            progressGeneration != operationGeneration)
+        {
+            return;
+        }
+
+        isResettingPlaythrough = true;
+
         try
         {
             ProgressData newProgress = ReadLocalProgress();
 
             if (newProgress == null ||
+                !newProgress.pendingNewGameReset ||
                 newProgress.playthroughId != newPlaythroughId)
             {
                 Debug.LogWarning(
-                    "New Game upload cancelled: Local playthrough changed."
+                    "New Game upload cancelled: Invalid local reset data."
                 );
                 return;
             }
@@ -461,11 +626,6 @@ public class ProgressManager : MonoBehaviour
 
             if (success)
             {
-                Debug.Log(
-                    "New Game synchronized with Firestore: " +
-                    newPlaythroughId
-                );
-
                 ConfirmNewGameReset(
                     accountId,
                     newPlaythroughId,
@@ -475,19 +635,22 @@ public class ProgressManager : MonoBehaviour
             else
             {
                 Debug.LogWarning(
-                    "New Game reset was not confirmed by Firestore. " +
-                    "It remains pending locally."
+                    "New Game reset was not confirmed. It remains pending."
                 );
             }
         }
         catch (System.Exception e)
         {
             Debug.LogWarning(
-                "New Game reset upload failed. It remains pending locally: " +
-                e.Message
+                "New Game reset upload failed: " + e.Message
             );
         }
+        finally
+        {
+            isResettingPlaythrough = false;
+        }
     }
+
 
     public async Task<bool> RetryPendingNewGameReset()
     {
@@ -499,14 +662,14 @@ public class ProgressManager : MonoBehaviour
             return false;
         }
 
-        isResettingPlaythrough = true;
-
         if (currentAccount == null ||
             !pendingNewGameReset ||
             string.IsNullOrEmpty(playthroughId))
         {
             return false;
         }
+
+        isResettingPlaythrough = true;
 
         string accountId = currentAccount.id;
         string newPlaythroughId = playthroughId;
@@ -578,6 +741,103 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
+    public async Task<bool> SynchronizeQuizProgress()
+    {
+        if (currentAccount == null)
+        {
+            Debug.LogWarning(
+                "Automatic synchronization skipped: No active account."
+            );
+            return false;
+        }
+
+        string accountId = currentAccount.id;
+        string activePlaythroughId = playthroughId;
+        int operationGeneration = progressGeneration;
+
+        // Step 1: Recover a pending New Game reset.
+        if (pendingNewGameReset)
+        {
+            bool resetRecovered = await RetryPendingNewGameReset();
+
+            if (!resetRecovered)
+            {
+                Debug.LogWarning(
+                    "Automatic synchronization postponed: " +
+                    "New Game reset is still pending."
+                );
+                return false;
+            }
+        }
+
+        // Step 2: Verify that the account and playthrough
+        // are still the same after the awaited operation.
+        if (currentAccount == null ||
+            currentAccount.id != accountId ||
+            playthroughId != activePlaythroughId ||
+            progressGeneration != operationGeneration)
+        {
+            Debug.LogWarning(
+                "Automatic synchronization cancelled: Session changed."
+            );
+            return false;
+        }
+
+        if (pendingNewGameReset || isResettingPlaythrough)
+        {
+            return false;
+        }
+
+        if (!quizResultLedgerInitialized ||
+            string.IsNullOrEmpty(playthroughId))
+        {
+            Debug.LogWarning(
+                "Automatic synchronization skipped: " +
+                "Quiz result ledger is not initialized."
+            );
+            return false;
+        }
+
+        // Step 3: Upload locally saved quiz results.
+        await SyncPendingQuizResults();
+
+        // Step 4: Verify the session again.
+        if (currentAccount == null ||
+            currentAccount.id != accountId ||
+            playthroughId != activePlaythroughId ||
+            progressGeneration != operationGeneration)
+        {
+            return false;
+        }
+
+        // Step 5: Reconcile local statistics with Firestore.
+        bool reconciled = await ReconcileQuizProgress();
+
+        if (reconciled)
+        {
+            Debug.Log(
+                "Automatic quiz synchronization completed successfully."
+            );
+        }
+
+        return reconciled;
+    }
+
+    private void StartAutomaticQuizSynchronization()
+    {
+        if (currentAccount == null)
+            return;
+
+        if (isAutomaticallySynchronizing)
+            return;
+
+        if (string.IsNullOrEmpty(playthroughId))
+            return;
+
+        _ = SynchronizeQuizProgress();
+    }
+
+
     public async void SyncProgressFromFirestore()
     {
         if (currentAccount == null)
@@ -631,6 +891,18 @@ public class ProgressManager : MonoBehaviour
         SaveProgress(false);
 
         Debug.Log($"Pending quiz result recorded: {type}, Correct: {isCorrect}");
+
+        // Attempt automatic synchronization after recording an answer.
+        // The answer remains saved locally if synchronization fails.
+        if (!pendingNewGameReset &&
+            !isResettingPlaythrough &&
+            !isAutomaticallySynchronizing &&
+            !isSyncingQuizResults &&
+            !isReconcilingProgress &&
+            quizResultLedgerInitialized)
+        {
+            _ = SynchronizeQuizProgress();
+        }
     }
 
     private ProgressData ReadLocalProgress()
@@ -823,6 +1095,12 @@ public class ProgressManager : MonoBehaviour
             return false;
         }
 
+        if (pendingNewGameReset || isResettingPlaythrough)
+        {
+            Debug.LogWarning("Quiz reconciliation skipped: New Game reset is not yet confirmed.");
+            return false;
+        }
+
         isReconcilingProgress = true;
 
         string accountId = currentAccount.id;
@@ -953,6 +1231,12 @@ public class ProgressManager : MonoBehaviour
         if (currentAccount == null)
         {
             Debug.LogWarning("Cannot sync: No active account.");
+            return;
+        }
+
+        if (pendingNewGameReset || isResettingPlaythrough)
+        {
+            Debug.LogWarning("Quiz synchronization skipped: New Game reset is not yet confirmed.");
             return;
         }
 
