@@ -25,4 +25,9 @@ public class ProgressData
     public int trueFalseTotal;
 
     public List<QuizResultData> pendingQuizResults = new List<QuizResultData>();
+
+    public bool quizResultLedgerInitialized = false;
+
+    public bool pendingNewGameReset = false;
+    public string previousPlaythroughId = "";
 }
