@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class HeroStats : MonoBehaviour
 {
+    public static event System.Action OnHpLost;
+    public static event System.Action OnShieldGained;
+    public static event System.Action OnHealed;
+
     public HeroType heroType;
     public GameObject uiObject;
 
@@ -36,6 +40,8 @@ public class HeroStats : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        int previousHP = currentHP;
+
         if (shield > 0)
         {
             int shieldDamage = Mathf.Min(shield, amount);
@@ -51,6 +57,11 @@ public class HeroStats : MonoBehaviour
         else
         {
             currentHP -= amount;
+        }
+
+        if (currentHP < previousHP)
+        {
+            OnHpLost?.Invoke();
         }
 
         if (animationRelay != null && currentHP > 0)
@@ -81,7 +92,13 @@ public class HeroStats : MonoBehaviour
 
         amount = Mathf.Max(0, amount);
 
+        int previousHP = currentHP;
         currentHP = Mathf.Min(currentHP + amount, heroType.maxHp);
+
+        if (currentHP > previousHP)
+        {
+            OnHealed?.Invoke();
+        }
 
         Debug.Log(name + " Healed for" + amount + " | Current HP: " + currentHP);
     }
@@ -96,6 +113,11 @@ public class HeroStats : MonoBehaviour
         amount = Mathf.Max(0, amount);
 
         shield += amount;
+
+        if (amount > 0)
+        {
+            OnShieldGained?.Invoke();
+        }
 
         Debug.Log(name + " gained " + amount + " shield | Total Shield: " + shield);
     }

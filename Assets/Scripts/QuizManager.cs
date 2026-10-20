@@ -12,6 +12,7 @@ public class QuizManager : MonoBehaviour
 {
     public event Action OnQuizOpened;
     public event Action OnQuizInfoOpened;
+    public event Action<bool> OnAnswerEvaluated;
 
     public GameObject quizPanel;
     public GameObject cardPanel;
@@ -220,6 +221,7 @@ public class QuizManager : MonoBehaviour
 
         bool correct = index == currentQuestion.correctIndex;
 
+        OnAnswerEvaluated?.Invoke(correct);
         Debug.Log(correct ? "Correct!" : "Incorrect");
 
         if (correct)
@@ -244,6 +246,7 @@ public class QuizManager : MonoBehaviour
 
         bool isCorrect = userAnswer == correct;
 
+        OnAnswerEvaluated?.Invoke(isCorrect);
         Debug.Log(isCorrect ? "Correct" : "Incorrect");
         if (isCorrect)
         {
@@ -264,6 +267,7 @@ public class QuizManager : MonoBehaviour
 
         bool correct = playerAnswer == currentQuestion.correctBool;
 
+        OnAnswerEvaluated?.Invoke(correct);
         Debug.Log(correct ? "Correct" : "Incorrect");
 
         if (correct)

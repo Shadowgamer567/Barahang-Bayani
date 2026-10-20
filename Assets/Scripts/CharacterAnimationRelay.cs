@@ -4,6 +4,7 @@ using System;
 public class CharacterAnimationRelay : MonoBehaviour
 {
     public event Action OnActionAnimationComplete;
+    public static event Action<CharacterAnimationType> OnAnimationPlayed;
 
     [Header("Animator")]
     public Animator animator;
@@ -66,6 +67,8 @@ public class CharacterAnimationRelay : MonoBehaviour
                 animator.Play(deathState);
                 break;
         }
+
+        OnAnimationPlayed?.Invoke(type);
     }
 
     public void OnCardAnimationComplete()

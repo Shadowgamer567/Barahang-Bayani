@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
 {
+    public static event System.Action OnHpLost;
+    public static event System.Action OnShieldGained;
+    public static event System.Action OnHealed;
+
     public EnemyTypes enemyType;
     public GameObject uiObject;
     public EnemyUI ui;
@@ -98,6 +102,7 @@ public class EnemyStats : MonoBehaviour
     public void TakeDamage(int amount)
     {
         Debug.Log(name + " RECEIVED DAMAGE CALL");
+        int previousHP = currentHP;
 
         if (shield > 0)
         {
@@ -120,6 +125,11 @@ public class EnemyStats : MonoBehaviour
 
         currentHP = Mathf.Max(currentHP, 0);
         shield = Mathf.Max(shield, 0);
+
+        if (currentHP < previousHP)
+        {
+            OnHpLost?.Invoke();
+        }
 
         Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
 
@@ -175,13 +185,26 @@ public class EnemyStats : MonoBehaviour
         }
 
         amount = Mathf.Max(0, amount);
+        int previousHP = currentHP;
         currentHP = Mathf.Min(currentHP + amount, enemyType.maxHp);
+
+        if (currentHP > previousHP)
+        {
+            OnHealed?.Invoke();
+        }
+
         Debug.Log(name + " healed for: " + amount);
     }
 
     public void AddShield(int amount)
     {
         shield += amount;
+
+        if (amount > 0)
+        {
+            OnShieldGained?.Invoke();
+        }
+
         Debug.Log(name + " gained shield " + amount);
     }
 

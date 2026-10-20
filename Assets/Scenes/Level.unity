@@ -34279,6 +34279,7 @@ GameObject:
   - component: {fileID: 1483837069}
   - component: {fileID: 1483837071}
   - component: {fileID: 1483837070}
+  - component: {fileID: 1483837072}
   m_Layer: 5
   m_Name: QuizManager
   m_TagString: Untagged
@@ -34459,6 +34460,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1483837067}
   m_CullTransparentMesh: 1
+--- !u!114 &1483837072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483837067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 042f698c8f9c5fc4486d8ce269955f1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnswerSound
+  correctAnswerSound: {fileID: 8300000, guid: bfc40e027cbd5b94993a10200706da1c, type: 3}
+  incorrectAnswerSound: {fileID: 8300000, guid: 3adacbe9e600cf7458298358a6283336, type: 3}
 --- !u!1 &1488091248
 GameObject:
   m_ObjectHideFlags: 0
@@ -41979,6 +41994,7 @@ GameObject:
   - component: {fileID: 1839832274}
   - component: {fileID: 1839832276}
   - component: {fileID: 1839832275}
+  - component: {fileID: 1839832277}
   m_Layer: 0
   m_Name: BattleController
   m_TagString: Untagged
@@ -42160,6 +42176,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1839832277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1839832271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7de40b7050acfc14f88c439e63a00717, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleSound
+  hpLostSound: {fileID: 8300000, guid: afb2f3045cb3c1a43a44f5a87a4cedf2, type: 3}
+  hpLostVolume: 0.51
+  shieldGainedSound: {fileID: 8300000, guid: ebc4cd1d01846c04897fb252aa681498, type: 3}
+  shieldGainedVolume: 0.45
+  healedSound: {fileID: 8300000, guid: bf1387388643a464cbf4bcb125b5ec96, type: 3}
+  healedVolume: 1
+  deathSound: {fileID: 8300000, guid: c71428f3c9024da408e211000dd3c7d9, type: 3}
+  deathVolume: 1.51
+  actionSound: {fileID: 0}
+  actionVolume: 1
+  hitSound: {fileID: 8300000, guid: b05c6f8f111b78d4a90cbe6fbf9f4bbd, type: 3}
+  hitVolume: 1
+  attackSound: {fileID: 8300000, guid: 003dbfb7e79a9d6449e746880415ea66, type: 3}
+  attackVolume: 1
 --- !u!1 &1840773473
 GameObject:
   m_ObjectHideFlags: 0
