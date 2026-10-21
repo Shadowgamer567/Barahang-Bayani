@@ -41,6 +41,18 @@ public class FirestoreAccountManager : MonoBehaviour
         Debug.Log("Uploaded Account: " + account.username);
     }
 
+    public static async Task<bool> IsAccountUploaded(string accountID)
+    {
+        DocumentReference accountRef = FirestoreManager.Instance
+            .AccountsCollection()
+            .Document(accountID);
+
+        DocumentSnapshot snapshot =
+            await accountRef.GetSnapshotAsync(Source.Server);
+
+        return snapshot.Exists;
+    }
+
     public async Task DownloadAccounts()
     {
         string classroomID = DatabaseManager.Instance.CurrentDatabase;
@@ -49,6 +61,11 @@ public class FirestoreAccountManager : MonoBehaviour
             .AccountsCollection()
             .GetSnapshotAsync();
 
+        // Preserve accounts created locally but not yet uploaded.
+        List<AccountData> pendingLocalAccounts = AccountManager.Instance.registry.accounts.FindAll(
+            account => AccountManager.Instance.IsAccountPendingUpload(account.id));
+
+        // Rebuild the registry from Firestore.
         AccountManager.Instance.registry.accounts.Clear();
 
         foreach(DocumentSnapshot doc in snapshot.Documents)
@@ -87,11 +104,27 @@ public class FirestoreAccountManager : MonoBehaviour
             AccountManager.Instance.registry.accounts.Add(account);
         }
 
+        // Restore pending local accounts that were not in Firestore.
+        foreach (AccountData pendingAccount in pendingLocalAccounts)
+        {
+            bool alreadyExists =
+                AccountManager.Instance.registry.accounts.Exists(
+                    account => account.id == pendingAccount.id
+                );
+
+            if (!alreadyExists)
+            {
+                AccountManager.Instance.registry.accounts.Add(pendingAccount);
+            }
+        }
+
         AccountManager.Instance.SaveAccount();
 
         AccountManager.Instance.RefreshUI();
 
         Debug.Log("Downloaded " + snapshot.Documents.Count() + " accounts.");
+
+        await AccountManager.Instance.SynchronizePendingAccounts();
     }
 
     public async void TestDownloadAccounts()

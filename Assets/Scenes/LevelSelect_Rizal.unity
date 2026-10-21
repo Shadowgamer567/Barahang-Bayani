@@ -4782,7 +4782,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 766557940}
+      - m_Target: {fileID: 1338983233}
         m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
@@ -5598,7 +5598,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 766557940}
+      - m_Target: {fileID: 1498966628}
         m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
@@ -5924,7 +5924,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 766557940}
+      - m_Target: {fileID: 1576158424}
         m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
@@ -6299,7 +6299,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 766557940}
+      - m_Target: {fileID: 1717845127}
         m_TargetAssemblyTypeName: LevelButton, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1

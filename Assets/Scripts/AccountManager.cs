@@ -93,11 +93,15 @@ public class AccountManager : MonoBehaviour
     public TMP_InputField confirmPasswordInputField;
     public Button confirmAccountRecoveryButton;
 
-
     private string pendingRecoveryCode;
     private bool creatingAccount = false;
+    private bool synchronizingPendingAccounts = false;
 
     private string registryPath => Application.persistentDataPath + "/accounts.json";
+
+    private string pendingAccountsPath => Application.persistentDataPath + "/pending_accounts.json";
+
+    private PendingAccountUploads pendingAccountUploads = new PendingAccountUploads();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -120,6 +124,9 @@ public class AccountManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        EnsureAccountsFileExists();
+        LoadPendingAccountUploads();
     }
 
     public void LoadAccount()
@@ -166,71 +173,85 @@ public class AccountManager : MonoBehaviour
         }
     }
 
-    public async Task<bool> CreateAccount(AccountType type)
+    public Task<bool> CreateAccount(AccountType type)
     {
         string username = usernameInputField.text.Trim();
 
         if (string.IsNullOrWhiteSpace(username))
         {
             Debug.LogWarning("No Username Entered");
-            return false;
+            return Task.FromResult(false);
         }
-
-        AccountData newAccount = new AccountData();
-
-        newAccount.id = System.Guid.NewGuid().ToString();
-
-        newAccount.username = username;
 
         string password = passwordInputField.text.Trim();
 
         if (string.IsNullOrWhiteSpace(password))
         {
             Debug.LogWarning("No Password Entered");
-            return false;
+            return Task.FromResult(false);
         }
 
-        newAccount.passwordHash = HashPassword(password);
+        AccountData newAccount = new AccountData();
 
+        newAccount.id = System.Guid.NewGuid().ToString();
+        newAccount.username = username;
+        newAccount.passwordHash = HashPassword(password);
         newAccount.accountType = type;
 
-        // Generate recovery code.
         string recoveryCode = GenerateRecoveryCode();
 
-        //Temp store the readeable code for display 
-        pendingRecoveryCode = recoveryCode;
-
-        //store hashed code in account 
         newAccount.recoveryCodeHash = HashRecoveryCode(recoveryCode);
         newAccount.recoveryCodeEnabled = true;
 
         try
         {
-            // Wait for Firestore to save the account successfully.
-            await FirestoreAccountManager.UploadAccount(newAccount);
-
-            // Only register the account locally after a successful upload.
+            // Save locally first, without waiting for Firestore.
             registry.accounts.Add(newAccount);
 
-            SaveAccount();
+            // Record the account as awaiting Firestore upload.
+            pendingAccountUploads.accountIDs.Add(newAccount.id);
 
-            Debug.Log("Created Account: " + newAccount.username);
+            try
+            {
+                SavePendingAccountUploads();
+                SaveAccount();
+            }
+
+            catch
+            {
+                pendingAccountUploads.accountIDs.Remove(newAccount.id);
+                SavePendingAccountUploads();
+                throw;
+            }
+
+            // Only expose the recovery code after local saving succeeds.
+            pendingRecoveryCode = recoveryCode;
+
+            Debug.Log(
+                "Created account locally: " + newAccount.username
+            );
         }
         catch (System.Exception ex)
         {
-            Debug.LogError("Account creation failed during saving: " + ex.Message);
+            registry.accounts.Remove(newAccount);
 
             pendingRecoveryCode = null;
 
-            return false;
+            Debug.LogError(
+                "Failed to save account locally: " + ex.Message
+            );
+
+            return Task.FromResult(false);
         }
 
         usernameInputField.text = "";
         passwordInputField.text = "";
 
         RefreshUI();
-        return true;
+
+        return Task.FromResult(true);
     }
+
 
     public void DeleteSelected()
     {
@@ -256,6 +277,12 @@ public class AccountManager : MonoBehaviour
 
         selectedAccount = null;
         selectedCard = null;
+
+        if (IsAccountPendingUpload(selectedAccount.id))
+        {
+            Debug.LogWarning("Cannot delete an account while its initial upload is pending.");
+            return;
+        }
 
         SaveAccount();
 
@@ -348,6 +375,17 @@ public class AccountManager : MonoBehaviour
                 return;
             }
 
+            // Prevent additional submissions after successful creation.
+            Button submitButton = null;
+
+            if (usernameInputField != null)
+            {
+                submitButton = usernameInputField.GetComponentInParent<Button>();
+            }
+
+            // The account has already been created successfully.
+            // Keep the submission guard active until the recovery code is confirmed.
+
             // Display the generated recovery code.
             recoveryCodeText.text = pendingRecoveryCode;
 
@@ -355,13 +393,19 @@ public class AccountManager : MonoBehaviour
 
             Debug.Log("Account created. Recovery code displayed.");
         }
+
         catch (System.Exception ex)
         {
             Debug.LogError("Unexpected account creation error: " + ex.Message);
         }
+
         finally
         {
-            creatingAccount = false;
+            // Keep submissions blocked while the recovery code is displayed.
+            if (!accountRecoveryDisplay.activeSelf)
+            {
+                creatingAccount = false;
+            }
         }
     }
 
@@ -370,6 +414,8 @@ public class AccountManager : MonoBehaviour
         pendingRecoveryCode = null;
 
         recoveryCodeText.text = "";
+
+        creatingAccount = false;
 
         accountRecoveryDisplay.SetActive(false);
 
@@ -800,7 +846,6 @@ public class AccountManager : MonoBehaviour
         }
     }
 
-
     private void LoadTeacherStats(AccountData teacher)
     {
         string path = Application.persistentDataPath + "/progress_" + teacher.id + ".json";
@@ -930,6 +975,117 @@ public class AccountManager : MonoBehaviour
     public void SelectTeacherStudent(AccountCardUI card)
     {
         OpenStudentInfo(card.GetAccountData());
+    }
+
+    private void LoadPendingAccountUploads()
+    {
+        if (!File.Exists(pendingAccountsPath))
+        {
+            pendingAccountUploads = new PendingAccountUploads();
+            return;
+        }
+
+        string json = File.ReadAllText(pendingAccountsPath);
+
+        pendingAccountUploads =
+            JsonUtility.FromJson<PendingAccountUploads>(json)
+            ?? new PendingAccountUploads();
+
+        if (pendingAccountUploads.accountIDs == null)
+            pendingAccountUploads.accountIDs = new List<string>();
+    }
+
+    private void SavePendingAccountUploads()
+    {
+        string json = JsonUtility.ToJson(pendingAccountUploads, true);
+        File.WriteAllText(pendingAccountsPath, json);
+    }
+
+    public bool IsAccountPendingUpload(string accountID)
+    {
+        return pendingAccountUploads.accountIDs.Contains(accountID);
+    }
+
+    public async Task SynchronizePendingAccounts()
+    {
+        if (synchronizingPendingAccounts)
+            return;
+
+        if (pendingAccountUploads.accountIDs.Count == 0)
+            return;
+
+        if (FirestoreManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "Account synchronization skipped: Firestore is not initialized."
+            );
+            return;
+        }
+
+        synchronizingPendingAccounts = true;
+
+        try
+        {
+            // Snapshot the queue so changes do not affect iteration.
+            List<string> pendingIDs =
+                new List<string>(pendingAccountUploads.accountIDs);
+
+            foreach (string accountID in pendingIDs)
+            {
+                AccountData account = registry.accounts.Find(
+                    a => a.id == accountID
+                );
+
+                if (account == null)
+                {
+                    Debug.LogWarning(
+                        "Pending account not found locally: " + accountID
+                    );
+
+                    // Keep the pending ID for investigation.
+                    continue;
+                }
+
+                try
+                {
+                    await FirestoreAccountManager.UploadAccount(account);
+
+                    // Verify that the account exists on the server.
+                    bool uploaded = await FirestoreAccountManager.IsAccountUploaded(accountID);
+
+                    if (!uploaded)
+                    {
+                        Debug.LogWarning(
+                            "Account upload not yet confirmed by Firestore: " +
+                            account.username
+                        );
+
+                        continue;
+                    }
+
+                    // Remove only after Firestore confirms the upload.
+                    pendingAccountUploads.accountIDs.Remove(accountID);
+                    SavePendingAccountUploads();
+
+                    Debug.Log(
+                        "Pending account synchronized: " + account.username
+                    );
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning(
+                        "Account synchronization failed for " +
+                        account.username + ": " + ex.Message
+                    );
+
+                    // Preserve the pending entry for the next attempt.
+                }
+            }
+        }
+        finally
+        {
+            synchronizingPendingAccounts = false;
+        }
     }
 
     public void ConnectUI(AccountUIReferences ui)
@@ -1184,4 +1340,10 @@ public class AccountManager : MonoBehaviour
     {
 
     }
+}
+
+[System.Serializable]
+public class PendingAccountUploads
+{
+    public List<string> accountIDs = new List<string>();
 }
