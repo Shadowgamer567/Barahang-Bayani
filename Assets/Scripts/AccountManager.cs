@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Threading.Tasks;
 
 public class AccountManager : MonoBehaviour
 {
@@ -946,6 +948,16 @@ public class AccountManager : MonoBehaviour
 
         quizStatsText.text = "Multiple Choice: " + data.multipleChoiceCorrect + "/" + data.multipleChoiceTotal + "\n\n" + "Identification: " + data.identificationCorrect + "/" + data.identificationTotal + "\n\n" + "True/False: " + data.trueFalseCorrect + "/" + data.trueFalseTotal;
     }
+    public void CloseStudentInfo()
+    {
+        if (studentInfoPanel == null || !studentInfoPanel.activeSelf)
+            return;
+
+        studentInfoPanel.SetActive(false);
+
+        Debug.Log("Student Information Panel closed.");
+    }
+
     public void CloseAccountMenu()
     {
         waitingToStartGame = false;
@@ -1338,7 +1350,37 @@ public class AccountManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (studentInfoPanel == null || !studentInfoPanel.activeInHierarchy)
+            return;
 
+        if (Mouse.current == null ||
+            !Mouse.current.leftButton.wasPressedThisFrame)
+            return;
+
+        if (EventSystem.current == null)
+            return;
+
+        // Check which UI elements were clicked.
+        PointerEventData pointerData =
+            new PointerEventData(EventSystem.current);
+
+        pointerData.position = Mouse.current.position.ReadValue();
+
+        List<RaycastResult> results = new List<RaycastResult>();
+
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            // Ignore clicks on scrollable UI controls.
+            if (result.gameObject.GetComponentInParent<ScrollRect>() != null &&
+                result.gameObject.transform.IsChildOf(studentInfoPanel.transform))
+            {
+                return;
+            }
+        }
+
+        CloseStudentInfo();
     }
 }
 
