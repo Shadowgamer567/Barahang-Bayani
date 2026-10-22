@@ -104,6 +104,11 @@ public class AccountManager : MonoBehaviour
     private string pendingAccountsPath => Application.persistentDataPath + "/pending_accounts.json";
 
     private PendingAccountUploads pendingAccountUploads = new PendingAccountUploads();
+    private string pendingAssignmentsPath => Application.persistentDataPath + "/pending_assignments.json";
+
+    private PendingAccountUploads pendingAssignmentUploads = new PendingAccountUploads();
+
+    private bool synchronizingAssignments = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -129,6 +134,7 @@ public class AccountManager : MonoBehaviour
 
         EnsureAccountsFileExists();
         LoadPendingAccountUploads();
+        LoadPendingAssignmentUploads();
     }
 
     public void LoadAccount()
@@ -447,17 +453,20 @@ public class AccountManager : MonoBehaviour
         if (assigningStudents)
         {
             if (clickedAccount.accountType != AccountType.Student)
-            {
                 return;
-            }
 
-            if (pendingStudents.Contains(clickedAccount))
+            bool alreadySelected = pendingStudents.Exists(
+                student => student.id == clickedAccount.id
+            );
+
+            if (alreadySelected)
             {
-                pendingStudents.Remove(clickedAccount);
+                pendingStudents.RemoveAll(
+                    student => student.id == clickedAccount.id
+                );
 
                 card.SetSelected(false);
             }
-
             else
             {
                 pendingStudents.Add(clickedAccount);
@@ -465,7 +474,7 @@ public class AccountManager : MonoBehaviour
                 card.SetSelected(true);
             }
 
-                return;
+            return;
         }
 
         if (selectedCard != null)
@@ -675,13 +684,39 @@ public class AccountManager : MonoBehaviour
             return;
 
         assigningStudents = true;
-
         assigningTeacher = selectedAccount;
 
         pendingStudents.Clear();
 
-        assignStudentsButton.SetActive(false);
+        if (assigningTeacher.assignedStudentIDs == null)
+            assigningTeacher.assignedStudentIDs = new List<string>();
 
+        // Start with students already assigned to this teacher.
+        foreach (AccountData student in registry.accounts)
+        {
+            if (student.accountType == AccountType.Student &&
+                assigningTeacher.assignedStudentIDs.Contains(student.id))
+            {
+                pendingStudents.Add(student);
+            }
+        }
+
+        // Highlight students currently selected for assignment.
+        foreach (Transform child in studentContainer)
+        {
+            AccountCardUI card = child.GetComponent<AccountCardUI>();
+
+            if (card == null)
+                continue;
+
+            AccountData student = card.GetAccountData();
+
+            card.SetSelected(
+                pendingStudents.Exists(s => s.id == student.id)
+            );
+        }
+
+        assignStudentsButton.SetActive(false);
         confirmAssignButton.SetActive(true);
 
         Debug.Log("Assignment Mode Started");
@@ -692,26 +727,35 @@ public class AccountManager : MonoBehaviour
         if (assigningTeacher == null)
             return;
 
-        assigningTeacher.assignedStudentIDs.Clear();
+        if (assigningTeacher.assignedStudentIDs == null)
+            assigningTeacher.assignedStudentIDs = new List<string>();
 
-        foreach (AccountData student in pendingStudents)
-        {
-            assigningTeacher.assignedStudentIDs.Add(student.id);
-        }
+        // Save the final selection, including existing assignments
+        // that were not deselected.
+        assigningTeacher.assignedStudentIDs =
+            pendingStudents.ConvertAll(student => student.id);
 
         SaveAccount();
+        QueueAssignmentUpload(assigningTeacher.id);
 
         assigningStudents = false;
-
         assigningTeacher = null;
 
         pendingStudents.Clear();
 
         assignStudentsButton.SetActive(true);
-
         confirmAssignButton.SetActive(false);
 
-        Debug.Log("Students Assigned");
+        // Clear temporary selection colors.
+        foreach (Transform child in studentContainer)
+        {
+            AccountCardUI card = child.GetComponent<AccountCardUI>();
+
+            if (card != null)
+                card.SetSelected(false);
+        }
+
+        Debug.Log("Student assignments updated.");
     }
 
     public void PromptForAccountThenStartGame()
@@ -1005,6 +1049,132 @@ public class AccountManager : MonoBehaviour
 
         if (pendingAccountUploads.accountIDs == null)
             pendingAccountUploads.accountIDs = new List<string>();
+    }
+
+    private void LoadPendingAssignmentUploads()
+    {
+        if (!File.Exists(pendingAssignmentsPath))
+        {
+            pendingAssignmentUploads = new PendingAccountUploads();
+            return;
+        }
+
+        string json = File.ReadAllText(pendingAssignmentsPath);
+
+        pendingAssignmentUploads =
+            JsonUtility.FromJson<PendingAccountUploads>(json)
+            ?? new PendingAccountUploads();
+
+        if (pendingAssignmentUploads.accountIDs == null)
+            pendingAssignmentUploads.accountIDs = new List<string>();
+    }
+
+    private void SavePendingAssignmentUploads()
+    {
+        string json = JsonUtility.ToJson(
+            pendingAssignmentUploads, true
+        );
+
+        File.WriteAllText(pendingAssignmentsPath, json);
+    }
+
+    public bool IsAssignmentPendingUpload(string accountID)
+    {
+        return pendingAssignmentUploads.accountIDs.Contains(accountID);
+    }
+
+    public void QueueAssignmentUpload(string teacherID)
+    {
+        if (!pendingAssignmentUploads.accountIDs.Contains(teacherID))
+        {
+            pendingAssignmentUploads.accountIDs.Add(teacherID);
+            SavePendingAssignmentUploads();
+        }
+
+        _ = SynchronizePendingAssignments();
+    }
+
+    public async Task SynchronizePendingAssignments()
+    {
+        if (synchronizingAssignments)
+            return;
+
+        if (pendingAssignmentUploads.accountIDs.Count == 0)
+            return;
+
+        if (FirestoreManager.Instance == null)
+            return;
+
+        synchronizingAssignments = true;
+
+        try
+        {
+            List<string> pendingIDs = new List<string>(
+                pendingAssignmentUploads.accountIDs
+            );
+
+            foreach (string teacherID in pendingIDs)
+            {
+                AccountData teacher = registry.accounts.Find(
+                    a => a.id == teacherID
+                );
+
+                if (teacher == null)
+                    continue;
+
+                // An account still awaiting its initial creation upload
+                // will be handled by the existing account queue.
+                if (IsAccountPendingUpload(teacherID))
+                    continue;
+
+                try
+                {
+                    List<string> assignmentSnapshot =
+                        new List<string>(teacher.assignedStudentIDs);
+
+                    await FirestoreAccountManager.UploadAssignments(
+                        teacherID,
+                        assignmentSnapshot
+                    );
+
+                    bool verified =
+                        await FirestoreAccountManager.VerifyAssignments(
+                            teacherID,
+                            assignmentSnapshot
+                        );
+
+                    if (!verified)
+                        continue;
+
+                    // Don't clear the pending entry if the user changed
+                    // assignments while this upload was in progress.
+                    if (!new HashSet<string>(teacher.assignedStudentIDs)
+                        .SetEquals(assignmentSnapshot))
+                    {
+                        continue;
+                    }
+
+                    pendingAssignmentUploads.accountIDs.Remove(teacherID);
+                    SavePendingAssignmentUploads();
+
+                    Debug.Log(
+                        "Teacher assignments synchronized: " +
+                        teacher.username
+                    );
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning(
+                        "Assignment sync pending for " +
+                        teacher.username + ": " + ex.Message
+                    );
+                }
+            }
+        }
+        finally
+        {
+            synchronizingAssignments = false;
+        }
     }
 
     private void SavePendingAccountUploads()

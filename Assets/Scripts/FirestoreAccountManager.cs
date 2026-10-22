@@ -65,6 +65,18 @@ public class FirestoreAccountManager : MonoBehaviour
         List<AccountData> pendingLocalAccounts = AccountManager.Instance.registry.accounts.FindAll(
             account => AccountManager.Instance.IsAccountPendingUpload(account.id));
 
+        // Preserve unsynchronized teacher assignments.
+        Dictionary<string, List<string>> pendingAssignments =
+            new Dictionary<string, List<string>>();
+
+        foreach (AccountData account in AccountManager.Instance.registry.accounts)
+        {
+            if (account.accountType == AccountType.Teacher && AccountManager.Instance.IsAssignmentPendingUpload(account.id))
+            {
+                pendingAssignments[account.id] = new List<string>(account.assignedStudentIDs);
+            }
+        }
+
         // Rebuild the registry from Firestore.
         AccountManager.Instance.registry.accounts.Clear();
 
@@ -102,6 +114,13 @@ public class FirestoreAccountManager : MonoBehaviour
             }
 
             AccountManager.Instance.registry.accounts.Add(account);
+
+            // Local unsynchronized assignments take priority over
+            // older Firestore assignments.
+            if (pendingAssignments.TryGetValue(account.id, out List<string> localAssignments))
+            {
+                account.assignedStudentIDs = new List<string>(localAssignments);
+            }
         }
 
         // Restore pending local accounts that were not in Firestore.
@@ -125,6 +144,51 @@ public class FirestoreAccountManager : MonoBehaviour
         Debug.Log("Downloaded " + snapshot.Documents.Count() + " accounts.");
 
         await AccountManager.Instance.SynchronizePendingAccounts();
+        await AccountManager.Instance.SynchronizePendingAssignments();
+    }
+
+    public static async Task UploadAssignments(
+    string teacherID,
+    List<string> studentIDs)
+    {
+        DocumentReference teacherRef =
+            FirestoreManager.Instance
+                .AccountsCollection()
+                .Document(teacherID);
+
+        await teacherRef.UpdateAsync(
+            "assignedStudentIDs",
+            studentIDs
+        );
+
+        Debug.Log("Uploaded assignments for teacher: " + teacherID);
+    }
+
+    public static async Task<bool> VerifyAssignments(
+        string teacherID,
+        List<string> expectedIDs)
+    {
+        DocumentSnapshot snapshot =
+            await FirestoreManager.Instance
+                .AccountsCollection()
+                .Document(teacherID)
+                .GetSnapshotAsync(Source.Server);
+
+        if (!snapshot.Exists ||
+            !snapshot.ContainsField("assignedStudentIDs"))
+        {
+            return false;
+        }
+
+        List<object> storedIDs =
+            snapshot.GetValue<List<object>>("assignedStudentIDs");
+
+        HashSet<string> actual =
+            new HashSet<string>(
+                storedIDs.ConvertAll(item => item.ToString())
+            );
+
+        return actual.SetEquals(expectedIDs);
     }
 
     public async void TestDownloadAccounts()
