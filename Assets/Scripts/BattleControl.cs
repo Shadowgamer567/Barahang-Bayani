@@ -50,6 +50,18 @@ public class BattleControl : MonoBehaviour
 
     private CharacterAnimationRelay activeCardAnimationRelay;
 
+    public bool IsTargetingEnemies =>
+    isSelectingTarget &&
+    pendingCard != null &&
+    (pendingCard.effectType == CardEffectType.Damage ||
+     pendingCard.effectType == CardEffectType.Debuff);
+
+    public bool IsTargetingHeroes =>
+        isSelectingTarget &&
+        pendingCard != null &&
+        (pendingCard.effectType == CardEffectType.Heal ||
+         pendingCard.effectType == CardEffectType.Shield);
+
     EnemyStats[] enemies;
     HeroStats[] heroes;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -735,49 +747,70 @@ public class BattleControl : MonoBehaviour
 
     public void SelectEnemyTarget(EnemyStats enemy)
     {
-        Debug.Log("SelectEnemyTarget Called");
-
-        if(enemy == null || enemy.IsDead())
+        if (!isSelectingTarget ||
+            pendingCard == null ||
+            pendingHero == null ||
+            enemy == null ||
+            enemy.IsDead())
         {
             return;
         }
 
-        if (!isSelectingTarget || pendingCard == null)
+        // Only Damage and Debuff may target enemies.
+        if (pendingCard.effectType != CardEffectType.Damage &&
+            pendingCard.effectType != CardEffectType.Debuff)
         {
-            Debug.Log("Blocked: selecting=" + isSelectingTarget + " pending=" + pendingCard);
             return;
         }
+
+        ResolveSingleTarget(enemy, null);
+    }
+
+    public void SelectHeroTarget(HeroStats hero)
+    {
+        if (!isSelectingTarget ||
+            pendingCard == null ||
+            pendingHero == null ||
+            hero == null ||
+            hero.IsDead())
+        {
+            return;
+        }
+
+        // Only Heal and Shield may target heroes.
+        if (pendingCard.effectType != CardEffectType.Heal && pendingCard.effectType != CardEffectType.Shield)
+        {
+            return;
+        }
+
+        ResolveSingleTarget(null, hero);
+    }
+
+    private void ResolveSingleTarget(EnemyStats targetEnemy, HeroStats targetHero)
+    {
+        CardType card = pendingCard;
+        HeroStats actingHero = pendingHero;
+
+        CharacterAnimationType animation =
+            card.effectType == CardEffectType.Damage ||
+            card.effectType == CardEffectType.Debuff
+            ? CharacterAnimationType.Attack
+            : CharacterAnimationType.Action;
+
+        BeginCardAnimation(actingHero, animation);
+
+        // ExecuteCardEffect already applies the correct effect
+        // and consumes player modifiers for numerical actions.
+        ExecuteCardEffect(card, actingHero, targetHero: targetHero, targetEnemy: targetEnemy);
+
+        isSelectingTarget = false;
+        pendingCard = null;
+        pendingHero = null;
 
         if (selectTargetPanel != null)
         {
             selectTargetPanel.SetActive(false);
         }
-
-        /*foreach (EnemyStats e in enemies)
-        {
-            if (e != null)
-            {
-                e.SetHighlighted(false);
-            }
-        }*/
-
-        CardType usedCard = pendingCard;
-
-        Debug.Log("Applying Damage: " + pendingCard.damage);
-
-        Debug.Log("TARGET CLICKED: " + enemy.name);
-        Debug.Log("Pending damage: " + pendingCard.damage);
-
-        if (pendingHero != null && pendingHero.gameObject.activeInHierarchy)
-        {
-            BeginCardAnimation(pendingHero, CharacterAnimationType.Attack);
-        }
-
-        enemy.TakeDamage(pendingCard.damage);
-
-        isSelectingTarget = false;
-        pendingCard = null;
-        pendingHero = null;
 
         if (cardPanel != null)
         {
@@ -830,7 +863,8 @@ public class BattleControl : MonoBehaviour
             StartCoroutine(NextBattle());
         }*/
 
-        if (Mouse.current.leftButton.wasPressedThisFrame) {
+        if (isSelectingTarget && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && Camera.main != null)
+        {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -839,24 +873,21 @@ public class BattleControl : MonoBehaviour
 
                 EnemyStats enemy = hit.collider.GetComponentInParent<EnemyStats>();
 
-                if(enemy != null)
+                HeroStats hero = hit.collider.GetComponentInParent<HeroStats>();
+
+                if (enemy != null)
                 {
                     SelectEnemyTarget(enemy);
                 }
-            }
+                else if (hero != null)
 
-            else
-            {
-                Debug.Log("Nothing Hit");
+                {
+                    SelectHeroTarget(hero);
+                }
             }
         }
 
-        if (isLevelFinished)
-        {
-            return;
-        }
 
-        UpdateUI();
     }
 
     void UpdateUI()

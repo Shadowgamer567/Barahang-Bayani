@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Test
-  cardShortDesc: Grant the User 5 Shield
+  cardShortDesc: 'Heal 5 Health
+
+'
   cardFullDesc: 
   cardImage: {fileID: 0}
-  effectType: 2
-  targetType: 3
+  effectType: 1
+  targetType: 1
   damage: 5
   cost: 1
   quizCard: 0

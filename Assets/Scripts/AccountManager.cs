@@ -360,7 +360,58 @@ public class AccountManager : MonoBehaviour
             Debug.Log("Spawned UI Card for: " + account.username);
         }
 
+        RefreshAccountHighlights();
         Debug.Log("RefreshUI Finished");
+    }
+
+    public void RefreshAccountHighlights()
+    {
+        string activeAccountID =
+            CurrentAccount.ActiveAccount != null
+            ? CurrentAccount.ActiveAccount.id
+            : null;
+
+        RefreshContainerHighlights(studentContainer, activeAccountID);
+        RefreshContainerHighlights(teacherContainer, activeAccountID);
+    }
+
+    private void RefreshContainerHighlights(
+        Transform container,
+        string activeAccountID)
+    {
+        if (container == null)
+            return;
+
+        foreach (Transform child in container)
+        {
+            AccountCardUI card = child.GetComponent<AccountCardUI>();
+
+            if (card == null)
+                continue;
+
+            AccountData account = card.GetAccountData();
+
+            if (account == null)
+                continue;
+
+            bool shouldHighlight;
+
+            if (assigningStudents &&
+                account.accountType == AccountType.Student)
+            {
+                shouldHighlight = pendingStudents.Exists(
+                    student => student.id == account.id
+                );
+            }
+            else
+            {
+                shouldHighlight =
+                    !string.IsNullOrEmpty(activeAccountID) &&
+                    account.id == activeAccountID;
+            }
+
+            card.SetSelected(shouldHighlight);
+        }
     }
 
     public async void SubmitUsername()
@@ -477,14 +528,9 @@ public class AccountManager : MonoBehaviour
             return;
         }
 
-        if (selectedCard != null)
-        {
-            selectedCard.SetSelected(false);
-        }
-
         selectedCard = card;
 
-        selectedCard.SetSelected(true);
+        RefreshAccountHighlights();
 
         pendingLoginAccount = card.GetAccountData();
 
@@ -517,6 +563,8 @@ public class AccountManager : MonoBehaviour
         CurrentAccount.ActiveAccount = selectedAccount;
 
         ProgressManager.Instance.SetActiveAccount(selectedAccount);
+
+        RefreshAccountHighlights();
 
         loginPanel.SetActive(false);
 
@@ -747,13 +795,7 @@ public class AccountManager : MonoBehaviour
         confirmAssignButton.SetActive(false);
 
         // Clear temporary selection colors.
-        foreach (Transform child in studentContainer)
-        {
-            AccountCardUI card = child.GetComponent<AccountCardUI>();
-
-            if (card != null)
-                card.SetSelected(false);
-        }
+        RefreshAccountHighlights();
 
         Debug.Log("Student assignments updated.");
     }
