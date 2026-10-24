@@ -9,6 +9,12 @@ public class VictoryUI : MonoBehaviour
     public TextMeshProUGUI trueorfalseText;
     public TextMeshProUGUI totalText;
 
+    private bool BlockOtherVictoryButtons =>
+    TutorialManager.Instance != null &&
+    TutorialManager.Instance.tutorialActive &&
+    (TutorialManager.Instance.currentStage == TutorialStage.BattleTutorial ||
+     TutorialManager.Instance.currentStage == TutorialStage.VictoryTutorial);
+
     private void OnEnable()
     {
         UpdateUI();
@@ -50,12 +56,23 @@ public class VictoryUI : MonoBehaviour
 
     public void OnRetry()
     {
+        if (BlockOtherVictoryButtons)
+        {
+            Debug.Log("Tutorial: Retry is blocked during Victory Tutorial.");
+            return;
+        }
+
         Time.timeScale = 1f;
         SceneManager.LoadScene("Level");
     }
 
     public void OnContinue()
     {
+        if (BlockOtherVictoryButtons)
+        {
+            Debug.Log("Tutorial: Continue is blocked during Victory Tutorial.");
+            return;
+        }
 
         Time.timeScale = 1f;
 

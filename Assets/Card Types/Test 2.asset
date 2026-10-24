@@ -20,4 +20,4 @@ MonoBehaviour:
   targetType: 1
   damage: 5
   cost: 1
-  quizCard: 0
+  quizCard: 1

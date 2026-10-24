@@ -88,6 +88,14 @@ public class MainMenu : MonoBehaviour
 
     public void SelectRegion1()
     {
+        // Prevent selecting Rizal Campaign while the tutorial
+        // requires the player to select Tutorial Campaign.
+        if (TutorialManager.Instance != null && TutorialManager.Instance.tutorialActive)
+        {
+            Debug.Log("Rizal Campaign blocked during tutorial.");
+            return;
+        }
+
         SceneTransitionManager.Instance.SwitchScene("LevelSelect_Rizal");
     }
 

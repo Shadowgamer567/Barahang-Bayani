@@ -525,7 +525,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -12.5, y: 13}
+  m_AnchoredPosition: {x: -6.983612, y: 15.758179}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &29364446
@@ -3204,6 +3204,7 @@ MonoBehaviour:
   enemies: []
   heropanel: []
   heroes: []
+  tutorialBattleController: {fileID: 0}
   heroPanelContainer: {fileID: 0}
   enemyPanelContainer: {fileID: 0}
   heroPanelTemplate: {fileID: 0}
@@ -4022,7 +4023,7 @@ Transform:
   m_GameObject: {fileID: 217764672}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -736.8304, y: -24.97425, z: -139.56616}
+  m_LocalPosition: {x: -736.8304, y: -24.97425, z: -141.56616}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5899,7 +5900,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -33.098, y: -11.032}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &304699677
 MonoBehaviour:
@@ -5948,7 +5949,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 58.15
+  m_fontSize: 34.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6385,8 +6386,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.062, y: 33.682}
-  m_SizeDelta: {x: 160, y: 90}
+  m_AnchoredPosition: {x: -0.662, y: 37.56}
+  m_SizeDelta: {x: 170, y: 97.756}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &346130140
 MonoBehaviour:
@@ -9283,7 +9284,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &479899437
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9302,7 +9303,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 800, y: 65}
+  m_SizeDelta: {x: 800, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &479899438
 MonoBehaviour:
@@ -17604,7 +17605,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 36.4}
-  m_SizeDelta: {x: 400, y: 500}
+  m_SizeDelta: {x: 600, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &850475600
 MonoBehaviour:
@@ -17951,8 +17952,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -22}
-  m_SizeDelta: {x: 390, y: 65}
+  m_AnchoredPosition: {x: -3.9247475, y: -41.307343}
+  m_SizeDelta: {x: 493.89, y: 69.033}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &863406606
 MonoBehaviour:
@@ -18001,12 +18002,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
+  m_fontSize: 55
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 20
-  m_fontSizeMax: 50
+  m_fontSizeMax: 55
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -18745,8 +18746,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -16.262}
-  m_SizeDelta: {x: 162, y: 39.998}
+  m_AnchoredPosition: {x: -0.149, y: -16.262}
+  m_SizeDelta: {x: 166.15, y: 44.234}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &902827345
 MonoBehaviour:
@@ -18834,7 +18835,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -2.0872192, y: 0.23163219, z: -0.95472336, w: -0.054667477}
+  m_margin: {x: -0.3034972, y: 0.23163219, z: 0.06057357, w: -0.054667477}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -19152,6 +19153,7 @@ MonoBehaviour:
   enemies: []
   heropanel: []
   heroes: []
+  tutorialBattleController: {fileID: 0}
   heroPanelContainer: {fileID: 0}
   enemyPanelContainer: {fileID: 0}
   heroPanelTemplate: {fileID: 0}
@@ -20169,8 +20171,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 2.7176, y: -80}
-  m_SizeDelta: {x: 300.7227, y: 150}
+  m_AnchoredPosition: {x: -3.9246843, y: -110.34009}
+  m_SizeDelta: {x: 493.89, y: 215.824}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &959217827
 MonoBehaviour:
@@ -20251,8 +20253,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -0.6496, y: 158.1006}
-  m_SizeDelta: {x: 197.8631, y: 273.9641}
+  m_AnchoredPosition: {x: -0.6496, y: 177.40796}
+  m_SizeDelta: {x: 200, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &961083221
 MonoBehaviour:
@@ -20368,8 +20370,8 @@ MonoBehaviour:
   m_IgnoreLayout: 0
   m_MinWidth: -1
   m_MinHeight: -1
-  m_PreferredWidth: 197.8631
-  m_PreferredHeight: 273.9641
+  m_PreferredWidth: 200
+  m_PreferredHeight: 300
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
@@ -24377,7 +24379,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 7.318, y: 3.9995117}
-  m_SizeDelta: {x: 0, y: 310}
+  m_SizeDelta: {x: 0, y: 350}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1098025576
 MonoBehaviour:
@@ -28382,8 +28384,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.2, y: -50.671}
-  m_SizeDelta: {x: 160, y: 73.282}
+  m_AnchoredPosition: {x: -1.0119898, y: -54.80829}
+  m_SizeDelta: {x: 170, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1268910196
 MonoBehaviour:
@@ -38611,8 +38613,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 5, y: -76.6}
-  m_SizeDelta: {x: 390, y: 200.88}
+  m_AnchoredPosition: {x: 49.131042, y: -138.65927}
+  m_SizeDelta: {x: 493.889, y: 324.998}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1660257586
 MonoBehaviour:
@@ -38661,12 +38663,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 43
+  m_fontSize: 50
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 12
-  m_fontSizeMax: 43
+  m_fontSizeMax: 50
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -38700,7 +38702,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0.62285227}
+  m_margin: {x: -3.17123, y: 0, z: -0.79214483, w: 0.62285227}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -43542,7 +43544,7 @@ Transform:
   m_GameObject: {fileID: 1861589580}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -665.5437, y: 290.6418, z: -4.934952}
+  m_LocalPosition: {x: -665.5437, y: 290.6418, z: -6.934952}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -44400,8 +44402,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -542.1805, y: 27.656996}
-  m_SizeDelta: {x: 184.743, y: 267.43}
+  m_AnchoredPosition: {x: -531.1475, y: 27.656982}
+  m_SizeDelta: {x: 195.776, y: 299.75}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1914537693
 MonoBehaviour:
@@ -47284,6 +47286,7 @@ MonoBehaviour:
   enemies: []
   heropanel: []
   heroes: []
+  tutorialBattleController: {fileID: 447595116}
   heroPanelContainer: {fileID: 574093396}
   enemyPanelContainer: {fileID: 1983243690}
   heroPanelTemplate: {fileID: 915981734}

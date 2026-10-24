@@ -606,9 +606,19 @@ public class QuizManager : MonoBehaviour
         EndQuiz();
 
         // Apply the card effect only if the answer was correct
-        if (correct && battleControl != null && pendingQuizCard != null)
+        if (battleControl != null && pendingQuizCard != null)
         {
-            battleControl.ResolveQuizCard(pendingQuizCard);
+            if (correct)
+            {
+                // Correct answer: execute the quiz card normally.
+                battleControl.ResolveQuizCard(pendingQuizCard);
+            }
+            else
+            {
+                // Incorrect answer: enemies take a penalty turn.
+                // This does not refill AP or cards.
+                battleControl.StartQuizPenaltyTurn();
+            }
         }
 
         pendingQuizCard = null;

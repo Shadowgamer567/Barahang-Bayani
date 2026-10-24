@@ -48,6 +48,13 @@ public class CardUI : MonoBehaviour
 
     void OnClick()
     {
+        TutorialBattleController tutorial = FindFirstObjectByType<TutorialBattleController>();
+
+        if (tutorial != null && !tutorial.CanSelectHandCard(this))
+        {
+            return;
+        }
+
         OnCardClicked?.Invoke();
         Debug.Log("Card clicked -> sending to BattleControl");
 

@@ -53,18 +53,36 @@ public class LevelButton : MonoBehaviour
 
     public void OnClick()
     {
+        // Restrict level selection during the tutorial.
+        if (TutorialManager.Instance != null && TutorialManager.Instance.tutorialActive &&
+            SceneManager.GetActiveScene().name == "LevelSelect_Tutorial")
+            {
+                // Only allow level selection after the introduction
+                // has reached the interactive level-selection stage.
+                if (TutorialManager.Instance.currentStage != TutorialStage.ExploreScrollableContent)
+                {
+                    Debug.Log("Tutorial: Level selection is not allowed yet.");
+                    return;
+                }
+            }
+
         GameManager.Instance.selectedLevel = levelData;
 
-        if (TutorialManager.Instance != null && TutorialManager.Instance.tutorialActive && TutorialManager.Instance.currentStage == TutorialStage.ExploreScrollableContent && SceneManager.GetActiveScene().name == "LevelSelect_Tutorial")
-        {
-            TutorialManager.Instance.AdvanceStage(TutorialStage.BattleTutorial);
-        }
+        if (TutorialManager.Instance != null && TutorialManager.Instance.tutorialActive &&
+            TutorialManager.Instance.currentStage ==TutorialStage.ExploreScrollableContent &&
+            SceneManager.GetActiveScene().name == "LevelSelect_Tutorial")
+            {
+                TutorialManager.Instance.AdvanceStage(
+                    TutorialStage.BattleTutorial
+                );
+            }
 
         ProgressManager.Instance.lastCampaignScene = SceneManager.GetActiveScene().name;
 
         Debug.Log("Last Campaign Scene: " + ProgressManager.Instance.lastCampaignScene);
 
         ProgressManager.Instance.SaveProgress();
+
         SceneManager.LoadScene("Level");
     }
 

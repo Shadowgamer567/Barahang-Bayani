@@ -34,6 +34,50 @@ public class TutorialBattleController : MonoBehaviour
     private bool battleIntroductionStarted = false;
     private bool selectingScriptedQuizCard = false;
 
+    public bool BlockCardPreviewCancellation =>
+    TutorialManager.Instance != null &&
+    TutorialManager.Instance.tutorialActive &&
+    TutorialManager.Instance.currentStage == TutorialStage.BattleTutorial &&
+    (showingFullCardTutorial || waitingForCardToBePlayed);
+
+    public bool BlockEndTurn =>
+    TutorialManager.Instance != null &&
+    TutorialManager.Instance.tutorialActive &&
+    TutorialManager.Instance.currentStage == TutorialStage.BattleTutorial &&
+    (waitingForCardSelection ||
+     showingFullCardTutorial ||
+     waitingForCardToBePlayed);
+
+    public bool CanSelectHandCard(CardUI card)
+    {
+        if (TutorialManager.Instance == null ||
+            !TutorialManager.Instance.tutorialActive ||
+            TutorialManager.Instance.currentStage != TutorialStage.BattleTutorial)
+        {
+            return true;
+        }
+
+        // During scripted Quiz Card selection, only slot 5 is allowed.
+        if (selectingScriptedQuizCard)
+        {
+            if (cardPanelManager == null ||
+                cardPanelManager.cardContainer == null ||
+                cardPanelManager.cardContainer.childCount < 5)
+            {
+                return false;
+            }
+
+            CardUI requiredCard = cardPanelManager.cardContainer
+                .GetChild(4)
+                .GetComponent<CardUI>();
+
+            return card == requiredCard;
+        }
+
+        // Other tutorial card-selection phases remain unchanged.
+        return true;
+    }
+
     private void Start()
     {
         // Hide tutorial UI by default.

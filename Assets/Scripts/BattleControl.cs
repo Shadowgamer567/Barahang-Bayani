@@ -238,6 +238,16 @@ public class BattleControl : MonoBehaviour
 
     public void endPlayersTurn()
     {
+        // Prevent ending the turn during required tutorial card interactions.
+        TutorialBattleController tutorial =
+            FindFirstObjectByType<TutorialBattleController>();
+
+        if (tutorial != null && tutorial.BlockEndTurn)
+        {
+            Debug.Log("Tutorial: End Turn is currently blocked.");
+            return;
+        }
+
         if (currentstate != BattleState.PlayerTurn)
         {
             return;
@@ -250,7 +260,20 @@ public class BattleControl : MonoBehaviour
         StartCoroutine(EnemyTurn());
     }
 
-    IEnumerator EnemyTurn()
+    public void StartQuizPenaltyTurn()
+    {
+        if (currentstate != BattleState.PlayerTurn ||
+            isLevelFinished)
+        {
+            return;
+        }
+
+        currentstate = BattleState.Busy;
+
+        StartCoroutine(EnemyTurn(true));
+    }
+
+    IEnumerator EnemyTurn(bool isPenaltyTurn = false)
     {
         Debug.Log("EnemyTurn Started");
 
@@ -306,7 +329,21 @@ public class BattleControl : MonoBehaviour
             yield break;
         }
 
-        StartPlayerTurn();
+        if (isPenaltyTurn)
+        {
+            // Resume the existing player turn without resetting resources.
+            currentstate = BattleState.PlayerTurn;
+
+            Debug.Log(
+                "Enemy penalty turn finished. " +
+                "Player resumes with " + currentActionPoint + " AP."
+            );
+        }
+        else
+        {
+            // Normal enemy turn: start a fresh player turn.
+            StartPlayerTurn();
+        }
     }
 
     void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
@@ -489,6 +526,12 @@ public class BattleControl : MonoBehaviour
 
     public bool TrySpendAP(int cost)
     {
+        if (currentstate != BattleState.PlayerTurn)
+        {
+            Debug.Log("Cannot play cards outside the player turn.");
+            return false;
+        }
+
         if (currentActionPoint < cost)
         {
             Debug.Log("Not Enough AP");

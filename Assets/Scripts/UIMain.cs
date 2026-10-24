@@ -51,12 +51,14 @@ public class UIMain : MonoBehaviour
     public HeroPanel[] heropanel;
     public HeroStats[] heroes;
 
+    [Header("Tutorial Reference")]
+    public TutorialBattleController tutorialBattleController;
+
     public Transform heroPanelContainer;
     public Transform enemyPanelContainer;
 
     public GameObject heroPanelTemplate;
     public GameObject enemyPanelTemplate;
-
 
     private float[] enemydisplayedHP;
     private float[] herodisplayedHP;
@@ -316,6 +318,11 @@ public class UIMain : MonoBehaviour
 
     public void CancelCardPreview()
     {
+        if (tutorialBattleController != null && tutorialBattleController.BlockCardPreviewCancellation)
+        {
+            return;
+        }
+
         if (selectedCardUI != null)
         {
             selectedCardUI.gameObject.SetActive(true);
@@ -326,6 +333,7 @@ public class UIMain : MonoBehaviour
         selectedCardUI = null;
         selectedCardType = null;
     }
+
     // Update is called once per frame
     void Update()
     {
