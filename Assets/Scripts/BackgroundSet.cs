@@ -5,6 +5,9 @@ public class BackgroundSet : ScriptableObject
 {
     public string campaignName;
 
+    [Header("Campaign Quiz")]
+    public TextAsset campaignQuizFile;
+
     [Header("General Use Cards")]
     public CardType[] generalCards;
     
