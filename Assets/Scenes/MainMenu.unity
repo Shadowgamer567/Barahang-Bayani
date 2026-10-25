@@ -6317,6 +6317,7 @@ GameObject:
   m_Component:
   - component: {fileID: 255791440}
   - component: {fileID: 255791439}
+  - component: {fileID: 255791441}
   m_Layer: 0
   m_Name: FirestoreManager
   m_TagString: Untagged
@@ -6351,6 +6352,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &255791441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255791438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bd82962376454d4b90980c7a2149981, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuizPackageUploadManager
 --- !u!1 &257266064
 GameObject:
   m_ObjectHideFlags: 0
