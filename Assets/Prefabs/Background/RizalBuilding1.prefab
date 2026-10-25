@@ -63110,6 +63110,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 734deee0718703c4ca6ef8742ef4f719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TreeUpperSway
+  swaySpeed: 2
+  swayAmount: 0.15
+  heightCutoff: 2
+  bendPower: 0.5
+  deformAmount: 0.03
 --- !u!4 &3386935813014016402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9f59073c13e2cd44981167b92abc2f8f, type: 3}

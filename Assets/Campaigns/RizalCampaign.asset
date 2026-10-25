@@ -32,7 +32,7 @@ MonoBehaviour:
   - startLevel: 4
     endLevel: 7
     prefabs:
-    - {fileID: 1557915589052753272, guid: f3c4dc6c5cffa814ebbe087c3de3bff4, type: 3}
+    - {fileID: 5041309075862469040, guid: 68bb08ec8e60873489fea52b50af7ada, type: 3}
     groundMaterial: {fileID: 0}
   - startLevel: 8
     endLevel: 10

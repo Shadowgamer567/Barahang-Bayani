@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: TutorialCampaign
   m_EditorClassIdentifier: Assembly-CSharp::BackgroundSet
   campaignName: TutorialCampaign
+  campaignQuizFile: {fileID: 0}
+  campaignQuizInfoFile: {fileID: 0}
   generalCards:
   - {fileID: 11400000, guid: 4ebedce5aa7c015448db65de44c0e068, type: 2}
   - {fileID: 11400000, guid: 894d8b0425efc9e49a167c69acf402da, type: 2}
@@ -20,5 +22,7 @@ MonoBehaviour:
   levelsRanges:
   - startLevel: 1
     endLevel: 1
-    prefabs: []
-    groundMaterial: {fileID: 0}
+    prefabs:
+    - {fileID: 3331465445925665639, guid: 09795d02710671546874864cd499e761, type: 3}
+    - {fileID: 3331465445925665639, guid: 09795d02710671546874864cd499e761, type: 3}
+    groundMaterial: {fileID: 2100000, guid: a8dd11e38038d6d45af3c5da612ff1f5, type: 2}
