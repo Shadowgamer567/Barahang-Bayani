@@ -36,6 +36,7 @@ public class AnswerSound : MonoBehaviour
         GameObject playbackObject = new GameObject("Answer Sound");
         AudioSource playbackSource = playbackObject.AddComponent<AudioSource>();
         playbackSource.spatialBlend = 0f;
+        SoundVolumeControl.RegisterSource(playbackSource, AudioVolumeGroup.Sfx);
         playbackSource.PlayOneShot(clip);
         Destroy(playbackObject, clip.length);
     }

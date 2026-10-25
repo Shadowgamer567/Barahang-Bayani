@@ -482,7 +482,7 @@ public class AccountManager : MonoBehaviour
 
         accountSelectPanel.SetActive(true);
 
-        accountManagementPanel.SetActive(true);
+        ShowAccountManagementPanel();
 
         backButton.SetActive(true);
 
@@ -538,7 +538,7 @@ public class AccountManager : MonoBehaviour
 
         loginPasswordInput.text = "";
 
-        loginPanel.SetActive(true);
+        ShowLoginPanel();
     }
 
     public async void ConfirmLogin()
@@ -567,6 +567,7 @@ public class AccountManager : MonoBehaviour
         RefreshAccountHighlights();
 
         loginPanel.SetActive(false);
+        RestorePanelsAfterLogin();
 
         Debug.Log("Logged in as: " + selectedAccount.username);
 
@@ -609,6 +610,73 @@ public class AccountManager : MonoBehaviour
         loginPasswordInput.text = "";
 
         loginPanel.SetActive(false);
+        RestorePanelsAfterLogin();
+    }
+
+    private void RestorePanelsAfterLogin()
+    {
+        PanelHider panelHider = loginPanel.GetComponent<PanelHider>();
+        if (panelHider == null)
+        {
+            Debug.LogError("AccountManager: PanelHider is missing from LoginPanel.", loginPanel);
+            return;
+        }
+
+        panelHider.RestorePanels();
+
+        if (accountManagementPanel != null && accountManagementPanel.activeSelf)
+        {
+            HideAccountManagementTitle();
+        }
+    }
+
+    private void ShowLoginPanel()
+    {
+        loginPanel.SetActive(true);
+
+        PanelHider panelHider = loginPanel.GetComponent<PanelHider>();
+        if (panelHider == null)
+        {
+            Debug.LogError("AccountManager: PanelHider is missing from LoginPanel.", loginPanel);
+            return;
+        }
+
+        panelHider.HidePanels();
+    }
+
+    private void ShowAccountManagementPanel()
+    {
+        accountManagementPanel.SetActive(true);
+        HideAccountManagementTitle();
+    }
+
+    private void HideAccountManagementTitle()
+    {
+        SetAccountManagementTitleVisible(false);
+    }
+
+    private void ShowAccountManagementTitle()
+    {
+        SetAccountManagementTitleVisible(true);
+    }
+
+    private void SetAccountManagementTitleVisible(bool visible)
+    {
+        Transform canvas = accountManagementPanel.transform.parent;
+        if (canvas == null)
+        {
+            Debug.LogError("AccountManager: AccountManagementPanel has no parent Canvas.", accountManagementPanel);
+            return;
+        }
+
+        Transform title = canvas.Find("Title");
+        if (title == null)
+        {
+            Debug.LogError("AccountManager: Could not find the Title object under the Canvas.", accountManagementPanel);
+            return;
+        }
+
+        title.gameObject.SetActive(visible);
     }
 
     public void OpenAccountRecovery()
@@ -628,7 +696,7 @@ public class AccountManager : MonoBehaviour
     public void CancelAccountRecovery()
     {
         accountRecoveryPanel.SetActive(false);
-        loginPanel.SetActive(true);
+        ShowLoginPanel();
     }
 
 
@@ -706,7 +774,7 @@ public class AccountManager : MonoBehaviour
 
             // Return to the login panel.
             accountRecoveryPanel.SetActive(false);
-            loginPanel.SetActive(true);
+            ShowLoginPanel();
         }
         catch (System.Exception ex)
         {
@@ -848,7 +916,7 @@ public class AccountManager : MonoBehaviour
 
         accountSelectPanel.SetActive(true);
 
-        accountManagementPanel.SetActive(true);
+        ShowAccountManagementPanel();
 
         backButton.SetActive(true);
 
@@ -1056,6 +1124,7 @@ public class AccountManager : MonoBehaviour
         accountSelectPanel.SetActive(false);
 
         accountManagementPanel.SetActive(false);
+        ShowAccountManagementTitle();
 
         createAccountPanel.SetActive(false);
 

@@ -59,6 +59,7 @@ public class SoundHandlerBtn : MonoBehaviour
         GameObject playbackObject = new GameObject("UI Click Sound");
         AudioSource playbackSource = playbackObject.AddComponent<AudioSource>();
         playbackSource.spatialBlend = 0f;
+        SoundVolumeControl.RegisterSource(playbackSource, AudioVolumeGroup.Sfx);
         playbackSource.PlayOneShot(clickSound);
         DontDestroyOnLoad(playbackObject);
         Destroy(playbackObject, clickSound.length);

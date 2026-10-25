@@ -108,7 +108,7 @@ public class BattleSound : MonoBehaviour
         GameObject playbackObject = new GameObject("Battle Sound");
         AudioSource playbackSource = playbackObject.AddComponent<AudioSource>();
         playbackSource.spatialBlend = 0f;
-        playbackSource.volume = volume;
+        SoundVolumeControl.RegisterSource(playbackSource, AudioVolumeGroup.Sfx, volume);
         playbackSource.PlayOneShot(clip);
         Destroy(playbackObject, clip.length);
     }

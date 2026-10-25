@@ -58,6 +58,7 @@ public class CardSound : MonoBehaviour
         GameObject playbackObject = new GameObject("Card Sound");
         AudioSource playbackSource = playbackObject.AddComponent<AudioSource>();
         playbackSource.spatialBlend = 0f;
+        SoundVolumeControl.RegisterSource(playbackSource, AudioVolumeGroup.Sfx);
         playbackSource.PlayOneShot(clip);
         DontDestroyOnLoad(playbackObject);
         Destroy(playbackObject, clip.length);

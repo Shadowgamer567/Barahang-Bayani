@@ -296,6 +296,11 @@ public class QuizManager : MonoBehaviour
     }
     void Awake()
     {
+        if (audioSource != null)
+        {
+            SoundVolumeControl.RegisterSource(audioSource, AudioVolumeGroup.Sfx, audioSource.volume);
+        }
+
         LoadQuestions();
         Debug.Log("Loaded Quiz Info");
         LoadQuizInfo();

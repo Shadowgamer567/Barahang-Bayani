@@ -8,10 +8,12 @@ public class SoundHandlerScene : MonoBehaviour
     [SerializeField] private bool loop;
 
     private AudioSource audioSource;
+    private float baseVolume;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        baseVolume = audioSource.volume;
     }
 
     private void OnEnable()
@@ -21,12 +23,14 @@ public class SoundHandlerScene : MonoBehaviour
 
     private void Start()
     {
+        SoundVolumeControl.RegisterSource(audioSource, AudioVolumeGroup.Music, baseVolume);
+
         if (sound == null)
         {
             return;
         }
-
         audioSource.clip = sound;
+        audioSource.loop = loop;
         audioSource.loop = loop;
         audioSource.Play();
     }
