@@ -1,0 +1,18 @@
+[ID:TEST QUIZ1]
+TITLE: HAHA Funny
+IMAGE: 
+DESC: asdfasdfasdf
+[END]
+
+[ID:TEST QUIZ2]
+TITLE: LOL Xd
+IMAGE: 
+DESC: alflajdfla
+[END]
+
+[ID:TEST QUIZ3]
+TITLE: Plastered
+IMAGE: 
+DESC: adfadifahidhaihfd
+[END]
+

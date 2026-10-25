@@ -39,6 +39,17 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
+        QuizManager quizManager = FindFirstObjectByType<QuizManager>();
+
+        if (quizManager != null)
+        {
+            quizManager.LoadQuestions(levelData.campaign);
+        }
+        else
+        {
+            Debug.LogError("QuizManager not found in the Level scene!");
+        }
+
         BackgroundLoop bg = FindFirstObjectByType<BackgroundLoop>();
 
         if (bg != null)

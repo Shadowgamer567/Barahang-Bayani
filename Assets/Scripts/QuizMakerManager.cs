@@ -69,7 +69,8 @@ public class QuizMakerManager : MonoBehaviour
 
     private string selectedQuizPath;
 
-    public static string SelectedQuizName = "questions";
+    public static string SelectedQuizName = null;
+    public static string SelectedQuizFilePath = null;
     public string SelectedQuizPath => selectedQuizPath;
 
     public void OpenQuizMakerPanel()
@@ -116,25 +117,67 @@ public class QuizMakerManager : MonoBehaviour
             return;
         }
 
-        string folderPath = Path.Combine(Application.dataPath, "Resources");
-
-        if (!Directory.Exists(folderPath))
+        // Prevent invalid folder and file names.
+        if (quizName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||quizName == "." || quizName == "..")
         {
-            Directory.CreateDirectory(folderPath);
+            Debug.LogWarning("Quiz name contains invalid characters.");
+            return;
         }
 
-        string filePath = Path.Combine(folderPath, quizName + ".txt");
+        // Root directory for custom quiz packages.
+        string quizRoot;
 
-        if (!File.Exists(filePath))
+        #if UNITY_EDITOR
+                quizRoot = Path.Combine(
+                    Directory.GetParent(Application.dataPath).FullName,
+                    "QuizPackages");
+        #else
+        quizRoot = Path.Combine(
+            Application.persistentDataPath,
+            "QuizPackages"
+        );
+        #endif
+
+        // Each quiz gets its own folder.
+        string packageFolder = Path.Combine(quizRoot, quizName);
+
+        string imagesFolder = Path.Combine(packageFolder, "Images");
+        string soundsFolder = Path.Combine(packageFolder, "Sounds");
+
+        string quizFilePath = Path.Combine(packageFolder,quizName + ".txt");
+
+        string infoFilePath = Path.Combine(packageFolder,quizName + "_info.txt");
+
+        try
         {
-            File.WriteAllText(filePath, "");
+            // Don't accidentally reuse or overwrite an existing package.
+            if (Directory.Exists(packageFolder))
+            {
+                Debug.LogWarning("A Quiz Package with this name already exists: " + quizName);
+                {
+                    return;
+                }
+            }
+
+            Directory.CreateDirectory(packageFolder);
+            Directory.CreateDirectory(imagesFolder);
+            Directory.CreateDirectory(soundsFolder);
+
+            // Create the question and Quiz Info files.
+            File.WriteAllText(quizFilePath, "");
+            File.WriteAllText(infoFilePath, "");
+
+            // Select the newly created quiz.
+            SelectQuiz(quizFilePath);
+
+            nameQuizPanel.SetActive(false);
+
+            Debug.Log("Successfully created Quiz Package: " +packageFolder);
         }
-
-        SelectQuiz(filePath);
-
-        nameQuizPanel.SetActive(false);
-
-        Debug.Log("Successfully created new quiz");
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Failed to create Quiz Package: " + ex.Message);
+        }
     }
 
     public void RemoveQuiz()
@@ -160,7 +203,8 @@ public class QuizMakerManager : MonoBehaviour
         }
 
         selectedQuizPath = null;
-        SelectedQuizName = "";
+        SelectedQuizName = null;
+        SelectedQuizFilePath = null;
 
         currentQuizText.text = "No quiz selected";
 
@@ -294,7 +338,19 @@ public class QuizMakerManager : MonoBehaviour
 
     public void OpenFileExplorer()
     {
-        string folderPath = Path.Combine(Application.dataPath, "Resources");
+        string folderPath;
+
+        #if UNITY_EDITOR
+                folderPath = Path.Combine(
+                    Directory.GetParent(Application.dataPath).FullName,
+                    "QuizPackages"
+                );
+        #else
+        folderPath = Path.Combine(
+            Application.persistentDataPath,
+            "QuizPackages"
+        );
+        #endif
 
         if (!Directory.Exists(folderPath))
         {
@@ -332,6 +388,13 @@ public class QuizMakerManager : MonoBehaviour
 
     public void OpenImageFileExplorer()
     {
+        if (string.IsNullOrEmpty(selectedQuizPath) ||
+            !File.Exists(selectedQuizPath))
+        {
+            Debug.LogWarning("Select a quiz before adding an image.");
+            return;
+        }
+
         ExtensionFilter[] extensions =
         {
         new ExtensionFilter("Image Files", "png", "jpg", "jpeg")
@@ -344,33 +407,74 @@ public class QuizMakerManager : MonoBehaviour
             false
         );
 
-        if (paths.Length > 0)
-        {
-            selectedImagePath = Path.GetFileNameWithoutExtension(paths[0]);
+        if (paths.Length == 0 || string.IsNullOrEmpty(paths[0]))
+            return;
 
-            Debug.Log("Selected Image: " + selectedImagePath);
+        try
+        {
+            string packageFolder = Path.GetDirectoryName(selectedQuizPath);
+            string imagesFolder = Path.Combine(packageFolder, "Images");
+
+            Directory.CreateDirectory(imagesFolder);
+
+            string fileName = Path.GetFileName(paths[0]);
+            string destination = Path.Combine(imagesFolder, fileName);
+
+            if (Path.GetFullPath(paths[0]) != Path.GetFullPath(destination))
+            {
+                File.Copy(paths[0], destination, true);
+            }
+
+            selectedImagePath = "Images/" + fileName;
+
+            Debug.Log("Image added to Quiz Package: " + selectedImagePath);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Failed to import image: " + ex.Message);
         }
     }
 
     public void OpenAudioFileExplorer()
     {
+        if (string.IsNullOrEmpty(selectedQuizPath) || !File.Exists(selectedQuizPath))
+        {
+            Debug.LogWarning("Select a quiz before adding audio.");
+            return;
+        }
+
         ExtensionFilter[] extensions =
         {
         new ExtensionFilter("Audio Files", "mp3", "wav", "ogg")
-    };
+        };
 
-        string[] paths = StandaloneFileBrowser.OpenFilePanel(
-            "Select Audio",
-            "",
-            extensions,
-            false
-        );
+        string[] paths = StandaloneFileBrowser.OpenFilePanel("Select Audio", "", extensions, false);
 
-        if (paths.Length > 0)
+        if (paths.Length == 0 || string.IsNullOrEmpty(paths[0]))
+            return;
+
+        try
         {
-            selectedAudioPath = Path.GetFileNameWithoutExtension(paths[0]);
+            string packageFolder = Path.GetDirectoryName(selectedQuizPath);
+            string soundsFolder = Path.Combine(packageFolder, "Sounds");
 
-            Debug.Log("Selected Audio: " + selectedAudioPath);
+            Directory.CreateDirectory(soundsFolder);
+
+            string fileName = Path.GetFileName(paths[0]);
+            string destination = Path.Combine(soundsFolder, fileName);
+
+            if (Path.GetFullPath(paths[0]) != Path.GetFullPath(destination))
+            {
+                File.Copy(paths[0], destination, true);
+            }
+
+            selectedAudioPath = "Sounds/" + fileName;
+
+            Debug.Log("Audio added to Quiz Package: " + selectedAudioPath);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Failed to import audio: " + ex.Message);
         }
     }
 
@@ -392,8 +496,24 @@ public class QuizMakerManager : MonoBehaviour
         currentQuizText.text = fileName;
 
         SelectedQuizName = fileName;
+        SelectedQuizFilePath = path;
 
         Debug.Log("Selected Quiz:" + fileName);
+    }
+
+    public void DeselectQuiz()
+    {
+        selectedQuizPath = null;
+
+        SelectedQuizName = null;
+        SelectedQuizFilePath = null;
+
+        if (currentQuizText != null)
+        {
+            currentQuizText.text = "No quiz selected";
+        }
+
+        Debug.Log("Quiz deselected. Campaign quiz files will be used.");
     }
 
     public void OnInputTypeChanged()
@@ -639,6 +759,7 @@ public class QuizMakerManager : MonoBehaviour
 
         //Add question to the file
         File.AppendAllText(selectedQuizPath, entry);
+        ClearQuestionFields();
     }
 
     private class RemoveQuestionData
@@ -808,6 +929,32 @@ public class QuizMakerManager : MonoBehaviour
         }
     }
 
+    private void ClearQuestionFields()
+    {
+        // Clear question text
+        quizQuestionInputField.text = "";
+
+        // Clear multiple-choice answers
+        AnswerA.text = "";
+        AnswerB.text = "";
+        AnswerC.text = "";
+        AnswerD.text = "";
+
+        // Clear identification answer
+        identificationAnswer.text = "";
+
+        // Clear selected image and audio references
+        selectedImagePath = null;
+        selectedAudioPath = null;
+
+        // Reset answer selections
+        SetCorrectAnswer(0);
+        SetTrueAnswer();
+
+        Debug.Log("Question fields cleared.");
+    }
+
+
     public void ToggleQuestionSelection(int index, bool selected)
     {
         if (selected)
@@ -829,20 +976,7 @@ public class QuizMakerManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        string defaultQuizPath = Path.Combine(
-            Application.dataPath,
-            "Resources",
-            "questions.txt"
-        );
-
-        if (File.Exists(defaultQuizPath))
-        {
-            SelectQuiz(defaultQuizPath);
-        }
-        else
-        {
-            Debug.LogWarning("Default Questions.txt was not found.");
-        }
+        currentQuizText.text = "No quiz selected";
 
         SetCorrectAnswer(0);
         SetTrueAnswer();

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
 public class QuizManager : MonoBehaviour
@@ -137,36 +139,70 @@ public class QuizManager : MonoBehaviour
                 imageObject.SetActive(true);
                 questionImage.gameObject.SetActive(true);
 
-                Sprite sprite = Resources.Load<Sprite>("Images/" + question.imagePath);
-                Debug.Log("Question Type" + question.type);
-                Debug.Log("Image Question Tirggered");
+                string selectedQuiz = QuizMakerManager.SelectedQuizFilePath;
 
-                if (sprite != null)
+                if (!string.IsNullOrEmpty(selectedQuiz) &&
+                    question.imagePath.StartsWith("Images/", StringComparison.OrdinalIgnoreCase))
                 {
-                    questionImage.sprite = sprite;
+                    // Load image from the selected Quiz Package.
+                    StartCoroutine(LoadPackageImage(question.imagePath));
                 }
-
                 else
                 {
-                    Debug.LogError("Image Not Found " + question.imagePath);
+                    // Existing campaign / legacy image loading.
+                    Sprite sprite = Resources.Load<Sprite>("Images/" + question.imagePath);
+
+                    if (sprite != null)
+                    {
+                        questionImage.sprite = sprite;
+                    }
+                    else
+                    {
+                        Debug.LogError("Image Not Found: " + question.imagePath);
+                    }
                 }
+
                 break;
+
 
             case QuizType.Audio:
                 audioButton.SetActive(true);
-                AudioClip clip = Resources.Load<AudioClip>("Audio/" + question.audioPath);
 
-                if (clip != null)
+                // Clear the previous question's audio.
+                audioSource.Stop();
+                audioSource.clip = null;
+
+                string selectedAudioQuiz = QuizMakerManager.SelectedQuizFilePath;
+
+                if (!string.IsNullOrEmpty(selectedAudioQuiz) &&
+                    !string.IsNullOrEmpty(question.audioPath) &&
+                    question.audioPath.StartsWith(
+                        "Sounds/",
+                        StringComparison.OrdinalIgnoreCase))
                 {
-                    audioSource.clip = clip;
-                    audioSource.Play();
+                    // Load audio from the selected Quiz Package.
+                    StartCoroutine(LoadPackageAudio(question.audioPath));
                 }
-
                 else
                 {
-                    Debug.LogError("Audio Not Found " + question.audioPath);
+                    // Preserve existing campaign audio loading.
+                    AudioClip clip = Resources.Load<AudioClip>(
+                        "Audio/" + question.audioPath
+                    );
+
+                    if (clip != null)
+                    {
+                        audioSource.clip = clip;
+                        audioSource.Play();
+                    }
+                    else
+                    {
+                        Debug.LogError("Audio Not Found: " + question.audioPath);
+                    }
                 }
+
                 break;
+
         }
 
         switch (question.inputType)
@@ -301,24 +337,46 @@ public class QuizManager : MonoBehaviour
             SoundVolumeControl.RegisterSource(audioSource, AudioVolumeGroup.Sfx, audioSource.volume);
         }
 
-        LoadQuestions();
         Debug.Log("Loaded Quiz Info");
         LoadQuizInfo();
     }
 
-    void LoadQuestions()
+    public void LoadQuestions(BackgroundSet campaign)
     {
-        TextAsset file = Resources.Load<TextAsset>(QuizMakerManager.SelectedQuizName);
+        questions.Clear();
 
-        if (file == null)
+        string quizText;
+
+        // Custom quiz selected in Quiz Maker overrides campaign files.
+        string customPath = QuizMakerManager.SelectedQuizFilePath;
+
+        if (!string.IsNullOrEmpty(customPath))
         {
-            Debug.LogError("questions.txt not FOUND");
-            return;
+            if (!File.Exists(customPath))
+            {
+                Debug.LogError("Selected custom quiz file not found: " + customPath);
+                return;
+            }
+
+            quizText = File.ReadAllText(customPath);
+
+            Debug.Log("Loading custom quiz file: " + customPath);
+        }
+        else
+        {
+            // No custom selection: use the current campaign's file.
+            if (campaign == null || campaign.campaignQuizFile == null)
+            {
+                Debug.LogError("No quiz file assigned to the current campaign.");
+                return;
+            }
+
+            quizText = campaign.campaignQuizFile.text;
+
+            Debug.Log("Loading campaign quiz: " + campaign.campaignName);
         }
 
-        Debug.Log("File loaded successfully");
-        Debug.Log(file.text);
-        string[] lines = file.text.Split('\n');
+        string[] lines = quizText.Split('\n');
 
         for (int i = 0; i < lines.Length;)
         {
@@ -412,84 +470,142 @@ public class QuizManager : MonoBehaviour
                 q.Answer = new string[4];
                 q.correctIndex = 0;
 
+
                 for (int j = 0; j < 4; j++)
                 {
-                    string line = lines[i + 3 + j];
+                    string line = lines[i + 3 + j].Trim();
 
                     bool isCorrect = line.Contains("\"C\"");
 
-                    string answerText = line.Substring(3).Replace("\"C\"", "").Trim();
+                    // Remove the answer label (A., B., C., D.)
+                    // without assuming the line contains an answer.
+                    int answerDotIndex = line.IndexOf('.');
+
+                    string answerText = answerDotIndex >= 0
+                        ? line.Substring(answerDotIndex + 1).Trim()
+                        : line;
+
+                    answerText = answerText.Replace("\"C\"", "").Trim();
 
                     if (isCorrect)
                     {
                         q.correctIndex = j;
-
                         q.correctAnswer = answerText;
                     }
 
                     q.Answer[j] = answerText;
                 }
+
                 questions.Add(q);
                 i += 7;
             }
         }
     }
 
+
     void LoadQuizInfo()
     {
-        TextAsset file = Resources.Load<TextAsset>("quizinfo");
-        if (file == null) return;
+        infoDatabase.Clear();
 
-        string[] lines = file.text.Split('\n');
-        QuizInfoData current = null;
+        string infoContent;
+        string customQuizPath = QuizMakerManager.SelectedQuizFilePath;
 
-        foreach (string rawline in lines)
+        if (!string.IsNullOrEmpty(customQuizPath))
         {
-            string line = rawline.Trim();
+            // Custom Quiz Package: locate its companion Info file.
+            string folder = Path.GetDirectoryName(customQuizPath);
+            string quizName = Path.GetFileNameWithoutExtension(customQuizPath);
 
-            // Don't skip empty lines if we are currently recording a description
-            if (string.IsNullOrWhiteSpace(line))
+            string infoPath = Path.Combine(folder, quizName + "_info.txt");
+
+            if (!File.Exists(infoPath))
             {
-                if (current != null) current.description += "\n";
-                continue;
+                Debug.LogWarning("Quiz Info file not found: " + infoPath);
+                return;
             }
 
-            if (line.StartsWith("[ID:"))
+            infoContent = File.ReadAllText(infoPath);
+
+            Debug.Log("Loading custom Quiz Info: " + infoPath);
+        }
+        else
+        {
+            // Default campaign Quiz Info.
+            TextAsset file = Resources.Load<TextAsset>("quizinfo");
+
+            if (file == null)
             {
-                current = new QuizInfoData();
-                current.id = line.Replace("[ID:", "").Replace("]", "").Trim();
-                current.description = "";
+                Debug.LogWarning("Default Quiz Info file not found.");
+                return;
             }
-            else if (line.StartsWith("TITLE:"))
+
+            infoContent = file.text;
+
+            Debug.Log("Loading default Quiz Info.");
+        }
+
+        string[] lines = infoContent.Split('\n');
+        QuizInfoData current = null;
+        bool readingDescription = false;
+
+        foreach (string rawLine in lines)
+        {
+            string line = rawLine.Trim();
+
+            if (line.StartsWith("[ID:") && line.EndsWith("]"))
             {
-                current.title = line.Substring(6).Trim();
-            }
-            else if (line.StartsWith("IMAGE:"))
-            {
-                current.imagePath = line.Substring(6).Trim();
-            }
-            else if (line.StartsWith("DESC:"))
-            {
-                // Just a marker, we can ignore the "DESC:" line itself
-                continue;
-            }
-            else if (line.StartsWith("[END]")) // Removed colon to match your file
-            {
-                if (current != null)
+                current = new QuizInfoData
                 {
+                    id = line.Substring(4, line.Length - 5).Trim(),
+                    title = "",
+                    imagePath = "",
+                    description = ""
+                };
+
+                readingDescription = false;
+            }
+            else if (line == "[END]")
+            {
+                if (current != null && !string.IsNullOrEmpty(current.id))
+                {
+                    current.description = current.description.TrimEnd();
                     infoDatabase[current.id] = current;
+
                     Debug.Log("Successfully Loaded Info for: " + current.id);
                 }
+
+                current = null;
+                readingDescription = false;
             }
-            else
+            else if (current != null)
             {
-                if (current != null)
+                if (line.StartsWith("TITLE:") && !readingDescription)
                 {
-                    current.description += line + " ";
+                    current.title = line.Substring(6).Trim();
+                }
+                else if (line.StartsWith("IMAGE:") && !readingDescription)
+                {
+                    current.imagePath = line.Substring(6).Trim();
+                }
+                else if (line == "DESC:")
+                {
+                    readingDescription = true;
+                }
+                else if (readingDescription)
+                {
+                    if (current.description.Length > 0)
+                    {
+                        current.description += "\n";
+                    }
+
+                    current.description += rawLine.TrimEnd('\r');
                 }
             }
         }
+
+        Debug.Log("Total Quiz Info entries loaded: " + infoDatabase.Count);
     }
+
 
     public QuizQuestion GetRandomQuestions()
     {
@@ -575,6 +691,11 @@ public class QuizManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(2f);
 
         // ===== SHOW INFO PANEL =====
+        infoName.text = "";
+        infoText.text = "";
+        infoImage.sprite = null;
+        infoImage.gameObject.SetActive(false);
+
         quizInfoPanel.SetActive(true);
 
         OnQuizInfoOpened?.Invoke();
@@ -586,16 +707,35 @@ public class QuizManager : MonoBehaviour
             infoName.text = info.title;
             infoText.text = info.description;
 
-            Sprite infoSprite = Resources.Load<Sprite>("Images/" + info.imagePath);
+            // Clear the previous Quiz Info image.
+            infoImage.sprite = null;
+            infoImage.gameObject.SetActive(false);
 
-            if (infoSprite != null)
+            if (!string.IsNullOrEmpty(info.imagePath))
             {
-                infoImage.sprite = infoSprite;
-                infoImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                infoImage.gameObject.SetActive(false);
+                string selectedQuiz = QuizMakerManager.SelectedQuizFilePath;
+
+                if (!string.IsNullOrEmpty(selectedQuiz) &&
+                    info.imagePath.StartsWith("Images/", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Load the image from the selected Quiz Package.
+                    yield return StartCoroutine(LoadPackageInfoImage(info.imagePath));
+                }
+                else
+                {
+                    // Preserve the original Resources image loading.
+                    Sprite infoSprite = Resources.Load<Sprite>("Images/" + info.imagePath);
+
+                    if (infoSprite != null)
+                    {
+                        infoImage.sprite = infoSprite;
+                        infoImage.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Quiz Info image not found: " + info.imagePath);
+                    }
+                }
             }
         }
 
@@ -628,4 +768,232 @@ public class QuizManager : MonoBehaviour
 
         pendingQuizCard = null;
     }
+
+    private IEnumerator LoadPackageImage(string imagePath)
+    {
+        string quizPath = QuizMakerManager.SelectedQuizFilePath;
+
+        if (string.IsNullOrEmpty(quizPath))
+            yield break;
+
+        string packageFolder = Path.GetDirectoryName(quizPath);
+
+        string fullImagePath = Path.GetFullPath(
+            Path.Combine(packageFolder, imagePath)
+        );
+
+        // Prevent media paths from escaping the Quiz Package.
+        string fullPackageFolder = Path.GetFullPath(packageFolder);
+        string packagePrefix = fullPackageFolder.TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar
+        ) + Path.DirectorySeparatorChar;
+
+        if (!fullImagePath.StartsWith(
+            packagePrefix,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogError("Invalid Quiz Package image path: " + imagePath);
+            yield break;
+        }
+
+        if (!File.Exists(fullImagePath))
+        {
+            Debug.LogError("Quiz Package image not found: " + fullImagePath);
+            yield break;
+        }
+
+        string fileUrl = new Uri(fullImagePath).AbsoluteUri;
+
+        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(fileUrl))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Failed to load quiz image: " + request.error);
+                yield break;
+            }
+
+            Texture2D texture = DownloadHandlerTexture.GetContent(request);
+
+            Sprite sprite = Sprite.Create(
+                texture,
+                new Rect(0, 0, texture.width, texture.height),
+                new Vector2(0.5f, 0.5f)
+            );
+
+            questionImage.sprite = sprite;
+
+            Debug.Log("Loaded Quiz Package image: " + imagePath);
+        }
+    }
+
+
+    private IEnumerator LoadPackageInfoImage(string imagePath)
+    {
+        string quizPath = QuizMakerManager.SelectedQuizFilePath;
+
+        if (string.IsNullOrEmpty(quizPath))
+            yield break;
+
+        string packageFolder = Path.GetFullPath(
+            Path.GetDirectoryName(quizPath)
+        );
+
+        string fullImagePath = Path.GetFullPath(
+            Path.Combine(packageFolder, imagePath)
+        );
+
+        // Prevent paths from escaping the Quiz Package folder.
+        string packagePrefix = packageFolder.TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar
+        ) + Path.DirectorySeparatorChar;
+
+        if (!fullImagePath.StartsWith(
+            packagePrefix,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogError("Invalid Quiz Info image path: " + imagePath);
+            yield break;
+        }
+
+        if (!File.Exists(fullImagePath))
+        {
+            Debug.LogWarning("Quiz Info image not found: " + fullImagePath);
+            yield break;
+        }
+
+        string fileUrl = new Uri(fullImagePath).AbsoluteUri;
+
+        using (UnityWebRequest request =
+            UnityWebRequestTexture.GetTexture(fileUrl))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError(
+                    "Failed to load Quiz Info image: " + request.error
+                );
+                yield break;
+            }
+
+            Texture2D texture = DownloadHandlerTexture.GetContent(request);
+
+            Sprite sprite = Sprite.Create(
+                texture,
+                new Rect(0, 0, texture.width, texture.height),
+                new Vector2(0.5f, 0.5f)
+            );
+
+            infoImage.sprite = sprite;
+            infoImage.gameObject.SetActive(true);
+
+            Debug.Log("Loaded Quiz Info image: " + imagePath);
+        }
+    }
+
+
+    private IEnumerator LoadPackageAudio(string audioPath)
+    {
+        string quizPath = QuizMakerManager.SelectedQuizFilePath;
+
+        if (string.IsNullOrEmpty(quizPath))
+            yield break;
+
+        string packageFolder = Path.GetDirectoryName(quizPath);
+
+        string fullAudioPath = Path.GetFullPath(
+            Path.Combine(packageFolder, audioPath)
+        );
+
+        // Prevent paths from escaping the Quiz Package.
+        string fullPackageFolder = Path.GetFullPath(packageFolder);
+
+        string packagePrefix = fullPackageFolder.TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar
+        ) + Path.DirectorySeparatorChar;
+
+        if (!fullAudioPath.StartsWith(
+            packagePrefix,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogError("Invalid Quiz Package audio path: " + audioPath);
+            yield break;
+        }
+
+        if (!File.Exists(fullAudioPath))
+        {
+            Debug.LogError("Quiz Package audio not found: " + fullAudioPath);
+            yield break;
+        }
+
+        // Determine audio format from file extension.
+        string extension = Path.GetExtension(fullAudioPath).ToLowerInvariant();
+
+        AudioType audioType;
+
+        switch (extension)
+        {
+            case ".wav":
+                audioType = AudioType.WAV;
+                break;
+
+            case ".mp3":
+                audioType = AudioType.MPEG;
+                break;
+
+            case ".ogg":
+                audioType = AudioType.OGGVORBIS;
+                break;
+
+            default:
+                Debug.LogError("Unsupported audio format: " + extension);
+                yield break;
+        }
+
+        string fileUrl = new Uri(fullAudioPath).AbsoluteUri;
+
+        using (UnityWebRequest request =
+            UnityWebRequestMultimedia.GetAudioClip(fileUrl, audioType))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError(
+                    "Failed to load Quiz Package audio: " + request.error
+                );
+                yield break;
+            }
+
+            AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
+
+            if (clip == null)
+            {
+                Debug.LogError("Loaded audio clip is null: " + audioPath);
+                yield break;
+            }
+
+            // Avoid playing audio if the question was closed or replaced
+            // while the file was loading.
+            if (!quizPanel.activeInHierarchy ||
+                currentQuestion == null ||
+                currentQuestion.type != QuizType.Audio ||
+                currentQuestion.audioPath != audioPath)
+            {
+                Destroy(clip);
+                yield break;
+            }
+
+            audioSource.clip = clip;
+            audioSource.Play();
+
+            Debug.Log("Loaded Quiz Package audio: " + audioPath);
+        }
+    }
+
 }

@@ -1,18 +1,27 @@
 ID:TEST QUIZ1
-1. HAha Funny
+1. Test Question 1
 TYPE:TEXT
 INPUT:IDENTIFICATION
-A. Yes "C"
+A. 1 "C"
 B.
 C.
 D.
 
 ID:TEST QUIZ2
-2. asdhfashfdlajdfjlsaadfa
+2. Test Question 2
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. 2 "C"
+B.
+C.
+D.
+
+ID:TEST QUIZ3
+3. Test Question 3
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
-A. vv "C"
-B. cc
-C. aa
-D. dd
+A. 3 "C"
+B. 4
+C. 5
+D. 6
 
