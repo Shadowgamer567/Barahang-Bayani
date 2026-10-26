@@ -73,6 +73,24 @@ public class QuizMakerManager : MonoBehaviour
     public static string SelectedQuizFilePath = null;
     public string SelectedQuizPath => selectedQuizPath;
 
+    public static string QuizPackagesRoot
+    {
+        get
+        {
+            #if UNITY_EDITOR
+                        return Path.Combine(
+                            Directory.GetParent(Application.dataPath).FullName,
+                            "QuizPackages"
+                        );
+            #else
+                    return Path.Combine(
+                        Application.persistentDataPath,
+                        "QuizPackages"
+                    );
+            #endif
+                    }
+                }
+
     public void OpenQuizMakerPanel()
     {
         QuizMakerPanel.SetActive(true);
@@ -125,18 +143,7 @@ public class QuizMakerManager : MonoBehaviour
         }
 
         // Root directory for custom quiz packages.
-        string quizRoot;
-
-        #if UNITY_EDITOR
-                quizRoot = Path.Combine(
-                    Directory.GetParent(Application.dataPath).FullName,
-                    "QuizPackages");
-        #else
-        quizRoot = Path.Combine(
-            Application.persistentDataPath,
-            "QuizPackages"
-        );
-        #endif
+        string quizRoot = QuizPackagesRoot;
 
         // Each quiz gets its own folder.
         string packageFolder = Path.Combine(quizRoot, quizName);
@@ -338,19 +345,7 @@ public class QuizMakerManager : MonoBehaviour
 
     public void OpenFileExplorer()
     {
-        string folderPath;
-
-        #if UNITY_EDITOR
-                folderPath = Path.Combine(
-                    Directory.GetParent(Application.dataPath).FullName,
-                    "QuizPackages"
-                );
-        #else
-        folderPath = Path.Combine(
-            Application.persistentDataPath,
-            "QuizPackages"
-        );
-        #endif
+        string folderPath = QuizPackagesRoot;
 
         if (!Directory.Exists(folderPath))
         {

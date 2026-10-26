@@ -1,0 +1,36 @@
+ID:TEST PACKAGE1
+1. Question 4
+TYPE:IMAGE:Images/Laffey.jpg
+INPUT:IDENTIFICATION
+A. Laffey "C"
+B.
+C.
+D.
+
+ID:TEST PACKAGE2
+2. Question 5
+TYPE:AUDIO:Sounds/vowels.wav
+INPUT:IDENTIFICATION
+A. Laffey 2 "C"
+B.
+C.
+D.
+
+ID:TEST PACKAGE3
+3. Question 7
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. Laffey 3 "C"
+B.
+C.
+D.
+
+ID:TEST PACKAGE4
+4. Question 8
+TYPE:IMAGE:Images/00000-107961072.png
+INPUT:IDENTIFICATION
+A. Laffey 4 "C"
+B.
+C.
+D.
+
