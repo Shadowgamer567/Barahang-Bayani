@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 public class QuizPackageDownloadManager : MonoBehaviour
 {
     private bool isDownloading = false;
+    private bool isSynchronizing = false;
 
     public class QuizPackageFileInfo
     {
@@ -27,6 +28,20 @@ public class QuizPackageDownloadManager : MonoBehaviour
         public List<QuizPackageFileInfo> files =
             new List<QuizPackageFileInfo>();
     }
+
+    [Serializable]
+    private class QuizPackageUpdateRecoveryData
+    {
+        public string classroomID;
+        public string packageID;
+
+        public string previousVersionID;
+        public string newVersionID;
+
+        public string destinationFolder;
+        public string backupFolder;
+    }
+
 
     public bool TryGetQuizCollection(out CollectionReference quizCollection)
     {
@@ -849,6 +864,30 @@ public class QuizPackageDownloadManager : MonoBehaviour
             }
         }
 
+        foreach (string name in new[]
+        {
+            manifest.classroomID,
+            manifest.packageID
+        })
+        {
+            if (string.IsNullOrWhiteSpace(name) ||
+                name == "." ||
+                name == ".." ||
+                name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                name.Contains("/") ||
+                name.Contains("\\") ||
+                name.Contains(":") ||
+                Path.IsPathRooted(name))
+            {
+                Debug.LogError(
+                    "Unsafe Quiz Package folder name. " +
+                    "Replacement cancelled."
+                );
+
+                return false;
+            }
+        }
+
         string classroomFolder =
             GetClassroomFolder(manifest.classroomID);
 
@@ -953,10 +992,8 @@ public class QuizPackageDownloadManager : MonoBehaviour
     private bool ReplaceInstalledPackage(
     QuizPackageManifest manifest,
     string temporaryFolder,
-    out string backupFolder)
+    string backupFolder)
     {
-        backupFolder = null;
-
         if (manifest == null ||
             string.IsNullOrWhiteSpace(temporaryFolder) ||
             !Directory.Exists(temporaryFolder))
@@ -988,10 +1025,36 @@ public class QuizPackageDownloadManager : MonoBehaviour
             ".update-" + operationID
         );
 
-        backupFolder = Path.Combine(
-        classroomFolder,
-        ".backup-" + operationID
-);
+        if (string.IsNullOrWhiteSpace(backupFolder) ||
+        Directory.Exists(backupFolder) ||
+        File.Exists(backupFolder))
+        {
+            Debug.LogError(
+                "Invalid or already existing Quiz Package backup path."
+            );
+
+            return false;
+        }
+
+        string expectedParent = Path.GetFullPath(classroomFolder);
+
+        string actualParent = Path.GetFullPath(
+            Path.GetDirectoryName(
+                Path.GetFullPath(backupFolder)
+            )
+        );
+
+        if (!string.Equals(
+            expectedParent,
+            actualParent,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogError(
+                "Quiz Package backup must be inside its Classroom folder."
+            );
+
+            return false;
+        }
 
         bool backupCreated = false;
 
@@ -1146,9 +1209,1091 @@ public class QuizPackageDownloadManager : MonoBehaviour
         }
     }
 
+    private string SaveUpdateRecoveryRecord(
+        QuizPackageUpdateRecoveryData data)
+    {
+        string recoveryFolder = Path.Combine(
+            GetQuizPackageRoot(),
+            ".UpdateRecovery"
+        );
+
+        Directory.CreateDirectory(recoveryFolder);
+
+        string recordPath = Path.Combine(
+            recoveryFolder,
+            Guid.NewGuid().ToString("N") + ".json"
+        );
+
+        string json = JsonUtility.ToJson(data, true);
+
+        File.WriteAllText(recordPath, json);
+
+        return recordPath;
+    }
+
+    private void DeleteUpdateRecoveryRecord(string recordPath)
+    {
+        if (string.IsNullOrWhiteSpace(recordPath))
+            return;
+
+        try
+        {
+            if (File.Exists(recordPath))
+                File.Delete(recordPath);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning(
+                "Could not delete Quiz Package recovery record: " +
+                ex.Message
+            );
+        }
+    }
+
+    private bool IsValidUpdateRecoveryRecord(
+        QuizPackageUpdateRecoveryData data)
+    {
+        if (data == null ||
+            string.IsNullOrWhiteSpace(data.classroomID) ||
+            string.IsNullOrWhiteSpace(data.packageID) ||
+            string.IsNullOrWhiteSpace(data.previousVersionID) ||
+            string.IsNullOrWhiteSpace(data.newVersionID) ||
+            string.IsNullOrWhiteSpace(data.destinationFolder) ||
+            string.IsNullOrWhiteSpace(data.backupFolder))
+        {
+            return false;
+        }
+
+        // Reject unsafe Classroom and package names.
+        foreach (string name in new[]
+        {
+        data.classroomID,
+        data.packageID
+    })
+        {
+            if (name == "." ||
+                name == ".." ||
+                name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                name.Contains("/") ||
+                name.Contains("\\") ||
+                name.Contains(":") ||
+                Path.IsPathRooted(name))
+            {
+                return false;
+            }
+        }
+
+        string expectedDestination = Path.GetFullPath(
+            GetPackageFolder(data.classroomID, data.packageID)
+        );
+
+        string actualDestination = Path.GetFullPath(
+            data.destinationFolder
+        );
+
+        if (!string.Equals(
+            expectedDestination,
+            actualDestination,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        string classroomFolder = Path.GetFullPath(
+            GetClassroomFolder(data.classroomID)
+        );
+
+        string backupFolder = Path.GetFullPath(
+            data.backupFolder
+        );
+
+        string backupParent = Path.GetFullPath(
+            Path.GetDirectoryName(backupFolder)
+        );
+
+        if (!string.Equals(
+            classroomFolder,
+            backupParent,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        string backupName = Path.GetFileName(backupFolder);
+
+        if (!backupName.StartsWith(
+            ".backup-",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private List<string> GetPendingUpdateRecoveryRecords()
+    {
+        List<string> records = new List<string>();
+
+        string recoveryFolder = Path.Combine(
+            GetQuizPackageRoot(),
+            ".UpdateRecovery"
+        );
+
+        if (!Directory.Exists(recoveryFolder))
+            return records;
+
+        try
+        {
+            records.AddRange(
+                Directory.GetFiles(
+                    recoveryFolder,
+                    "*.json",
+                    SearchOption.TopDirectoryOnly
+                )
+            );
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to read Quiz Package recovery records: " + ex
+            );
+        }
+
+        return records;
+    }
+
+    private void InspectPendingUpdateRecoveryRecords()
+    {
+        List<string> records =
+            GetPendingUpdateRecoveryRecords();
+
+        foreach (string recordPath in records)
+        {
+            try
+            {
+                string json = File.ReadAllText(recordPath);
+
+                QuizPackageUpdateRecoveryData data =
+                    JsonUtility.FromJson<QuizPackageUpdateRecoveryData>(
+                        json
+                    );
+
+                if (!IsValidUpdateRecoveryRecord(data))
+                {
+                    Debug.LogError(
+                        "Invalid Quiz Package recovery record: " +
+                        recordPath
+                    );
+
+                    continue;
+                }
+
+                bool destinationExists =
+                    Directory.Exists(data.destinationFolder);
+
+                bool backupExists =
+                    Directory.Exists(data.backupFolder);
+
+                QuizPackageSyncData sync =
+                    QuizPackageSyncManager.Load(
+                        data.classroomID,
+                        data.packageID
+                    );
+
+                string savedVersion =
+                    sync != null ? sync.baseVersionID : null;
+
+                Debug.Log(
+                    "[Quiz Recovery] Package: " +
+                    data.packageID +
+                    " | Destination: " + destinationExists +
+                    " | Backup: " + backupExists +
+                    " | Saved Version: " +
+                    (savedVersion ?? "Unknown")
+                );
+
+                if (backupExists && !destinationExists)
+                {
+                    Debug.LogWarning(
+                        "[Quiz Recovery] Previous package backup " +
+                        "can potentially be restored: " +
+                        data.packageID
+                    );
+                }
+                else if (backupExists && destinationExists)
+                {
+                    Debug.LogWarning(
+                        "[Quiz Recovery] Both package and backup exist. " +
+                        "Version verification is required before cleanup: " +
+                        data.packageID
+                    );
+                }
+                else if (!backupExists)
+                {
+                    Debug.LogWarning(
+                        "[Quiz Recovery] Backup is missing. " +
+                        "Installed package and metadata must be checked: " +
+                        data.packageID
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(
+                    "Failed to inspect Quiz Package recovery record: " +
+                    recordPath + "\n" + ex
+                );
+            }
+        }
+    }
+
+    private async Task<bool> VerifyRecoveryBackupAsync(
+        QuizPackageUpdateRecoveryData data)
+    {
+        if (!IsValidUpdateRecoveryRecord(data))
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Invalid recovery record."
+            );
+
+            return false;
+        }
+
+        if (!Directory.Exists(data.backupFolder))
+        {
+            Debug.LogWarning(
+                "[Quiz Recovery] Backup folder is missing: " +
+                data.packageID
+            );
+
+            return false;
+        }
+
+        if (FirestoreManager.Instance == null ||
+            FirestoreManager.Instance.DB == null ||
+            !FirebaseManager.IsAuthenticated)
+        {
+            Debug.LogWarning(
+                "[Quiz Recovery] Firebase is unavailable. " +
+                "Backup verification postponed."
+            );
+
+            return false;
+        }
+
+        try
+        {
+            DocumentReference packageDoc =
+                FirestoreManager.Instance.DB
+                    .Collection("Classroom")
+                    .Document(data.classroomID)
+                    .Collection("quizzes")
+                    .Document(data.packageID);
+
+            List<QuizPackageFileInfo> previousFiles =
+                await GetVersionFilesAsync(
+                    packageDoc,
+                    data.previousVersionID
+                );
+
+            if (previousFiles == null ||
+                previousFiles.Count == 0)
+            {
+                Debug.LogError(
+                    "[Quiz Recovery] Previous version manifest unavailable: " +
+                    data.packageID
+                );
+
+                return false;
+            }
+
+            bool matches = AreLocalFilesMatchingManifest(
+                data.backupFolder,
+                previousFiles
+            );
+
+            if (!matches)
+            {
+                Debug.LogError(
+                    "[Quiz Recovery] Backup verification failed: " +
+                    data.packageID
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "[Quiz Recovery] Backup verified successfully: " +
+                data.packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Backup verification failed: " + ex
+            );
+
+            return false;
+        }
+    }
+
+    private async Task<bool> RecoverMissingInstalledPackageAsync(
+    QuizPackageUpdateRecoveryData data)
+    {
+        if (!IsValidUpdateRecoveryRecord(data))
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Invalid recovery data."
+            );
+
+            return false;
+        }
+
+        if (Directory.Exists(data.destinationFolder))
+        {
+            Debug.LogWarning(
+                "[Quiz Recovery] Installed package already exists. " +
+                "Automatic restoration skipped: " + data.packageID
+            );
+
+            return false;
+        }
+
+        if (!Directory.Exists(data.backupFolder))
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Cannot restore package. " +
+                "Backup is missing: " + data.packageID
+            );
+
+            return false;
+        }
+
+        // Verify the backup before restoring it.
+        if (!await VerifyRecoveryBackupAsync(data))
+        {
+            Debug.LogWarning(
+                "[Quiz Recovery] Restoration postponed because " +
+                "the backup could not be verified: " +
+                data.packageID
+            );
+
+            return false;
+        }
+
+        try
+        {
+            // Restore the previous package files.
+            Directory.Move(
+                data.backupFolder,
+                data.destinationFolder
+            );
+
+            // Restore the previous synchronization baseline.
+            if (!RestorePackageSyncVersion(
+                data.classroomID,
+                data.packageID,
+                data.previousVersionID))
+            {
+                Debug.LogError(
+                    "[Quiz Recovery] Package files were restored, " +
+                    "but synchronization metadata could not be restored."
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "[Quiz Recovery] Previous Quiz Package restored: " +
+                data.packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Failed to restore package: " + ex
+            );
+
+            return false;
+        }
+    }
+
+    private async Task<bool> RecoverInterruptedUpdateAsync(
+        QuizPackageUpdateRecoveryData data)
+    {
+        if (!IsValidUpdateRecoveryRecord(data))
+            return false;
+
+        bool installedExists =
+            Directory.Exists(data.destinationFolder);
+
+        bool backupExists =
+            Directory.Exists(data.backupFolder);
+
+        // Existing recovery method handles a missing installation.
+        if (!installedExists && backupExists)
+        {
+            return await RecoverMissingInstalledPackageAsync(data);
+        }
+
+        if (!installedExists && !backupExists)
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Both installation and backup are missing: " +
+                data.packageID
+            );
+
+            return false;
+        }
+
+
+        if (!backupExists)
+        {
+            // The update may have completed before the recovery
+            // record could be deleted.
+            if (FirestoreManager.Instance == null ||
+                FirestoreManager.Instance.DB == null ||
+                !FirebaseManager.IsAuthenticated)
+            {
+                Debug.LogWarning(
+                    "[Quiz Recovery] Firebase unavailable. " +
+                    "Cannot verify installed package: " +
+                    data.packageID
+                );
+
+                return false;
+            }
+
+            try
+            {
+                DocumentReference packageDoc =
+                    FirestoreManager.Instance.DB
+                        .Collection("Classroom")
+                        .Document(data.classroomID)
+                        .Collection("quizzes")
+                        .Document(data.packageID);
+
+                List<QuizPackageFileInfo> newVersionFiles =
+                    await GetVersionFilesAsync(
+                        packageDoc,
+                        data.newVersionID
+                    );
+
+                if (newVersionFiles == null ||
+                    !AreLocalFilesMatchingManifest(
+                        data.destinationFolder,
+                        newVersionFiles))
+                {
+                    Debug.LogWarning(
+                        "[Quiz Recovery] Installed package could not " +
+                        "be verified. Recovery record preserved: " +
+                        data.packageID
+                    );
+
+                    return false;
+                }
+
+                // The installed package matches the new version.
+                // Ensure the local synchronization baseline agrees.
+                QuizPackageSyncManager.Save(
+                    data.classroomID,
+                    data.packageID,
+                    data.newVersionID
+                );
+
+                QuizPackageSyncData confirmedSync =
+                    QuizPackageSyncManager.Load(
+                        data.classroomID,
+                        data.packageID
+                    );
+
+                if (confirmedSync == null ||
+                    confirmedSync.baseVersionID != data.newVersionID)
+                {
+                    Debug.LogError(
+                        "[Quiz Recovery] Failed to confirm " +
+                        "synchronization metadata: " +
+                        data.packageID
+                    );
+
+                    return false;
+                }
+
+                Debug.Log(
+                    "[Quiz Recovery] Completed update verified: " +
+                    data.packageID
+                );
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(
+                    "[Quiz Recovery] Failed to verify completed update: " +
+                    ex
+                );
+
+                return false;
+            }
+        }
+
+
+        // Both the installed package and backup exist.
+        if (FirestoreManager.Instance == null ||
+            FirestoreManager.Instance.DB == null ||
+            !FirebaseManager.IsAuthenticated)
+        {
+            Debug.LogWarning(
+                "[Quiz Recovery] Firebase unavailable. Recovery postponed."
+            );
+
+            return false;
+        }
+
+        try
+        {
+            DocumentReference packageDoc =
+                FirestoreManager.Instance.DB
+                    .Collection("Classroom")
+                    .Document(data.classroomID)
+                    .Collection("quizzes")
+                    .Document(data.packageID);
+
+            List<QuizPackageFileInfo> newVersionFiles =
+                await GetVersionFilesAsync(
+                    packageDoc,
+                    data.newVersionID
+                );
+
+            if (newVersionFiles == null)
+                return false;
+
+            bool installedMatchesNewVersion =
+                AreLocalFilesMatchingManifest(
+                    data.destinationFolder,
+                    newVersionFiles
+                );
+
+            if (!installedMatchesNewVersion)
+            {
+                Debug.LogWarning(
+                    "[Quiz Recovery] Installed package is not the expected " +
+                    "new version. Preserving both copies: " +
+                    data.packageID
+                );
+
+                return false;
+            }
+
+            // Confirm the previous backup is intact before cleanup.
+            if (!await VerifyRecoveryBackupAsync(data))
+                return false;
+
+            // Make sure the new version is recorded locally.
+            QuizPackageSyncManager.Save(
+                data.classroomID,
+                data.packageID,
+                data.newVersionID
+            );
+
+            QuizPackageSyncData confirmedSync =
+                QuizPackageSyncManager.Load(
+                    data.classroomID,
+                    data.packageID
+                );
+
+            if (confirmedSync == null ||
+                confirmedSync.baseVersionID != data.newVersionID)
+            {
+                Debug.LogError(
+                    "[Quiz Recovery] Failed to confirm new version metadata."
+                );
+
+                return false;
+            }
+
+            // Both copies are verified and the new version is recorded.
+            DeletePackageBackup(data.backupFolder);
+
+            if (Directory.Exists(data.backupFolder))
+            {
+                Debug.LogWarning(
+                    "[Quiz Recovery] Backup cleanup incomplete."
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "[Quiz Recovery] Interrupted update finalized: " +
+                data.packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "[Quiz Recovery] Failed to finalize update: " + ex
+            );
+
+            return false;
+        }
+    }
+
+    public async Task<bool> RecoverPendingUpdatesAsync()
+    {
+        if (isDownloading)
+        {
+            Debug.LogWarning(
+                "[Quiz Recovery] Cannot recover while downloading."
+            );
+
+            return false;
+        }
+
+        isDownloading = true;
+
+        try
+        {
+            List<string> records =
+                GetPendingUpdateRecoveryRecords();
+
+            if (records.Count == 0)
+                return true;
+
+            Debug.Log(
+                "[Quiz Recovery] Found " + records.Count +
+                " pending update record(s)."
+            );
+
+            bool allRecovered = true;
+
+            foreach (string recordPath in records)
+            {
+                try
+                {
+                    QuizPackageUpdateRecoveryData data =
+                        JsonUtility.FromJson<QuizPackageUpdateRecoveryData>(
+                            File.ReadAllText(recordPath)
+                        );
+
+                    if (!IsValidUpdateRecoveryRecord(data))
+                    {
+                        Debug.LogError(
+                            "[Quiz Recovery] Invalid recovery record: " +
+                            recordPath
+                        );
+
+                        allRecovered = false;
+                        continue;
+                    }
+
+                    bool recovered =
+                        await RecoverInterruptedUpdateAsync(data);
+
+                    if (recovered)
+                    {
+                        DeleteUpdateRecoveryRecord(recordPath);
+
+                        if (File.Exists(recordPath))
+                            allRecovered = false;
+                    }
+                    else
+                    {
+                        allRecovered = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError(
+                        "[Quiz Recovery] Recovery failed: " + ex
+                    );
+
+                    allRecovered = false;
+                }
+            }
+
+            return allRecovered;
+        }
+        finally
+        {
+            isDownloading = false;
+        }
+    }
+
+
+    public async Task<bool> SyncActiveClassroomPackagesAsync()
+    {
+        if (isSynchronizing || isDownloading)
+        {
+            Debug.LogWarning(
+                "[Quiz Sync] Another Quiz Package operation is running."
+            );
+
+            return false;
+        }
+
+        isSynchronizing = true;
+
+        try
+        {
+            // Resolve interrupted updates before downloading anything.
+            if (!await RecoverPendingUpdatesAsync())
+            {
+                Debug.LogWarning(
+                    "[Quiz Sync] Pending recovery is incomplete."
+                );
+
+                return false;
+            }
+
+            if (!TryGetQuizCollection(
+                out CollectionReference collection))
+            {
+                return false;
+            }
+
+            string classroomID =
+                DatabaseManager.Instance.CurrentDatabase;
+
+            List<string> packageIDs =
+                await GetPublishedQuizPackagesAsync();
+
+            if (DatabaseManager.Instance == null ||
+                DatabaseManager.Instance.CurrentDatabase != classroomID)
+            {
+                Debug.LogWarning(
+                    "[Quiz Sync] Classroom changed during discovery."
+                );
+
+                return false;
+            }
+
+            bool allSucceeded = true;
+
+            foreach (string packageID in packageIDs)
+            {
+                if (DatabaseManager.Instance == null ||
+                    DatabaseManager.Instance.CurrentDatabase != classroomID)
+                {
+                    Debug.LogWarning(
+                        "[Quiz Sync] Classroom changed. Sync cancelled."
+                    );
+
+                    return false;
+                }
+
+                string packageFolder =
+                    GetPackageFolder(classroomID, packageID);
+
+                bool success;
+
+
+                if (Directory.Exists(packageFolder))
+                {
+                    QuizPackageSyncData syncData =
+                        QuizPackageSyncManager.Load(
+                            classroomID,
+                            packageID
+                        );
+
+                    if (syncData == null ||
+                        string.IsNullOrWhiteSpace(syncData.baseVersionID))
+                    {
+                        // Do not assume that existing files match Firestore.
+                        // Retrieve the published manifest and verify the files.
+                        QuizPackageManifest manifest =
+                            await GetPackageManifestAsync(packageID);
+
+                        if (manifest != null &&
+                            AreLocalFilesMatchingManifest(
+                                packageFolder,
+                                manifest.files))
+                        {
+                            QuizPackageSyncManager.Save(
+                                classroomID,
+                                packageID,
+                                manifest.versionID
+                            );
+
+                            QuizPackageSyncData repairedSync =
+                                QuizPackageSyncManager.Load(
+                                    classroomID,
+                                    packageID
+                                );
+
+                            success =
+                                repairedSync != null &&
+                                repairedSync.baseVersionID == manifest.versionID;
+
+                            if (success)
+                            {
+                                Debug.Log(
+                                    "[Quiz Sync] Missing synchronization baseline repaired: " +
+                                    packageID
+                                );
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning(
+                                "[Quiz Sync] Existing package has no baseline " +
+                                "and does not match the published version. " +
+                                "Files preserved: " + packageID
+                            );
+
+                            success = false;
+                        }
+                    }
+                    else
+                    {
+                        success =
+                            await UpdateInstalledPackageAsync(packageID);
+                    }
+                }
+                else
+                {
+                    success =
+                        await InstallPackageAsync(packageID);
+                }
+
+
+                if (!success)
+                {
+                    allSucceeded = false;
+
+                    Debug.LogWarning(
+                        "[Quiz Sync] Package could not be synchronized: " +
+                        packageID
+                    );
+                }
+            }
+
+            Debug.Log(
+                "[Quiz Sync] Synchronization finished for Classroom: " +
+                classroomID
+            );
+
+            return allSucceeded;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "[Quiz Sync] Unexpected error: " + ex
+            );
+
+            return false;
+        }
+        finally
+        {
+            isSynchronizing = false;
+        }
+    }
+
+
+    private bool RestorePackageSyncVersion(
+        string classroomID,
+        string packageID,
+        string previousVersionID)
+    {
+        if (string.IsNullOrWhiteSpace(previousVersionID))
+            return false;
+
+        try
+        {
+            QuizPackageSyncManager.Save(
+                classroomID,
+                packageID,
+                previousVersionID
+            );
+
+            QuizPackageSyncData restoredSync =
+                QuizPackageSyncManager.Load(
+                    classroomID,
+                    packageID
+                );
+
+            if (restoredSync == null ||
+                restoredSync.baseVersionID != previousVersionID)
+            {
+                Debug.LogError(
+                    "Quiz Package synchronization metadata " +
+                    "could not be restored."
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "Previous Quiz Package synchronization version restored: " +
+                previousVersionID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to restore Quiz Package synchronization metadata: " +
+                ex
+            );
+
+            return false;
+        }
+    }
+
+    public async Task<bool> InstallPackageAsync(string packageID)
+    {
+        if (isDownloading)
+        {
+            Debug.LogWarning(
+                "[Quiz Install] Another package operation is running."
+            );
+            return false;
+        }
+
+        if (!TryGetQuizCollection(
+            out CollectionReference collection))
+            return false;
+
+        isDownloading = true;
+        string temporaryFolder = null;
+
+        try
+        {
+            QuizPackageManifest manifest =
+                await GetPackageManifestAsync(packageID);
+
+            if (manifest == null || manifest.files.Count == 0)
+                return false;
+
+            string destinationFolder =
+                GetPackageFolder(
+                    manifest.classroomID,
+                    manifest.packageID
+                );
+
+            if (Directory.Exists(destinationFolder) ||
+                File.Exists(destinationFolder))
+            {
+                Debug.LogWarning(
+                    "[Quiz Install] Package already exists: " + packageID
+                );
+
+                return false;
+            }
+
+            DocumentReference packageDoc =
+                collection.Document(packageID);
+
+            temporaryFolder =
+                await DownloadPackageToTemporaryFolderAsync(
+                    packageID,
+                    packageDoc,
+                    manifest.files
+                );
+
+            if (DatabaseManager.Instance == null ||
+                DatabaseManager.Instance.CurrentDatabase !=
+                    manifest.classroomID)
+            {
+                Debug.LogWarning(
+                    "[Quiz Install] Classroom changed during download."
+                );
+                return false;
+            }
+
+            DocumentSnapshot latestSnapshot =
+                await packageDoc.GetSnapshotAsync();
+
+            if (!latestSnapshot.Exists ||
+                !latestSnapshot.TryGetValue(
+                    "activeVersion",
+                    out string latestVersion) ||
+                latestVersion != manifest.versionID)
+            {
+                Debug.LogWarning(
+                    "[Quiz Install] Published version changed."
+                );
+                return false;
+            }
+
+            if (!InstallDownloadedPackage(
+                manifest,
+                temporaryFolder))
+            {
+                return false;
+            }
+
+            QuizPackageSyncManager.Save(
+                manifest.classroomID,
+                manifest.packageID,
+                manifest.versionID
+            );
+
+            QuizPackageSyncData confirmedSync =
+                QuizPackageSyncManager.Load(
+                    manifest.classroomID,
+                    manifest.packageID
+                );
+
+            if (confirmedSync == null ||
+                confirmedSync.baseVersionID != manifest.versionID)
+            {
+                Debug.LogError(
+                    "[Quiz Install] Synchronization metadata was not saved."
+                );
+                return false;
+            }
+
+            Debug.Log(
+                "[Quiz Install] Successfully installed: " +
+                packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "[Quiz Install] Installation failed: " + ex
+            );
+            return false;
+        }
+        finally
+        {
+            if (!string.IsNullOrEmpty(temporaryFolder) &&
+                Directory.Exists(temporaryFolder))
+            {
+                try
+                {
+                    Directory.Delete(temporaryFolder, true);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning(
+                        "[Quiz Install] Temporary cleanup failed: " +
+                        ex.Message
+                    );
+                }
+            }
+
+            isDownloading = false;
+        }
+    }
+
     public async Task<bool> UpdateInstalledPackageAsync(string packageID)
     {
         string installedFolder = null;
+        string originalClassroomID = null;
+        string originalVersionID = null;
+        string recoveryRecordPath = null;
 
         if (isDownloading)
         {
@@ -1205,6 +2350,8 @@ public class QuizPackageDownloadManager : MonoBehaviour
             }
 
             string expectedBaseVersion = localSync.baseVersionID;
+            originalClassroomID = classroomID;
+            originalVersionID = expectedBaseVersion;
 
             // Verify local files against the previously synchronized version.
             if (await HasUnsynchronizedLocalChangesAsync(
@@ -1281,14 +2428,44 @@ public class QuizPackageDownloadManager : MonoBehaviour
                 return false;
             }
 
+
+            // Predetermine the backup location.
+            backupFolder = Path.Combine(
+                GetClassroomFolder(classroomID),
+                ".backup-" + Guid.NewGuid().ToString("N")
+            );
+
+            // Record the operation before modifying installed files.
+            QuizPackageUpdateRecoveryData recoveryData =
+                new QuizPackageUpdateRecoveryData
+                {
+                    classroomID = classroomID,
+                    packageID = packageID,
+                    previousVersionID = expectedBaseVersion,
+                    newVersionID = manifest.versionID,
+                    destinationFolder = destinationFolder,
+                    backupFolder = backupFolder
+                };
+
+            recoveryRecordPath =
+                SaveUpdateRecoveryRecord(recoveryData);
+
             // Replace the installation, preserving the old version.
             if (!ReplaceInstalledPackage(
                 manifest,
                 temporaryFolder,
-                out backupFolder))
+                backupFolder))
             {
+                // Keep the recovery record if a backup remains.
+                if (!Directory.Exists(backupFolder))
+                {
+                    DeleteUpdateRecoveryRecord(recoveryRecordPath);
+                    recoveryRecordPath = null;
+                }
+
                 return false;
             }
+
 
             replacementCompleted = true;
 
@@ -1312,6 +2489,13 @@ public class QuizPackageDownloadManager : MonoBehaviour
             }
 
             DeletePackageBackup(backupFolder);
+
+            if (!Directory.Exists(backupFolder))
+            {
+                DeleteUpdateRecoveryRecord(recoveryRecordPath);
+                recoveryRecordPath = null;
+            }
+
             backupFolder = null;
 
             Debug.Log(
@@ -1327,22 +2511,42 @@ public class QuizPackageDownloadManager : MonoBehaviour
                 "Quiz Package update failed: " + ex
             );
 
-            if (replacementCompleted && !string.IsNullOrWhiteSpace(backupFolder))
+
+            if (replacementCompleted &&
+                !string.IsNullOrWhiteSpace(backupFolder))
             {
-                bool restored = RestorePackageBackup(
+                bool filesRestored = RestorePackageBackup(
                     installedFolder,
                     backupFolder
                 );
 
-                if (restored)
+                if (filesRestored)
                 {
-                    Debug.LogWarning(
-                        "Previous Quiz Package restored. " +
-                        "Synchronization metadata should be verified " +
-                        "before attempting another update."
+                    bool metadataRestored =
+                        RestorePackageSyncVersion(
+                            originalClassroomID,
+                            packageID,
+                            originalVersionID
+                        );
+
+                    if (!metadataRestored)
+                    {
+                        Debug.LogError(
+                            "Quiz Package files were restored, but " +
+                            "synchronization metadata recovery failed. " +
+                            "Manual recovery may be required."
+                        );
+                    }
+                }
+                else
+                {
+                    Debug.LogError(
+                        "Quiz Package rollback failed. " +
+                        "The backup has been preserved for recovery."
                     );
                 }
             }
+
 
             return false;
         }
@@ -1723,6 +2927,90 @@ public class QuizPackageDownloadManager : MonoBehaviour
                 ? "[Update Test] PASSED."
                 : "[Update Test] Update skipped or failed. Check warnings."
         );
+    }
+
+    [ContextMenu("Test Quiz Package Recovery Inspection")]
+    public void TestQuizPackageRecoveryInspection()
+    {
+        Debug.Log(
+            "[Recovery Test] Inspecting pending Quiz Package updates..."
+        );
+
+        InspectPendingUpdateRecoveryRecords();
+
+        Debug.Log(
+            "[Recovery Test] Inspection finished."
+        );
+    }
+
+    [ContextMenu("Test Quiz Package Missing Installation Recovery")]
+    public async void TestMissingInstallationRecovery()
+    {
+        List<string> records =
+            GetPendingUpdateRecoveryRecords();
+
+        if (records.Count == 0)
+        {
+            Debug.Log(
+                "[Recovery Test] No pending update records found."
+            );
+
+            return;
+        }
+
+        foreach (string recordPath in records)
+        {
+            try
+            {
+                QuizPackageUpdateRecoveryData data =
+                    JsonUtility.FromJson<QuizPackageUpdateRecoveryData>(
+                        File.ReadAllText(recordPath)
+                    );
+
+                if (!IsValidUpdateRecoveryRecord(data))
+                {
+                    Debug.LogError(
+                        "[Recovery Test] Invalid record: " + recordPath
+                    );
+
+                    continue;
+                }
+
+                bool recovered = await RecoverInterruptedUpdateAsync(data);
+
+                if (recovered)
+                {
+                    DeleteUpdateRecoveryRecord(recordPath);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(
+                    "[Recovery Test] Recovery failed: " + ex
+                );
+            }
+        }
+    }
+
+    [ContextMenu("Test Pending Quiz Package Recovery")]
+    public async void TestPendingQuizPackageRecovery()
+    {
+        try
+        {
+            bool success = await RecoverPendingUpdatesAsync();
+
+            Debug.Log(
+                "[Recovery Test] Pending recovery result: " +
+                (success ? "SUCCESS" : "INCOMPLETE")
+            );
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "[Recovery Test] Unexpected error: " + ex
+            );
+        }
     }
 
 }

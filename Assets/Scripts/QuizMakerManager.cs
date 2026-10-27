@@ -63,6 +63,7 @@ public class QuizMakerManager : MonoBehaviour
 
     private bool trueFalseAnswer = true;
     private int correctAnswerIndex = 0;
+    private bool isClosingQuizMaker = false;
 
     private string selectedImagePath;
     private string selectedAudioPath;
@@ -117,13 +118,64 @@ public class QuizMakerManager : MonoBehaviour
         removeQuestionPanel.SetActive(false);
     }
 
-    public void CloseQuizMakerPanel()
+
+    public async void CloseQuizMakerPanel()
     {
-        QuizMakerPanel.SetActive(false);
-        accountButton.SetActive(true);
-        backButton.SetActive(false);
-        mainMenuImage.SetActive(true);
+        // Prevent the player from triggering another exit
+        // while an upload is already running.
+        if (isClosingQuizMaker)
+            return;
+
+        isClosingQuizMaker = true;
+
+        try
+        {
+            string selectedQuizPath = SelectedQuizFilePath;
+
+            if (!string.IsNullOrWhiteSpace(selectedQuizPath))
+            {
+                QuizPackageUploadManager uploadManager =
+                    FindFirstObjectByType<QuizPackageUploadManager>();
+
+                if (uploadManager != null)
+                {
+                    bool success =
+                        await uploadManager.UploadSelectedPackageAsync();
+
+                    if (!success)
+                    {
+                        Debug.LogWarning(
+                            "[Quiz Maker] Automatic upload was unsuccessful. " +
+                            "Local Quiz Package files were preserved."
+                        );
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        "[Quiz Maker] QuizPackageUploadManager not found. " +
+                        "Automatic upload skipped."
+                    );
+                }
+            }
+
+            QuizMakerPanel.SetActive(false);
+            accountButton.SetActive(true);
+            backButton.SetActive(false);
+            mainMenuImage.SetActive(true);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError(
+                "[Quiz Maker] Error while closing Quiz Maker: " + ex
+            );
+        }
+        finally
+        {
+            isClosingQuizMaker = false;
+        }
     }
+
 
     public void ConfirmNewQuiz()
     {

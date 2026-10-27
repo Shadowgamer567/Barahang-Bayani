@@ -340,26 +340,42 @@ public class QuizPackageUploadManager : MonoBehaviour
 
         try
         {
+
             QuizPackageSyncData localSync =
                 QuizPackageSyncManager.Load(
                     classroomID,
                     packageID
                 );
 
-            if (localSync == null)
+            bool isNewPackage = localSync == null;
+            string expectedVersion =
+                localSync != null ? localSync.baseVersionID : null;
+
+            if (isNewPackage)
             {
-                Debug.LogWarning(
-                    "Quiz Package upload blocked: " +
-                    "No verified synchronization record exists for " +
+                DocumentSnapshot remoteSnapshot =
+                    await packageDoc.GetSnapshotAsync();
+
+                // A package already exists remotely, but we have
+                // no synchronization history for it.
+                if (remoteSnapshot.Exists)
+                {
+                    Debug.LogWarning(
+                        "Quiz Package upload blocked: " +
+                        "A remote package already exists without " +
+                        "verified local synchronization history: " +
+                        packageID
+                    );
+
+                    return false;
+                }
+
+                Debug.Log(
+                    "New Quiz Package detected. Preparing first upload: " +
                     packageID
                 );
-
-                return false;
             }
-
-            string expectedVersion = localSync.baseVersionID;
-
-            if (await HasVersionConflictAsync(
+            else if (await HasVersionConflictAsync(
                 packageDoc,
                 classroomID,
                 packageID))
@@ -1058,8 +1074,9 @@ public class QuizPackageUploadManager : MonoBehaviour
                 packageID
             );
 
-        if (currentSync == null ||
-            currentSync.baseVersionID != expectedVersion)
+        if (expectedVersion != null &&
+           (currentSync == null ||
+           currentSync.baseVersionID != expectedVersion))
         {
             Debug.LogWarning(
                 "Quiz Package publication cancelled: " +
@@ -1077,20 +1094,44 @@ public class QuizPackageUploadManager : MonoBehaviour
                     DocumentSnapshot snapshot =
                         await transaction.GetSnapshotAsync(packageDoc);
 
+
                     string currentVersion = null;
 
                     if (snapshot.Exists)
                     {
-                        snapshot.TryGetValue(
+                        // A first-time upload must never overwrite an
+                        // existing package, even if it has no activeVersion.
+                        if (expectedVersion == null)
+                        {
+                            Debug.LogWarning(
+                                "First-time Quiz Package publication rejected: " +
+                                "Package already exists in Firestore."
+                            );
+
+                            return false;
+                        }
+
+                        if (!snapshot.TryGetValue(
                             "activeVersion",
-                            out currentVersion
-                        );
+                            out currentVersion))
+                        {
+                            return false;
+                        }
+                    }
+
+                    else
+                    {
+                        // An existing synchronized package should not
+                        // unexpectedly disappear from Firestore.
+                        if (expectedVersion != null)
+                            return false;
                     }
 
                     if (currentVersion != expectedVersion)
                     {
                         return false;
                     }
+
 
                     transaction.Set(
                         packageDoc,
@@ -1122,6 +1163,24 @@ public class QuizPackageUploadManager : MonoBehaviour
                 packageID,
                 versionID
             );
+
+            QuizPackageSyncData confirmedSync =
+                QuizPackageSyncManager.Load(
+                    classroomID,
+                    packageID
+                );
+
+            if (confirmedSync == null ||
+                confirmedSync.baseVersionID != versionID)
+            {
+                Debug.LogError(
+                    "Quiz Package was published, but local " +
+                    "synchronization metadata could not be verified: " +
+                    packageID
+                );
+
+                return false;
+            }
 
             Debug.Log(
                 "Quiz Package version published safely: " +

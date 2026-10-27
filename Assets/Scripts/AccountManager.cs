@@ -921,6 +921,8 @@ public class AccountManager : MonoBehaviour
         backButton.SetActive(true);
 
         classroomPanel.SetActive(true);
+
+        _ = SyncQuizPackagesOnAccountOpenAsync();
     }
 
     public void OpenCreateStudentMenu()
@@ -1663,6 +1665,49 @@ public class AccountManager : MonoBehaviour
 
         CloseStudentInfo();
     }
+
+    private async System.Threading.Tasks.Task SyncQuizPackagesOnAccountOpenAsync()
+    {
+        try
+        {
+            QuizPackageDownloadManager downloadManager =
+                FindFirstObjectByType<QuizPackageDownloadManager>();
+
+            if (downloadManager == null)
+            {
+                Debug.LogWarning(
+                    "[Account Menu] Quiz Package Download Manager not found."
+                );
+
+                return;
+            }
+
+            bool success =
+                await downloadManager.SyncActiveClassroomPackagesAsync();
+
+            if (success)
+            {
+                Debug.Log(
+                    "[Account Menu] Quiz Package synchronization completed."
+                );
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "[Account Menu] Quiz Package synchronization " +
+                    "was skipped or partially unsuccessful."
+                );
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError(
+                "[Account Menu] Quiz Package synchronization failed: " +
+                ex
+            );
+        }
+    }
+
 }
 
 [System.Serializable]
