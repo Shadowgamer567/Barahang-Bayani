@@ -5,6 +5,7 @@ using UnityEngine;
 public class PanelHider : MonoBehaviour
 {
     [SerializeField] private GameObject mainMenuTitle;
+    [SerializeField] private GameObject[] additionalObjectsToHide;
     [SerializeField] private bool hideSiblingPanels = true;
 
     private readonly Dictionary<GameObject, bool> panelActiveStates = new Dictionary<GameObject, bool>();
@@ -43,6 +44,7 @@ public class PanelHider : MonoBehaviour
             HideMainMenuTitle();
         }
 
+        HideAdditionalObjects();
         RestoreBackdropStates();
     }
 
@@ -103,6 +105,19 @@ public class PanelHider : MonoBehaviour
                 panelActiveStates.Add(mainMenuTitle, mainMenuTitleWasActive);
             }
         }
+
+        if (additionalObjectsToHide == null)
+        {
+            return;
+        }
+
+        foreach (GameObject target in additionalObjectsToHide)
+        {
+            if (target != null && !panelActiveStates.ContainsKey(target))
+            {
+                panelActiveStates.Add(target, target.activeSelf);
+            }
+        }
     }
 
     private void CaptureBackdropStates(Transform panelContainer)
@@ -145,6 +160,22 @@ public class PanelHider : MonoBehaviour
         if (mainMenuTitle != null)
         {
             mainMenuTitle.SetActive(false);
+        }
+    }
+
+    private void HideAdditionalObjects()
+    {
+        if (additionalObjectsToHide == null)
+        {
+            return;
+        }
+
+        foreach (GameObject target in additionalObjectsToHide)
+        {
+            if (target != null)
+            {
+                target.SetActive(false);
+            }
         }
     }
 

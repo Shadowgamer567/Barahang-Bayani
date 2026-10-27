@@ -1116,6 +1116,11 @@ public class AccountManager : MonoBehaviour
 
     public void CloseAccountMenu()
     {
+        if (MainMenu.IsOptionsMenuOpen)
+        {
+            return;
+        }
+
         waitingToStartGame = false;
         waitingToLoadGame = false;
 

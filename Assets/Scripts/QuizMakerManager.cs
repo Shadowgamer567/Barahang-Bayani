@@ -121,6 +121,9 @@ public class QuizMakerManager : MonoBehaviour
 
     public async void CloseQuizMakerPanel()
     {
+        if (MainMenu.IsOptionsMenuOpen)
+            return;
+
         // Prevent the player from triggering another exit
         // while an upload is already running.
         if (isClosingQuizMaker)
@@ -1035,4 +1038,3 @@ public class QuizMakerManager : MonoBehaviour
 
     }
 }
-
