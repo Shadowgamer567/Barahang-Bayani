@@ -53,6 +53,19 @@ public class FirestoreAccountManager : MonoBehaviour
         return snapshot.Exists;
     }
 
+    public static async Task DeleteAccount(string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        await FirestoreManager.Instance
+            .AccountsCollection()
+            .Document(accountID)
+            .DeleteAsync();
+
+        Debug.Log("Deleted account from Firestore: " + accountID);
+    }
+
     public async Task DownloadAccounts()
     {
         string classroomID = DatabaseManager.Instance.CurrentDatabase;

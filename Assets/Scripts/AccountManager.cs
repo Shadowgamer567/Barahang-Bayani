@@ -261,41 +261,132 @@ public class AccountManager : MonoBehaviour
     }
 
 
-    public void DeleteSelected()
+
+    private bool deletingAccount = false;
+
+    public async void DeleteSelected()
     {
-        if (selectedAccount == null)
+        if (deletingAccount || selectedAccount == null)
             return;
 
-        string saveFile = Application.persistentDataPath + "/progress_" + selectedAccount.id + ".json";
+        AccountData accountToDelete = selectedAccount;
+        string accountID = accountToDelete.id;
 
-        if (File.Exists(saveFile))
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        // Prevent deletion while the initial account upload is pending.
+        if (synchronizingPendingAccounts)
         {
-            File.Delete(saveFile);
+            Debug.LogWarning(
+                "Cannot delete an account while account uploads are synchronizing."
+            );
+            return;
         }
 
-        registry.accounts.RemoveAll(a => a.id == selectedAccount.id);
+        bool isPendingUpload = IsAccountPendingUpload(accountID);
 
-        foreach (AccountData account in registry.accounts)
+        if (synchronizingAssignments)
         {
-            if (account.assignedStudentIDs != null)
+            Debug.LogWarning(
+                "Cannot delete an account while assignments are synchronizing."
+            );
+            return;
+        }
+
+        if (FirestoreManager.Instance == null ||
+            DatabaseManager.Instance == null ||
+            string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase) ||
+            DatabaseManager.Instance.CurrentDatabase == "DefaultDatabase")
+        {
+            Debug.LogWarning(
+                "Account deletion blocked: No active Classroom or Firestore connection."
+            );
+            return;
+        }
+
+        string classroomID = DatabaseManager.Instance.CurrentDatabase;
+
+        deletingAccount = true;
+
+        try
+        {
+            // Pending accounts have not yet been confirmed uploaded.
+            // Delete remotely as well, in case an earlier upload partially succeeded.
+            await FirestoreAccountManager.DeleteAccount(accountID);
+
+            // Ensure the Classroom hasn't changed during the operation.
+            if (DatabaseManager.Instance.CurrentDatabase != classroomID)
             {
-                account.assignedStudentIDs.Remove(selectedAccount.id);
+                Debug.LogWarning(
+                    "Account deleted from Firestore, but local cleanup was cancelled " +
+                    "because the active Classroom changed."
+                );
+                return;
             }
+
+            // Remove the local progress file.
+            string saveFile = Path.Combine(
+                Application.persistentDataPath,
+                "progress_" + accountID + ".json"
+            );
+
+            if (File.Exists(saveFile))
+                File.Delete(saveFile);
+
+            // Remove the account from the local registry.
+            registry.accounts.RemoveAll(a => a.id == accountID);
+
+            if (isPendingUpload)
+            {
+                pendingAccountUploads.accountIDs.Remove(accountID);
+                SavePendingAccountUploads();
+            }
+
+            // Remove deleted students from teacher assignments.
+            foreach (AccountData account in registry.accounts)
+            {
+                if (account.assignedStudentIDs != null &&
+                    account.assignedStudentIDs.Remove(accountID) &&
+                    account.accountType == AccountType.Teacher)
+                {
+                    QueueAssignmentUpload(account.id);
+                }
+            }
+
+            // Remove any queued assignment upload for the deleted account.
+            pendingAssignmentUploads.accountIDs.Remove(accountID);
+            SavePendingAssignmentUploads();
+
+            if (CurrentAccount.ActiveAccount != null &&
+                CurrentAccount.ActiveAccount.id == accountID)
+            {
+                CurrentAccount.ActiveAccount = null;
+            }
+
+            selectedAccount = null;
+            selectedCard = null;
+
+            SaveAccount();
+            RefreshUI();
+
+            Debug.Log(
+                "Account deleted locally and from Firestore: " +
+                accountToDelete.username
+            );
         }
-
-        selectedAccount = null;
-        selectedCard = null;
-
-        if (IsAccountPendingUpload(selectedAccount.id))
+        catch (System.Exception ex)
         {
-            Debug.LogWarning("Cannot delete an account while its initial upload is pending.");
-            return;
+            Debug.LogError(
+                "Account deletion failed: " + ex
+            );
         }
-
-        SaveAccount();
-
-        RefreshUI();
+        finally
+        {
+            deletingAccount = false;
+        }
     }
+
 
     public void RefreshUI()
     {

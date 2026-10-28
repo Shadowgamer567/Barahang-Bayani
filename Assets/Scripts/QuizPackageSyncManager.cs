@@ -67,7 +67,6 @@ public static class QuizPackageSyncManager
         }
     }
 
-
     public static void Save(
         string classroomID,
         string packageID,
@@ -99,4 +98,45 @@ public static class QuizPackageSyncManager
             $"{packageID} -> {versionID}"
         );
     }
+
+    public static bool Delete(
+        string classroomID,
+        string packageID)
+    {
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            string.IsNullOrWhiteSpace(packageID))
+        {
+            return false;
+        }
+
+        try
+        {
+            string path = GetSyncFilePath(
+                classroomID,
+                packageID
+            );
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            Debug.Log(
+                "Quiz Package synchronization metadata removed: " +
+                packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to remove Quiz Package synchronization metadata: " +
+                ex
+            );
+
+            return false;
+        }
+    }
+
 }

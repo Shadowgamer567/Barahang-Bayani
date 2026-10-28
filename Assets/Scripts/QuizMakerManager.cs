@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using SFB;
+using Firebase.Firestore;
 
 public class QuizMakerManager : MonoBehaviour
 {
@@ -54,6 +55,9 @@ public class QuizMakerManager : MonoBehaviour
     [Header("Remove Question Panel")]
     public GameObject removeQuestionPanel;
 
+    [Header("Remove Quiz Confirmation")]
+    public GameObject removeQuizConfirmationPanel;
+
     public Transform questionGridContent;
 
     public GameObject multipleChoiceQuestionTemplate;
@@ -64,6 +68,8 @@ public class QuizMakerManager : MonoBehaviour
     private bool trueFalseAnswer = true;
     private int correctAnswerIndex = 0;
     private bool isClosingQuizMaker = false;
+    private bool isDeletingQuiz = false;
+    public bool IsDeletingQuiz => isDeletingQuiz;
 
     private string selectedImagePath;
     private string selectedAudioPath;
@@ -118,7 +124,6 @@ public class QuizMakerManager : MonoBehaviour
         removeQuestionPanel.SetActive(false);
     }
 
-
     public async void CloseQuizMakerPanel()
     {
         if (MainMenu.IsOptionsMenuOpen)
@@ -126,7 +131,7 @@ public class QuizMakerManager : MonoBehaviour
 
         // Prevent the player from triggering another exit
         // while an upload is already running.
-        if (isClosingQuizMaker)
+        if (isClosingQuizMaker || isDeletingQuiz)
             return;
 
         isClosingQuizMaker = true;
@@ -197,11 +202,33 @@ public class QuizMakerManager : MonoBehaviour
             return;
         }
 
-        // Root directory for custom quiz packages.
-        string quizRoot = QuizPackagesRoot;
 
-        // Each quiz gets its own folder.
-        string packageFolder = Path.Combine(quizRoot, quizName);
+        // Every Quiz Package belongs to the active Classroom.
+        string classroomID =
+            DatabaseManager.Instance != null
+                ? DatabaseManager.Instance.CurrentDatabase
+                : null;
+
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            classroomID == "DefaultDatabase")
+        {
+            Debug.LogWarning(
+                "Select a Classroom before creating a Quiz Package."
+            );
+            return;
+        }
+
+        // Root directory for this Classroom's Quiz Packages.
+        string quizRoot = Path.Combine(
+            QuizPackagesRoot,
+            classroomID
+        );
+
+        // Each Quiz Package gets its own folder.
+        string packageFolder = Path.Combine(
+            quizRoot,
+            quizName
+        );
 
         string imagesFolder = Path.Combine(packageFolder, "Images");
         string soundsFolder = Path.Combine(packageFolder, "Sounds");
@@ -239,6 +266,262 @@ public class QuizMakerManager : MonoBehaviour
         catch (System.Exception ex)
         {
             Debug.LogError("Failed to create Quiz Package: " + ex.Message);
+        }
+    }
+
+    public void OpenRemoveQuizConfirmation()
+    {
+        if (string.IsNullOrWhiteSpace(selectedQuizPath))
+        {
+            Debug.LogWarning("No Quiz selected for deletion.");
+            return;
+        }
+
+        string quizName =
+            Path.GetFileNameWithoutExtension(selectedQuizPath);
+
+        if (string.Equals(
+            quizName,
+            "questions",
+            System.StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogWarning("Default Questions.txt cannot be deleted.");
+            return;
+        }
+
+        removeQuizConfirmationPanel.SetActive(true);
+    }
+
+    public void CancelRemoveQuizConfirmation()
+    {
+        removeQuizConfirmationPanel.SetActive(false);
+    }
+
+    public async void ConfirmRemoveQuiz()
+    {
+        if (isDeletingQuiz || isClosingQuizMaker)
+            return;
+
+        if (string.IsNullOrWhiteSpace(selectedQuizPath))
+            return;
+
+        string originalPath = selectedQuizPath;
+        string packageID = Path.GetFileNameWithoutExtension(originalPath);
+
+        if (string.Equals(
+            packageID,
+            "questions",
+            System.StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogWarning("Default Questions.txt cannot be deleted.");
+            return;
+        }
+
+        string classroomID =
+            DatabaseManager.Instance != null
+                ? DatabaseManager.Instance.CurrentDatabase
+                : null;
+
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            classroomID == "DefaultDatabase")
+        {
+            Debug.LogWarning(
+                "Select a Classroom before deleting a Quiz Package."
+            );
+            return;
+        }
+
+        // Only allow deletion of a package inside the active Classroom.
+        string expectedFolder = Path.GetFullPath(
+            Path.Combine(
+                QuizPackagesRoot,
+                classroomID,
+                packageID
+            )
+        );
+
+        string actualFolder = Path.GetFullPath(
+            Path.GetDirectoryName(originalPath)
+        );
+
+        string expectedQuizFile = Path.Combine(
+            expectedFolder,
+            packageID + ".txt"
+        );
+
+        if (!string.Equals(
+            actualFolder,
+            expectedFolder,
+            System.StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(
+                Path.GetFullPath(originalPath),
+                Path.GetFullPath(expectedQuizFile),
+                System.StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogWarning(
+                "Deletion blocked: Selected file is not inside " +
+                "the expected Classroom Quiz Package folder."
+            );
+            return;
+        }
+
+        if (!Directory.Exists(expectedFolder) ||
+            !File.Exists(expectedQuizFile))
+        {
+            Debug.LogWarning(
+                "Deletion blocked: Quiz Package files are missing."
+            );
+            return;
+        }
+
+        QuizPackageUploadManager uploadManager =
+            FindFirstObjectByType<QuizPackageUploadManager>();
+
+        if (uploadManager == null)
+        {
+            Debug.LogError(
+                "Deletion blocked: QuizPackageUploadManager not found."
+            );
+            return;
+        }
+
+        if (uploadManager.IsUploading)
+        {
+            Debug.LogWarning(
+                "Deletion blocked: A Quiz Package upload is currently running."
+            );
+            return;
+        }
+
+        isDeletingQuiz = true;
+
+        try
+        { 
+            bool alreadyDeleted =
+                await uploadManager.IsPackageDeletionConfirmedAsync(
+                    classroomID,
+                    packageID
+                );
+
+            if (alreadyDeleted)
+            {
+                Debug.Log(
+                    "Quiz Package was already marked deleted in Firestore. " +
+                    "Retrying local cleanup: " + packageID
+                );
+            }
+
+            QuizPackageSyncData sync =
+                QuizPackageSyncManager.Load(classroomID, packageID);
+
+            if (alreadyDeleted)
+            {
+                // Firestore already confirmed deletion.
+                // Continue to local cleanup without another cloud write.
+            }
+            else if (sync != null &&
+                     !string.IsNullOrWhiteSpace(sync.baseVersionID))
+            {
+                if (uploadManager == null)
+                {
+                    Debug.LogError(
+                        "Deletion blocked: Upload Manager not found."
+                    );
+                    return;
+                }
+
+                // This method verifies that the published version
+                // still matches our local synchronization baseline.
+                bool markedDeleted =
+                    await uploadManager.MarkPackageDeletedAsync(packageID);
+
+                if (!markedDeleted)
+                {
+                    Debug.LogWarning(
+                        "Deletion cancelled: Firestore did not confirm deletion."
+                    );
+                    return;
+                }
+            }
+
+            else
+            {
+                // A package without synchronization metadata may be
+                // local-only. Verify and reserve its deletion in Firestore.
+                if (uploadManager == null)
+                {
+                    Debug.LogError(
+                        "Deletion blocked: Upload Manager not found."
+                    );
+                    return;
+                }
+
+                bool markedDeleted =
+                    await uploadManager.MarkLocalOnlyPackageDeletedAsync(
+                        classroomID,
+                        packageID
+                    );
+
+                if (!markedDeleted)
+                {
+                    Debug.LogWarning(
+                        "Deletion cancelled: Firestore could not confirm " +
+                        "that this is a local-only Quiz Package."
+                    );
+                    return;
+                }
+
+                Debug.Log(
+                    "Local-only Quiz Package deletion authorized: " +
+                    packageID
+                );
+            }
+
+            // The Classroom-wide deletion has been acknowledged.
+            // Remove the entire local package, including media and Quiz Info.
+
+            if (DatabaseManager.Instance == null ||
+                DatabaseManager.Instance.CurrentDatabase != classroomID ||
+                selectedQuizPath != originalPath ||
+                SelectedQuizFilePath != originalPath)
+            {
+                Debug.LogWarning(
+                    "Local deletion cancelled: The active Classroom " +
+                    "or selected Quiz Package changed during deletion."
+                );
+                return;
+            }
+
+
+            Directory.Delete(expectedFolder, true);
+
+            if (!QuizPackageSyncManager.Delete(classroomID, packageID))
+            {
+                Debug.LogWarning(
+                    "Quiz Package deleted, but local synchronization " +
+                    "metadata could not be removed."
+                );
+            }
+
+            if (selectedQuizPath == originalPath)
+                DeselectQuiz();
+
+            removeQuizConfirmationPanel.SetActive(false);
+
+            Debug.Log(
+                "Quiz Package deleted locally and marked deleted in Firestore: " +
+                packageID
+            );
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError(
+                "Quiz Package deletion failed: " + ex
+            );
+        }
+        finally
+        {
+            isDeletingQuiz = false;
         }
     }
 
@@ -398,9 +681,27 @@ public class QuizMakerManager : MonoBehaviour
         RefreshRemoveQuestionPanel();
     }
 
+
     public void OpenFileExplorer()
     {
-        string folderPath = QuizPackagesRoot;
+        string classroomID =
+            DatabaseManager.Instance != null
+                ? DatabaseManager.Instance.CurrentDatabase
+                : null;
+
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            classroomID == "DefaultDatabase")
+        {
+            Debug.LogWarning(
+                "Select a Classroom before choosing a Quiz Package."
+            );
+            return;
+        }
+
+        string folderPath = Path.Combine(
+            QuizPackagesRoot,
+            classroomID
+        );
 
         if (!Directory.Exists(folderPath))
         {
@@ -1003,7 +1304,6 @@ public class QuizMakerManager : MonoBehaviour
 
         Debug.Log("Question fields cleared.");
     }
-
 
     public void ToggleQuestionSelection(int index, bool selected)
     {

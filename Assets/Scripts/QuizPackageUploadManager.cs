@@ -303,6 +303,7 @@ public class QuizPackageUploadManager : MonoBehaviour
     }
 
     private bool isUploading = false;
+    public bool IsUploading => isUploading;
 
     public async Task<bool> UploadSelectedPackageAsync()
     {
@@ -311,6 +312,20 @@ public class QuizPackageUploadManager : MonoBehaviour
             Debug.LogWarning("A Quiz Package upload is already running.");
             return false;
         }
+
+        QuizMakerManager quizMaker =
+            FindFirstObjectByType<QuizMakerManager>();
+
+        if (quizMaker != null && quizMaker.IsDeletingQuiz)
+        {
+            Debug.LogWarning(
+                "Quiz Package upload blocked: " +
+                "A Quiz Package deletion is currently running."
+            );
+
+            return false;
+        }
+
 
         string quizPath = QuizMakerManager.SelectedQuizFilePath;
 
@@ -1017,6 +1032,21 @@ public class QuizPackageUploadManager : MonoBehaviour
         DocumentSnapshot remoteSnapshot =
             await packageDoc.GetSnapshotAsync();
 
+        if (remoteSnapshot.Exists &&
+        remoteSnapshot.TryGetValue(
+            "deleted",
+            out bool isDeleted) &&
+        isDeleted)
+        {
+            Debug.LogWarning(
+                "Quiz Package upload blocked: " +
+                "The package has been deleted from Firestore: " +
+                packageID
+            );
+
+            return true;
+        }
+
         string remoteVersion = null;
 
         if (remoteSnapshot.Exists)
@@ -1093,7 +1123,15 @@ public class QuizPackageUploadManager : MonoBehaviour
                 {
                     DocumentSnapshot snapshot =
                         await transaction.GetSnapshotAsync(packageDoc);
-
+                    
+                    if (snapshot.Exists &&
+                    snapshot.TryGetValue(
+                        "deleted",
+                        out bool isDeleted) &&
+                    isDeleted)
+                    {
+                        return false;
+                    }
 
                     string currentVersion = null;
 
@@ -1424,6 +1462,258 @@ public class QuizPackageUploadManager : MonoBehaviour
         {
             Debug.LogError(
                 "Quiz Package synchronization initialization failed: " +
+                ex
+            );
+
+            return false;
+        }
+    }
+
+    public async Task<bool> IsPackageDeletionConfirmedAsync(
+        string classroomID,
+        string packageID)
+    {
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            string.IsNullOrWhiteSpace(packageID))
+        {
+            return false;
+        }
+
+        if (DatabaseManager.Instance == null ||
+            DatabaseManager.Instance.CurrentDatabase != classroomID)
+        {
+            Debug.LogWarning(
+                "Deletion recovery blocked: Active Classroom changed."
+            );
+
+            return false;
+        }
+
+        if (!TryGetQuizCollection(
+            out CollectionReference collection))
+        {
+            return false;
+        }
+
+        try
+        {
+            DocumentReference packageDoc =
+                collection.Document(packageID);
+
+            DocumentSnapshot snapshot =
+                await packageDoc.GetSnapshotAsync(
+                    Source.Server
+                );
+
+            if (!snapshot.Exists)
+                return false;
+
+            if (!snapshot.TryGetValue(
+                "deleted",
+                out bool isDeleted))
+            {
+                return false;
+            }
+
+            if (!isDeleted)
+                return false;
+
+            Debug.Log(
+                "Firestore confirmed Quiz Package was already deleted: " +
+                packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to verify Quiz Package deletion state: " +
+                ex
+            );
+
+            return false;
+        }
+    }
+
+    public async Task<bool> MarkPackageDeletedAsync(string packageID)
+    {
+        if (string.IsNullOrWhiteSpace(packageID))
+            return false;
+
+        if (!TryGetQuizCollection(
+            out CollectionReference collection))
+            return false;
+
+        string classroomID =
+            DatabaseManager.Instance.CurrentDatabase;
+
+        QuizPackageSyncData localSync =
+            QuizPackageSyncManager.Load(
+                classroomID,
+                packageID
+            );
+
+        if (localSync == null ||
+            string.IsNullOrEmpty(localSync.baseVersionID))
+        {
+            Debug.LogWarning(
+                "Deletion blocked: No verified synchronization " +
+                "record exists for " + packageID
+            );
+
+            return false;
+        }
+
+        string expectedVersion = localSync.baseVersionID;
+
+        DocumentReference packageDoc =
+            collection.Document(packageID);
+
+        try
+        {
+            bool deleted = await FirestoreManager.Instance.DB
+                .RunTransactionAsync(async transaction =>
+                {
+                    DocumentSnapshot snapshot =
+                        await transaction.GetSnapshotAsync(packageDoc);
+
+                    if (!snapshot.Exists ||
+                        !snapshot.TryGetValue(
+                            "activeVersion",
+                            out string currentVersion) ||
+                        currentVersion != expectedVersion)
+                    {
+                        return false;
+                    }
+
+                    if (snapshot.TryGetValue(
+                        "deleted",
+                        out bool alreadyDeleted) &&
+                        alreadyDeleted)
+                    {
+                        return false;
+                    }
+
+                    transaction.Update(
+                        packageDoc,
+                        new Dictionary<string, object>
+                        {
+                        { "deleted", true },
+                        { "deletedAt", FieldValue.ServerTimestamp }
+                        }
+                    );
+
+                    return true;
+                });
+
+            if (!deleted)
+            {
+                Debug.LogWarning(
+                    "Quiz Package deletion rejected: " +
+                    "The package was already deleted or " +
+                    "its published version has changed."
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "Quiz Package marked as deleted in Firestore: " +
+                packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to mark Quiz Package as deleted: " + ex
+            );
+
+            return false;
+        }
+    }
+
+    public async Task<bool> MarkLocalOnlyPackageDeletedAsync(
+        string classroomID,
+        string packageID)
+    {
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            string.IsNullOrWhiteSpace(packageID))
+        {
+            return false;
+        }
+
+        if (DatabaseManager.Instance == null ||
+            DatabaseManager.Instance.CurrentDatabase != classroomID)
+        {
+            Debug.LogWarning(
+                "Local-only deletion blocked: Active Classroom changed."
+            );
+            return false;
+        }
+
+        if (!TryGetQuizCollection(
+            out CollectionReference collection))
+        {
+            return false;
+        }
+
+        DocumentReference packageDoc =
+            collection.Document(packageID);
+
+        try
+        {
+            bool deleted = await FirestoreManager.Instance.DB
+                .RunTransactionAsync(async transaction =>
+                {
+                    DocumentSnapshot snapshot =
+                        await transaction.GetSnapshotAsync(packageDoc);
+
+                    // Never delete or overwrite an existing package,
+                    // including an existing deletion tombstone.
+                    if (snapshot.Exists)
+                    {
+                        return false;
+                    }
+
+                    // Reserve this package ID as deleted.
+                    transaction.Set(
+                        packageDoc,
+                        new Dictionary<string, object>
+                        {
+                        { "packageName", packageID },
+                        { "deleted", true },
+                        { "deletedAt", FieldValue.ServerTimestamp }
+                        }
+                    );
+
+                    return true;
+                });
+
+            if (!deleted)
+            {
+                Debug.LogWarning(
+                    "Local-only deletion rejected: " +
+                    "Package already exists in Firestore: " +
+                    packageID
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "Local-only Quiz Package deletion tombstone created: " +
+                packageID
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to mark local-only Quiz Package as deleted: " +
                 ex
             );
 

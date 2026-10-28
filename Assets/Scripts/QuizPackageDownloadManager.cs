@@ -110,6 +110,20 @@ public class QuizPackageDownloadManager : MonoBehaviour
 
             foreach (DocumentSnapshot document in snapshot.Documents)
             {
+
+                if (document.TryGetValue(
+                    "deleted",
+                    out bool isDeleted) &&
+                    isDeleted)
+                {
+                    Debug.Log(
+                        "[Quiz Sync] Skipping deleted Quiz Package: " +
+                        document.Id
+                    );
+
+                    continue;
+                }
+
                 // Ignore packages without a published version.
                 if (!document.TryGetValue(
                     "activeVersion",
@@ -206,6 +220,21 @@ public class QuizPackageDownloadManager : MonoBehaviour
             DocumentSnapshot packageSnapshot =
                 await packageDoc.GetSnapshotAsync();
 
+
+            if (packageSnapshot.Exists &&
+                packageSnapshot.TryGetValue(
+                    "deleted",
+                    out bool isDeleted) &&
+                isDeleted)
+            {
+                Debug.LogWarning(
+                    "[Quiz Sync] Cannot download deleted Quiz Package: " +
+                    packageID
+                );
+
+                return null;
+            }
+
             // Get the currently published version.
             if (!packageSnapshot.Exists ||
                 !packageSnapshot.TryGetValue(
@@ -288,6 +317,22 @@ public class QuizPackageDownloadManager : MonoBehaviour
             // while we were retrieving its manifest.
             DocumentSnapshot latestPackageSnapshot =
                 await packageDoc.GetSnapshotAsync();
+
+            if (latestPackageSnapshot.Exists &&
+                latestPackageSnapshot.TryGetValue(
+                    "deleted",
+                    out bool wasDeleted) &&
+                wasDeleted)
+            {
+                Debug.LogWarning(
+                    "[Quiz Sync] Quiz Package was deleted " +
+                    "during manifest retrieval: " +
+                    packageID
+                );
+
+                return null;
+            }
+
 
             if (!latestPackageSnapshot.Exists ||
                 !latestPackageSnapshot.TryGetValue(
@@ -2213,6 +2258,9 @@ public class QuizPackageDownloadManager : MonoBehaviour
                 await packageDoc.GetSnapshotAsync();
 
             if (!latestSnapshot.Exists ||
+                (latestSnapshot.TryGetValue(
+                    "deleted",
+                    out bool isDeleted) && isDeleted) ||
                 !latestSnapshot.TryGetValue(
                     "activeVersion",
                     out string latestVersion) ||
@@ -2394,10 +2442,14 @@ public class QuizPackageDownloadManager : MonoBehaviour
                 await packageDoc.GetSnapshotAsync();
 
             if (!latestSnapshot.Exists ||
+                (latestSnapshot.TryGetValue(
+                    "deleted",
+                    out bool isDeleted) && isDeleted) ||
                 !latestSnapshot.TryGetValue(
                     "activeVersion",
                     out string latestVersion) ||
                 latestVersion != manifest.versionID)
+
             {
                 Debug.LogWarning(
                     "Update cancelled: Published version changed."
@@ -2817,10 +2869,14 @@ public class QuizPackageDownloadManager : MonoBehaviour
                 await packageDoc.GetSnapshotAsync();
 
             if (!latestSnapshot.Exists ||
+                (latestSnapshot.TryGetValue(
+                    "deleted",
+                    out bool isDeleted) && isDeleted) ||
                 !latestSnapshot.TryGetValue(
                     "activeVersion",
                     out string latestVersion) ||
                 latestVersion != manifest.versionID)
+
             {
                 Debug.LogWarning(
                     "Installation cancelled: Published version changed."
