@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/LevelSelect_Rizal.unity
     guid: 44ec0b6ea47f483409cfffc8e2d7f9b3
   - enabled: 1
+    path: Assets/Scenes/LevelSelect_Tutorial.unity
+    guid: fa0bc18fd3a8914408e70eff2b61a66c
+  - enabled: 1
     path: Assets/Scenes/MapMenu.unity
     guid: d9e2697d488929c4fa20fc36b725d0f2
   - enabled: 1

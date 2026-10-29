@@ -51,7 +51,7 @@ MonoBehaviour:
     id: 
     username: 
     accountType: 0
-  accountCardPrefab: {fileID: 0}
+  accountCardPrefab: {fileID: 7045330002664947850, guid: a4c1e7dc84661374bb58f4691b8f3341, type: 3}
   usernameInputField: {fileID: 0}
   accountButton: {fileID: 0}
   backButton: {fileID: 0}

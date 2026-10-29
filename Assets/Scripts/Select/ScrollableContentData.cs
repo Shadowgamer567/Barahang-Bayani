@@ -47,6 +47,14 @@ public class ScrollableContentData : ScriptableObject
 
     [Header("Layout & Panel Styling")]
     public Color panelBackgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.8f);
-    public RectOffset panelPadding = new RectOffset(15, 15, 15, 15);
+    public RectOffset panelPadding;
     public float elementSpacing = 10f;
+
+    private void OnEnable()
+    {
+        if (panelPadding == null)
+        {
+            panelPadding = new RectOffset(15, 15, 15, 15);
+        }
+    }
 }

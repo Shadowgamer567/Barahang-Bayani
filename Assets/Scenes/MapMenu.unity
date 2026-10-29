@@ -291,7 +291,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -754, y: 456}
+  m_AnchoredPosition: {x: -603.11, y: 453}
   m_SizeDelta: {x: 639.699, y: 101.729}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &108589361
@@ -2299,7 +2299,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -250, y: -20}
+  m_AnchoredPosition: {x: 268, y: -9}
   m_SizeDelta: {x: 438, y: 612}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1014764914
@@ -2409,6 +2409,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   loadGame: {fileID: 0}
+  optionsMenu: {fileID: 0}
+  optionsBackdrop: {fileID: 0}
+  accountsButton: {fileID: 0}
+  optionsBackButton: {fileID: 0}
 --- !u!1 &1025605554
 GameObject:
   m_ObjectHideFlags: 0
@@ -2847,6 +2851,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   loadGame: {fileID: 0}
+  optionsMenu: {fileID: 0}
+  optionsBackdrop: {fileID: 0}
+  accountsButton: {fileID: 0}
+  optionsBackButton: {fileID: 0}
 --- !u!1 &1262087116
 GameObject:
   m_ObjectHideFlags: 0
@@ -3080,7 +3088,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -750, y: -20}
+  m_AnchoredPosition: {x: -232, y: -9}
   m_SizeDelta: {x: 438, y: 612}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1337217513
@@ -3096,6 +3104,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   loadGame: {fileID: 0}
+  optionsMenu: {fileID: 0}
+  optionsBackdrop: {fileID: 0}
+  accountsButton: {fileID: 0}
+  optionsBackButton: {fileID: 0}
 --- !u!114 &1337217514
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -997,23 +997,21 @@ public class AccountManager : MonoBehaviour
 
     public void OpenAccountMenu()
     {
+        Debug.Log("[Account Menu] OpenAccountMenu entered.");
+
         HideAllPanels();
+        Debug.Log("[Account Menu] Existing panels hidden.");
 
         mainMenu.SetActive(false);
-
         cardDeck.SetActive(false);
-
         accountButton.SetActive(false);
 
         accountSelectPanel.SetActive(true);
-
         ShowAccountManagementPanel();
-
         backButton.SetActive(true);
-
         classroomPanel.SetActive(true);
 
-        _ = SyncQuizPackagesOnAccountOpenAsync();
+        Debug.Log("[Account Menu] Account panels activated.");
     }
 
     public void OpenCreateStudentMenu()
@@ -1760,48 +1758,6 @@ public class AccountManager : MonoBehaviour
         }
 
         CloseStudentInfo();
-    }
-
-    private async System.Threading.Tasks.Task SyncQuizPackagesOnAccountOpenAsync()
-    {
-        try
-        {
-            QuizPackageDownloadManager downloadManager =
-                FindFirstObjectByType<QuizPackageDownloadManager>();
-
-            if (downloadManager == null)
-            {
-                Debug.LogWarning(
-                    "[Account Menu] Quiz Package Download Manager not found."
-                );
-
-                return;
-            }
-
-            bool success =
-                await downloadManager.SyncActiveClassroomPackagesAsync();
-
-            if (success)
-            {
-                Debug.Log(
-                    "[Account Menu] Quiz Package synchronization completed."
-                );
-            }
-            else
-            {
-                Debug.LogWarning(
-                    "[Account Menu] Quiz Package synchronization " +
-                    "was skipped or partially unsuccessful."
-                );
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError(
-                "[Account Menu] Quiz Package synchronization failed: " +
-                ex
-            );
-        }
     }
 
 }
