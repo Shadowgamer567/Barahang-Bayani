@@ -717,7 +717,6 @@ GameObject:
   - component: {fileID: 34122248}
   - component: {fileID: 34122247}
   - component: {fileID: 34122246}
-  - component: {fileID: 34122249}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -821,25 +820,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 34122244}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &34122249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34122244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &37058614
 GameObject:
   m_ObjectHideFlags: 0
@@ -7208,7 +7188,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   levelData: {fileID: 0}
   battleControl: {fileID: 0}
-  debugLevelData: {fileID: 11400000, guid: 77c8c69dfd5073845a3385ea21384a48, type: 2}
+  debugLevelData: {fileID: 11400000, guid: 65bd2fba3d61ada42ab3003dd7e49d9b, type: 2}
   mainUI: {fileID: 2020279085}
   victoryUI: {fileID: 190305778}
 --- !u!4 &371324284
@@ -13652,7 +13632,6 @@ GameObject:
   - component: {fileID: 657567181}
   - component: {fileID: 657567180}
   - component: {fileID: 657567179}
-  - component: {fileID: 657567182}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -13756,25 +13735,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 657567177}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &657567182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 657567177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &663140610
 GameObject:
   m_ObjectHideFlags: 0
@@ -25144,7 +25104,6 @@ GameObject:
   - component: {fileID: 1149153576}
   - component: {fileID: 1149153575}
   - component: {fileID: 1149153574}
-  - component: {fileID: 1149153577}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -25248,25 +25207,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1149153572}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1149153577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1149153572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &1149618408
 GameObject:
   m_ObjectHideFlags: 0
@@ -49140,7 +49080,6 @@ GameObject:
   - component: {fileID: 2092994699}
   - component: {fileID: 2092994698}
   - component: {fileID: 2092994697}
-  - component: {fileID: 2092994700}
   m_Layer: 0
   m_Name: AnimateChild
   m_TagString: Untagged
@@ -49244,25 +49183,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2092994695}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2092994700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2092994695}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996663765f905104f997467c88cc6206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationRelay
-  animator: {fileID: 0}
-  neutralState: Idle
-  moveState: Move
-  attackState: Attack
-  actionState: Action
-  damagedState: Hit
-  deathState: Death
 --- !u!1 &2093348965
 GameObject:
   m_ObjectHideFlags: 0
