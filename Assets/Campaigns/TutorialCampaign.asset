@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: TutorialCampaign
   m_EditorClassIdentifier: Assembly-CSharp::BackgroundSet
   campaignName: TutorialCampaign
-  campaignQuizFile: {fileID: 0}
-  campaignQuizInfoFile: {fileID: 0}
+  campaignQuizFile: {fileID: 4900000, guid: 5cc20c1c5cdf45848be7935966f3ca6d, type: 3}
+  campaignQuizInfoFile: {fileID: 4900000, guid: 04fb65388f6bfc141a2d03c98242b32d, type: 3}
   generalCards:
   - {fileID: 11400000, guid: 4ebedce5aa7c015448db65de44c0e068, type: 2}
   - {fileID: 11400000, guid: 894d8b0425efc9e49a167c69acf402da, type: 2}
