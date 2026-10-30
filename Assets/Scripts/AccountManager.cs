@@ -423,7 +423,12 @@ public class AccountManager : MonoBehaviour
 
         Debug.Log("Cleared old cards");
 
-        foreach (AccountData account in registry.accounts)
+        // Sort accounts alphabetically by username (A-Z).
+        List<AccountData> sortedAccounts = new List<AccountData>(registry.accounts);
+
+        sortedAccounts.Sort((a, b) => string.Compare(a.username, b.username, System.StringComparison.OrdinalIgnoreCase));
+
+        foreach (AccountData account in sortedAccounts)
         {
             Transform parent =
                 account.accountType == AccountType.Student
