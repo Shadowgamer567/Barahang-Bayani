@@ -42,6 +42,10 @@ public class UIMain : MonoBehaviour
     public TextMeshProUGUI descriptionText;
     public Image fullCardImage;
 
+    [Header("Full Card Appearance")]
+    public Image fullCardBackground;
+    public Outline fullCardOutline;
+
     private CardUI selectedCardUI;
     private CardType selectedCardType;
 
@@ -290,6 +294,18 @@ public class UIMain : MonoBehaviour
         {
             fullCardImage.sprite = cardType.cardImage;
             fullCardImage.enabled = cardType.cardImage != null;
+        }
+
+        // Match the selected card's parchment background.
+        if (fullCardBackground != null)
+        {
+            fullCardBackground.sprite = cardUI.CurrentBackground;
+        }
+
+        // Match the selected card's effect-type outline.
+        if (fullCardOutline != null)
+        {
+            fullCardOutline.effectColor = cardUI.CurrentOutlineColor;
         }
 
         // hide small card while previewing

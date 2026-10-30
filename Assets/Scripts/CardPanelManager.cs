@@ -5,6 +5,19 @@ using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
 
+[System.Serializable]
+public class CardPoolEntry
+{
+    public CardType card;
+    public HeroType owner;
+
+    public CardPoolEntry(CardType card, HeroType owner)
+    {
+        this.card = card;
+        this.owner = owner;
+    }
+}
+
 public class CardPanelManager : MonoBehaviour
 {
     public static event System.Action OnHandRefilled;
@@ -14,6 +27,8 @@ public class CardPanelManager : MonoBehaviour
     public BattleControl battle;
     public QuizManager quizManager;
     public UIMain uiMain;
+
+    private List<CardPoolEntry> cardPool = new List<CardPoolEntry>();
 
     public CardType[] availableCards;
     public int cardCount = 5;
@@ -53,31 +68,33 @@ public class CardPanelManager : MonoBehaviour
 
     public void DrawCard()
     {
-        if(availableCards == null || availableCards.Length == 0)
+        if(cardPool == null || cardPool.Count == 0)
         {
             return;
         }
 
-        CardType randomCard = availableCards[Random.Range(0, availableCards.Length)];
+        CardPoolEntry entry = cardPool[Random.Range(0, cardPool.Count)];
+
         GameObject obj = Instantiate(cardTemplate, cardContainer);
         obj.SetActive(true);
 
         CardUI ui = obj.GetComponent<CardUI>();
-        ui.Setup(randomCard, battle, this, quizManager, uiMain);
+
+        SetupCardUI(ui, entry);
     }
 
     //THis is for Tutorial
     // Ensures the first tutorial battle starts with non-Quiz Cards.
     public bool ForceNonQuizStartingHand()
     {
-        List<CardType> nonQuizCards = new List<CardType>();
+        List<CardPoolEntry> nonQuizCards = new List<CardPoolEntry>();
 
         // Find all available non-Quiz Cards.
-        foreach (CardType card in availableCards)
+        foreach (CardPoolEntry entry in cardPool)
         {
-            if (card != null && !card.quizCard)
+            if (entry.card != null && !entry.card.quizCard)
             {
-                nonQuizCards.Add(card);
+                nonQuizCards.Add(entry);
             }
         }
 
@@ -101,10 +118,9 @@ public class CardPanelManager : MonoBehaviour
                 return false;
             }
 
-            CardType selectedCard =
-                nonQuizCards[Random.Range(0, nonQuizCards.Count)];
+            CardPoolEntry selectedEntry = nonQuizCards[Random.Range(0, nonQuizCards.Count)];
 
-            cardUI.Setup(selectedCard, battle, this, quizManager, uiMain);
+            SetupCardUI(cardUI, selectedEntry);
         }
 
         Debug.Log("CardPanelManager: First tutorial hand contains only non-Quiz Cards.");
@@ -116,18 +132,18 @@ public class CardPanelManager : MonoBehaviour
     public bool ForceQuizCardInFifthSlot()
     {
         // Find the first available Quiz Card.
-        CardType quizCard = null;
+        CardPoolEntry quizEntry = null;
 
-        foreach (CardType card in availableCards)
+        foreach (CardPoolEntry entry in cardPool)
         {
-            if (card != null && card.quizCard)
+            if (entry.card != null && entry.card.quizCard)
             {
-                quizCard = card;
+                quizEntry = entry;
                 break;
             }
         }
 
-        if (quizCard == null)
+        if (quizEntry == null)
         {
             Debug.LogWarning("CardPanelManager: No Quiz Card found!");
             return false;
@@ -154,7 +170,7 @@ public class CardPanelManager : MonoBehaviour
         }
 
         // Replace its card data with the scripted Quiz Card.
-        cardUI.Setup(quizCard, battle, this, quizManager, uiMain);
+        SetupCardUI(cardUI, quizEntry);
 
         Debug.Log("CardPanelManager: Scripted Quiz Card loaded into slot 5.");
 
@@ -183,6 +199,8 @@ public class CardPanelManager : MonoBehaviour
     {
         List<CardType> cards = new List<CardType>();
 
+        cardPool.Clear();
+
         Debug.Log("=== INITIALIZING CARD POOL ===");
         Debug.Log("Level: " + levelData.levelName);
 
@@ -197,6 +215,8 @@ public class CardPanelManager : MonoBehaviour
                 if (card != null)
                 {
                     cards.Add(card);
+                    cardPool.Add(new CardPoolEntry(card, null));
+
                     Debug.Log("Added GENERAL card: " + card.cardName);
                 }
             }
@@ -215,7 +235,6 @@ public class CardPanelManager : MonoBehaviour
                 {
                     continue;
                 }
-                    
 
                 Debug.Log("Hero: " + hero.name + " | Custom Cards: " + (hero.customCards != null ? hero.customCards.Length : 0));
 
@@ -229,6 +248,7 @@ public class CardPanelManager : MonoBehaviour
                     if (card != null)
                     {
                         cards.Add(card);
+                        cardPool.Add(new CardPoolEntry(card, hero));
 
                         Debug.Log("Added CUSTOM card: " + card.cardName + " | Hero: " + hero.name);
                     }
@@ -239,6 +259,12 @@ public class CardPanelManager : MonoBehaviour
         availableCards = cards.ToArray();
 
         Debug.Log("=== CARD POOL COMPLETE: " + availableCards.Length + " cards ===");
+    }
+    private void SetupCardUI(CardUI ui, CardPoolEntry entry)
+    {
+        Sprite background = entry.owner != null ? entry.owner.customCardBackground : null;
+
+        ui.Setup(entry.card, battle, this, quizManager, uiMain, background);
     }
 
     // Update is called once per frame

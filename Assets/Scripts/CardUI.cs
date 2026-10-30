@@ -15,13 +15,36 @@ public class CardUI : MonoBehaviour
     public Image cardImage;
     public Button button;
 
+    [Header("Card Appearnace")]
+    public Outline cardOutline;
+    public Image cardBackground;
+
+    public Sprite defaultCardBackground;
+
     private CardType cardType;
     private BattleControl battleControl;
     private CardPanelManager cardManager;
     private QuizManager quizManager;
     private UIMain uiMain;
 
-    public void Setup(CardType type, BattleControl battle, CardPanelManager manager, QuizManager quiz, UIMain ui)
+    public Sprite CurrentBackground => cardBackground != null ? cardBackground.sprite : null;
+
+    public Color CurrentOutlineColor => cardOutline != null ? cardOutline.effectColor : Color.white;
+
+    public void Awake()
+    {
+        if (cardBackground == null)
+        {
+            cardBackground = GetComponent<Image>();
+        }
+
+        if (cardBackground != null)
+        {
+            defaultCardBackground = cardBackground.sprite;
+        }       
+    }
+
+    public void Setup(CardType type, BattleControl battle, CardPanelManager manager, QuizManager quiz, UIMain ui, Sprite customBackground = null)
     {
         cardType = type;
         battleControl = battle;
@@ -32,7 +55,13 @@ public class CardUI : MonoBehaviour
         nameText.text = type.cardName;
         costText.text = type.cost.ToString();
         descriptionText.text = type.cardShortDesc;
-        
+        UpdateCardOutline(type.effectType);
+
+        if (cardBackground != null)
+        {
+            cardBackground.sprite = customBackground != null ? customBackground : defaultCardBackground;
+        }
+
         if (cardImage != null)
         {
             cardImage.sprite = type.cardImage;
@@ -44,6 +73,34 @@ public class CardUI : MonoBehaviour
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnClick);
+    }
+    private void UpdateCardOutline(CardEffectType effectType)
+    {
+        if (cardOutline == null)
+            return;
+
+        switch (effectType)
+        {
+            case CardEffectType.Damage:
+                cardOutline.effectColor = new Color32(229, 57, 53, 255);
+                break;
+
+            case CardEffectType.Heal:
+                cardOutline.effectColor = new Color32(40, 184, 74, 255);
+                break;
+
+            case CardEffectType.Shield:
+                cardOutline.effectColor = new Color32(138, 152, 168, 255);
+                break;
+
+            case CardEffectType.Buff:
+                cardOutline.effectColor = new Color32(245, 179, 24, 255);
+                break;
+
+            case CardEffectType.Debuff:
+                cardOutline.effectColor = new Color32(166, 77, 224, 255);
+                break;
+        }
     }
 
     void OnClick()

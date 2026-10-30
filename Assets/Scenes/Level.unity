@@ -1036,6 +1036,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 42486912}
   m_CullTransparentMesh: 1
+--- !u!1 &43710875
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 43710876}
+  - component: {fileID: 43710878}
+  - component: {fileID: 43710877}
+  m_Layer: 5
+  m_Name: CardBorder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &43710876
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 43710875}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 961083220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 10, y: 10}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &43710877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 43710875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.9245283, g: 0.082858644, b: 0.082858644, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &43710878
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 43710875}
+  m_CullTransparentMesh: 1
 --- !u!1 &47938002
 GameObject:
   m_ObjectHideFlags: 0
@@ -3180,6 +3255,8 @@ MonoBehaviour:
   costText: {fileID: 0}
   descriptionText: {fileID: 0}
   fullCardImage: {fileID: 0}
+  fullCardBackground: {fileID: 0}
+  fullCardOutline: {fileID: 0}
   enemypanel: []
   enemies: []
   heropanel: []
@@ -17537,6 +17614,7 @@ GameObject:
   - component: {fileID: 850475601}
   - component: {fileID: 850475600}
   - component: {fileID: 850475602}
+  - component: {fileID: 850475603}
   m_Layer: 5
   m_Name: FullCardPanel
   m_TagString: Untagged
@@ -17661,6 +17739,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &850475603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850475598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &850789748
 GameObject:
   m_ObjectHideFlags: 0
@@ -19109,6 +19202,8 @@ MonoBehaviour:
   costText: {fileID: 0}
   descriptionText: {fileID: 0}
   fullCardImage: {fileID: 0}
+  fullCardBackground: {fileID: 0}
+  fullCardOutline: {fileID: 0}
   enemypanel: []
   enemies: []
   heropanel: []
@@ -20186,6 +20281,7 @@ GameObject:
   - component: {fileID: 961083221}
   - component: {fileID: 961083224}
   - component: {fileID: 961083225}
+  - component: {fileID: 961083226}
   m_Layer: 5
   m_Name: CardTemplate
   m_TagString: Untagged
@@ -20205,6 +20301,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 43710876}
   - {fileID: 902827344}
   - {fileID: 655908284}
   - {fileID: 346130139}
@@ -20233,6 +20330,9 @@ MonoBehaviour:
   descriptionText: {fileID: 1268910196}
   cardImage: {fileID: 346130140}
   button: {fileID: 961083224}
+  cardOutline: {fileID: 961083226}
+  cardBackground: {fileID: 961083222}
+  defaultCardBackground: {fileID: 21300000, guid: a4f38ff8af9def84fb8493e2cf66c5f7, type: 3}
 --- !u!114 &961083222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20335,6 +20435,21 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &961083226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961083219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.5411765, g: 0.59607846, b: 0.65882355, a: 1}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 0
 --- !u!1 &964191463
 GameObject:
   m_ObjectHideFlags: 0
@@ -47222,6 +47337,8 @@ MonoBehaviour:
   costText: {fileID: 29364446}
   descriptionText: {fileID: 1660257586}
   fullCardImage: {fileID: 959217827}
+  fullCardBackground: {fileID: 850475600}
+  fullCardOutline: {fileID: 850475603}
   enemypanel: []
   enemies: []
   heropanel: []

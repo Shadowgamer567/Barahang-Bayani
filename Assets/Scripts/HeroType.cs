@@ -13,4 +13,7 @@ public class HeroType : ScriptableObject
 
     [Header("Custom Cards")]
     public CardType[] customCards;
+
+    [Header("Custom Card Appearance")]
+    public Sprite customCardBackground;
 }
