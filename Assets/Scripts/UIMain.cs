@@ -46,6 +46,11 @@ public class UIMain : MonoBehaviour
     public Image fullCardBackground;
     public Outline fullCardOutline;
 
+    [Header("Card Transition")]
+    public CardTransitionAnimator cardTransitionAnimator;
+
+    private bool isCardTransitioning = false;
+
     private CardUI selectedCardUI;
     private CardType selectedCardType;
 
@@ -281,11 +286,15 @@ public class UIMain : MonoBehaviour
 
     public void ShowFullCard(CardUI cardUI, CardType cardType)
     {
+        if (isCardTransitioning || selectedCardUI != null)
+        {
+            return;
+        }
+
         selectedCardUI = cardUI;
         selectedCardType = cardType;
 
-        fullCardPanel.SetActive(true);
-
+        // Prepare the FullCard content.
         nameText.text = cardType.cardName;
         costText.text = cardType.cost.ToString();
         descriptionText.text = cardType.cardFullDesc;
@@ -296,29 +305,41 @@ public class UIMain : MonoBehaviour
             fullCardImage.enabled = cardType.cardImage != null;
         }
 
-        // Match the selected card's parchment background.
         if (fullCardBackground != null)
         {
             fullCardBackground.sprite = cardUI.CurrentBackground;
         }
 
-        // Match the selected card's effect-type outline.
         if (fullCardOutline != null)
         {
             fullCardOutline.effectColor = cardUI.CurrentOutlineColor;
         }
 
-        // hide small card while previewing
-        cardUI.gameObject.SetActive(false);
+        if (cardTransitionAnimator != null)
+        {
+            StartCoroutine(ShowFullCardAnimated(cardUI));
+        }
 
-        //Notify Listeners that Full Card is ready
-        OnFullCardOpened?.Invoke();
+        else
+        {
+            // Fallback to the original behavior.
+            fullCardPanel.SetActive(true);
+            cardUI.gameObject.SetActive(false);
+            OnFullCardOpened?.Invoke();
+        }
     }
 
     public void ConfirmCardPlay()
     {
         if (selectedCardUI == null || selectedCardType == null)
+        {
             return;
+        }
+
+        if (isCardTransitioning)
+        {
+            return;
+        }
 
         bool played = selectedCardUI.PlayCard();
 
@@ -334,20 +355,34 @@ public class UIMain : MonoBehaviour
 
     public void CancelCardPreview()
     {
+        if (isCardTransitioning)
+        { 
+            return; 
+        }
+
         if (tutorialBattleController != null && tutorialBattleController.BlockCardPreviewCancellation)
         {
             return;
         }
 
-        if (selectedCardUI != null)
+        if (selectedCardUI == null)
         {
-            selectedCardUI.gameObject.SetActive(true);
+            return;
         }
 
-        fullCardPanel.SetActive(false);
+        if (cardTransitionAnimator != null)
+        {
+            StartCoroutine(CancelCardPreviewAnimated());
+        }
 
-        selectedCardUI = null;
-        selectedCardType = null;
+        else
+        {
+            selectedCardUI.gameObject.SetActive(true);
+            fullCardPanel.SetActive(false);
+
+            selectedCardUI = null;
+            selectedCardType = null;
+        }
     }
 
     // Update is called once per frame
@@ -362,5 +397,62 @@ public class UIMain : MonoBehaviour
         {
             UpdateHeroUI();
         }
+    }
+
+    private IEnumerator ShowFullCardAnimated(CardUI cardUI)
+    {
+        isCardTransitioning = true;
+
+        RectTransform source = cardUI.GetComponent<RectTransform>();
+
+        RectTransform destination = cardTransitionAnimator.fullCardTarget;
+
+        // Keep FullCard hidden while the animation plays.
+        fullCardPanel.SetActive(false);
+
+        // Animate the visual copy from the hand to FullCard.
+        yield return StartCoroutine(cardTransitionAnimator.AnimateCard(source, destination));
+
+        // The original card is hidden only after the animation.
+        if (cardUI != null)
+        {
+            cardUI.gameObject.SetActive(false);
+        }
+
+        // Reveal the actual FullCard.
+        fullCardPanel.SetActive(true);
+
+        isCardTransitioning = false;
+
+        // Notify existing tutorial and UI listeners.
+        OnFullCardOpened?.Invoke();
+    }
+
+    private IEnumerator CancelCardPreviewAnimated()
+    {
+        isCardTransitioning = true;
+
+        CardUI cardUI = selectedCardUI;
+
+        RectTransform source = cardUI.GetComponent<RectTransform>();
+
+        RectTransform destination = cardTransitionAnimator.fullCardTarget;
+
+        // Hide FullCard while the animated copy returns.
+        fullCardPanel.SetActive(false);
+
+        // Animate from FullCard back to the original hand position.
+        yield return StartCoroutine(cardTransitionAnimator.AnimateCard(source, destination, true));
+
+        // Restore the original card.
+        if (cardUI != null)
+        {
+            cardUI.gameObject.SetActive(true);
+        }
+
+        selectedCardUI = null;
+        selectedCardType = null;
+
+        isCardTransitioning = false;
     }
 }
