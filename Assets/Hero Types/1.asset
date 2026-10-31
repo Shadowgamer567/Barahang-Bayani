@@ -23,4 +23,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: da02455726e88944ebefea9020fa5f5b, type: 2}
   - {fileID: 11400000, guid: 5d7af0c34ebc74a44b46608c0ad47c56, type: 2}
   - {fileID: 11400000, guid: b867d0fafe6bea74f99f6493d5b3b515, type: 2}
-  customCardBackground: {fileID: 21300000, guid: e42b15ab1c9966346a1cb829af431d44, type: 3}
+  customCardBackground: {fileID: 21300000, guid: 3d5877f14ce13a041a3710d18f6148b0, type: 3}
