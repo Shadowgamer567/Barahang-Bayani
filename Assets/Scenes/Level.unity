@@ -11018,6 +11018,9 @@ MonoBehaviour:
   cutsceneUI: {fileID: 2111556092}
   leftSpawn: {fileID: 47938003}
   rightSpawn: {fileID: 1428017042}
+  heroCamera: {fileID: 1085126653}
+  enemyCamera: {fileID: 1258905459}
+  cutsceneAnimatorController: {fileID: 9100000, guid: 7c7ced0a7835ab04e93b9bb95f0e8798, type: 2}
   dialogueText: {fileID: 1456929830}
   namePanel: {fileID: 2047344897}
   mainUI: {fileID: 2020279085}

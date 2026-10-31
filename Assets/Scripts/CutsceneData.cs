@@ -15,6 +15,17 @@ public enum SpeakerType
     Narrator
 }
 
+public enum CutscenePose
+{
+    Idle,
+    Talking,
+    Thinking,
+    Surprised,
+    Happy,
+    Angry,
+    Sad
+}
+
 [System.Serializable]
 public class CutsceneLine
 {
@@ -27,4 +38,7 @@ public class CutsceneLine
     public string Dialogue;
 
     public bool isLeftSide;
+
+    [Header("Character Animation")]
+    public CutscenePose pose = CutscenePose.Idle;
 }
