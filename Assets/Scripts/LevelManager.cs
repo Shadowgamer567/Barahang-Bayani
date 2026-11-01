@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
 
     public GameObject mainUI;
     public GameObject victoryUI;
+    public GameObject defeatUI;
     private CutsceneManager cutsceneManager;
 
     private int battlesCompleted = 0;
@@ -91,6 +92,7 @@ public class LevelManager : MonoBehaviour
         battleControl.Initialize(levelData);
 
         battleControl.OnBattleWon += HandleBattleWon;
+        battleControl.OnBattleLost += HandleBattleLost;
 
         Debug.Log("Loaded Level: " + levelData.levelName);
         Debug.Log("Battles Required: " + levelData.battlesRequired);
@@ -133,11 +135,19 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    void HandleBattleLost()
+    {
+        Debug.Log("LevelManager: HandleBattleLost Called");
+
+        ShowDefeatScreen();
+    }
+
     void OnDestroy()
     {
         if (battleControl != null)
         {
             battleControl.OnBattleWon -= HandleBattleWon;
+            battleControl.OnBattleLost -= HandleBattleLost;
         }
     }
 
@@ -188,6 +198,41 @@ public class LevelManager : MonoBehaviour
 
         Debug.Log("LevelManager: Victory Screen opened.");
     }
+
+    public void ShowDefeatScreen()
+    {
+        Debug.Log("LevelManager: Opening Defeat Screen.");
+
+        Time.timeScale = 0f;
+
+        if (battleControl != null)
+        {
+            battleControl.isLevelFinished = true;
+            battleControl.StopAllCoroutines();
+        }
+
+        if (mainUI != null)
+        {
+            mainUI.SetActive(false);
+        }
+
+        if (victoryUI != null)
+        {
+            victoryUI.SetActive(false);
+        }
+
+        if (defeatUI != null)
+        {
+            defeatUI.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("LevelManager: DefeatUI is not assigned!");
+        }
+
+        Debug.Log("LevelManager: Defeat Screen opened.");
+    }
+
 
     void TriggerCutscene(CutsceneTriggerType type, int battleIndex, System.Action onFinished = null)
     {

@@ -9,6 +9,9 @@ public class VictoryUI : MonoBehaviour
     public TextMeshProUGUI trueorfalseText;
     public TextMeshProUGUI totalText;
 
+    [Header("Screen Settings")]
+    public bool isDefeatScreen = false;
+
     private bool BlockOtherVictoryButtons =>
     TutorialManager.Instance != null &&
     TutorialManager.Instance.tutorialActive &&
@@ -33,13 +36,14 @@ public class VictoryUI : MonoBehaviour
         totalText.text = $"Total: {stats.totalCorrect} / {stats.totalQuestions}";
     }
 
+
     public void OnReturn()
     {
         Time.timeScale = 1f;
 
-        // Advance to the final tutorial when returning
-        // from the tutorial level's victory screen.
-        if (TutorialManager.Instance != null &&
+        // Advance the tutorial only after victory, not defeat.
+        if (!isDefeatScreen &&
+            TutorialManager.Instance != null &&
             TutorialManager.Instance.tutorialActive &&
             (TutorialManager.Instance.currentStage == TutorialStage.BattleTutorial ||
              TutorialManager.Instance.currentStage == TutorialStage.VictoryTutorial))
@@ -49,14 +53,26 @@ public class VictoryUI : MonoBehaviour
             Debug.Log("VictoryUI: Advancing tutorial to FinalExplanation.");
         }
 
-        Debug.Log("VictoryUI: Returning to " + LevelSelectTracker.lastLevelSelectScene);
+        // Use the previously visited level-selection scene.
+        string returnScene = LevelSelectTracker.lastLevelSelectScene;
 
-        SceneManager.LoadScene(LevelSelectTracker.lastLevelSelectScene);
+        // Fallback when testing the Level scene directly.
+        if (string.IsNullOrEmpty(returnScene))
+        {
+            returnScene = "LevelSelect_Rizal";
+
+            Debug.LogWarning("VictoryUI: No previous level-selection scene recorded. " + "Using fallback: " + returnScene);
+        }
+
+        Debug.Log("VictoryUI: Returning to " + returnScene);
+
+        SceneManager.LoadScene(returnScene);
     }
+
 
     public void OnRetry()
     {
-        if (BlockOtherVictoryButtons)
+        if (!isDefeatScreen && BlockOtherVictoryButtons)
         {
             Debug.Log("Tutorial: Retry is blocked during Victory Tutorial.");
             return;

@@ -48,6 +48,7 @@ public class QuizManager : MonoBehaviour
 
     private QuizQuestion currentQuestion;
     private BattleControl battleControl;
+    public BattleLogManager battleLog;
 
     private bool waitingForClick = false;
     private bool answerSubmitted = false;
@@ -750,16 +751,29 @@ public class QuizManager : MonoBehaviour
         // Close the quiz and restore normal gameplay first
         EndQuiz();
 
+
         // Apply the card effect only if the answer was correct
         if (battleControl != null && pendingQuizCard != null)
         {
             if (correct)
             {
+                if (battleLog != null)
+                {
+                    battleLog.AddLog($"Correct answer! \"{pendingQuizCard.cardName}\" activated.");
+                }
+
                 // Correct answer: execute the quiz card normally.
                 battleControl.ResolveQuizCard(pendingQuizCard);
             }
+
             else
             {
+                if (battleLog != null)
+                {
+                    battleLog.AddLog($"Incorrect answer! \"{pendingQuizCard.cardName}\" " +
+                        "failed to activate. Enemies take a turn.");
+                }
+
                 // Incorrect answer: enemies take a penalty turn.
                 // This does not refill AP or cards.
                 battleControl.StartQuizPenaltyTurn();

@@ -17,6 +17,10 @@ public class BattleControl : MonoBehaviour
     public GameObject selectTargetPanel;
     public GameObject notEnoughAPPanel;
     public UIMain uiMain;
+
+    [Header("Battle Log")]
+    public BattleLogManager battleLog;
+
     public CardType pendingCard;
     public HeroStats pendingHero;
     private LevelData levelData;
@@ -41,6 +45,7 @@ public class BattleControl : MonoBehaviour
     public System.Action<int, int> OnAPChanged;
 
     public System.Action OnBattleWon;
+    public System.Action OnBattleLost;
 
     public System.Action OnFirstBattleStarted;
     public System.Action OnSecondBattleStarted;
@@ -279,6 +284,11 @@ public class BattleControl : MonoBehaviour
 
         currentstate = BattleState.Busy;
 
+        if (battleLog != null)
+        {
+            battleLog.AddLog(isPenaltyTurn ? "--- Enemy Penalty Turn ---" : "--- Enemy Turn ---");
+        }
+
         yield return new WaitForSecondsRealtime(1f);
 
         foreach (EnemyStats enemy in enemies)
@@ -317,6 +327,13 @@ public class BattleControl : MonoBehaviour
 
             ExecuteEnemyAction(enemy, action);
 
+            // Stop immediately if the last hero was defeated.
+            if (CheckLoseCondition())
+            {
+                HandleBattleLost();
+                yield break;
+            }
+
             yield return new WaitForSecondsRealtime(0.5f);
         }
 
@@ -324,8 +341,8 @@ public class BattleControl : MonoBehaviour
 
         if (CheckLoseCondition())
         {
-            currentstate = BattleState.Lose;
             Debug.Log("You Lost");
+            HandleBattleLost();
             yield break;
         }
 
@@ -346,58 +363,129 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+
     void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
     {
+        string enemyName = enemy.enemyType.enemyName;
+
         switch (action.actionType)
         {
             case EnemyActionType.Attack:
                 HeroStats target = GetRandomAliveHero();
-                if(target != null)
+
+                if (target != null)
                 {
                     int finalDamage = enemy.GetModifiedActionValue(enemy.enemyType.damage);
 
+                    int previousHP = target.currentHP;
+                    int previousShield = target.shield;
+
                     enemy.PlayAnimation(CharacterAnimationType.Attack);
                     target.TakeDamage(finalDamage);
+
+                    int hpDamage = Mathf.Max(0, previousHP - target.currentHP);
+
+                    int shieldDamage = Mathf.Max(0, previousShield - target.shield);
+
+                    if (battleLog != null)
+                    {
+                        string targetName = target.heroType.heroName;
+
+                        if (shieldDamage > 0 && hpDamage > 0)
+                        {
+                            battleLog.AddLog($"{enemyName} attacked {targetName}, " + $"removing {shieldDamage} Shield and " +
+                                $"dealing {hpDamage} HP damage.");
+                        }
+
+                        else if (shieldDamage > 0)
+                        {
+                            battleLog.AddLog($"{enemyName} attacked {targetName}, " +$"removing {shieldDamage} Shield.");
+                        }
+
+                        else
+                        {
+                            battleLog.AddLog($"{enemyName} attacked {targetName} " + $"for {hpDamage} damage.");
+                        }
+                    }
+
                     Debug.Log(enemy.name + " attacked for " + finalDamage + " damage");
                 }
                 break;
 
             case EnemyActionType.Shield:
                 EnemyStats shieldTarget = GetRandomAliveEnemy();
+
                 if (shieldTarget != null)
                 {
                     int finalShield = enemy.GetModifiedActionValue(action.value);
+
+                    int previousShield = shieldTarget.shield;
+
                     enemy.PlayAnimation(CharacterAnimationType.Action);
                     shieldTarget.AddShield(finalShield);
+
+                    int actualShield = shieldTarget.shield - previousShield;
+
+                    if (battleLog != null)
+                    {
+                        battleLog.AddLog($"{enemyName} used Shield, granting " + $"{actualShield} Shield to " + $"{shieldTarget.enemyType.enemyName}.");
+                    }
                 }
                 break;
 
             case EnemyActionType.Heal:
                 EnemyStats healTarget = GetRandomAliveEnemy();
+
                 if (healTarget != null)
                 {
                     int finalHeal = enemy.GetModifiedActionValue(action.value);
+
+                    int previousHP = healTarget.currentHP;
+
                     enemy.PlayAnimation(CharacterAnimationType.Action);
                     healTarget.Heal(finalHeal);
+
+                    int actualHeal = healTarget.currentHP - previousHP;
+
+                    if (battleLog != null)
+                    {
+                        battleLog.AddLog($"{enemyName} used Heal, restoring " +$"{actualHeal} HP to " + $"{healTarget.enemyType.enemyName}.");
+                    }
                 }
                 break;
 
             case EnemyActionType.Buff:
                 EnemyStats buffTarget = GetRandomAliveEnemy();
+
                 if (buffTarget != null)
                 {
+                    int buffAmount = Mathf.Abs(action.value);
+
                     enemy.PlayAnimation(CharacterAnimationType.Action);
-                    buffTarget.AddActionModifier(Mathf.Abs(action.value));
+                    buffTarget.AddActionModifier(buffAmount);
+
+                    if (battleLog != null)
+                    {
+                        battleLog.AddLog($"{enemyName} used Buff, increasing " + $"{buffTarget.enemyType.enemyName}'s " +
+                            $"next action value by {buffAmount}.");
+                    }
+
                     Debug.Log(enemy.name + " buffed " + buffTarget.name + " by " + action.value);
                 }
                 break;
 
             case EnemyActionType.Debuff:
+                int debuffAmount = Mathf.Abs(action.value);
+
                 enemy.PlayAnimation(CharacterAnimationType.Action);
+                AddPlayerModifier(-debuffAmount);
 
-                AddPlayerModifier(-Mathf.Abs(action.value));
+                if (battleLog != null)
+                {
+                    battleLog.AddLog($"{enemyName} used Debuff, reducing " + $"the player's next action value by {debuffAmount}.");
+                }
 
-                Debug.Log(enemy.name + " debuffed the player team by " + action.value);
+                Debug.Log(enemy.name +" debuffed the player team by " + action.value);
                 break;
         }
     }
@@ -406,15 +494,15 @@ public class BattleControl : MonoBehaviour
     {
         List<HeroStats> alive = new List<HeroStats>();
 
-        foreach (var hero in heroes)
+        foreach (HeroStats hero in heroes)
         {
-            if (hero != null && hero.gameObject.activeInHierarchy)
+            if (hero != null && hero.gameObject.activeInHierarchy && !hero.IsDead())
             {
                 alive.Add(hero);
             }
         }
 
-        if(alive.Count == 0)
+        if (alive.Count == 0)
         {
             return null;
         }
@@ -476,17 +564,51 @@ public class BattleControl : MonoBehaviour
         return alive[Random.Range(0, alive.Count)];
     }
 
+
     bool CheckLoseCondition()
     {
-        foreach(var enemy in enemies)
+        if (heroes == null || heroes.Length == 0)
         {
-            if(enemy != null && !enemy.isDead)
+            return false;
+        }
+
+        foreach (HeroStats hero in heroes)
+        {
+            if (hero != null && hero.gameObject.activeInHierarchy && !hero.IsDead())
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private void HandleBattleLost()
+    {
+        if (currentstate == BattleState.Lose || currentstate == BattleState.Win || isLevelFinished)
+        {
+            return;
+        }
+
+        currentstate = BattleState.Lose;
+
+        isSelectingTarget = false;
+        pendingCard = null;
+        pendingHero = null;
+
+        if (selectTargetPanel != null)
+        {
+            selectTargetPanel.SetActive(false);
+        }
+
+        if (battleLog != null)
+        {
+            battleLog.AddLog("All heroes have fallen. Battle Lost.");
+        }
+
+        Debug.Log("BattleControl: All heroes defeated. Battle Lost.");
+
+        OnBattleLost?.Invoke();
     }
 
     public void OnEnemyKilled()
@@ -568,7 +690,7 @@ public class BattleControl : MonoBehaviour
         return Mathf.Max(0, baseValue);
     }
 
-    private void ExecuteCardEffect(CardType card, HeroStats actingHero, HeroStats targetHero = null, EnemyStats targetEnemy = null, int? calculatedValue = null)
+    private void ExecuteCardEffect(CardType card, HeroStats actingHero, HeroStats targetHero = null, EnemyStats targetEnemy = null, int? calculatedValue = null, bool suppressLog = false)
     {
         if (card == null || actingHero == null)
         {
@@ -584,9 +706,40 @@ public class BattleControl : MonoBehaviour
                 if (targetEnemy != null && !targetEnemy.isDead)
                 {
                     int finalDamage = calculatedValue ?? GetModifiedPlayerValue(value);
+
+                    // Record the target's stats before damage.
+                    int previousHP = targetEnemy.currentHP;
+                    int previousShield = targetEnemy.shield;
+
                     targetEnemy.TakeDamage(finalDamage);
 
-                    Debug.Log(actingHero.name + " dealt " + finalDamage + " damage to " + targetEnemy.name);
+                    // Calculate the actual damage applied.
+                    int hpDamage = previousHP - targetEnemy.currentHP;
+                    int shieldDamage = previousShield - targetEnemy.shield;
+
+                    if (battleLog != null && !suppressLog)
+                    {
+                        string targetName = targetEnemy.enemyType.enemyName;
+
+                        if (shieldDamage > 0 && hpDamage > 0)
+                        {
+                            battleLog.AddLog($"You played \"{card.cardName}\", removing " +
+                                $"{shieldDamage} Shield and dealing {hpDamage} HP damage to {targetName}."
+                            );
+                        }
+
+                        else if (shieldDamage > 0)
+                        {
+                            battleLog.AddLog($"You played \"{card.cardName}\", removing " + $"{shieldDamage} Shield from {targetName}.");
+                        }
+
+                        else
+                        {
+                            battleLog.AddLog($"You played \"{card.cardName}\", dealing " + $"{hpDamage} damage to {targetName}.");
+                        }
+                    }
+
+                    Debug.Log(actingHero.name + " dealt " + finalDamage +" damage to " + targetEnemy.name);
                 }
                 break;
 
@@ -594,7 +747,18 @@ public class BattleControl : MonoBehaviour
                 if (targetHero != null && !targetHero.IsDead())
                 {
                     int finalHeal = calculatedValue ?? GetModifiedPlayerValue(value);
+
+                    int previousHP = targetHero.currentHP;
+
                     targetHero.Heal(finalHeal);
+
+                    int actualHeal = targetHero.currentHP - previousHP;
+
+                    if (battleLog != null && !suppressLog)
+                    {
+                        battleLog.AddLog($"You played \"{card.cardName}\", restoring " +
+                            $"{actualHeal} HP to {targetHero.heroType.heroName}.");
+                    }
                 }
                 break;
 
@@ -602,18 +766,44 @@ public class BattleControl : MonoBehaviour
                 if (targetHero != null && !targetHero.IsDead())
                 {
                     int finalShield = calculatedValue ?? GetModifiedPlayerValue(value);
+
+                    int previousShield = targetHero.shield;
+
                     targetHero.Shield(finalShield);
+
+                    int actualShield = targetHero.shield - previousShield;
+
+                    if (battleLog != null && !suppressLog)
+                    {
+                        battleLog.AddLog($"You played \"{card.cardName}\", granting " +
+                            $"{actualShield} Shield to {targetHero.heroType.heroName}.");
+                    }
                 }
                 break;
 
             case CardEffectType.Buff:
-                AddPlayerModifier(Mathf.Abs(value));
+                int buffAmount = Mathf.Abs(value);
+
+                AddPlayerModifier(buffAmount);
+
+                if (battleLog != null && !suppressLog)
+                {
+                    battleLog.AddLog($"You played \"{card.cardName}\", increasing " + $"your team's next action value by {buffAmount}.");
+                }
                 break;
 
             case CardEffectType.Debuff:
                 if (targetEnemy != null && !targetEnemy.isDead)
                 {
-                    targetEnemy.AddActionModifier(-Mathf.Abs(value));
+                    int debuffAmount = Mathf.Abs(value);
+
+                    targetEnemy.AddActionModifier(-debuffAmount);
+
+                    if (battleLog != null && !suppressLog)
+                    {
+                        battleLog.AddLog($"You played \"{card.cardName}\", reducing " +
+                            $"{targetEnemy.enemyType.enemyName}'s next action value by {debuffAmount}.");
+                    }
                 }
                 break;
         }
@@ -631,7 +821,14 @@ public class BattleControl : MonoBehaviour
         {
             BeginCardAnimation(actingHero, CharacterAnimationType.Action);
 
-            AddPlayerModifier(Mathf.Abs(card.damage));
+            int buffAmount = Mathf.Abs(card.damage);
+
+            AddPlayerModifier(buffAmount);
+
+            if (battleLog != null)
+            {
+                battleLog.AddLog($"You played \"{card.cardName}\", increasing " + $"your team's next action value by {buffAmount}.");
+            }
 
             return;
         }
@@ -657,29 +854,65 @@ public class BattleControl : MonoBehaviour
 
         switch (card.targetType)
         {
+
             case TargetType.AllEnemies:
                 BeginCardAnimation(actingHero, animation);
 
+                int enemiesAffected = 0;
+
                 foreach (EnemyStats enemy in enemies)
                 {
-                    if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead)
+                    if (enemy != null &&
+                        enemy.gameObject.activeInHierarchy &&
+                        !enemy.isDead)
                     {
-                        ExecuteCardEffect(card, actingHero, targetEnemy: enemy, calculatedValue: finalValue);
+                        ExecuteCardEffect(
+                            card,
+                            actingHero,
+                            targetEnemy: enemy,
+                            calculatedValue: finalValue,
+                            suppressLog: true
+                        );
+
+                        enemiesAffected++;
                     }
+                }
+
+                if (battleLog != null && enemiesAffected > 0)
+                {
+                    battleLog.AddLog($"You played \"{card.cardName}\", " + $"{GetCardEffectLogDescription(card, finalValue)} " + "to all enemies.");
                 }
                 break;
 
             case TargetType.AllHeroes:
                 BeginCardAnimation(actingHero, animation);
 
+                int heroesAffected = 0;
+
                 foreach (HeroStats hero in heroes)
                 {
-                    if(hero != null && hero.gameObject.activeInHierarchy && !hero.IsDead())
+                    if (hero != null &&
+                        hero.gameObject.activeInHierarchy &&
+                        !hero.IsDead())
                     {
-                        ExecuteCardEffect(card, actingHero, targetHero: hero, calculatedValue: finalValue);
+                        ExecuteCardEffect(
+                            card,
+                            actingHero,
+                            targetHero: hero,
+                            calculatedValue: finalValue,
+                            suppressLog: true
+                        );
+
+                        heroesAffected++;
                     }
                 }
+
+                if (battleLog != null && heroesAffected > 0)
+                {
+                    battleLog.AddLog($"You played \"{card.cardName}\", " + $"{GetCardEffectLogDescription(card, finalValue)} " + "to all heroes.");
+                }
                 break;
+
 
             case TargetType.Self:
                 BeginCardAnimation(actingHero, animation);
@@ -699,6 +932,11 @@ public class BattleControl : MonoBehaviour
         }
 
         OnCardPlayAccepted?.Invoke();
+
+        if (battleLog != null && card.quizCard)
+        {
+            battleLog.AddLog($"You played \"{card.cardName}\".");
+        }
 
         if (card.quizCard)
         {
@@ -929,8 +1167,30 @@ public class BattleControl : MonoBehaviour
                 }
             }
         }
+    }
 
+    private string GetCardEffectLogDescription(CardType card, int value)
+    {
+        switch (card.effectType)
+        {
+            case CardEffectType.Damage:
+                return $"dealing up to {value} damage";
 
+            case CardEffectType.Heal:
+                return $"restoring up to {value} HP";
+
+            case CardEffectType.Shield:
+                return $"granting {value} Shield";
+
+            case CardEffectType.Buff:
+                return $"increasing action values by {value}";
+
+            case CardEffectType.Debuff:
+                return $"reducing action values by {Mathf.Abs(value)}";
+
+            default:
+                return "applying its effect";
+        }
     }
 
     void UpdateUI()
