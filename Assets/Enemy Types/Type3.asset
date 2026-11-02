@@ -17,5 +17,16 @@ MonoBehaviour:
   damage: 5
   maxShield: 0
   prefab: {fileID: 3825038894137292323, guid: 30dd0093a10a424459f4d7da23f330a9, type: 3}
+  actions:
+  - actionType: 0
+    value: 10
+  - actionType: 1
+    value: 5
+  - actionType: 2
+    value: 7
+  - actionType: 3
+    value: 7
+  - actionType: 4
+    value: 5
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: -0.8, z: 0}

@@ -4,6 +4,7 @@ using UnityEngine;
 public class ActionModifier : MonoBehaviour
 {
     public int pendingModifier = 0;
+    public int PendingModifier => pendingModifier;
 
     public void AddModifier(int amount)
     {

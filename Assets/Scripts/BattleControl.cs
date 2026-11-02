@@ -308,18 +308,14 @@ public class BattleControl : MonoBehaviour
                 );
             }
 
-            EnemyAction action;
+            EnemyAction action = ChooseEnemyAction(enemy);
 
-            if (enemy.action != null && enemy.action.Length > 0)
-            {
-                action = enemy.action[Random.Range(0, enemy.action.Length)];
-            }
-            else
+            if (action == null)
             {
                 action = new EnemyAction
                 {
                     actionType = EnemyActionType.Attack,
-                    value = enemy.enemyType.damage
+                    value = 0
                 };
             }
 
@@ -375,7 +371,10 @@ public class BattleControl : MonoBehaviour
 
                 if (target != null)
                 {
-                    int finalDamage = enemy.GetModifiedActionValue(enemy.enemyType.damage);
+                    int baseDamage = enemy.attack;
+                    int actionBonus = action.value;
+
+                    int finalDamage = enemy.GetModifiedActionValue(Mathf.Max(0, baseDamage + actionBonus));
 
                     int previousHP = target.currentHP;
                     int previousShield = target.shield;
@@ -413,7 +412,21 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case EnemyActionType.Shield:
-                EnemyStats shieldTarget = GetRandomAliveEnemy();
+                EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield);
+                
+                //Temp Debug
+                if (shieldTarget != null)
+                {
+                    Debug.Log(
+                        "[Enemy AI EXECUTED] " +
+                        enemy.enemyType.enemyName +
+                        " used SHIELD on " +
+                        shieldTarget.enemyType.enemyName +
+                        " (" + shieldTarget.gameObject.name + ")" +
+                        " | Target HP: " + shieldTarget.currentHP +
+                        " | Target Shield Before: " + shieldTarget.shield
+                    );
+                }
 
                 if (shieldTarget != null)
                 {
@@ -434,7 +447,7 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case EnemyActionType.Heal:
-                EnemyStats healTarget = GetRandomAliveEnemy();
+                EnemyStats healTarget = SelectEnemyAllyTarget(EnemyActionType.Heal);
 
                 if (healTarget != null)
                 {
@@ -455,7 +468,7 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case EnemyActionType.Buff:
-                EnemyStats buffTarget = GetRandomAliveEnemy();
+                EnemyStats buffTarget = SelectEnemyAllyTarget(EnemyActionType.Buff);
 
                 if (buffTarget != null)
                 {
@@ -488,6 +501,207 @@ public class BattleControl : MonoBehaviour
                 Debug.Log(enemy.name +" debuffed the player team by " + action.value);
                 break;
         }
+    }
+
+    private EnemyAction ChooseEnemyAction(EnemyStats enemy)
+    {
+        if (enemy == null || enemy.action == null || enemy.action.Length == 0)
+        {
+            return null;
+        }
+
+        List<EnemyAction> validActions = new List<EnemyAction>();
+        List<float> weights = new List<float>();
+
+        float totalWeight = 0f;
+
+        foreach (EnemyAction action in enemy.action)
+        {
+            if (action == null)
+            {
+                continue;
+            }
+
+            if ((action.actionType == EnemyActionType.Buff || action.actionType == EnemyActionType.Debuff) && action.value == 0)
+            {
+                continue;
+            }
+
+            float weight = 0f;
+
+            switch (action.actionType)
+            {
+                case EnemyActionType.Attack:
+                    weight = enemy.enemyType.attackWeight;
+                    break;
+
+                case EnemyActionType.Heal:
+                    weight = enemy.enemyType.healWeight;
+                    break;
+
+                case EnemyActionType.Shield:
+                    weight = enemy.enemyType.shieldWeight;
+                    break;
+
+                case EnemyActionType.Buff:
+                    weight = enemy.enemyType.buffWeight;
+                    break;
+
+                case EnemyActionType.Debuff:
+                    weight = enemy.enemyType.debuffWeight;
+                    break;
+            }
+
+            if (weight <= 0f)
+            {
+                continue;
+            }
+
+            switch (action.actionType)
+            {
+                case EnemyActionType.Attack:
+                    weight = 5f;
+                    break;
+
+                case EnemyActionType.Heal:
+                    EnemyStats healTarget = SelectEnemyAllyTarget(EnemyActionType.Heal);
+
+                    // No injured ally means healing is unnecessary.
+                    if (healTarget == null)
+                    {
+                        continue;
+                    }
+
+                    float healthRatio = (float)healTarget.currentHP / Mathf.Max(1, healTarget.enemyType.maxHp);
+
+                    if (healthRatio <= 0.25f)
+                    {
+                        weight *= 4f;
+                    }
+
+                    else if (healthRatio <= 0.50f)
+                    {
+                        weight *= 2.5f;
+                    }
+
+                    else
+                    {
+                        weight *= 1f;
+                    }
+
+                    break;
+
+                case EnemyActionType.Shield:
+                    EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield);
+
+                    if (shieldTarget == null)
+                    {
+                        continue;
+                    }
+                    float shieldHealthRatio = (float)shieldTarget.currentHP / Mathf.Max(1, shieldTarget.enemyType.maxHp);
+
+                    if (shieldHealthRatio <= 0.30f)
+                    {
+                        // Critically injured ally: prioritize protection.
+                        weight *= 3f;
+                    }
+
+                    else if (shieldTarget.shield <= 0)
+                    {
+                        // No protection available.
+                        weight *= 2f;
+                    }
+
+                    else if (shieldTarget.shield < 5)
+                    {
+                        // Some protection, but still vulnerable.
+                        weight *= 1f;
+                    }
+
+                    else
+                    {
+                        // Already protected: Shield is less attractive.
+                        weight *= 0.35f;
+                    }
+
+                    break;
+
+                case EnemyActionType.Buff:
+                    EnemyStats buffTarget = SelectEnemyAllyTarget(EnemyActionType.Buff);
+
+                    if (buffTarget == null)
+                    {
+                        continue;
+                    }
+
+                    // Buff is useful, but generally less urgent than
+                    // healing or protecting a critically injured ally.
+                    weight = 4f;
+                    break;
+
+                case EnemyActionType.Debuff:
+                    if (playerModifier == null)
+                    {
+                        continue;
+                    }
+
+                    int pendingPlayerModifier = playerModifier.PendingModifier;
+
+                    if (pendingPlayerModifier < 0)
+                    {
+                        // Player is already debuffed.
+                        // Allow another debuff, but make it less likely.
+                        weight *= 0.25f;
+                    }
+
+                    else if (pendingPlayerModifier > 0)
+                    {
+                        // Player has a positive buff.
+                        // Debuff becomes more useful to counter it.
+                        weight *= 1.75f;
+                    }
+
+                    else
+                    {
+                        // No active modifier.
+                        weight *= 1f;
+                    }
+
+                    break;
+            }
+
+            if (weight <= 0f)
+            {
+                continue;
+            }
+
+            validActions.Add(action);
+            weights.Add(weight);
+            totalWeight += weight;
+        }
+
+        if (validActions.Count == 0)
+        {
+            Debug.LogWarning("Enemy AI: No valid actions for " + enemy.name);
+
+            return null;
+        }
+
+        float roll = Random.Range(0f, totalWeight);
+
+        for (int i = 0; i < validActions.Count; i++)
+        {
+            roll -= weights[i];
+
+            if (roll <= 0f)
+            {
+                Debug.Log("Enemy AI: " + enemy.name + " selected " + validActions[i].actionType + " | Weight: " + weights[i]);
+
+                return validActions[i];
+            }
+        }
+
+        return validActions[validActions.Count - 1];
     }
 
     HeroStats GetRandomAliveHero()
@@ -562,6 +776,86 @@ public class BattleControl : MonoBehaviour
         }
 
         return randomHero;
+    }
+
+
+    private EnemyStats SelectEnemyAllyTarget(EnemyActionType actionType)
+    {
+        EnemyStats bestTarget = null;
+
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead || enemy.currentHP <= 0 || enemy.enemyType == null)
+            {
+                continue;
+            }
+
+            switch (actionType)
+            {
+                case EnemyActionType.Heal:
+                    // Only consider injured enemies.
+                    if (enemy.currentHP >= enemy.enemyType.maxHp)
+                    {
+                        continue;
+                    }
+
+                    // Prioritize the lowest HP percentage.
+                    if (bestTarget == null || (float)enemy.currentHP / Mathf.Max(1, enemy.enemyType.maxHp) <
+                        (float)bestTarget.currentHP / Mathf.Max(1, bestTarget.enemyType.maxHp))
+                    {
+                        bestTarget = enemy;
+                    }
+
+                    break;
+
+                case EnemyActionType.Shield:
+                    // Prioritize enemies with the least combined HP and Shield.
+                    if (bestTarget == null || enemy.currentHP + enemy.shield < bestTarget.currentHP + bestTarget.shield)
+                    {
+                        bestTarget = enemy;
+                    }
+                    break;
+
+                case EnemyActionType.Buff:
+                    // Avoid allies that already have a positive buff.
+                    if (enemy.PendingActionModifier > 0)
+                    {
+                        continue;
+                    }
+
+                    // Prefer allies with the highest attack.
+                    if (bestTarget == null || enemy.attack > bestTarget.attack)
+                    {
+                        bestTarget = enemy;
+                    }
+                    break;
+            }
+        }
+
+        //Temp Debug
+        if (bestTarget != null)
+        {
+            Debug.Log(
+                "[Enemy AI Targeting] " +
+                "Action: " + actionType +
+                " | Selected: " + bestTarget.enemyType.enemyName +
+                " (" + bestTarget.gameObject.name + ")" +
+                " | HP: " + bestTarget.currentHP +
+                "/" + bestTarget.enemyType.maxHp +
+                " | Shield: " + bestTarget.shield +
+                " | Pending Modifier: " + bestTarget.PendingActionModifier
+            );
+        }
+        else
+        {
+            Debug.Log(
+                "[Enemy AI Targeting] " +
+                "Action: " + actionType +
+                " | No eligible target found."
+            );
+        }
+
+        return bestTarget;
     }
 
 

@@ -12,7 +12,7 @@ public class EnemyStats : MonoBehaviour
     public EnemyTypes enemyType;
     public GameObject uiObject;
     public EnemyUI ui;
-    public EnemyAction[] action;
+    public EnemyAction[] action => enemyType != null ? enemyType.actions : null;
     private BattleControl battle;
 
     public Transform uiAnchor;
@@ -29,6 +29,7 @@ public class EnemyStats : MonoBehaviour
     private bool isDying = false;
     public bool isDead = false;
 
+    public int PendingActionModifier => actionModifier != null ? actionModifier.PendingModifier : 0;
     private void Start()
     {
         

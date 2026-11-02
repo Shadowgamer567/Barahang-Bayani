@@ -24600,7 +24600,7 @@ MonoBehaviour:
   ui: {fileID: 0}
   action:
   - actionType: 0
-    value: 10
+    value: 0
   - actionType: 1
     value: 5
   - actionType: 2
