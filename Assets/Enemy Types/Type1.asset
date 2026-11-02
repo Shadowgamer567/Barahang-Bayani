@@ -24,5 +24,10 @@ MonoBehaviour:
     value: 15
   - actionType: 2
     value: 5
+  attackWeight: 5
+  healWeight: 3
+  shieldWeight: 2.5
+  buffWeight: 2
+  debuffWeight: 2
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: -0.8, z: 0}

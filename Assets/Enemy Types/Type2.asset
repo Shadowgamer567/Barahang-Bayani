@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTypes
   enemyName: Spanish Priest
   maxHp: 20
-  damage: 5
+  damage: 2
   maxShield: 0
   prefab: {fileID: 2446511508103551290, guid: a019c777f267ed243a187c486f2f949f, type: 3}
   actions:
@@ -24,5 +24,10 @@ MonoBehaviour:
     value: 5
   - actionType: 0
     value: 3
+  attackWeight: 5
+  healWeight: 5
+  shieldWeight: 3
+  buffWeight: 4
+  debuffWeight: 4
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: -0.8, z: 0}
