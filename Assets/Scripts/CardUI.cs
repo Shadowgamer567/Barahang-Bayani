@@ -54,7 +54,8 @@ public class CardUI : MonoBehaviour
 
         nameText.text = type.cardName;
         costText.text = type.cost.ToString();
-        descriptionText.text = type.cardShortDesc;
+        descriptionText.richText = true;
+        descriptionText.text = CombatTextFormatter.Colorize(type.cardShortDesc);
         UpdateCardOutline(type.effectType);
 
         if (cardBackground != null)
