@@ -260,6 +260,33 @@ public class CardPanelManager : MonoBehaviour
 
         Debug.Log("=== CARD POOL COMPLETE: " + availableCards.Length + " cards ===");
     }
+
+    public void RemoveHeroCards(HeroType defeatedHero)
+    {
+        if (defeatedHero == null)
+            return;
+
+        int removedCount = cardPool.RemoveAll(
+            entry => entry.owner == defeatedHero
+        );
+
+        // Keep the public availableCards array synchronized.
+        List<CardType> remainingCards = new List<CardType>();
+
+        foreach (CardPoolEntry entry in cardPool)
+        {
+            remainingCards.Add(entry.card);
+        }
+
+        availableCards = remainingCards.ToArray();
+
+        Debug.Log(
+            "CardPanelManager: Removed " + removedCount +
+            " custom cards belonging to " + defeatedHero.heroName +
+            ". Remaining pool: " + cardPool.Count
+        );
+    }
+
     private void SetupCardUI(CardUI ui, CardPoolEntry entry)
     {
         Sprite background = entry.owner != null ? entry.owner.customCardBackground : null;

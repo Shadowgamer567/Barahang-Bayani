@@ -510,6 +510,7 @@ public class BattleControl : MonoBehaviour
         return alive[Random.Range(0, alive.Count)];
     }
 
+
     private HeroStats GetHeroForCard(CardType card)
     {
         if (card == null || heroes == null)
@@ -517,34 +518,52 @@ public class BattleControl : MonoBehaviour
             return null;
         }
 
-        //Checks whether this is a Custom or General Card
         foreach (HeroStats hero in heroes)
         {
-            if(hero == null || !hero.gameObject.activeInHierarchy || hero.heroType == null || hero.heroType.customCards == null)
+            if (hero == null || hero.heroType == null || hero.heroType.customCards == null)
             {
                 continue;
             }
 
             foreach (CardType customCard in hero.heroType.customCards)
             {
-                if (customCard == card)
+                if (customCard != card)
                 {
-                    Debug.Log("CUSTOM CARD: " + card.cardName + " | Assigned Hero: " + hero.heroType.name);
+                    continue;
+                }
+
+                // Custom card owner is still alive.
+                if (hero.gameObject.activeInHierarchy && !hero.IsDead())
+                {
+                    Debug.Log("CUSTOM CARD: " + card.cardName + " | Assigned Hero: " + hero.heroType.heroName);
+
                     return hero;
                 }
+
+                // Custom card owner has been defeated.
+                HeroStats replacementHero = GetRandomAliveHero();
+
+                if (replacementHero != null)
+                {
+                    Debug.Log("CUSTOM CARD: " + card.cardName + " | Original Hero Defeated: " + hero.heroType.heroName + " | Replacement Hero: " +
+                        replacementHero.heroType.heroName);
+                }
+
+                return replacementHero;
             }
         }
 
-        //Generals cards use one randomly selected active hero
+        // General cards are performed by a random surviving hero.
         HeroStats randomHero = GetRandomAliveHero();
 
         if (randomHero != null)
         {
-            Debug.Log("GENERAL CARD: " + card.cardName + " | Random Hero: " + randomHero.heroType.name);
+            Debug.Log("GENERAL CARD: " + card.cardName +" | Random Hero: " + randomHero.heroType.heroName);
         }
 
         return randomHero;
     }
+
 
     EnemyStats GetRandomAliveEnemy()
     {

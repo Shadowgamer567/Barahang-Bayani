@@ -40,6 +40,11 @@ public class HeroStats : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if (IsDead())
+        {
+            return;
+        }
+
         int previousHP = currentHP;
 
         if (shield > 0)
@@ -69,13 +74,28 @@ public class HeroStats : MonoBehaviour
             animationRelay.Play(CharacterAnimationType.Damaged);
         }
 
+
         if (currentHP <= 0)
         {
-            if(animationRelay != null)
+            currentHP = 0;
+
+            // Remove this hero's custom cards from future draws.
+            CardPanelManager cardManager = FindFirstObjectByType<CardPanelManager>();
+
+            if (cardManager != null)
+            {
+                cardManager.RemoveHeroCards(heroType);
+            }
+
+            else
+            {
+                Debug.LogWarning("HeroStats: CardPanelManager not found when hero died.");
+            }
+
+            if (animationRelay != null)
             {
                 animationRelay.Play(CharacterAnimationType.Death);
             }
-
             else
             {
                 gameObject.SetActive(false);
