@@ -19,7 +19,7 @@ MonoBehaviour:
   Cutscenes: []
   campaign: {fileID: 11400000, guid: f810cb7fd394cfc42a676c9e0e24c134, type: 2}
   previousLevel: {fileID: 11400000, guid: 703299e56764a9f4289086de6813f86e, type: 2}
-  nextLevel: {fileID: 0}
+  nextLevel: {fileID: 11400000, guid: 9d1a8eb7ec6a7f24c87efa41d1239ae0, type: 2}
   heroesInLevel:
   - {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
   maxHeroes: 4
