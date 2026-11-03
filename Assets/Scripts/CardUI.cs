@@ -83,7 +83,12 @@ public class CardUI : MonoBehaviour
         switch (effectType)
         {
             case CardEffectType.Damage:
+            case CardEffectType.Piercing:
                 cardOutline.effectColor = new Color32(229, 57, 53, 255);
+                break;
+
+            case CardEffectType.Bleed:
+                cardOutline.effectColor = new Color32(150, 35, 45, 255);
                 break;
 
             case CardEffectType.Heal:

@@ -35,12 +35,33 @@ public class EffectIndicatorUI : MonoBehaviour
         UpdateValue(value);
     }
 
+    private bool isBleed = false;
+
+    public void SetBleedDisplay()
+    {
+        isBleed = true;
+
+        if (effectValue != null)
+        {
+            effectValue.text = effectValue.text.TrimStart('+');
+            effectValue.color = new Color32(180, 40, 50, 255);
+        }
+    }
+
     public void UpdateValue(int value)
     {
-        effectValue.text = value > 0 ? "+" + value : value.ToString();
-
-        effectValue.color = value > 0 ? Color.green : Color.red;
+        if (isBleed)
+        {
+            effectValue.text = value.ToString();
+            effectValue.color = new Color32(180, 40, 50, 255);
+        }
+        else
+        {
+            effectValue.text = value > 0 ? "+" + value : value.ToString();
+            effectValue.color = value > 0 ? Color.green : Color.red;
+        }
     }
+
 
     public void PlayAppear()
     {

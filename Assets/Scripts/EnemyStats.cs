@@ -26,6 +26,12 @@ public class EnemyStats : MonoBehaviour
     public int currentHP;
     public int shield;
     public int attack;
+
+    [Header("Persistent Effects")]
+    [SerializeField] private int bleedValue = 0;
+
+    public int BleedValue => bleedValue;
+
     private bool isDying = false;
     public bool isDead = false;
 
@@ -49,6 +55,7 @@ public class EnemyStats : MonoBehaviour
         shield = enemyType.maxShield;
 
         attack = enemyType.damage;
+        bleedValue = 0;
 
         isDying = false;
         isDead = false;
@@ -79,6 +86,8 @@ public class EnemyStats : MonoBehaviour
         shield = enemyType.maxShield;
         attack = enemyType.damage;
 
+        bleedValue = 0;
+
         isDying = false;
         isDead = false;
 
@@ -100,12 +109,19 @@ public class EnemyStats : MonoBehaviour
         animationRelay = GetComponentInChildren<CharacterAnimationRelay>();
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, bool bypassShield = false)
     {
+        if (isDead || isDying || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        amount = Mathf.Max(0, amount);
+
         Debug.Log(name + " RECEIVED DAMAGE CALL");
         int previousHP = currentHP;
 
-        if (shield > 0)
+        if (shield > 0 && !bypassShield)
         {
             int shieldDamage = Mathf.Min(shield, amount);
             shield -= shieldDamage;
@@ -161,6 +177,42 @@ public class EnemyStats : MonoBehaviour
             }
         }
     }
+    public void TakePiercingDamage(int amount)
+    {
+        TakeDamage(amount, true);
+    }
+
+    public void AddBleed(int amount)
+    {
+        if (amount <= 0 || isDead || isDying || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        bleedValue += amount;
+
+        Debug.Log(name + " gained " + amount + " Bleed. Total Bleed: " + bleedValue
+        );
+    }
+
+    public void ProcessBleed()
+    {
+        if (bleedValue <= 0 || isDead || isDying || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        int damage = bleedValue;
+
+        // Bleed bypasses Shield and damages HP directly.
+        TakePiercingDamage(damage);
+
+        // Reduce Bleed after dealing damage.
+        bleedValue = bleedValue <= 1 ? 0 : Mathf.CeilToInt(bleedValue / 2f);
+
+        Debug.Log(name + " took " + damage + " Bleed Damage. Remaining Bleed: " + bleedValue);
+    }
+
 
     /*
     void DieImmediate()

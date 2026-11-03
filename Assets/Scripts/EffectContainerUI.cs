@@ -63,6 +63,12 @@ public class EffectContainerUI : MonoBehaviour
 
         EffectIndicatorUI newIndicator = Instantiate(effectIndicatorPrefab, transform);
 
+        if (effectID == "Bleed")
+        {
+            newIndicator.SetBleedDisplay();
+        }
+
+        // Initialize the icon and value immediately.
         newIndicator.Setup(icon, value);
 
         activeIndicators[effectID] = new ActiveIndicator

@@ -27,6 +27,8 @@ public class CardTypeEditor : Editor
         switch (selectedEffect)
         {
             case CardEffectType.Damage:
+            case CardEffectType.Piercing:
+            case CardEffectType.Bleed:
             case CardEffectType.Debuff:
                 allowedTargets = new TargetType[]
                 {

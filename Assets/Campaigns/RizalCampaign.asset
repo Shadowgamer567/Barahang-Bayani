@@ -16,11 +16,7 @@ MonoBehaviour:
   campaignQuizFile: {fileID: 4900000, guid: 5cc20c1c5cdf45848be7935966f3ca6d, type: 3}
   campaignQuizInfoFile: {fileID: 4900000, guid: 04fb65388f6bfc141a2d03c98242b32d, type: 3}
   generalCards:
-  - {fileID: 11400000, guid: 9c3e4eb233847854ba5f84514bab6758, type: 2}
-  - {fileID: 11400000, guid: 95773bd0cb5195d4888e9a1542205c5f, type: 2}
-  - {fileID: 11400000, guid: 8d48891681cc8a94a9f783de91d6a018, type: 2}
-  - {fileID: 11400000, guid: 030e79508fa16864d9030632a56be530, type: 2}
-  - {fileID: 11400000, guid: 5a578256151f91d46af85af2be53e262, type: 2}
+  - {fileID: 11400000, guid: ee10609edaff58d46b1ca082abca5c90, type: 2}
   levelsRanges:
   - startLevel: 1
     endLevel: 3

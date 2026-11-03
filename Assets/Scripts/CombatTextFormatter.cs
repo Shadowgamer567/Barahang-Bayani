@@ -9,7 +9,10 @@ public static class CombatTextFormatter
 
         string pattern =
             @"\b(?:removing \d+ Shield|" +
-            @"dealing (?:up to )?\d+ (?:HP )?damage|" +
+            @"dealing (?:up to )?\d+ (?:(?:HP|Piercing) )?damage|" +
+            @"(?:apply|applying) (?:up to )?\d+ Bleed|" +
+            @"\d+ Bleed Damage|" +
+            @"Remaining Bleed: \d+|" +
             @"restoring (?:up to )?\d+ HP|" +
             @"granting \d+ Shield|" +
             @"Correct answer|" +
@@ -19,17 +22,19 @@ public static class CombatTextFormatter
             @"damage|shield|buff|debuff|" +
             @"increasing|increase|reducing|reduce)\b";
 
-        return Regex.Replace(
-            message,
-            pattern,
-            match =>
-            {
+        return Regex.Replace(message, pattern, match =>
+        {
                 string word = match.Value;
                 string lower = word.ToLowerInvariant();
 
                 string color;
 
-                if (lower.Contains("incorrect") ||
+                if (lower.Contains("bleed"))
+                {
+                    color = "#B4283C"; // Bleed - Dark Crimson
+                }
+
+                else if (lower.Contains("incorrect") ||
                     lower.Contains("failed") ||
                     lower.Contains("damage") ||
                     lower.Contains("removing") ||

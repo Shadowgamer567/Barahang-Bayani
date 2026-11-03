@@ -38,5 +38,7 @@ public enum CardEffectType
     Heal,
     Shield,
     Buff,
-    Debuff
+    Debuff,
+    Piercing,
+    Bleed
 }

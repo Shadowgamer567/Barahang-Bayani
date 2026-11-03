@@ -58,8 +58,10 @@ public class BattleControl : MonoBehaviour
     public bool IsTargetingEnemies =>
     isSelectingTarget &&
     pendingCard != null &&
-    (pendingCard.effectType == CardEffectType.Damage ||
-     pendingCard.effectType == CardEffectType.Debuff);
+    (pendingCard.effectType == CardEffectType.Damage || 
+     pendingCard.effectType == CardEffectType.Piercing ||
+     pendingCard.effectType == CardEffectType.Debuff ||
+     pendingCard.effectType == CardEffectType.Bleed);
 
     public bool IsTargetingHeroes =>
         isSelectingTarget &&
@@ -287,6 +289,21 @@ public class BattleControl : MonoBehaviour
         if (battleLog != null)
         {
             battleLog.AddLog(isPenaltyTurn ? "--- Enemy Penalty Turn ---" : "--- Enemy Turn ---");
+        }
+
+        // Bleed activates only when the player normally ends their turn.
+        if (!isPenaltyTurn)
+        {
+            ProcessEnemyBleedEffects();
+
+            // Allow death animations to finish before enemy actions.
+            yield return new WaitForSecondsRealtime(1f);
+
+            // Bleed may have defeated every enemy.
+            if (battleAlreadyWon || isLevelFinished || currentstate == BattleState.Win)
+            {
+                yield break;
+            }
         }
 
         yield return new WaitForSecondsRealtime(1f);
@@ -1056,6 +1073,47 @@ public class BattleControl : MonoBehaviour
                 }
                 break;
 
+            case CardEffectType.Piercing:
+                if (targetEnemy != null && !targetEnemy.isDead)
+                {
+                    int finalDamage = calculatedValue ?? GetModifiedPlayerValue(value);
+
+                    int previousHP = targetEnemy.currentHP;
+
+                    targetEnemy.TakePiercingDamage(finalDamage);
+
+                    int actualDamage = previousHP - targetEnemy.currentHP;
+
+                    if (battleLog != null && !suppressLog)
+                    {
+                        battleLog.AddLog($"You played \"{card.cardName}\", " + $"dealing {actualDamage} Piercing Damage " +
+                            $"to {targetEnemy.enemyType.enemyName}, " +
+                            $"ignoring Shield."
+                        );
+                    }
+
+                    Debug.Log( actingHero.name + " dealt " + actualDamage + " Piercing Damage to " + targetEnemy.name);
+                }
+                break;
+
+            case CardEffectType.Bleed:
+                if (targetEnemy != null &&!targetEnemy.isDead)
+                {
+                    int finalBleed = calculatedValue ?? GetModifiedPlayerValue(value);
+
+                    finalBleed = Mathf.Max(0, finalBleed);
+
+                    targetEnemy.AddBleed(finalBleed);
+
+                    if (battleLog != null && !suppressLog)
+                    {
+                        battleLog.AddLog($"You played \"{card.cardName}\", " + $"applying {finalBleed} Bleed to " + $"{targetEnemy.enemyType.enemyName}.");
+                    }
+
+                    Debug.Log(actingHero.name + " applied " + finalBleed + " Bleed to " +targetEnemy.name);
+                }
+                break;
+
             case CardEffectType.Heal:
                 if (targetHero != null && !targetHero.IsDead())
                 {
@@ -1122,6 +1180,34 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    private void ProcessEnemyBleedEffects()
+    {
+        if (enemies == null)
+            return;
+
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead || enemy.BleedValue <= 0)
+            {
+                continue;
+            }
+
+            int damage = enemy.BleedValue;
+            int previousHP = enemy.currentHP;
+
+            enemy.ProcessBleed();
+
+            int actualDamage = previousHP - enemy.currentHP;
+
+            if (battleLog != null && actualDamage > 0)
+            {
+                battleLog.AddLog( $"{enemy.enemyType.enemyName} suffered " + $"{actualDamage} Bleed Damage, ignoring Shield. " + $"Remaining Bleed: {enemy.BleedValue}."
+                );
+            }
+        }
+    }
+
+
     //Handles Modifier Usage for all 3 Targeting Types 
     private void ModifierEffectHandler(CardType card, HeroStats actingHero)
     {
@@ -1148,6 +1234,7 @@ public class BattleControl : MonoBehaviour
 
         bool consumeModifier =
             card.effectType == CardEffectType.Damage ||
+            card.effectType == CardEffectType.Piercing ||
             card.effectType == CardEffectType.Heal ||
             card.effectType == CardEffectType.Shield;
 
@@ -1162,6 +1249,8 @@ public class BattleControl : MonoBehaviour
 
         CharacterAnimationType animation =
             card.effectType == CardEffectType.Damage ||
+            card.effectType == CardEffectType.Piercing ||
+            card.effectType == CardEffectType.Bleed ||
             card.effectType == CardEffectType.Debuff ?
             CharacterAnimationType.Attack : CharacterAnimationType.Action;
 
@@ -1175,17 +1264,9 @@ public class BattleControl : MonoBehaviour
 
                 foreach (EnemyStats enemy in enemies)
                 {
-                    if (enemy != null &&
-                        enemy.gameObject.activeInHierarchy &&
-                        !enemy.isDead)
+                    if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead)
                     {
-                        ExecuteCardEffect(
-                            card,
-                            actingHero,
-                            targetEnemy: enemy,
-                            calculatedValue: finalValue,
-                            suppressLog: true
-                        );
+                        ExecuteCardEffect(card, actingHero, targetEnemy: enemy, calculatedValue: finalValue,suppressLog: true);
 
                         enemiesAffected++;
                     }
@@ -1204,17 +1285,9 @@ public class BattleControl : MonoBehaviour
 
                 foreach (HeroStats hero in heroes)
                 {
-                    if (hero != null &&
-                        hero.gameObject.activeInHierarchy &&
-                        !hero.IsDead())
+                    if (hero != null &&hero.gameObject.activeInHierarchy && !hero.IsDead())
                     {
-                        ExecuteCardEffect(
-                            card,
-                            actingHero,
-                            targetHero: hero,
-                            calculatedValue: finalValue,
-                            suppressLog: true
-                        );
+                        ExecuteCardEffect(card, actingHero, targetHero: hero, calculatedValue: finalValue, suppressLog: true);
 
                         heroesAffected++;
                     }
@@ -1341,18 +1414,16 @@ public class BattleControl : MonoBehaviour
 
     public void SelectEnemyTarget(EnemyStats enemy)
     {
-        if (!isSelectingTarget ||
-            pendingCard == null ||
-            pendingHero == null ||
-            enemy == null ||
-            enemy.IsDead())
+        if (!isSelectingTarget || pendingCard == null || pendingHero == null || enemy == null ||enemy.IsDead())
         {
             return;
         }
 
-        // Only Damage and Debuff may target enemies.
+        // Only Damage, Piercing, Bleed, and Debuff may target enemies.
         if (pendingCard.effectType != CardEffectType.Damage &&
-            pendingCard.effectType != CardEffectType.Debuff)
+            pendingCard.effectType != CardEffectType.Piercing &&
+            pendingCard.effectType != CardEffectType.Debuff &&
+            pendingCard.effectType != CardEffectType.Bleed)
         {
             return;
         }
@@ -1387,7 +1458,9 @@ public class BattleControl : MonoBehaviour
 
         CharacterAnimationType animation =
             card.effectType == CardEffectType.Damage ||
-            card.effectType == CardEffectType.Debuff
+            card.effectType == CardEffectType.Piercing ||
+            card.effectType == CardEffectType.Debuff ||
+            card.effectType == CardEffectType.Bleed 
             ? CharacterAnimationType.Attack
             : CharacterAnimationType.Action;
 
@@ -1488,6 +1561,12 @@ public class BattleControl : MonoBehaviour
         {
             case CardEffectType.Damage:
                 return $"dealing up to {value} damage";
+
+            case CardEffectType.Piercing:
+                return $"dealing up to {value} Piercing Damage";
+
+            case CardEffectType.Bleed:
+                return $"applying up to {value} Bleed";
 
             case CardEffectType.Heal:
                 return $"restoring up to {value} HP";

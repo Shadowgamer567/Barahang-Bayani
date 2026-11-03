@@ -67,6 +67,7 @@ public class UIMain : MonoBehaviour
 
     [Header("Effect Indicator Sprites")]
     public Sprite modifierSprite;
+    public Sprite bleedSprite;
 
     [Header("Tutorial Reference")]
     public TutorialBattleController tutorialBattleController;
@@ -241,11 +242,15 @@ public class UIMain : MonoBehaviour
 
                 int modifier = enemyModifier != null ? enemyModifier.PendingModifier : 0;
 
+
                 if (enemypanel[i].effectContainer != null)
                 {
+                    // Priority 0: Action Modifier
                     enemypanel[i].effectContainer.SetEffect("Modifier", modifierSprite, modifier, 0);
-                }
 
+                    // Priority 1: Bleed
+                    enemypanel[i].effectContainer.SetEffect("Bleed", bleedSprite, enemy.BleedValue, 1);
+                }
             }
 
             else

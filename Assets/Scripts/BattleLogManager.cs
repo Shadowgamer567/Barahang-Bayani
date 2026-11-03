@@ -187,12 +187,12 @@ public class BattleLogManager : MonoBehaviour
         }
     }
 
-
     private string ColorizeLog(string message)
     {
         string pattern =
             @"\b(?:removing \d+ Shield|" +
-            @"dealing (?:up to )?\d+ (?:HP )?damage|" +
+            @"dealing (?:up to )?\d+ (?:HP |Piercing )?damage|" +
+            @"applying (?:up to )?\d+ Bleed|" +
             @"restoring (?:up to )?\d+ HP|" +
             @"granting \d+ Shield|" +
             @"Correct answer|" +
@@ -208,8 +208,16 @@ public class BattleLogManager : MonoBehaviour
 
                 string color;
 
-                if (lower.Contains("incorrect") || lower.Contains("failed") || lower.Contains("damage") || lower.Contains("removing") ||
-                    lower == "attacked")
+                if (lower.Contains("bleed"))
+                {
+                    color = "#B4283C";
+                }
+
+                else if (lower.Contains("incorrect") ||
+                         lower.Contains("failed") ||
+                         lower.Contains("damage") ||
+                         lower.Contains("removing") ||
+                         lower == "attacked")
                 {
                     color = "#C94B45";
                 }

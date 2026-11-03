@@ -3429,7 +3429,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &171686206
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3479,6 +3479,7 @@ MonoBehaviour:
   heroes: []
   playerModifier: {fileID: 0}
   modifierSprite: {fileID: 0}
+  bleedSprite: {fileID: 0}
   tutorialBattleController: {fileID: 0}
   heroPanelContainer: {fileID: 0}
   enemyPanelContainer: {fileID: 0}
@@ -15760,6 +15761,7 @@ MonoBehaviour:
   currentHP: 0
   shield: 0
   attack: 0
+  bleedValue: 0
   isDead: 0
 --- !u!114 &675937669
 MonoBehaviour:
@@ -20885,7 +20887,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &915981735
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20935,6 +20937,7 @@ MonoBehaviour:
   heroes: []
   playerModifier: {fileID: 0}
   modifierSprite: {fileID: 0}
+  bleedSprite: {fileID: 0}
   tutorialBattleController: {fileID: 0}
   heroPanelContainer: {fileID: 0}
   enemyPanelContainer: {fileID: 0}
@@ -21749,6 +21752,7 @@ MonoBehaviour:
   currentHP: 0
   shield: 0
   attack: 0
+  bleedValue: 0
   isDead: 0
 --- !u!114 &953550667
 MonoBehaviour:
@@ -22464,6 +22468,7 @@ MonoBehaviour:
   currentHP: 0
   shield: 0
   attack: 0
+  bleedValue: 0
   isDead: 0
 --- !u!114 &965580279
 MonoBehaviour:
@@ -24664,6 +24669,7 @@ MonoBehaviour:
   currentHP: 0
   shield: 0
   attack: 0
+  bleedValue: 0
   isDead: 0
 --- !u!114 &1049373498
 MonoBehaviour:
@@ -50971,6 +50977,7 @@ MonoBehaviour:
   heroes: []
   playerModifier: {fileID: 1839832274}
   modifierSprite: {fileID: 21300000, guid: b7b7ce3c4b6c62247bd502d66cb67115, type: 3}
+  bleedSprite: {fileID: 21300000, guid: 9f0d01f56549c5a4989508a976ef8a2d, type: 3}
   tutorialBattleController: {fileID: 447595116}
   heroPanelContainer: {fileID: 574093396}
   enemyPanelContainer: {fileID: 1983243690}
