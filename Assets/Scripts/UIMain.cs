@@ -17,6 +17,7 @@ public class EnemyPanel
     public TextMeshProUGUI hpText;
     public Image shieldFill;
     public TextMeshProUGUI shieldText;
+    public EffectContainerUI effectContainer;
 
 }
 
@@ -29,6 +30,7 @@ public class HeroPanel
     public TextMeshProUGUI hpText;
     public Image shieldFill;
     public TextMeshProUGUI shieldText;
+    public EffectContainerUI effectContainer;
 }
 
 public class UIMain : MonoBehaviour
@@ -60,6 +62,12 @@ public class UIMain : MonoBehaviour
     public HeroPanel[] heropanel;
     public HeroStats[] heroes;
 
+    [Header("Player Modifier")]
+    public ActionModifier playerModifier;
+
+    [Header("Effect Indicator Sprites")]
+    public Sprite modifierSprite;
+
     [Header("Tutorial Reference")]
     public TutorialBattleController tutorialBattleController;
 
@@ -76,6 +84,7 @@ public class UIMain : MonoBehaviour
 
     private List<EnemyStats> activeEnemies = new List<EnemyStats>();
     private List<HeroStats> activeHeroes = new List<HeroStats>();
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -109,20 +118,17 @@ public class UIMain : MonoBehaviour
 
             panel.heroPanel = panelObj;
 
-            panel.HeroName = panelObj.transform.Find("Name")
-                .GetComponent<TextMeshProUGUI>();
+            panel.HeroName = panelObj.transform.Find("Name").GetComponent<TextMeshProUGUI>();
 
-            panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill")
-                .GetComponent<Image>();
+            panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill").GetComponent<Image>();
 
-            panel.hpText = panelObj.transform.Find("HP_Background/HP_Text")
-                .GetComponent<TextMeshProUGUI>();
+            panel.hpText = panelObj.transform.Find("HP_Background/HP_Text").GetComponent<TextMeshProUGUI>();
 
-            panel.shieldFill = panelObj.transform.Find("Shield_Background/Shield_Fill")
-                .GetComponent<Image>();
+            panel.shieldFill = panelObj.transform.Find("Shield_Background/Shield_Fill").GetComponent<Image>();
 
-            panel.shieldText = panelObj.transform.Find("Shield_Background/Shield_Text")
-                .GetComponent<TextMeshProUGUI>();
+            panel.shieldText = panelObj.transform.Find("Shield_Background/Shield_Text").GetComponent<TextMeshProUGUI>();
+
+            panel.effectContainer = panelObj.transform.Find("EffectContainer").GetComponent<EffectContainerUI>();
 
             generatedPanels.Add(panel);
         }
@@ -169,20 +175,17 @@ public class UIMain : MonoBehaviour
 
             panel.enemyPanel = panelObj;
 
-            panel.EnemyName = panelObj.transform.Find("Name")
-                .GetComponent<TextMeshProUGUI>();
+            panel.EnemyName = panelObj.transform.Find("Name").GetComponent<TextMeshProUGUI>();
 
-            panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill")
-                .GetComponent<Image>();
+            panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill").GetComponent<Image>();
 
-            panel.hpText = panelObj.transform.Find("HP_Background/HP_Text")
-                .GetComponent<TextMeshProUGUI>();
+            panel.hpText = panelObj.transform.Find("HP_Background/HP_Text").GetComponent<TextMeshProUGUI>();
 
-            panel.shieldFill = panelObj.transform.Find("Shield_Background/Shield_Fill")
-                .GetComponent<Image>();
+            panel.shieldFill = panelObj.transform.Find("Shield_Background/Shield_Fill").GetComponent<Image>();
 
-            panel.shieldText = panelObj.transform.Find("Shield_Background/Shield_Text")
-                .GetComponent<TextMeshProUGUI>();
+            panel.shieldText = panelObj.transform.Find("Shield_Background/Shield_Text").GetComponent<TextMeshProUGUI>();
+
+            panel.effectContainer = panelObj.transform.Find("EffectContainer").GetComponent<EffectContainerUI>();
 
             generatedPanels.Add(panel);
         }
@@ -232,7 +235,19 @@ public class UIMain : MonoBehaviour
 
                 enemypanel[i].shieldFill.fillAmount = enemydisplayedShield[i];
                 enemypanel[i].shieldText.text = $"{enemy.shield} / {enemy.enemyType.maxShield}";
+
+                // Each enemy has its own action modifier.
+                ActionModifier enemyModifier = enemy.GetComponent<ActionModifier>();
+
+                int modifier = enemyModifier != null ? enemyModifier.PendingModifier : 0;
+
+                if (enemypanel[i].effectContainer != null)
+                {
+                    enemypanel[i].effectContainer.SetEffect("Modifier", modifierSprite, modifier, 0);
+                }
+
             }
+
             else
             {
                 enemypanel[i].enemyPanel.SetActive(false);
@@ -276,7 +291,19 @@ public class UIMain : MonoBehaviour
 
                 heropanel[i].shieldFill.fillAmount = herodisplayedShield[i];
                 heropanel[i].shieldText.text = $"{hero.shield} / {hero.heroType.maxShield}";
+
+
+                // MODIFIER
+                // All heroes share the player's team modifier.
+                int modifier = playerModifier != null ? playerModifier.PendingModifier : 0;
+
+                if (heropanel[i].effectContainer != null)
+                {
+                    heropanel[i].effectContainer.SetEffect("Modifier", modifierSprite, modifier, 0);
+                }
+
             }
+
             else
             {
                 heropanel[i].heroPanel.SetActive(false);

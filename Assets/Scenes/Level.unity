@@ -3429,7 +3429,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &171686206
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3445,6 +3445,7 @@ RectTransform:
   - {fileID: 363134181}
   - {fileID: 31643984}
   - {fileID: 77105415}
+  - {fileID: 524359605}
   m_Father: {fileID: 2020279089}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
@@ -3476,6 +3477,8 @@ MonoBehaviour:
   enemies: []
   heropanel: []
   heroes: []
+  playerModifier: {fileID: 0}
+  modifierSprite: {fileID: 0}
   tutorialBattleController: {fileID: 0}
   heroPanelContainer: {fileID: 0}
   enemyPanelContainer: {fileID: 0}
@@ -7758,7 +7761,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   levelData: {fileID: 0}
   battleControl: {fileID: 0}
-  debugLevelData: {fileID: 11400000, guid: 65bd2fba3d61ada42ab3003dd7e49d9b, type: 2}
+  debugLevelData: {fileID: 11400000, guid: 74af413f1c0e528439ea7a623a6827ba, type: 2}
   mainUI: {fileID: 2020279085}
   victoryUI: {fileID: 190305778}
   defeatUI: {fileID: 1810637990}
@@ -11630,6 +11633,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 523360021}
   m_CullTransparentMesh: 1
+--- !u!1 &524359604
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 524359605}
+  - component: {fileID: 524359606}
+  - component: {fileID: 524359607}
+  m_Layer: 5
+  m_Name: EffectContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &524359605
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524359604}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 171686206}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: -130, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &524359606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524359604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 2
+  m_StartCorner: 1
+  m_StartAxis: 0
+  m_CellSize: {x: 75, y: 75}
+  m_Spacing: {x: 10, y: 10}
+  m_Constraint: 1
+  m_ConstraintCount: 4
+--- !u!114 &524359607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524359604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ffe856a2288d5d4fa6ea01d79d9828e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectContainerUI
+  effectIndicatorPrefab: {fileID: 376734638150968792, guid: e7606f9ae04ea384f8094d4049ba42f9, type: 3}
 --- !u!1 &525037238
 GameObject:
   m_ObjectHideFlags: 0
@@ -15676,13 +15753,6 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: 9f05b8be591ccc24e973b97f234410b1, type: 2}
   uiObject: {fileID: 0}
   ui: {fileID: 0}
-  action:
-  - actionType: 0
-    value: 2
-  - actionType: 3
-    value: 4
-  - actionType: 2
-    value: 10
   uiAnchor: {fileID: 1649977853}
   animateChild: {fileID: 2092994696}
   visualRoot: {fileID: 388421396}
@@ -20815,7 +20885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &915981735
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20831,6 +20901,7 @@ RectTransform:
   - {fileID: 1918851532}
   - {fileID: 395010226}
   - {fileID: 573293458}
+  - {fileID: 1995486716}
   m_Father: {fileID: 2020279089}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
@@ -20862,6 +20933,8 @@ MonoBehaviour:
   enemies: []
   heropanel: []
   heroes: []
+  playerModifier: {fileID: 0}
+  modifierSprite: {fileID: 0}
   tutorialBattleController: {fileID: 0}
   heroPanelContainer: {fileID: 0}
   enemyPanelContainer: {fileID: 0}
@@ -21669,13 +21742,6 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
   uiObject: {fileID: 0}
   ui: {fileID: 0}
-  action:
-  - actionType: 2
-    value: 3
-  - actionType: 1
-    value: 5
-  - actionType: 1
-    value: 20
   uiAnchor: {fileID: 1147399042}
   animateChild: {fileID: 34122245}
   visualRoot: {fileID: 2139743828}
@@ -22391,13 +22457,6 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
   uiObject: {fileID: 0}
   ui: {fileID: 0}
-  action:
-  - actionType: 0
-    value: 1
-  - actionType: 0
-    value: 10
-  - actionType: 3
-    value: 4
   uiAnchor: {fileID: 1425979589}
   animateChild: {fileID: 1149153573}
   visualRoot: {fileID: 1242671788}
@@ -24598,13 +24657,6 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
   uiObject: {fileID: 0}
   ui: {fileID: 0}
-  action:
-  - actionType: 0
-    value: 0
-  - actionType: 1
-    value: 5
-  - actionType: 2
-    value: 3
   uiAnchor: {fileID: 1099781664}
   animateChild: {fileID: 657567178}
   visualRoot: {fileID: 1440590692}
@@ -47740,7 +47792,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -413, y: 19.3}
+  m_AnchoredPosition: {x: -413, y: 19.300049}
   m_SizeDelta: {x: 195, y: 300}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1914537693
@@ -50218,6 +50270,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1988972333}
   m_CullTransparentMesh: 1
+--- !u!1 &1995486715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1995486716}
+  - component: {fileID: 1995486717}
+  - component: {fileID: 1995486718}
+  m_Layer: 5
+  m_Name: EffectContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1995486716
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995486715}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 915981735}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 130, y: -0.000015258789}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 1, y: 1}
+--- !u!114 &1995486717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995486715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 75, y: 75}
+  m_Spacing: {x: 10, y: 10}
+  m_Constraint: 1
+  m_ConstraintCount: 4
+--- !u!114 &1995486718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995486715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ffe856a2288d5d4fa6ea01d79d9828e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectContainerUI
+  effectIndicatorPrefab: {fileID: 376734638150968792, guid: e7606f9ae04ea384f8094d4049ba42f9, type: 3}
 --- !u!1 &2006787494
 GameObject:
   m_ObjectHideFlags: 0
@@ -50843,6 +50969,8 @@ MonoBehaviour:
   enemies: []
   heropanel: []
   heroes: []
+  playerModifier: {fileID: 1839832274}
+  modifierSprite: {fileID: 21300000, guid: b7b7ce3c4b6c62247bd502d66cb67115, type: 3}
   tutorialBattleController: {fileID: 447595116}
   heroPanelContainer: {fileID: 574093396}
   enemyPanelContainer: {fileID: 1983243690}

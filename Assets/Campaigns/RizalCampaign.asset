@@ -20,6 +20,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 95773bd0cb5195d4888e9a1542205c5f, type: 2}
   - {fileID: 11400000, guid: 8d48891681cc8a94a9f783de91d6a018, type: 2}
   - {fileID: 11400000, guid: 030e79508fa16864d9030632a56be530, type: 2}
+  - {fileID: 11400000, guid: 5a578256151f91d46af85af2be53e262, type: 2}
   levelsRanges:
   - startLevel: 1
     endLevel: 3
@@ -39,5 +40,6 @@ MonoBehaviour:
     groundMaterial: {fileID: 2100000, guid: 7170cb36067a48948abe7f42655304ce, type: 2}
   - startLevel: 8
     endLevel: 10
-    prefabs: []
-    groundMaterial: {fileID: 0}
+    prefabs:
+    - {fileID: 2994760290788007504, guid: 8c1b21252a7a8f44c9112cdda28bb8f7, type: 3}
+    groundMaterial: {fileID: 2100000, guid: 7170cb36067a48948abe7f42655304ce, type: 2}
