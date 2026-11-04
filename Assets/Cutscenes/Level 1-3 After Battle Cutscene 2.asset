@@ -13,15 +13,35 @@ MonoBehaviour:
   m_Name: Level 1-3 After Battle Cutscene 2
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   line:
-  - speakerName: Narrator
-    speakerType: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: And with Chapter 1 finished, now we go to the next Chapter.
+    Dialogue: Somehow, I don't know how, I won against him. He hit the chairs near
+      him and fell to the ground. I let him go, making him lose his confidence. Maybe
+      because of my small size, my classmate thought that I was smart at fighting.
+      A boy challenged me and I accepted but lost, almost breaking my head.
     isLeftSide: 0
-  - speakerName: Narrator
-    speakerType: 2
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: "Chapter II: My Schooling and Daily Life in Bi\xF1an"
+    Dialogue: I don't want to take up time telling how many beatings I got, nor try
+      to tell how much it hurt. I used to win in competitions, as no one was better
+      than me. When I went out with my companions, they teased me with nicknames.
+      But every friend that I have were very kind to me that I didn't too much about
+      their teasing. Later, some of them were my schoolmates in Manila and came my
+      turn to tease.
     isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Near the house of my schoolmaster lived his father-in-law, generally
+      called Juancho. Juancho let me help him with his paintings, and in turn I learned
+      how to paint from him. I had liked this style of art that our classmates called
+      Jose Guevarra, another pupil, and myself the class painters.
+    isLeftSide: 0
+    pose: 0

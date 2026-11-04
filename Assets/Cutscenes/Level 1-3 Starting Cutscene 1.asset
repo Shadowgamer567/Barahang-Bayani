@@ -13,28 +13,74 @@ MonoBehaviour:
   m_Name: Level 1-3 Starting Cutscene 1
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   line:
-  - speakerName: Spanish Priest
-    speakerType: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: When I was four years of age, my little sister Concha died, and for
-      the first time I cried because of love and regret. Until then I had shed tears
-      only for my own mistakes, which my loving, wise mother knew how to correct.
+    Dialogue: "Bi\xF1an is a town near my hometown in Kalamba. My father was born
+      in Bi\xF1an, and wished for me to continue studying Latin there. He sent me
+      there on Sunday under the care of my brother. Parting from my family was both
+      hard and sad for all of us; I managed to hide my own tears, even though I was
+      only nine. "
     isLeftSide: 0
-  - speakerName: Spanish Priest
-    speakerType: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: In June of 1868, I went to Manila with my father. We went and rode
-      a boat, and I cannot tell how happy I was at each new stop on the banks of
-      the Pasig. A few years later, we went to Cainta, Taytay, and Antipolo, and
-      then to Manila. In Santa Ana I visited my eldest sister, Saturnina, who at
-      that time was a student in La Concordia College. Then I returned to my village
-      and remained until 1870.
+    Dialogue: "We reached Bi\xF1an by nightfall, and went to an aunt\u2019s house
+      where I was to live. When the moon came up, a cousin took me around the town.
+      Bi\xF1an appeared to me large and wealthy but neither attractive nor cheerful."
     isLeftSide: 0
-  - speakerName: Spanish Priest
-    speakerType: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: "Now it's time to go to Bi\xF1an."
+    Dialogue: My brother left me to the schoolmaster. I was a bit nervous at first,
+      until he talked to me.
     isLeftSide: 0
+    pose: 0
+  - speakerName: Teacher
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: You, do you speak Spanish?
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: A little, sir.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Teacher
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Do you know Latin?
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: A little, sir.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "These answers got the teacher\u2019s son to start making fun of me.
+      Somehow or another, we ended up fighting."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Hoo boy, I didn't want things to end like this.
+    isLeftSide: 0
+    pose: 0

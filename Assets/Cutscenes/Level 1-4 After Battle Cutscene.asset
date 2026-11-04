@@ -17,5 +17,58 @@ MonoBehaviour:
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: 
+    Dialogue: "I left Bi\xF1an on December 17, 1870. I was nine back then, first
+      time seeing what a steamer really was. It seemed to me most beautiful and in
+      every way admirable. I was the only passenger from Bi\xF1an. Two sailors put
+      my baggage into the cabin. "
     isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Then I went to check my belongings. I thought I was going to be alone
+      in the cabin, but a Frenchman, Arturo Camps, who was a friend of my father,
+      looked after me. The journey seemed very long but we finally arrived at Kalamba.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Oh! How happy I was to see the shore! At once I wanted to jump into
+      the first banca. A deckhand took me in his arms and put me into the captain's
+      boat. Then the Frenchman came and four sailors rowed us ashore. It's impossible
+      to describe how happy I was when I saw a servant waiting for us in the carriage.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: I jumped in and soon found myself again in our home, happy in love
+      of my family. Here end my recollections of that period of mingled sadness and
+      gladness., in which for the first time, I came to know anybody of foreign birth.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Finally, I'm home.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Chapter II Complete.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: 
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Chapter III The Injustice Done My Mother
+    isLeftSide: 0
+    pose: 0

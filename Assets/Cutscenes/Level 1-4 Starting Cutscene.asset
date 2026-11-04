@@ -17,55 +17,41 @@ MonoBehaviour:
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: "Bi\xF1an is a town near my hometown in Kalamba. My father was born
-      in Bi\xF1an, and wished for me to continue studying Latin there. He sent me
-      there on Sunday under the care of my brother. Parting from my family was both
-      hard and sad for all of us; I managed to hide my own tears, even though I was
-      only nine. "
+    Dialogue: Many of us lived in the same house. There was my aunt, two cousins,
+      and three half-cousins. My manner of life was simple. I heard mass at four
+      if there were a service so early, or studied at that hour and went to mass
+      after. Then I went out in the yard to look for apples. Then came breakfast,
+      where I ate a plate of rice and two dried sardines. There was class work until
+      ten and after lunch a study period.
     isLeftSide: 0
+    pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: "We reached Bi\xF1an by nightfall, and went to an aunt\u2019s house
-      where I was to live. When the moon came up, a cousin took me around the town.
-      Bi\xF1an appeared to me large and wealthy but neither attractive nor cheerful. "
+    Dialogue: "In the afternoon, there was school from two o\u2019clock until five.
+      Next, there would be play with my cousins for a while. Study and perhaps painting
+      took up the remainder of the afternoon. At night came supper, one or two plates
+      of rice with fish. In the evening we had prayers and then, if it was moonlight,
+      a cousin and I would play in the street with the others."
     isLeftSide: 0
+    pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: 'My brother left me to the schoolmaster. I was a bit nervous at first,
-      until he talked to me. '
+    Dialogue: Fortunately, I was never ill while away from home. From time to time,
+      I went to my own village. How long the trip seemed going, and how short coming
+      back!
     isLeftSide: 0
-  - speakerName: Schoolmaster
-    speakerType: 2
-    hero: {fileID: 0}
-    enemy: {fileID: 0}
-    Dialogue: 'You, do you speak Spanish? '
-    isLeftSide: 0
+    pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
-    Dialogue: 'A little, sir. '
+    Dialogue: A lot of things happened which would take too long to explain and tiring
+      to read. Finally came a letter from my sister Saturnina which announced that
+      the steamer would stop for me on a certain day. I said my goodbyes to my friends
+      and teacher. I expressed my sadness in leaving and gratitude for his instruction.
     isLeftSide: 0
-  - speakerName: Schoolmaster
-    speakerType: 2
-    hero: {fileID: 0}
-    enemy: {fileID: 0}
-    Dialogue: 'Do you know Latin? '
-    isLeftSide: 0
-  - speakerName: Jose Rizal
-    speakerType: 0
-    hero: {fileID: 0}
-    enemy: {fileID: 0}
-    Dialogue: 'A little, sir. '
-    isLeftSide: 0
-  - speakerName: Jose Rizal
-    speakerType: 0
-    hero: {fileID: 0}
-    enemy: {fileID: 0}
-    Dialogue: "These answers got the teacher\u2019s son to start making fun of me.
-      Somehow or another, we ended up fighting."
-    isLeftSide: 0
+    pose: 0

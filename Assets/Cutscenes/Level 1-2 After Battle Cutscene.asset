@@ -12,4 +12,77 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
   m_Name: Level 1-2 After Battle Cutscene
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
-  line: []
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: I had nine sisters and a brother. Our father was a model parent. He
+      gave us the education that was suitable in a family that was neither rich nor
+      poor. He was creative and careful with saving money, which allowed him to build
+      two houses. One of the two became the house that I lived in with a nipa hut
+      nearby, shaded with banana trees, where I had fond memories of.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "At night I prayed along with my mother and siblings. Afterwards, we
+      went to the roof to enjoy the moonlight; and our nurse would tell us stories.
+      Sometimes sad, sometimes happy, the nurse\u2019s stories were unique in their
+      imagination. In these stories, dead people, gold, and plants on which diamonds
+      grew were all mixed together."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: When I was four years of age, my little sister Concha died, and for
+      the first time I cried because of love and regret. Until then I had shed tears
+      only for my own mistakes, which my loving, wise mother knew how to correct.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: I learned to write in my own village. My father looked after my education.
+      He paid an old man, who had been his schoolmate, to teach me the first steps
+      in Latin. This teacher lived in our house till he died, five months later.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: In June of 1868, I went to Manila with my father. We went and rode
+      a boat, and I cannot tell how happy I was at each new stop on the banks of
+      the Pasig. A few years later, we went to Cainta, Taytay, and Antipolo, and
+      then to Manila. In Santa Ana I visited my eldest sister, Saturnina, who at
+      that time was a student in La Concordia College. Then I returned to my village
+      and remained until 1870.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Now it's time to go to Bi\xF1an."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: And with Chapter 1 finished, now we go to the next Chapter.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: 
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Chapter II: My Schooling and Daily Life in Bi\xF1an"
+    isLeftSide: 0
+    pose: 0
