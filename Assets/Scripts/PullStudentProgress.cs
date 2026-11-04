@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PullStudentProgress : MonoBehaviour
 {
+    //Deprecated
+    /*
     public static async Task PullProgress(AccountData account)
     {
         if (account == null)
@@ -90,6 +92,12 @@ public class PullStudentProgress : MonoBehaviour
             progress.trueFalseTotal =
                 GetInt(data, "trueFalseTotal");
 
+            progress.multipleSelectCorrect =
+                GetInt(data, "multipleSelectCorrect");
+
+            progress.multipleSelectTotal =
+                GetInt(data, "multipleSelectTotal");
+
             progress.completedLevel =
                 GetStringList(data, "completedLevels");
 
@@ -124,6 +132,13 @@ public class PullStudentProgress : MonoBehaviour
                 progress.trueFalseTotal
             );
 
+            Debug.Log(
+                "Multiple Select: " +
+                progress.multipleSelectCorrect +
+                "/" +
+                progress.multipleSelectTotal
+            );
+
             // Apply the downloaded progress to ProgressManager
             ApplyProgress(progress, data, account.id);
         }
@@ -135,6 +150,7 @@ public class PullStudentProgress : MonoBehaviour
             );
         }
     }
+    */
 
     private static void ApplyProgress(
         ProgressData data,
@@ -171,6 +187,10 @@ public class PullStudentProgress : MonoBehaviour
             data.trueFalseCorrect;
         QuizStats.Instance.typeTotal[InputType.TrueOrFalse] =
             data.trueFalseTotal;
+        QuizStats.Instance.typeCorrect[InputType.MultipleSelect] =
+        data.multipleSelectCorrect;
+        QuizStats.Instance.typeTotal[InputType.MultipleSelect] =
+            data.multipleSelectTotal;
 
         Debug.Log(
             "Firestore progress applied locally for account '" +

@@ -67,6 +67,7 @@ public class QuizMakerManager : MonoBehaviour
 
     private bool trueFalseAnswer = true;
     private int correctAnswerIndex = 0;
+    private bool[] multipleSelectAnswers = new bool[4];
     private bool isClosingQuizMaker = false;
     private bool isDeletingQuiz = false;
     public bool IsDeletingQuiz => isDeletingQuiz;
@@ -887,7 +888,17 @@ public class QuizMakerManager : MonoBehaviour
             case 2: //True or False
                 trueFalsePanel.SetActive(true);
                 break;
+
+            case 3: //Multiple Select
+                multipleChoicePanel.SetActive(true);
+                break;
         }
+
+        // Reset answer selections when changing input types.
+        correctAnswerIndex = 0;
+        multipleSelectAnswers = new bool[4];
+
+        UpdateCorrectAnswerButtons();
     }
     public void OnQuestionTypeChanged()
     {
@@ -980,6 +991,32 @@ public class QuizMakerManager : MonoBehaviour
 
                 entry += "ANSWER:" + (trueFalseAnswer ? "TRUE" : "FALSE") + "\n";
                 break;
+
+            case 3: // Multiple Select
+                entry += "INPUT:MULTIPLE_SELECT\n";
+
+                string[] selectAnswers =
+                {
+                    AnswerA.text.Trim(),
+                    AnswerB.text.Trim(),
+                    AnswerC.text.Trim(),
+                    AnswerD.text.Trim()
+                };
+
+                for (int i = 0; i < selectAnswers.Length; i++)
+                {
+                    char answerLetter = (char)('A' + i);
+
+                    entry += answerLetter + ". " + selectAnswers[i];
+
+                    if (multipleSelectAnswers[i])
+                    {
+                        entry += " \"C\"";
+                    }
+
+                    entry += "\n";
+                }
+                break;
         }
 
         entry += "\n";
@@ -989,22 +1026,54 @@ public class QuizMakerManager : MonoBehaviour
 
     public void SetCorrectAnswer(int index)
     {
-        correctAnswerIndex = index;
-
-        for(int i = 0; i < correctAnswerButtons.Length; i++)
+        if (index < 0 || index >= correctAnswerButtons.Length || index >= multipleSelectAnswers.Length)
         {
-            if(i == index)
-            {
-                correctAnswerButtons[i].color = Color.green;
-            }
-
-            else
-            {
-                correctAnswerButtons[i].color = Color.white;
-            }
+            Debug.LogWarning("Invalid correct answer index: " + index);
+            return;
         }
 
-        Debug.Log("Correct Answer Set To: " + index);
+        if (inputTypeDropdown.value == 3) // Multiple Select
+        {
+            // Toggle the selected answer independently.
+            multipleSelectAnswers[index] = !multipleSelectAnswers[index];
+
+            Debug.Log("Multiple Select Answer " + index + ": " + multipleSelectAnswers[index]);
+        }
+
+        else // Multiple Choice
+        {
+            // Only one correct answer.
+            correctAnswerIndex = index;
+
+            Debug.Log("Correct Answer Set To: " + index);
+        }
+
+        UpdateCorrectAnswerButtons();
+    }
+
+    private void UpdateCorrectAnswerButtons()
+    {
+        for (int i = 0; i < correctAnswerButtons.Length; i++)
+        {
+            if (correctAnswerButtons[i] == null)
+            {
+                continue;
+            }
+
+            bool isCorrect;
+
+            if (inputTypeDropdown.value == 3) // Multiple Select
+            {
+                isCorrect = i < multipleSelectAnswers.Length && multipleSelectAnswers[i];
+            }
+
+            else // Multiple Choice
+            {
+                isCorrect = i == correctAnswerIndex;
+            }
+
+            correctAnswerButtons[i].color = isCorrect ? Color.green : Color.white;
+        }
     }
 
     public void SetTrueAnswer()
@@ -1078,6 +1147,38 @@ public class QuizMakerManager : MonoBehaviour
 
             case 2: // True or False
                 break;
+
+            case 3: // Multiple Select
+
+                // All four answers must be filled.
+                if (string.IsNullOrWhiteSpace(AnswerA.text) ||
+                    string.IsNullOrWhiteSpace(AnswerB.text) ||
+                    string.IsNullOrWhiteSpace(AnswerC.text) ||
+                    string.IsNullOrWhiteSpace(AnswerD.text))
+                {
+                    Debug.LogWarning( "All Multiple Select answers must be filled.");
+
+                    return;
+                }
+
+                // Require at least two correct answers.
+                int correctCount = 0;
+
+                foreach (bool isCorrect in multipleSelectAnswers)
+                {
+                    if (isCorrect)
+                    {
+                        correctCount++;
+                    }
+                }
+
+                if (correctCount < 2)
+                {
+                    Debug.LogWarning("Multiple Select requires at least two correct answers.");
+
+                    return;
+                }
+                break;
         }
 
         int questionCount = 0;
@@ -1103,7 +1204,7 @@ public class QuizMakerManager : MonoBehaviour
         string entry = BuildQuestionEntry(id, questionNumber);
 
         //separeate previous question from new question
-        if(new FileInfo(selectedQuizPath).Length > 0)
+        if (new FileInfo(selectedQuizPath).Length > 0)
         {
             File.AppendAllText(selectedQuizPath, "");
         }
@@ -1298,8 +1399,11 @@ public class QuizMakerManager : MonoBehaviour
         selectedImagePath = null;
         selectedAudioPath = null;
 
-        // Reset answer selections
-        SetCorrectAnswer(0);
+        // Reset answer selections.
+        correctAnswerIndex = 0;
+        multipleSelectAnswers = new bool[4];
+
+        UpdateCorrectAnswerButtons();
         SetTrueAnswer();
 
         Debug.Log("Question fields cleared.");
@@ -1328,7 +1432,10 @@ public class QuizMakerManager : MonoBehaviour
     {
         currentQuizText.text = "No quiz selected";
 
-        SetCorrectAnswer(0);
+        correctAnswerIndex = 0;
+        multipleSelectAnswers = new bool[4];
+
+        UpdateCorrectAnswerButtons();
         SetTrueAnswer();
     }
 

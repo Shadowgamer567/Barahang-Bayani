@@ -24,7 +24,12 @@ public class QuizManager : MonoBehaviour
     public UnityEngine.UI.Image questionImage;
     public AudioSource audioSource;
     public GameObject audioButton;
+
+    [Header("Submit Buttons")]
     public GameObject submitButton;
+    public GameObject multipleSelectSubmitButton;
+
+
     public GameObject endButton;
     public GameObject inputPanel;
     public GameObject truthPanel;
@@ -52,6 +57,7 @@ public class QuizManager : MonoBehaviour
 
     private bool waitingForClick = false;
     private bool answerSubmitted = false;
+    private bool[] selectedMultipleAnswers = new bool[4];
     public bool blockInfoPanelDismissal = false;
     private int pendingDamage;
     private CardType pendingQuizCard;
@@ -63,6 +69,7 @@ public class QuizManager : MonoBehaviour
     {
         currentQuestion = question;
         answerSubmitted = false;
+        selectedMultipleAnswers = new bool[4];
         pendingQuizCard = card;
         pendingDamage = card.damage;
         battleControl = battle;
@@ -83,6 +90,9 @@ public class QuizManager : MonoBehaviour
         inputPanel.SetActive(false);
         truthPanel.SetActive(false);
         falsePanel.SetActive(false);
+
+        // Multiple Select has its own Submit button.
+        multipleSelectSubmitButton.SetActive(false);
 
         if (audioSource != null)
         {
@@ -209,12 +219,15 @@ public class QuizManager : MonoBehaviour
         switch (question.inputType)
         {
             case InputType.MultipleChoice:
+            case InputType.MultipleSelect:
                 inputPanel.SetActive(false);
 
                 for (int i = 0; i < answerText.Length; i++)
                 {
                     answerText[i].transform.parent.gameObject.SetActive(true);
                 }
+
+                multipleSelectSubmitButton.SetActive(question.inputType == InputType.MultipleSelect);
                 break;
 
             case InputType.Identification:
@@ -254,11 +267,28 @@ public class QuizManager : MonoBehaviour
             return;
         }
 
+        if (currentQuestion.inputType == InputType.MultipleSelect)
+        {
+            if (index < 0 || index >= selectedMultipleAnswers.Length)
+            {
+                return;
+            }
+
+            selectedMultipleAnswers[index] = !selectedMultipleAnswers[index];
+
+            // Highlight selected answers.
+            answerBackgrounds[index].color = selectedMultipleAnswers[index] ? new Color32(225, 220, 50, 255) : normalColor;
+
+            return;
+        }
+
+        // Existing Multiple Choice behavior.
         answerSubmitted = true;
 
         bool correct = index == currentQuestion.correctIndex;
 
         OnAnswerEvaluated?.Invoke(correct);
+
         Debug.Log(correct ? "Correct!" : "Incorrect");
 
         if (correct)
@@ -269,6 +299,63 @@ public class QuizManager : MonoBehaviour
         ProgressManager.Instance.RecordQuizResult(currentQuestion.inputType, correct);
 
         StartCoroutine(ShowAnswerRoutine(correct, index));
+    }
+
+    public void SubmitMultipleSelect()
+    {
+        if (answerSubmitted || currentQuestion == null || currentQuestion.inputType != InputType.MultipleSelect)
+        {
+            return;
+        }
+
+        bool anySelected = false;
+
+        foreach (bool selected in selectedMultipleAnswers)
+        {
+            if (selected)
+            {
+                anySelected = true;
+                break;
+            }
+        }
+
+        if (!anySelected)
+        {
+            Debug.LogWarning("Select at least one answer.");
+            return;
+        }
+
+        if (currentQuestion.correctSelection == null || currentQuestion.correctSelection.Length != selectedMultipleAnswers.Length)
+        {
+            Debug.LogError("Multiple Select answer data is invalid.");
+            return;
+        }
+
+        bool correct = true;
+
+        for (int i = 0; i < selectedMultipleAnswers.Length; i++)
+        {
+            if (selectedMultipleAnswers[i] != currentQuestion.correctSelection[i])
+            {
+                correct = false;
+                break;
+            }
+        }
+
+        answerSubmitted = true;
+
+        OnAnswerEvaluated?.Invoke(correct);
+
+        Debug.Log(correct ? "Correct!" : "Incorrect");
+
+        if (correct)
+        {
+            QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
+        }
+
+        ProgressManager.Instance.RecordQuizResult(currentQuestion.inputType, correct);
+
+        StartCoroutine(ShowAnswerRoutine(correct));
     }
 
     public void SubmitIdentification()
@@ -442,6 +529,11 @@ public class QuizManager : MonoBehaviour
                 q.inputType = InputType.TrueOrFalse;
             }
 
+            else if (inputLine.StartsWith("INPUT:MULTIPLE_SELECT"))
+            {
+                q.inputType = InputType.MultipleSelect;
+            }
+
             if (q.inputType == InputType.TrueOrFalse)
             {
                 q.Answer = new string[0];
@@ -471,6 +563,8 @@ public class QuizManager : MonoBehaviour
                 q.Answer = new string[4];
                 q.correctIndex = 0;
 
+                // Store correct-answer flags for Multiple Select.
+                q.correctSelection = new bool[4];
 
                 for (int j = 0; j < 4; j++)
                 {
@@ -478,23 +572,30 @@ public class QuizManager : MonoBehaviour
 
                     bool isCorrect = line.Contains("\"C\"");
 
-                    // Remove the answer label (A., B., C., D.)
-                    // without assuming the line contains an answer.
+                    // Remove the answer label (A., B., C., D.).
                     int answerDotIndex = line.IndexOf('.');
 
-                    string answerText = answerDotIndex >= 0
-                        ? line.Substring(answerDotIndex + 1).Trim()
-                        : line;
+                    string answerText = answerDotIndex >= 0 ? line.Substring(answerDotIndex + 1).Trim() : line;
 
+                    // Remove the correct-answer marker.
                     answerText = answerText.Replace("\"C\"", "").Trim();
 
-                    if (isCorrect)
+                    // Save the answer text.
+                    q.Answer[j] = answerText;
+
+                    if (q.inputType == InputType.MultipleSelect)
                     {
+                        // Multiple Select can have several correct answers.
+                        q.correctSelection[j] = isCorrect;
+                    }
+
+                    else if (isCorrect)
+                    {
+                        // Preserve existing Multiple Choice and
+                        // Identification behavior.
                         q.correctIndex = j;
                         q.correctAnswer = answerText;
                     }
-
-                    q.Answer[j] = answerText;
                 }
 
                 questions.Add(q);
@@ -639,8 +740,37 @@ public class QuizManager : MonoBehaviour
 
     IEnumerator ShowAnswerRoutine(bool correct, int selectedIndex = -1)
     {
+        // ===== MULTIPLE SELECT =====
+        if (currentQuestion.inputType == InputType.MultipleSelect)
+        {
+            // Only process the four Multiple Select answers.
+            for (int i = 0; i < currentQuestion.correctSelection.Length; i++)
+            {
+                bool shouldBeSelected = currentQuestion.correctSelection[i];
+                bool wasSelected = selectedMultipleAnswers[i];
+
+                if (shouldBeSelected)
+                {
+                    // Correct answers appear green.
+                    answerBackgrounds[i].color = correctColor;
+                }
+
+                else if (wasSelected)
+                {
+                    // Incorrectly selected answers appear red.
+                    answerBackgrounds[i].color = wrongColor;
+                }
+
+                else
+                {
+                    // Unselected incorrect answers remain normal.
+                    answerBackgrounds[i].color = normalColor;
+                }
+            }
+        }
+
         // ===== MULTIPLE CHOICE =====
-        if (currentQuestion.inputType == InputType.MultipleChoice)
+        else if(currentQuestion.inputType == InputType.MultipleChoice)
         {
             // reset colors first
             for (int i = 0; i < answerBackgrounds.Length; i++)

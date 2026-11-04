@@ -724,6 +724,11 @@ public class AccountManager : MonoBehaviour
         {
             HideAccountManagementTitle();
         }
+
+        if (backButton != null)
+        {
+            backButton.SetActive(true);
+        }
     }
 
     private void ShowLoginPanel()
@@ -738,6 +743,7 @@ public class AccountManager : MonoBehaviour
         }
 
         panelHider.HidePanels();
+        backButton.SetActive(false);
     }
 
     private void ShowAccountManagementPanel()
@@ -1031,6 +1037,8 @@ public class AccountManager : MonoBehaviour
 
         createAccountPanel.SetActive(true);
 
+        classroomPanel.SetActive(false);
+
         backButton.SetActive(false);
     }
 
@@ -1045,6 +1053,8 @@ public class AccountManager : MonoBehaviour
         accountRecoveryDisplay.SetActive(false);
 
         createAccountPanel.SetActive(true);
+
+        classroomPanel.SetActive(false);
 
         backButton.SetActive(false);
     }
@@ -1143,12 +1153,14 @@ public class AccountManager : MonoBehaviour
         int totalAnswered =
             data.multipleChoiceTotal +
             data.identificationTotal +
-            data.trueFalseTotal;
+            data.trueFalseTotal +
+            data.multipleSelectTotal; ;
 
         int totalCorrect =
             data.multipleChoiceCorrect +
             data.identificationCorrect +
-            data.trueFalseCorrect;
+            data.trueFalseCorrect +
+            data.multipleSelectCorrect;
 
         if (totalAnswered == 0)
         {
@@ -1169,6 +1181,10 @@ public class AccountManager : MonoBehaviour
             "True/False: " +
             data.trueFalseCorrect + "/" +
             data.trueFalseTotal + "\n\n" +
+
+            "Multiple Select: " +
+            data.multipleSelectCorrect + "/" +
+            data.multipleSelectTotal + "\n\n" +
 
             "Total: " + totalCorrect + "/" + totalAnswered;
     }
@@ -1196,7 +1212,11 @@ public class AccountManager : MonoBehaviour
             completedLevelsText.text += level + "\n";
         }
 
-        quizStatsText.text = "Multiple Choice: " + data.multipleChoiceCorrect + "/" + data.multipleChoiceTotal + "\n\n" + "Identification: " + data.identificationCorrect + "/" + data.identificationTotal + "\n\n" + "True/False: " + data.trueFalseCorrect + "/" + data.trueFalseTotal;
+        quizStatsText.text = 
+            "Multiple Choice: " + data.multipleChoiceCorrect + "/" + data.multipleChoiceTotal +
+            "\n\n" + "Identification: " + data.identificationCorrect + "/" + data.identificationTotal +
+            "\n\n" + "True/False: " + data.trueFalseCorrect + "/" + data.trueFalseTotal +
+            "\n\n" + "Multiple Select: " + data.multipleSelectCorrect + "/" + data.multipleSelectTotal;
     }
     public void CloseStudentInfo()
     {

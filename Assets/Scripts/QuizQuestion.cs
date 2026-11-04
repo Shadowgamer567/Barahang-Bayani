@@ -12,7 +12,8 @@ public enum InputType
 {
     MultipleChoice,
     Identification,
-    TrueOrFalse
+    TrueOrFalse,
+    MultipleSelect
 }
 
 [System.Serializable]
@@ -26,6 +27,10 @@ public class QuizQuestion
     public string correctAnswer;
     public int correctIndex;
     public bool correctBool;
+
+    // Multiple Select: one correct/incorrect flag per answer.
+    public bool[] correctSelection;
+
     public string questionID;
 
     public string imagePath;

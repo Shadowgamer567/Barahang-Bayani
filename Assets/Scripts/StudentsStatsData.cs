@@ -18,4 +18,7 @@ public class StudentStatsData
 
     public int trueFalseCorrect;
     public int trueFalseTotal;
+
+    public int multipleSelectCorrect;
+    public int multipleSelectTotal;
 }

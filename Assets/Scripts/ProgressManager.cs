@@ -24,6 +24,9 @@ public class ProgressManager : MonoBehaviour
     public int trueFalseCorrect = 0;
     public int trueFalseTotal = 0;
 
+    public int multipleSelectCorrect = 0;
+    public int multipleSelectTotal = 0;
+
     [Header("Pending Quiz Synchronization")]
     public List<QuizResultData> pendingQuizResults = new();
     public bool quizResultLedgerInitialized = false;
@@ -41,7 +44,6 @@ public class ProgressManager : MonoBehaviour
     private bool isResettingPlaythrough = false;
     private bool isAutomaticallySynchronizing = false;
     private int progressGeneration = 0;
-
 
     private void Start()
     {
@@ -81,6 +83,9 @@ public class ProgressManager : MonoBehaviour
 
         trueFalseCorrect = 0;
         trueFalseTotal = 0;
+
+        multipleSelectCorrect = 0;
+        multipleSelectTotal = 0;
 
         pendingNewGameReset = false;
         previousPlaythroughId = "";
@@ -134,6 +139,10 @@ public class ProgressManager : MonoBehaviour
             case InputType.TrueOrFalse:
                 trueFalseTotal++;
                 break;
+
+            case InputType.MultipleSelect:
+                multipleSelectTotal++;
+                break;
         }
     }
 
@@ -154,6 +163,10 @@ public class ProgressManager : MonoBehaviour
 
             case InputType.TrueOrFalse:
                 trueFalseCorrect++;
+                break;
+
+            case InputType.MultipleSelect:
+                multipleSelectCorrect++;
                 break;
         }
     }
@@ -194,6 +207,9 @@ public class ProgressManager : MonoBehaviour
 
         data.trueFalseCorrect = trueFalseCorrect;
         data.trueFalseTotal = trueFalseTotal;
+
+        data.multipleSelectCorrect = multipleSelectCorrect;
+        data.multipleSelectTotal = multipleSelectTotal;
 
         string json = JsonUtility.ToJson(data, true);
 
@@ -478,6 +494,9 @@ public class ProgressManager : MonoBehaviour
         trueFalseCorrect = data.trueFalseCorrect;
         trueFalseTotal = data.trueFalseTotal;
 
+        multipleSelectCorrect = data.multipleSelectCorrect;
+        multipleSelectTotal = data.multipleSelectTotal;
+
         tutorialCompleted = data.tutorialCompleted;
     }
 
@@ -532,6 +551,9 @@ public class ProgressManager : MonoBehaviour
 
         trueFalseCorrect = 0;
         trueFalseTotal = 0;
+
+        multipleSelectCorrect = 0;
+        multipleSelectTotal = 0;
 
         // Clear results of previous playthrough
         pendingQuizResults.Clear();
@@ -1001,8 +1023,7 @@ public class ProgressManager : MonoBehaviour
         return validResults;
     }
 
-    private void AddPendingResultsToCounters(
-        List<QuizResultData> results)
+    private void AddPendingResultsToCounters(List<QuizResultData> results)
     {
         foreach (QuizResultData result in results)
         {
@@ -1034,6 +1055,14 @@ public class ProgressManager : MonoBehaviour
                         trueFalseCorrect++;
 
                     break;
+
+                case "MultipleSelect":
+                    multipleSelectTotal++;
+
+                    if (result.isCorrect)
+                        multipleSelectCorrect++;
+
+                    break;
             }
         }
     }
@@ -1051,6 +1080,9 @@ public class ProgressManager : MonoBehaviour
 
         trueFalseCorrect = cloudProgress.trueFalseCorrect;
         trueFalseTotal = cloudProgress.trueFalseTotal;
+
+        multipleSelectCorrect = cloudProgress.multipleSelectCorrect;
+        multipleSelectTotal = cloudProgress.multipleSelectTotal;
     }
 
 

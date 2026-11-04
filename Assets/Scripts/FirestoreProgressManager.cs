@@ -6,7 +6,7 @@ using UnityEngine;
 public class FirestoreProgressManager : MonoBehaviour
 {
     public static async Task UploadProgressForNewGame(
-        string accountID,
+       string accountID,
         ProgressData progress)
     {
         Dictionary<string, object> data =
@@ -41,6 +41,12 @@ public class FirestoreProgressManager : MonoBehaviour
 
         data["trueFalseTotal"] =
             progress.trueFalseTotal;
+
+        data["multipleSelectCorrect"] =
+            progress.multipleSelectCorrect;
+        
+        data["multipleSelectTotal"] =
+            progress.multipleSelectTotal;
 
         data["tutorialCompleted"] = 
             progress.tutorialCompleted;
@@ -120,6 +126,8 @@ public class FirestoreProgressManager : MonoBehaviour
                     { "identificationCorrect", progress.identificationCorrect },
                     { "identificationTotal", progress.identificationTotal },
                     { "trueFalseCorrect", progress.trueFalseCorrect },
+                    { "multipleSelectCorrect", progress.multipleSelectCorrect },
+                    { "multipleSelectTotal", progress.multipleSelectTotal },
                     { "trueFalseTotal", progress.trueFalseTotal },
                     { "tutorialCompleted", progress.tutorialCompleted },
                     { "quizResultLedgerInitialized", progress.quizResultLedgerInitialized }
@@ -302,6 +310,18 @@ public class FirestoreProgressManager : MonoBehaviour
                 snapshot.GetValue<int>("trueFalseTotal");
         }
 
+        if (snapshot.ContainsField("multipleSelectCorrect"))
+        {
+            progress.multipleSelectCorrect =
+                snapshot.GetValue<int>("multipleSelectCorrect");
+        }
+
+        if (snapshot.ContainsField("multipleSelectTotal"))
+        {
+            progress.multipleSelectTotal =
+                snapshot.GetValue<int>("multipleSelectTotal");
+        }
+
         if (snapshot.ContainsField("tutorialCompleted"))
         {
             progress.tutorialCompleted =
@@ -387,6 +407,8 @@ public class FirestoreProgressManager : MonoBehaviour
                     { "identificationTotal", 0 },
                     { "trueFalseCorrect", 0 },
                     { "trueFalseTotal", 0 },
+                    { "multipleSelectCorrect", 0 },
+                    { "multipleSelectTotal", 0 },
                     { "tutorialCompleted", false },
                     { "quizResultLedgerInitialized", true }
                     };
@@ -407,7 +429,7 @@ public class FirestoreProgressManager : MonoBehaviour
             .Collection("results");
     }
 
-    public static async Task<bool> UploadQuizResult( string accountID, QuizResultData result)
+    public static async Task<bool> UploadQuizResult(string accountID, QuizResultData result)
     {
         if (result == null || string.IsNullOrEmpty(result.resultId) || string.IsNullOrEmpty(result.playthroughId))
         {
@@ -484,6 +506,11 @@ public class FirestoreProgressManager : MonoBehaviour
                     case "TrueOrFalse":
                         correctField = "trueFalseCorrect";
                         totalField = "trueFalseTotal";
+                        break;
+
+                    case "MultipleSelect":
+                        correctField = "multipleSelectCorrect";
+                        totalField = "multipleSelectTotal";
                         break;
 
                     default:
@@ -624,6 +651,16 @@ public class FirestoreProgressManager : MonoBehaviour
 
             snapshot.cloudProgress.trueFalseCorrect =
                 progressSnapshot.GetValue<int>("trueFalseCorrect");
+
+            snapshot.cloudProgress.multipleSelectCorrect =
+                progressSnapshot.ContainsField("multipleSelectCorrect")
+                    ? progressSnapshot.GetValue<int>("multipleSelectCorrect")
+                    : 0;
+
+            snapshot.cloudProgress.multipleSelectTotal =
+                progressSnapshot.ContainsField("multipleSelectTotal")
+                    ? progressSnapshot.GetValue<int>("multipleSelectTotal")
+                    : 0;
 
             snapshot.cloudProgress.trueFalseTotal =
                 progressSnapshot.GetValue<int>("trueFalseTotal");
