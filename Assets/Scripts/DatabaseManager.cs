@@ -28,6 +28,12 @@ public class DatabaseManager : MonoBehaviour
 
     public void SetDatabase(string databaseName)
     {
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Cannot change the active classroom while account deletion is in progress.");
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(databaseName))
         {
             Debug.LogError("Cannot set database: database name is empty.");
@@ -71,6 +77,12 @@ public class DatabaseManager : MonoBehaviour
 
     public void LoadDatabaseConfig()
     {
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Cannot reload classroom configuration during account deletion.");
+            return;
+        }
+
         if (!File.Exists(ConfigPath))
         {
             CurrentDatabase = "DefaultDatabase";

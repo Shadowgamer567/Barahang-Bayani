@@ -8,6 +8,10 @@ using UnityEngine;
 public class FirestoreAccountManager : MonoBehaviour
 {
     public static FirestoreAccountManager Instance;
+    private static readonly Dictionary<string, HashSet<Task>> activeAccountOperations = new Dictionary<string, HashSet<Task>>();
+
+    private static Task activeAccountDownload = Task.CompletedTask;
+
     private void Awake()
     {
         if (Instance == null)
@@ -21,8 +25,115 @@ public class FirestoreAccountManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public static async Task WaitForAccountDownloads()
+    {
+        while (!activeAccountDownload.IsCompleted)
+        {
+            try
+            {
+                await activeAccountDownload;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning(
+                    "Account download failed while waiting: " + ex.Message
+                );
+            }
+        }
+    }
+
+    private static void TrackAccountOperation(string accountID, Task operation)
+    {
+        if (string.IsNullOrWhiteSpace(accountID) || operation == null)
+        {
+            return;
+        }
+
+        if (!activeAccountOperations.TryGetValue(
+            accountID,
+            out HashSet<Task> operations))
+        {
+            operations = new HashSet<Task>();
+            activeAccountOperations[accountID] = operations;
+        }
+
+        operations.Add(operation);
+
+        _ = ObserveAccountOperation(accountID, operation);
+    }
+
+    private static async Task ObserveAccountOperation(string accountID, Task operation)
+    {
+        try
+        {
+            await operation;
+        }
+
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning("Account operation failed for " + accountID + ": " + ex.Message);
+        }
+
+        finally
+        {
+            if (activeAccountOperations.TryGetValue(accountID, out HashSet<Task> operations))
+            {
+                operations.Remove(operation);
+
+                if (operations.Count == 0)
+                {
+                    activeAccountOperations.Remove(accountID);
+                }
+            }
+        }
+    }
+
+    public static async Task WaitForAccountOperations(
+        string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+        {
+            return;
+        }
+
+        while (activeAccountOperations.TryGetValue( accountID, out HashSet<Task> operations) && operations.Count > 0)
+        {
+            Task[] pending = operations.ToArray();
+
+            try
+            {
+                await Task.WhenAll(pending);
+            }
+
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning("An account operation failed while waiting: " + ex.Message);
+            }
+        }
+
+        Debug.Log("All tracked account operations completed for: " + accountID);
+    }
+
     public static async Task UploadAccount(AccountData account)
     {
+        if (account == null)
+        {
+            return;
+        }
+
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsDeletingAccount(account.id))
+        {
+            Debug.LogWarning("Account upload blocked: Account deletion is in progress for " + account.id);
+            return;
+        }
+
+        if (AccountManager.Instance != null && AccountManager.Instance.IsAccountPendingDeletion(account.id))
+        {
+            Debug.LogWarning("Account upload blocked: Account is pending deletion: " + account.id);
+            return;
+        }
+
         Dictionary<string, object> data = new Dictionary<string, object>();
 
         data["id"] = account.id;
@@ -33,10 +144,14 @@ public class FirestoreAccountManager : MonoBehaviour
         data["accountType"] = account.accountType.ToString();
         data["assignedStudentIDs"] = account.assignedStudentIDs;
 
-        await FirestoreManager.Instance
+        Task uploadTask = FirestoreManager.Instance
             .AccountsCollection()
             .Document(account.id)
             .SetAsync(data);
+
+        TrackAccountOperation(account.id, uploadTask);
+
+        await uploadTask;
 
         Debug.Log("Uploaded Account: " + account.username);
     }
@@ -53,6 +168,87 @@ public class FirestoreAccountManager : MonoBehaviour
         return snapshot.Exists;
     }
 
+    public static async Task DeleteAccountProgress(string accountID, string currentPlaythroughID = null, string previousPlaythroughID = null)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        DocumentReference progressRef =
+            FirestoreManager.Instance
+                .ProgressCollection()
+                .Document(accountID);
+
+        CollectionReference playthroughsRef =
+            progressRef.Collection("playthroughs");
+
+        HashSet<string> playthroughIDs =
+            new HashSet<string>();
+
+        // Retrieve all existing parent documents.
+        QuerySnapshot playthroughs =
+            await playthroughsRef.GetSnapshotAsync(Source.Server);
+
+        foreach (DocumentSnapshot playthrough in playthroughs.Documents)
+        {
+            playthroughIDs.Add(playthrough.Id);
+        }
+
+        // Include known playthrough IDs, even if their
+        // parent documents do not exist.
+        if (!string.IsNullOrWhiteSpace(currentPlaythroughID))
+        {
+            playthroughIDs.Add(currentPlaythroughID);
+        }
+
+        if (!string.IsNullOrWhiteSpace(previousPlaythroughID))
+        {
+            playthroughIDs.Add(previousPlaythroughID);
+        }
+
+        // Delete every discovered playthrough and its results.
+        foreach (string playthroughID in playthroughIDs)
+        {
+            DocumentReference playthroughRef =
+                playthroughsRef.Document(playthroughID);
+
+            await DeletePlaythrough(playthroughRef);
+        }
+
+        // Delete the main progress document last.
+        await progressRef.DeleteAsync();
+
+        Debug.Log(
+            "Deleted account progress from Firestore: " +
+            accountID
+        );
+    }
+
+    private static async Task DeletePlaythrough(
+    DocumentReference playthroughRef)
+    {
+        CollectionReference resultsRef = playthroughRef.Collection("results");
+
+        while (true)
+        {
+            QuerySnapshot results =
+                await resultsRef
+                    .Limit(100)
+                    .GetSnapshotAsync(Source.Server);
+
+            if (results.Count == 0)
+                break;
+
+            foreach (DocumentSnapshot result in results.Documents)
+            {
+                await result.Reference.DeleteAsync();
+            }
+        }
+
+        await playthroughRef.DeleteAsync();
+
+        Debug.Log("Deleted playthrough and its results: " + playthroughRef.Id);
+    }
+
     public static async Task DeleteAccount(string accountID)
     {
         if (string.IsNullOrWhiteSpace(accountID))
@@ -66,8 +262,40 @@ public class FirestoreAccountManager : MonoBehaviour
         Debug.Log("Deleted account from Firestore: " + accountID);
     }
 
-    public async Task DownloadAccounts()
+    public Task DownloadAccounts()
     {
+        if (ProgressManager.Instance != null &&
+            ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning(
+                "Account download blocked: Account deletion is in progress."
+            );
+
+            return Task.CompletedTask;
+        }
+
+        if (!activeAccountDownload.IsCompleted)
+        {
+            return activeAccountDownload;
+        }
+
+        activeAccountDownload = DownloadAccountsInternal();
+
+        return activeAccountDownload;
+    }
+
+    public async Task DownloadAccountsInternal()
+    {
+        if (ProgressManager.Instance != null &&
+            ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning(
+                "Account download blocked: Account deletion is in progress."
+            );
+
+            return;
+        }
+
         string classroomID = DatabaseManager.Instance.CurrentDatabase;
 
         QuerySnapshot snapshot = await FirestoreManager.Instance
@@ -160,19 +388,33 @@ public class FirestoreAccountManager : MonoBehaviour
         await AccountManager.Instance.SynchronizePendingAssignments();
     }
 
-    public static async Task UploadAssignments(
-    string teacherID,
-    List<string> studentIDs)
+    public static async Task UploadAssignments(string teacherID, List<string> studentIDs)
     {
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsDeletingAccount(teacherID))
+        {
+            Debug.LogWarning("Teacher assignment upload blocked: Account deletion is in progress for " + teacherID);
+            return;
+        }
+
+        if (AccountManager.Instance != null && AccountManager.Instance.IsAccountPendingDeletion(teacherID))
+        {
+            Debug.LogWarning("Teacher assignment upload blocked: Teacher account is pending deletion: " + teacherID);
+            return;
+        }
+
         DocumentReference teacherRef =
             FirestoreManager.Instance
                 .AccountsCollection()
                 .Document(teacherID);
 
-        await teacherRef.UpdateAsync(
+        Task uploadTask = teacherRef.UpdateAsync(
             "assignedStudentIDs",
             studentIDs
-        );
+);
+
+        TrackAccountOperation(teacherID, uploadTask);
+
+        await uploadTask;
 
         Debug.Log("Uploaded assignments for teacher: " + teacherID);
     }

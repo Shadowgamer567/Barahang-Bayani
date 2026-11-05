@@ -134,8 +134,16 @@ public class FirestoreClassroomManager : MonoBehaviour
 
     public void OpenClassroomSelection()
     {
-        if (classroomSelectionPanel == null)
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Cannot open classroom selection during account deletion.");
             return;
+        }
+
+        if (classroomSelectionPanel == null)
+        {
+            return;
+        }
 
         classroomSelectionPanel.SetActive(true);
 
@@ -152,6 +160,13 @@ public class FirestoreClassroomManager : MonoBehaviour
 
     public async void SelectClassroom(string classroomID)
     {
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Cannot switch classrooms while account deletion is in progress.");
+
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(classroomID))
         {
             return;

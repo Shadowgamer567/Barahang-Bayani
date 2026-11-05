@@ -442,6 +442,11 @@ public class FirestoreProgressManager : MonoBehaviour
                 .ProgressCollection()
                 .Document(accountID);
 
+        DocumentReference playthroughDocument =
+        progressDocument
+        .Collection("playthroughs")
+        .Document(result.playthroughId);
+
         DocumentReference resultDocument =
             QuizResultsCollection(
                 accountID,
@@ -534,6 +539,14 @@ public class FirestoreProgressManager : MonoBehaviour
 
                 transaction.Update(progressDocument, updates);
 
+                transaction.Set(
+                    playthroughDocument,
+                    new Dictionary<string, object>
+                    {
+                        { "playthroughId", result.playthroughId }
+                    },
+                    SetOptions.MergeAll
+);
                 transaction.Set(
                     resultDocument,
                     new Dictionary<string, object>

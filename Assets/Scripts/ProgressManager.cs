@@ -44,6 +44,9 @@ public class ProgressManager : MonoBehaviour
     private bool isResettingPlaythrough = false;
     private bool isAutomaticallySynchronizing = false;
     private int progressGeneration = 0;
+    private string deletingAccountID = null;
+
+    public bool IsAccountDeletionInProgress => !string.IsNullOrEmpty(deletingAccountID);
 
     private void Start()
     {
@@ -62,6 +65,164 @@ public class ProgressManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private readonly HashSet<Task> activeBackgroundOperations = new();
+
+    private void TrackBackgroundOperation(Task operation)
+    {
+        if (operation == null)
+        {
+            return;
+        }
+
+        activeBackgroundOperations.Add(operation);
+
+        _ = ObserveBackgroundOperation(operation);
+    }
+
+    private async Task ObserveBackgroundOperation(Task operation)
+    {
+        try
+        {
+            await operation;
+        }
+
+        catch (System.Exception e)
+        {
+            Debug.LogError("Background progress operation failed: " + e.Message);
+        }
+
+        finally
+        {
+            activeBackgroundOperations.Remove(operation);
+        }
+    }
+
+    public async Task WaitForBackgroundOperations()
+    {
+        while (activeBackgroundOperations.Count > 0)
+        {
+            Task[] operations = new List<Task>(activeBackgroundOperations).ToArray();
+
+            Debug.Log("Waiting for " + operations.Length + " background progress operation(s) to finish.");
+
+            try
+            {
+                await Task.WhenAll(operations);
+            }
+
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("A background progress operation ended with an error: " + e.Message);
+            }
+        }
+
+        Debug.Log("All tracked background progress operations have finished.");
+    }
+
+    public bool IsDeletingAccount(string accountID)
+    {
+        return !string.IsNullOrEmpty(accountID) &&
+               deletingAccountID == accountID;
+    }
+
+    private bool IsAccountBlockedFromSync(string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return false;
+
+        if (IsDeletingAccount(accountID))
+            return true;
+
+        return AccountManager.Instance != null &&
+               AccountManager.Instance.IsAccountPendingDeletion(accountID);
+    }
+
+    public void BeginAccountDeletion(string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        deletingAccountID = accountID;
+
+        Debug.Log(
+            "Progress synchronization blocked for account deletion: " +
+            accountID
+        );
+    }
+
+    public void EndAccountDeletion(string accountID)
+    {
+        if (deletingAccountID != accountID)
+            return;
+
+        deletingAccountID = null;
+
+        Debug.Log(
+            "Account deletion synchronization block cleared: " +
+            accountID
+        );
+    }
+
+    public void ClearDeletedAccountState(string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        if (currentAccount == null ||
+            currentAccount.id != accountID)
+        {
+            return;
+        }
+
+        // Invalidate the previous account session.
+        progressGeneration++;
+
+        // Clear account and save file references.
+        currentAccount = null;
+        savePath = null;
+
+        // Clear campaign progress.
+        completedLevels = new List<string>();
+        tutorialCompleted = false;
+        lastCampaignScene = "MapMenu";
+
+        // Clear playthrough information.
+        playthroughId = "";
+        previousPlaythroughId = "";
+        pendingNewGameReset = false;
+
+        // Clear quiz synchronization data.
+        pendingQuizResults = new List<QuizResultData>();
+        quizResultLedgerInitialized = false;
+
+        // Clear lifetime quiz statistics.
+        multipleChoiceCorrect = 0;
+        multipleChoiceTotal = 0;
+
+        identificationCorrect = 0;
+        identificationTotal = 0;
+
+        trueFalseCorrect = 0;
+        trueFalseTotal = 0;
+
+        multipleSelectCorrect = 0;
+        multipleSelectTotal = 0;
+
+        // Clear synchronization flags.
+        isSyncingQuizResults = false;
+        isReconcilingProgress = false;
+        isResettingPlaythrough = false;
+        isAutomaticallySynchronizing = false;
+
+        // Clear temporary quiz statistics.
+        QuizStats.Instance?.ResetStats();
+
+        Debug.Log(
+            "Cleared cached progress state for deleted account: " +
+            accountID
+        );
     }
 
     public void SetActiveAccount(AccountData account)
@@ -174,6 +335,12 @@ public class ProgressManager : MonoBehaviour
 
     public void SaveProgress(bool uploadToFirestore = true)
     {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Progress save skipped: Account deletion in progress.");
+            return;
+        }
+
         if (currentAccount == null)
         {
             Debug.LogError("No active account selected!");
@@ -217,7 +384,7 @@ public class ProgressManager : MonoBehaviour
 
         if (uploadToFirestore)
         {
-            _ = SyncCampaignProgress();
+            TrackBackgroundOperation(SyncCampaignProgress());
         }
 
         Debug.Log("Saved Progress For: " + currentAccount.username);
@@ -225,11 +392,19 @@ public class ProgressManager : MonoBehaviour
 
     private async Task SyncCampaignProgress()
     {
-        if (currentAccount == null ||
-            pendingNewGameReset ||
-            isResettingPlaythrough ||
-            string.IsNullOrEmpty(playthroughId))
+        if (IsAccountDeletionInProgress)
         {
+            return;
+        }
+
+        if (currentAccount == null || pendingNewGameReset || isResettingPlaythrough || string.IsNullOrEmpty(playthroughId))
+        {
+            return;
+        }
+
+        if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
+        {
+            Debug.LogWarning("Campaign progress synchronization blocked: Account is pending deletion.");
             return;
         }
 
@@ -284,7 +459,6 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
-
     private void MergeLocalCampaignProgress(
         ProgressData localProgress,
         ProgressData cloudProgress)
@@ -313,7 +487,6 @@ public class ProgressManager : MonoBehaviour
         // Tutorial completion should never revert within a playthrough.
         tutorialCompleted |= localProgress.tutorialCompleted;
     }
-
 
     public void LoadProgress()
     {
@@ -346,8 +519,31 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
-    public async Task<bool> LoadProgressForActiveAccount()
+    public Task<bool> LoadProgressForActiveAccount()
     {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Progress loading blocked: Account deletion is in progress.");
+
+            return Task.FromResult(false);
+        }
+
+        Task<bool> operation = LoadProgressForActiveAccountInternal();
+
+        TrackBackgroundOperation(operation);
+
+        return operation;
+    }
+
+    public async Task<bool> LoadProgressForActiveAccountInternal()
+    {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Progress loading skipped: Account deletion in progress.");
+
+            return false;
+        }
+
         if (currentAccount == null)
         {
             Debug.LogError("No active account selected!");
@@ -360,8 +556,7 @@ public class ProgressManager : MonoBehaviour
 
         try
         {
-            ProgressData cloudProgress =
-                await FirestoreProgressManager.DownloadProgress(accountId);
+            ProgressData cloudProgress = await FirestoreProgressManager.DownloadProgress(accountId);
 
             if (currentAccount == null ||
                 currentAccount.id != accountId ||
@@ -423,7 +618,7 @@ public class ProgressManager : MonoBehaviour
                     SaveProgress(false);
 
                     // Upload the merged campaign progress without touching quiz counters.
-                    _ = SyncCampaignProgress();
+                    TrackBackgroundOperation(SyncCampaignProgress());
 
                     StartAutomaticQuizSynchronization();
                     return true;
@@ -443,7 +638,7 @@ public class ProgressManager : MonoBehaviour
 
                 // Upload the merged campaign progress to Firestore.
                 // Quiz statistics remain managed by their separate synchronization system.
-                _ = SyncCampaignProgress();
+                TrackBackgroundOperation(SyncCampaignProgress());
 
                 StartAutomaticQuizSynchronization();
 
@@ -500,9 +695,17 @@ public class ProgressManager : MonoBehaviour
         tutorialCompleted = data.tutorialCompleted;
     }
 
-
     public void NewGame(bool uploadToFirestore = true)
     {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning(
+                "New Game blocked: Account deletion is in progress."
+            );
+
+            return;
+        }
+
         if (currentAccount == null)
         {
             Debug.LogError("No active account selected!");
@@ -568,25 +771,27 @@ public class ProgressManager : MonoBehaviour
 
         if (uploadToFirestore)
         {
-            _ = UploadNewGameProgress(accountId, previousPlaythroughId, newPlaythroughId, progressGeneration);
+            TrackBackgroundOperation(UploadNewGameProgress(accountId, previousPlaythroughId, newPlaythroughId, progressGeneration));
         }
 
         Debug.Log("New Game started. New playthrough ID: " + newPlaythroughId);
     }
 
-    private void ConfirmNewGameReset(
-        string accountId,
-        string expectedPlaythroughId,
-        int operationGeneration)
+    private void ConfirmNewGameReset(string accountId, string expectedPlaythroughId, int operationGeneration)
     {
+        if (IsDeletingAccount(accountId))
+        {
+            Debug.LogWarning("New Game confirmation skipped: Account deletion in progress.");
+
+            return;
+        }
+
         if (currentAccount == null ||
             currentAccount.id != accountId ||
             playthroughId != expectedPlaythroughId ||
             progressGeneration != operationGeneration)
         {
-            Debug.LogWarning(
-                "New Game confirmation ignored: Account or playthrough changed."
-            );
+            Debug.LogWarning("New Game confirmation ignored: Account or playthrough changed.");
             return;
         }
 
@@ -599,7 +804,6 @@ public class ProgressManager : MonoBehaviour
             "New Game reset confirmed and saved locally."
         );
     }
-
 
     private async Task UploadNewGameProgress(
         string accountId,
@@ -673,9 +877,39 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
-
-    public async Task<bool> RetryPendingNewGameReset()
+    public Task<bool> RetryPendingNewGameReset()
     {
+        if (currentAccount != null &&IsAccountBlockedFromSync(currentAccount.id))
+        {
+            Debug.LogWarning(
+                "New-game reset retry blocked: Account is pending deletion."
+            );
+
+            return Task.FromResult(false);
+        }
+
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("New Game reset recovery blocked: Account deletion is in progress.");
+
+            return Task.FromResult(false);
+        }
+
+        Task<bool> operation = RetryPendingNewGameResetInternal();
+
+        TrackBackgroundOperation(operation);
+
+        return operation;
+    }
+
+    public async Task<bool> RetryPendingNewGameResetInternal()
+    {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("New Game reset recovery skipped: Account deletion in progress.");
+            return false;
+        }
+
         if (isResettingPlaythrough)
         {
             Debug.LogWarning(
@@ -765,11 +999,21 @@ public class ProgressManager : MonoBehaviour
 
     public async Task<bool> SynchronizeQuizProgress()
     {
+        if (currentAccount != null &&IsAccountBlockedFromSync(currentAccount.id))
+        {
+            Debug.LogWarning("Quiz progress synchronization blocked: Account is pending deletion.");
+            return false;
+        }
+
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Quiz synchronization skipped: Account deletion in progress.");
+            return false;
+        }
+
         if (currentAccount == null)
         {
-            Debug.LogWarning(
-                "Automatic synchronization skipped: No active account."
-            );
+            Debug.LogWarning("Automatic synchronization skipped: No active account.");
             return false;
         }
 
@@ -794,7 +1038,8 @@ public class ProgressManager : MonoBehaviour
 
         // Step 2: Verify that the account and playthrough
         // are still the same after the awaited operation.
-        if (currentAccount == null ||
+        if (IsDeletingAccount(accountId) ||
+            currentAccount == null ||
             currentAccount.id != accountId ||
             playthroughId != activePlaythroughId ||
             progressGeneration != operationGeneration)
@@ -824,7 +1069,8 @@ public class ProgressManager : MonoBehaviour
         await SyncPendingQuizResults();
 
         // Step 4: Verify the session again.
-        if (currentAccount == null ||
+        if (IsDeletingAccount(accountId) ||
+            currentAccount == null ||
             currentAccount.id != accountId ||
             playthroughId != activePlaythroughId ||
             progressGeneration != operationGeneration)
@@ -847,16 +1093,32 @@ public class ProgressManager : MonoBehaviour
 
     private void StartAutomaticQuizSynchronization()
     {
-        if (currentAccount == null)
+        if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
+        {
+            Debug.LogWarning("Automatic quiz synchronization blocked: Account is pending deletion.");
             return;
+        }
+        if (IsAccountDeletionInProgress)
+        {
+            return;
+        }
+
+        if (currentAccount == null)
+        {
+            return;
+        }
 
         if (isAutomaticallySynchronizing)
+        {
             return;
+        }
 
         if (string.IsNullOrEmpty(playthroughId))
+        {
             return;
+        }
 
-        _ = SynchronizeQuizProgress();
+        TrackBackgroundOperation(SynchronizeQuizProgress());
     }
 
 
@@ -887,9 +1149,14 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
-
     public void RecordQuizResult(InputType type, bool isCorrect)
     {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Quiz result recording skipped: Account deletion in progress.");
+            return;
+        }
+
         if (currentAccount == null)
         {
             return;
@@ -923,7 +1190,7 @@ public class ProgressManager : MonoBehaviour
             !isReconcilingProgress &&
             quizResultLedgerInitialized)
         {
-            _ = SynchronizeQuizProgress();
+            TrackBackgroundOperation(SynchronizeQuizProgress());
         }
     }
 
@@ -944,7 +1211,6 @@ public class ProgressManager : MonoBehaviour
             return null;
         }
     }
-
 
     private void RestorePendingQuizResults(
         ProgressData localProgress,
@@ -1112,9 +1378,41 @@ public class ProgressManager : MonoBehaviour
         return unuploadedResults;
     }
 
-
-    public async Task<bool> ReconcileQuizProgress()
+    public Task<bool> ReconcileQuizProgress()
     {
+        if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
+        {
+            Debug.LogWarning(
+                "Quiz progress reconciliation blocked: Account is pending deletion."
+            );
+
+            return Task.FromResult(false);
+        }
+
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning(
+                "Quiz reconciliation blocked: Account deletion is in progress."
+            );
+
+            return Task.FromResult(false);
+        }
+
+        Task<bool> operation = ReconcileQuizProgressInternal();
+
+        TrackBackgroundOperation(operation);
+
+        return operation;
+    }
+
+    public async Task<bool> ReconcileQuizProgressInternal()
+    {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Quiz reconciliation skipped: Account deletion in progress.");
+            return false;
+        }
+
         if (isReconcilingProgress || isSyncingQuizResults)
         {
             Debug.LogWarning("Quiz reconciliation skipped: Another operation is running.");
@@ -1165,14 +1463,13 @@ public class ProgressManager : MonoBehaviour
                     );
 
             // Reject results if the active account or playthrough changed.
-            if(currentAccount == null ||
+            if (IsDeletingAccount(accountId) || 
+            currentAccount == null ||
             currentAccount.id != accountId ||
             playthroughId != activePlaythroughId ||
             progressGeneration != operationGeneration)
 {
-                Debug.LogWarning(
-                    "Reconciliation cancelled: Account or playthrough session changed."
-                );
+                Debug.LogWarning("Reconciliation cancelled: Account or playthrough session changed.");
                 return false;
             }
 
@@ -1257,9 +1554,36 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
-
-    public async Task SyncPendingQuizResults()
+    public Task SyncPendingQuizResults()
     {
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Pending quiz synchronization blocked: Account deletion is in progress.");
+
+            return Task.CompletedTask;
+        }
+
+        Task operation = SyncPendingQuizResultsInternal();
+
+        TrackBackgroundOperation(operation);
+
+        return operation;
+    }
+
+    public async Task SyncPendingQuizResultsInternal()
+    {
+        if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
+        {
+            Debug.LogWarning("Quiz synchronization blocked: Account is pending deletion.");
+
+            return;
+        }
+        if (IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning("Pending quiz synchronization skipped: Account deletion in progress.");
+            return;
+        }
+
         if (currentAccount == null)
         {
             Debug.LogWarning("Cannot sync: No active account.");
@@ -1300,7 +1624,8 @@ public class ProgressManager : MonoBehaviour
 
             foreach (QuizResultData result in resultsToSync)
             {
-                if (currentAccount == null ||
+                if (IsDeletingAccount(accountId)||
+                    currentAccount == null ||
                     currentAccount.id != accountId ||
                     playthroughId != activePlaythroughId || 
                     progressGeneration != operationGeneration)

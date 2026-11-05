@@ -103,6 +103,10 @@ public class AccountManager : MonoBehaviour
 
     private string pendingAccountsPath => Application.persistentDataPath + "/pending_accounts.json";
 
+    private string pendingDeletionsPath => Path.Combine(Application.persistentDataPath, "pending_account_deletions.json");
+
+    private PendingAccountDeletions pendingAccountDeletions = new PendingAccountDeletions();
+
     private PendingAccountUploads pendingAccountUploads = new PendingAccountUploads();
     private string pendingAssignmentsPath => Application.persistentDataPath + "/pending_assignments.json";
 
@@ -135,6 +139,7 @@ public class AccountManager : MonoBehaviour
         EnsureAccountsFileExists();
         LoadPendingAccountUploads();
         LoadPendingAssignmentUploads();
+        LoadPendingAccountDeletions();
     }
 
     public void LoadAccount()
@@ -260,14 +265,31 @@ public class AccountManager : MonoBehaviour
         return Task.FromResult(true);
     }
 
-
-
     private bool deletingAccount = false;
+    private bool loginInProgress = false;
 
     public async void DeleteSelected()
     {
         if (deletingAccount || selectedAccount == null)
             return;
+
+        if (loginInProgress)
+        {
+            Debug.LogWarning(
+                "Account deletion blocked: Login is still loading account progress."
+            );
+
+            return;
+        }
+
+        if (resettingPassword)
+        {
+            Debug.LogWarning(
+                "Account deletion blocked: Password recovery is still in progress."
+            );
+
+            return;
+        }
 
         AccountData accountToDelete = selectedAccount;
         string accountID = accountToDelete.id;
@@ -307,21 +329,57 @@ public class AccountManager : MonoBehaviour
 
         string classroomID = DatabaseManager.Instance.CurrentDatabase;
 
+        ProgressManager progressManager = ProgressManager.Instance;
+
+        if (progressManager == null)
+        {
+            Debug.LogError(
+                "Account deletion cancelled: ProgressManager is unavailable."
+            );
+            return;
+        }
+
+        if (progressManager.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning(
+                "Account deletion cancelled: Another deletion is in progress."
+            );
+            return;
+        }
+
         deletingAccount = true;
+
+        progressManager.BeginAccountDeletion(accountID);
 
         try
         {
-            // Pending accounts have not yet been confirmed uploaded.
-            // Delete remotely as well, in case an earlier upload partially succeeded.
+            Debug.Log("Waiting for outstanding account downloads.");
+
+            await FirestoreAccountManager.WaitForAccountDownloads();
+
+            Debug.Log("Waiting for outstanding progress synchronization operations.");
+
+            await progressManager.WaitForBackgroundOperations();
+
+            Debug.Log("Waiting for outstanding Firestore account operations: " +accountID);
+
+            await FirestoreAccountManager.WaitForAccountOperations(accountID);
+
+            // Persist deletion intent before making destructive
+            // changes to Firestore.
+            MarkAccountPendingDeletion(accountID);
+
+            // Delete the account's Firestore progress before deleting
+            // the account document itself.
+            await FirestoreAccountManager.DeleteAccountProgress(accountID);
+
+            // Delete the account document only after progress cleanup succeeds.
             await FirestoreAccountManager.DeleteAccount(accountID);
 
             // Ensure the Classroom hasn't changed during the operation.
             if (DatabaseManager.Instance.CurrentDatabase != classroomID)
             {
-                Debug.LogWarning(
-                    "Account deleted from Firestore, but local cleanup was cancelled " +
-                    "because the active Classroom changed."
-                );
+                Debug.LogWarning("Account deleted from Firestore, but local cleanup was cancelled " + "because the active Classroom changed.");
                 return;
             }
 
@@ -332,7 +390,9 @@ public class AccountManager : MonoBehaviour
             );
 
             if (File.Exists(saveFile))
+            {
                 File.Delete(saveFile);
+            }
 
             // Remove the account from the local registry.
             registry.accounts.RemoveAll(a => a.id == accountID);
@@ -361,6 +421,7 @@ public class AccountManager : MonoBehaviour
             if (CurrentAccount.ActiveAccount != null &&
                 CurrentAccount.ActiveAccount.id == accountID)
             {
+                progressManager.ClearDeletedAccountState(accountID);
                 CurrentAccount.ActiveAccount = null;
             }
 
@@ -370,20 +431,31 @@ public class AccountManager : MonoBehaviour
             SaveAccount();
             RefreshUI();
 
-            Debug.Log(
-                "Account deleted locally and from Firestore: " +
-                accountToDelete.username
-            );
+            Debug.Log("Account deleted locally and from Firestore: " + accountToDelete.username);
         }
+
         catch (System.Exception ex)
         {
             Debug.LogError(
-                "Account deletion failed: " + ex
+            "Account deletion failed for " + accountID +
+            ". The account may have been partially deleted from Firestore. " +
+            "Local account data has been retained where cleanup did not complete. " +
+            "Error: " + ex
             );
         }
+
         finally
         {
+            progressManager.EndAccountDeletion(accountID);
+
             deletingAccount = false;
+
+            // Resume pending teacher assignment synchronization
+            // after the deletion guard has been released.
+            if (pendingAssignmentUploads.accountIDs.Count > 0)
+            {
+                _ = SynchronizePendingAssignments();
+            }
         }
     }
 
@@ -595,7 +667,29 @@ public class AccountManager : MonoBehaviour
 
     public void SelectAccount(AccountCardUI card)
     {
+        if (deletingAccount)
+        {
+            Debug.LogWarning("Cannot select another account while account deletion is in progress.");
+            return;
+        }
+
         AccountData clickedAccount = card.GetAccountData();
+
+        if (clickedAccount == null)
+        {
+            Debug.LogWarning("Cannot select account: Account data is missing.");
+            return;
+        }
+
+        if (IsAccountPendingDeletion(clickedAccount.id))
+        {
+            Debug.LogWarning(
+                "Cannot select account because deletion is pending: " +
+                clickedAccount.id
+            );
+
+            return;
+        }
 
         if (assigningStudents)
         {
@@ -639,13 +733,32 @@ public class AccountManager : MonoBehaviour
 
     public async void ConfirmLogin()
     {
-        if (pendingLoginAccount == null)
+        if (deletingAccount)
         {
+            Debug.LogWarning("Cannot log into another account while account deletion is in progress.");
+            return;
+        }
+
+        if (loginInProgress)
+        {
+            Debug.LogWarning("Login is already in progress.");
+            return;
+        }
+
+        if (pendingLoginAccount == null)
+            return;
+
+        if (IsAccountPendingDeletion(pendingLoginAccount.id))
+        {
+            Debug.LogWarning(
+                "Cannot log into account because deletion is pending: " +
+                pendingLoginAccount.id
+            );
+
             return;
         }
 
         string enteredPassword = loginPasswordInput.text.Trim();
-
         string enteredHash = AccountManager.HashPassword(enteredPassword);
 
         if (enteredHash != pendingLoginAccount.passwordHash)
@@ -654,48 +767,66 @@ public class AccountManager : MonoBehaviour
             return;
         }
 
-        selectedAccount = pendingLoginAccount;
+        loginInProgress = true;
 
-        CurrentAccount.ActiveAccount = selectedAccount;
-
-        ProgressManager.Instance.SetActiveAccount(selectedAccount);
-
-        RefreshAccountHighlights();
-
-        loginPanel.SetActive(false);
-        RestorePanelsAfterLogin();
-
-        Debug.Log("Logged in as: " + selectedAccount.username);
-
-
-        if (selectedAccount.accountType == AccountType.Student ||
-            selectedAccount.accountType == AccountType.Teacher)
+        try
         {
-            await ProgressManager.Instance.LoadProgressForActiveAccount();
+            selectedAccount = pendingLoginAccount;
+
+            CurrentAccount.ActiveAccount = selectedAccount;
+
+            ProgressManager.Instance.SetActiveAccount(selectedAccount);
+
+            RefreshAccountHighlights();
+
+            loginPanel.SetActive(false);
+            RestorePanelsAfterLogin();
+
+            Debug.Log("Logged in as: " + selectedAccount.username);
+
+            if (selectedAccount.accountType == AccountType.Student || selectedAccount.accountType == AccountType.Teacher)
+            {
+                bool loaded = await ProgressManager.Instance.LoadProgressForActiveAccount();
+
+                if (!loaded)
+                {
+                    Debug.LogWarning("Account progress could not be fully loaded.");
+                }
+            }
+
+            if (waitingToStartGame)
+            {
+                waitingToStartGame = false;
+
+                MainMenu.StartNewGame();
+            }
+
+            else if (waitingToLoadGame)
+            {
+                waitingToLoadGame = false;
+
+                MainMenu mainMenuScript =FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
+
+                if (mainMenuScript != null)
+                {
+                    mainMenuScript.LoadGame();
+                }
+
+                else
+                {
+                    Debug.LogError("AccountManager: MainMenu script not found!");
+                }
+            }
         }
 
-
-        if (waitingToStartGame)
+        catch (System.Exception ex)
         {
-            waitingToStartGame = false;
-
-            MainMenu.StartNewGame();
+            Debug.LogError("Account login encountered an error: " + ex);
         }
 
-        else if (waitingToLoadGame)
+        finally
         {
-            waitingToLoadGame = false;
-
-            MainMenu mainMenuScript = FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
-
-            if (mainMenuScript != null)
-            {
-                mainMenuScript.LoadGame();
-            }
-            else
-            {
-                Debug.LogError("AccountManager: MainMenu script not found!");
-            }
+            loginInProgress = false;
         }
     }
 
@@ -806,6 +937,12 @@ public class AccountManager : MonoBehaviour
 
     public async void ConfirmAccountRecovery()
     {
+        if (deletingAccount || (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress))
+        {
+            Debug.LogWarning("Account recovery blocked: Account deletion is in progress.");
+            return;
+        }
+
         if (resettingPassword)
             return;
 
@@ -1301,6 +1438,93 @@ public class AccountManager : MonoBehaviour
             pendingAssignmentUploads.accountIDs = new List<string>();
     }
 
+    private void LoadPendingAccountDeletions()
+    {
+        if (!File.Exists(pendingDeletionsPath))
+        {
+            pendingAccountDeletions = new PendingAccountDeletions();
+            return;
+        }
+
+        string json = File.ReadAllText(pendingDeletionsPath);
+
+        pendingAccountDeletions =
+            JsonUtility.FromJson<PendingAccountDeletions>(json)
+            ?? new PendingAccountDeletions();
+
+        if (pendingAccountDeletions.accountIDs == null)
+        {
+            pendingAccountDeletions.accountIDs = new List<string>();
+        }
+    }
+
+    private void SavePendingAccountDeletions()
+    {
+        string json = JsonUtility.ToJson(pendingAccountDeletions, true);
+
+        File.WriteAllText(pendingDeletionsPath, json);
+    }
+
+    public bool IsAccountPendingDeletion(string accountID)
+    {
+        return !string.IsNullOrWhiteSpace(accountID) &&
+               pendingAccountDeletions.accountIDs.Contains(accountID);
+    }
+
+    private void MarkAccountPendingDeletion(string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        if (pendingAccountDeletions.accountIDs.Contains(accountID))
+            return;
+
+        pendingAccountDeletions.accountIDs.Add(accountID);
+
+        try
+        {
+            SavePendingAccountDeletions();
+
+            Debug.Log(
+                "Account marked for pending deletion: " + accountID
+            );
+        }
+        catch
+        {
+            pendingAccountDeletions.accountIDs.Remove(accountID);
+            throw;
+        }
+    }
+
+    private void ClearAccountPendingDeletion(string accountID)
+    {
+        if (string.IsNullOrWhiteSpace(accountID))
+            return;
+
+        if (!pendingAccountDeletions.accountIDs.Contains(accountID))
+            return;
+
+        pendingAccountDeletions.accountIDs.Remove(accountID);
+
+        try
+        {
+            SavePendingAccountDeletions();
+
+            Debug.Log(
+                "Pending account deletion cleared: " + accountID
+            );
+        }
+        catch (System.Exception ex)
+        {
+            pendingAccountDeletions.accountIDs.Add(accountID);
+
+            Debug.LogError(
+                "Failed to clear pending account deletion for " +
+                accountID + ": " + ex
+            );
+        }
+    }
+
     private void SavePendingAssignmentUploads()
     {
         string json = JsonUtility.ToJson(
@@ -1328,6 +1552,12 @@ public class AccountManager : MonoBehaviour
 
     public async Task SynchronizePendingAssignments()
     {
+        if (deletingAccount || (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress))
+        {
+            Debug.LogWarning("Pending assignment synchronization blocked: Account deletion is in progress.");
+            return;
+        }
+
         if (synchronizingAssignments)
             return;
 
@@ -1422,6 +1652,12 @@ public class AccountManager : MonoBehaviour
 
     public async Task SynchronizePendingAccounts()
     {
+        if (deletingAccount || (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress))
+        {
+            Debug.LogWarning("Pending account synchronization blocked: Account deletion is in progress.");
+            return;
+        }
+
         if (synchronizingPendingAccounts)
             return;
 
@@ -1457,6 +1693,16 @@ public class AccountManager : MonoBehaviour
                     );
 
                     // Keep the pending ID for investigation.
+                    continue;
+                }
+
+                if (IsAccountPendingDeletion(accountID))
+                {
+                    Debug.LogWarning(
+                        "Skipping pending account upload because deletion is pending: " +
+                        accountID
+                    );
+
                     continue;
                 }
 
@@ -1789,6 +2035,12 @@ public class AccountManager : MonoBehaviour
 
 [System.Serializable]
 public class PendingAccountUploads
+{
+    public List<string> accountIDs = new List<string>();
+}
+
+[System.Serializable]
+public class PendingAccountDeletions
 {
     public List<string> accountIDs = new List<string>();
 }
