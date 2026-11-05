@@ -25551,7 +25551,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def898f03d9f9ff4599faa8b0c4972e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundHandlerScene
-  sound: {fileID: 8300000, guid: ca83d4ac5e286324299b71eb69e5316e, type: 3}
+  sound: {fileID: 8300000, guid: 67a34fa813262db4fa54520b896426a8, type: 3}
   loop: 1
 --- !u!82 &897726199
 AudioSource:
