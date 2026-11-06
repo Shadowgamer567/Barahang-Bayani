@@ -56,6 +56,8 @@ public class AccountManager : MonoBehaviour
     private bool waitingToStartGame = false;
     private bool waitingToLoadGame = false;
 
+    private bool isAccountMenuSynchronizing = false;
+
     private AccountData assigningTeacher;
     private List<AccountData> pendingStudents = new();
 
@@ -1189,6 +1191,8 @@ public class AccountManager : MonoBehaviour
         classroomPanel.SetActive(true);
 
         Debug.Log("[Account Menu] Account panels activated.");
+
+        _ = SynchronizeAccountMenuAsync();
     }
 
     public void OpenCreateStudentMenu()
@@ -2220,6 +2224,72 @@ public class AccountManager : MonoBehaviour
         finally
         {
             synchronizingPendingAccounts = false;
+        }
+    }
+
+    private async Task SynchronizeAccountMenuAsync()
+    {
+        if (isAccountMenuSynchronizing)
+            return;
+
+        if (DatabaseManager.Instance == null ||
+            string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase))
+        {
+            Debug.LogWarning(
+                "[Account Menu Sync] No active classroom."
+            );
+            return;
+        }
+
+        isAccountMenuSynchronizing = true;
+
+        try
+        {
+            Debug.Log("[Account Menu Sync] Starting synchronization.");
+
+            // 1. Accounts and pending account changes.
+            if (FirestoreAccountManager.Instance != null)
+            {
+                await FirestoreAccountManager.Instance.DownloadAccounts();
+            }
+
+            // 2. Progress for the currently active account.
+            if (ProgressManager.Instance != null &&
+                ProgressManager.Instance.HasActiveAccount)
+            {
+                await ProgressManager.Instance.LoadProgressForActiveAccount();
+            }
+
+            // 3. Quiz Packages for the active classroom.
+            QuizPackageDownloadManager quizManager =
+                FindFirstObjectByType<QuizPackageDownloadManager>(
+                    FindObjectsInactive.Include
+                );
+
+            if (quizManager != null)
+            {
+                await quizManager.SyncActiveClassroomPackagesAsync();
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "[Account Menu Sync] Quiz Package Download Manager not found."
+                );
+            }
+
+            RefreshUI();
+
+            Debug.Log("[Account Menu Sync] Synchronization finished.");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError(
+                "[Account Menu Sync] Synchronization failed: " + ex
+            );
+        }
+        finally
+        {
+            isAccountMenuSynchronizing = false;
         }
     }
 

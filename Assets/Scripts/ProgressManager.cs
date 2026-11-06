@@ -39,6 +39,9 @@ public class ProgressManager : MonoBehaviour
 
     private string savePath;
     private AccountData currentAccount;
+
+    public bool HasActiveAccount => currentAccount != null;
+
     private bool isSyncingQuizResults = false;
     private bool isReconcilingProgress = false;
     private bool isResettingPlaythrough = false;
