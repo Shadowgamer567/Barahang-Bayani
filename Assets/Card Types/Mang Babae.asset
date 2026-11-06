@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
   m_Name: Mang Babae
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: Mang Bababe
+  cardName: Mang Babae
   cardShortDesc: Deal 5 Damage to all Enemies
   cardFullDesc: 
+  cardImage: {fileID: 0}
+  effectType: 0
   targetType: 0
   damage: 5
   cost: 1

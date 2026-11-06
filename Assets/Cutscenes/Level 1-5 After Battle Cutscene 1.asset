@@ -12,4 +12,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
   m_Name: Level 1-5 After Battle Cutscene 1
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
-  line: []
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: They scared and lied to my mother as they would have any other mother.
+      They threatened to condemn her if she did not say what they wished. She submitted
+      to the will of her enemies and lost her spirit.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The case became involved until the same alcalde asked pardon for her.
+      But this was only when the matter was before the Supreme Court. He asked for
+      the pardon because he was sorry for what he had done. Such was his meanness
+      that I felt afraid of him.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Attorneys Francisco de Marcaida and Manuel Masigan, Manila\u2019s
+      leading lawyers, defended my mother and they finally succeeded in having her
+      acquitted. They proved her innocence to her judges, her accusers and her hosts
+      of enemies. But how long did it take? After two and a half years? That is unacceptable."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: I found out for the first time what examinations were like. My examinations
+      were in Christian doctrine, arithmetic and reading, in San Juan de Letran College.
+      They gave me a passing mark and I returned to my home. A few days later came
+      the celebration of the town festival, after which I went to Manila. But even
+      then, I felt that unhappiness was in store for me.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: I found out for the first time what examinations were like. My examinations
+      were in Christian doctrine, arithmetic and reading, in San Juan de Letran College.
+      They gave me a passing mark and I returned to my home. A few days later came
+      the celebration of the town festival, after which I went to Manila. But even
+      then, I felt that unhappiness was in store for me.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: With Chapter III Complete. Let's start with the next chapter.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: 
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Chapter IV A Student in Manila
+    isLeftSide: 0
+    pose: 0
