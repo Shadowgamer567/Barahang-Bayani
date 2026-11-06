@@ -168,14 +168,23 @@ public class FirestoreAccountManager : MonoBehaviour
         return snapshot.Exists;
     }
 
-    public static async Task DeleteAccountProgress(string accountID, string currentPlaythroughID = null, string previousPlaythroughID = null)
+    public static async Task DeleteAccountProgress(
+    string accountID,
+    string currentPlaythroughID = null,
+    string previousPlaythroughID = null,
+    string classroomID = null)
     {
         if (string.IsNullOrWhiteSpace(accountID))
             return;
 
+        if (string.IsNullOrWhiteSpace(classroomID))
+        {
+            classroomID = DatabaseManager.Instance.CurrentDatabase;
+        }
+
         DocumentReference progressRef =
             FirestoreManager.Instance
-                .ProgressCollection()
+                .ProgressCollection(classroomID)
                 .Document(accountID);
 
         CollectionReference playthroughsRef =
@@ -249,17 +258,28 @@ public class FirestoreAccountManager : MonoBehaviour
         Debug.Log("Deleted playthrough and its results: " + playthroughRef.Id);
     }
 
-    public static async Task DeleteAccount(string accountID)
+    public static async Task DeleteAccount(
+    string accountID,
+    string classroomID = null)
     {
         if (string.IsNullOrWhiteSpace(accountID))
             return;
 
+        if (string.IsNullOrWhiteSpace(classroomID))
+        {
+            classroomID = DatabaseManager.Instance.CurrentDatabase;
+        }
+
         await FirestoreManager.Instance
-            .AccountsCollection()
+            .AccountsCollection(classroomID)
             .Document(accountID)
             .DeleteAsync();
 
-        Debug.Log("Deleted account from Firestore: " + accountID);
+        Debug.Log(
+            "Deleted account from Firestore: " +
+            accountID +
+            " | Classroom: " + classroomID
+        );
     }
 
     public Task DownloadAccounts()
@@ -296,15 +316,49 @@ public class FirestoreAccountManager : MonoBehaviour
             return;
         }
 
+        if (DatabaseManager.Instance == null || FirestoreManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "Account download skipped: Database managers are unavailable."
+            );
+
+            return;
+        }
+
         string classroomID = DatabaseManager.Instance.CurrentDatabase;
+
+        if (string.IsNullOrWhiteSpace(classroomID) ||
+            classroomID == "DefaultDatabase")
+        {
+            Debug.LogWarning(
+                "Account download skipped: No valid classroom is active."
+            );
+
+            return;
+        }
 
         QuerySnapshot snapshot = await FirestoreManager.Instance
             .AccountsCollection()
             .GetSnapshotAsync();
 
-        // Preserve accounts created locally but not yet uploaded.
-        List<AccountData> pendingLocalAccounts = AccountManager.Instance.registry.accounts.FindAll(
-            account => AccountManager.Instance.IsAccountPendingUpload(account.id));
+        if (DatabaseManager.Instance == null || DatabaseManager.Instance.CurrentDatabase != classroomID)
+        {
+            Debug.LogWarning(
+                "Account download cancelled: Active classroom changed " +
+                "while downloading accounts."
+            );
+
+            return;
+        }
+
+        // Preserve every pending account, including accounts
+        // belonging to other classrooms.
+        List<AccountData> pendingLocalAccounts =
+            AccountManager.Instance.registry.accounts.FindAll(
+                account =>
+                    account != null &&
+                    AccountManager.Instance.IsAccountPendingUpload(account.id)
+            );
 
         // Preserve unsynchronized teacher assignments.
         Dictionary<string, List<string>> pendingAssignments =
@@ -323,11 +377,23 @@ public class FirestoreAccountManager : MonoBehaviour
 
         foreach(DocumentSnapshot doc in snapshot.Documents)
         {
+            if (AccountManager.Instance.IsAccountPendingDeletion(doc.Id))
+            {
+                Debug.LogWarning(
+                    "Skipping downloaded account because deletion is pending: " +
+                    doc.Id
+                );
+
+                continue;
+            }
+
             Dictionary<string, object> data = doc.ToDictionary();
 
             AccountData account = new AccountData();
 
             account.id = data["id"].ToString();
+
+            account.classroomID = classroomID;
 
             account.username = data["username"].ToString();
 
@@ -367,6 +433,19 @@ public class FirestoreAccountManager : MonoBehaviour
         // Restore pending local accounts that were not in Firestore.
         foreach (AccountData pendingAccount in pendingLocalAccounts)
         {
+            if (pendingAccount == null)
+                continue;
+
+            if (AccountManager.Instance.IsAccountPendingDeletion(pendingAccount.id))
+            {
+                Debug.LogWarning(
+                    "Skipping local pending account because deletion is pending: " +
+                    pendingAccount.id
+                );
+
+                continue;
+            }
+
             bool alreadyExists =
                 AccountManager.Instance.registry.accounts.Exists(
                     account => account.id == pendingAccount.id

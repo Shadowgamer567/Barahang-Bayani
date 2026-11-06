@@ -10,6 +10,10 @@ public class FirestoreClassroomManager : MonoBehaviour
 {
     public static FirestoreClassroomManager Instance;
 
+    private bool selectingClassroom = false;
+
+    public bool IsSelectingClassroom => selectingClassroom;
+
     [Header("Classroom UI")]
     public GameObject classroomSelectionPanel;
     public Transform classroomContainer;
@@ -160,38 +164,81 @@ public class FirestoreClassroomManager : MonoBehaviour
 
     public async void SelectClassroom(string classroomID)
     {
-        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+        if (selectingClassroom)
         {
-            Debug.LogWarning("Cannot switch classrooms while account deletion is in progress.");
+            Debug.LogWarning(
+                "Classroom selection blocked: " +
+                "Another classroom selection is still in progress."
+            );
+
+            return;
+        }
+
+        if (ProgressManager.Instance != null &&
+            ProgressManager.Instance.IsAccountDeletionInProgress)
+        {
+            Debug.LogWarning(
+                "Cannot switch classrooms while account deletion is in progress."
+            );
 
             return;
         }
 
         if (string.IsNullOrWhiteSpace(classroomID))
-        {
             return;
-        }
 
-        Debug.Log("Selecting Classroom: " + classroomID);
+        selectingClassroom = true;
 
-        DatabaseManager.Instance.SetDatabase(classroomID);
-
-        if (currentClassroomText != null)
+        try
         {
-            currentClassroomText.text = classroomID;
+            Debug.Log("Selecting Classroom: " + classroomID);
+
+            // Wait for an earlier account download before
+            // changing the active classroom.
+            await FirestoreAccountManager.WaitForAccountDownloads();
+
+            // Recheck after waiting because deletion may have started.
+            if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+            {
+                Debug.LogWarning("Classroom selection cancelled: " + "Account deletion started while waiting.");
+
+                return;
+            }
+
+            DatabaseManager.Instance.SetDatabase(classroomID);
+
+            if (currentClassroomText != null)
+            {
+                currentClassroomText.text = classroomID;
+            }
+
+            CloseClassroomSelection();
+
+            await FirestoreAccountManager.Instance.DownloadAccounts();
+
+            if (AccountManager.Instance != null)
+            {
+                // Check for interrupted account deletions
+                // belonging to the newly selected classroom.
+                AccountManager.Instance.CheckPendingDeletionsForActiveClassroom();
+
+                await AccountManager.Instance.RecoverPendingAccountDeletions();
+
+                AccountManager.Instance.RefreshUI();
+            }
+
+            Debug.Log("Classroom switched successfully: " + classroomID);
         }
 
-        CloseClassroomSelection();
-
-        await FirestoreAccountManager.Instance.DownloadAccounts();
-
-        // Refresh account UI
-        if (AccountManager.Instance != null)
+        catch (System.Exception ex)
         {
-            AccountManager.Instance.RefreshUI();
+            Debug.LogError("Failed to select classroom " + classroomID + ": " + ex);
         }
 
-        Debug.Log("Classroom switched successfully: " + classroomID);
+        finally
+        {
+            selectingClassroom = false;
+        }
     }
 
     public async void ConfirmClassroomCreation()

@@ -18,6 +18,7 @@ public enum AccountCardMode
 public class AccountData
 {
     public string id;
+    public string classroomID;
     public string username;
     public string passwordHash;
     public string recoveryCodeHash = "";

@@ -140,6 +140,8 @@ public class AccountManager : MonoBehaviour
         LoadPendingAccountUploads();
         LoadPendingAssignmentUploads();
         LoadPendingAccountDeletions();
+
+        CheckInterruptedAccountDeletions();
     }
 
     public void LoadAccount()
@@ -207,6 +209,7 @@ public class AccountManager : MonoBehaviour
         AccountData newAccount = new AccountData();
 
         newAccount.id = System.Guid.NewGuid().ToString();
+        newAccount.classroomID = DatabaseManager.Instance.CurrentDatabase;
         newAccount.username = username;
         newAccount.passwordHash = HashPassword(password);
         newAccount.accountType = type;
@@ -329,6 +332,14 @@ public class AccountManager : MonoBehaviour
 
         string classroomID = DatabaseManager.Instance.CurrentDatabase;
 
+        if (accountToDelete.classroomID != classroomID)
+        {
+            Debug.LogWarning(
+                "Account deletion blocked: Account belongs to another classroom."
+            );
+            return;
+        }
+
         ProgressManager progressManager = ProgressManager.Instance;
 
         if (progressManager == null)
@@ -361,20 +372,20 @@ public class AccountManager : MonoBehaviour
 
             await progressManager.WaitForBackgroundOperations();
 
-            Debug.Log("Waiting for outstanding Firestore account operations: " +accountID);
+            Debug.Log("Waiting for outstanding Firestore account operations: " + accountID);
 
             await FirestoreAccountManager.WaitForAccountOperations(accountID);
 
             // Persist deletion intent before making destructive
             // changes to Firestore.
-            MarkAccountPendingDeletion(accountID);
+            MarkAccountPendingDeletion(classroomID, accountID);
 
             // Delete the account's Firestore progress before deleting
             // the account document itself.
-            await FirestoreAccountManager.DeleteAccountProgress(accountID);
+            await FirestoreAccountManager.DeleteAccountProgress(accountID, classroomID: classroomID);
 
             // Delete the account document only after progress cleanup succeeds.
-            await FirestoreAccountManager.DeleteAccount(accountID);
+            await FirestoreAccountManager.DeleteAccount(accountID, classroomID);
 
             // Ensure the Classroom hasn't changed during the operation.
             if (DatabaseManager.Instance.CurrentDatabase != classroomID)
@@ -429,6 +440,9 @@ public class AccountManager : MonoBehaviour
             selectedCard = null;
 
             SaveAccount();
+
+            ClearAccountPendingDeletion(classroomID, accountID);
+
             RefreshUI();
 
             Debug.Log("Account deleted locally and from Firestore: " + accountToDelete.username);
@@ -496,7 +510,13 @@ public class AccountManager : MonoBehaviour
         Debug.Log("Cleared old cards");
 
         // Sort accounts alphabetically by username (A-Z).
-        List<AccountData> sortedAccounts = new List<AccountData>(registry.accounts);
+        string activeClassroomID = DatabaseManager.Instance.CurrentDatabase;
+
+        List<AccountData> sortedAccounts = registry.accounts.FindAll(
+            account =>
+                account != null &&
+                account.classroomID == activeClassroomID
+        );
 
         sortedAccounts.Sort((a, b) => string.Compare(a.username, b.username, System.StringComparison.OrdinalIgnoreCase));
 
@@ -654,7 +674,16 @@ public class AccountManager : MonoBehaviour
 
         backButton.SetActive(true);
 
+        if (classroomPanel != null)
+        {
+            classroomPanel.SetActive(true);
+        }
+
         RefreshUI();
+
+        // Upload the newly created account to Firestore.
+        // If the upload fails, it remains queued for synchronization.
+        _ = SynchronizePendingAccounts();
     }
 
     private void ReIndexAccounts()
@@ -805,7 +834,7 @@ public class AccountManager : MonoBehaviour
             {
                 waitingToLoadGame = false;
 
-                MainMenu mainMenuScript =FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
+                MainMenu mainMenuScript = FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
 
                 if (mainMenuScript != null)
                 {
@@ -1336,7 +1365,7 @@ public class AccountManager : MonoBehaviour
         if (!System.IO.File.Exists(path))
         {
             return;
-        }    
+        }
 
         string json = System.IO.File.ReadAllText(path);
 
@@ -1349,7 +1378,7 @@ public class AccountManager : MonoBehaviour
             completedLevelsText.text += level + "\n";
         }
 
-        quizStatsText.text = 
+        quizStatsText.text =
             "Multiple Choice: " + data.multipleChoiceCorrect + "/" + data.multipleChoiceTotal +
             "\n\n" + "Identification: " + data.identificationCorrect + "/" + data.identificationTotal +
             "\n\n" + "True/False: " + data.trueFalseCorrect + "/" + data.trueFalseTotal +
@@ -1456,6 +1485,333 @@ public class AccountManager : MonoBehaviour
         {
             pendingAccountDeletions.accountIDs = new List<string>();
         }
+
+        if (pendingAccountDeletions.records == null)
+        {
+            pendingAccountDeletions.records = new List<PendingAccountDeletionRecord>();
+        }
+    }
+
+    private void CheckInterruptedAccountDeletions()
+    {
+        if (pendingAccountDeletions == null)
+        {
+            return;
+        }
+
+        int legacyCount = pendingAccountDeletions.accountIDs?.Count ?? 0;
+
+        int recordCount = pendingAccountDeletions.records?.Count ?? 0;
+
+        int totalCount = legacyCount + recordCount;
+
+        if (totalCount == 0)
+        {
+            Debug.Log("Account deletion recovery check: " + "No interrupted deletions detected."
+            );
+
+            return;
+        }
+
+        Debug.LogWarning("Account deletion recovery check: " + totalCount + " pending deletion record(s) detected."
+        );
+
+        if (pendingAccountDeletions.records != null)
+        {
+            foreach (PendingAccountDeletionRecord record in pendingAccountDeletions.records)
+            {
+                if (record == null)
+                {
+                    continue;
+                }
+
+                Debug.LogWarning("Pending deletion: Account " + record.accountID + " | Classroom: " + record.classroomID);
+            }
+        }
+
+        if (pendingAccountDeletions.accountIDs != null)
+        {
+            foreach (string accountID in pendingAccountDeletions.accountIDs)
+            {
+                Debug.LogWarning("Legacy pending deletion requires review: " + accountID);
+            }
+        }
+    }
+
+    private bool CanRecoverPendingAccountDeletion(PendingAccountDeletionRecord record)
+    {
+        if (record == null)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(record.classroomID) || string.IsNullOrWhiteSpace(record.accountID))
+        {
+            Debug.LogWarning("Account deletion recovery skipped: " + "Incomplete deletion record.");
+
+            return false;
+        }
+
+        if (deletingAccount)
+        {
+            return false;
+        }
+
+        if (DatabaseManager.Instance == null ||
+            FirestoreManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "Account deletion recovery skipped: " +
+                "Database managers are unavailable."
+            );
+
+            return false;
+        }
+
+        string activeClassroom = DatabaseManager.Instance.CurrentDatabase;
+
+        if (string.IsNullOrWhiteSpace(activeClassroom) || activeClassroom == "DefaultDatabase")
+        {
+            Debug.LogWarning("Account deletion recovery skipped: " + "No valid classroom is active.");
+
+            return false;
+        }
+
+        if (record.classroomID != activeClassroom)
+        {
+            Debug.LogWarning("Account deletion recovery deferred for account " + record.accountID + ": Pending classroom " + record.classroomID +
+                " does not match active classroom " + activeClassroom);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private void CheckRecoverableAccountDeletions()
+    {
+        if (pendingAccountDeletions == null || pendingAccountDeletions.records == null || pendingAccountDeletions.records.Count == 0)
+        {
+            return;
+        }
+
+        foreach (PendingAccountDeletionRecord record in pendingAccountDeletions.records)
+        {
+            if (!CanRecoverPendingAccountDeletion(record))
+            {
+                continue;
+            }
+
+            Debug.LogWarning("Account deletion recovery available: " + record.accountID + " | Classroom: " + record.classroomID);
+        }
+    }
+
+    public void CheckPendingDeletionsForActiveClassroom()
+    {
+        if (DatabaseManager.Instance == null)
+            return;
+
+        string classroomID = DatabaseManager.Instance.CurrentDatabase;
+
+        if (string.IsNullOrWhiteSpace(classroomID) || classroomID == "DefaultDatabase")
+        {
+            return;
+        }
+
+        if (deletingAccount)
+            return;
+
+        if (pendingAccountDeletions == null ||
+            pendingAccountDeletions.records == null)
+        {
+            return;
+        }
+
+        Debug.Log("Checking pending account deletions for classroom: " + classroomID);
+
+        CheckRecoverableAccountDeletions();
+    }
+
+    public async Task RecoverPendingAccountDeletions()
+    {
+        if (deletingAccount ||
+            synchronizingPendingAccounts ||
+            synchronizingAssignments ||
+            loginInProgress ||
+            resettingPassword ||
+            pendingAccountDeletions == null ||
+            pendingAccountDeletions.records == null ||
+            pendingAccountDeletions.records.Count == 0)
+        {
+            return;
+        }
+
+        ProgressManager progressManager = ProgressManager.Instance;
+
+        if (progressManager == null ||
+            progressManager.IsAccountDeletionInProgress)
+        {
+            return;
+        }
+
+        // Snapshot records because successful recovery removes them.
+        List<PendingAccountDeletionRecord> records =
+            new List<PendingAccountDeletionRecord>(
+                pendingAccountDeletions.records
+            );
+
+        foreach (PendingAccountDeletionRecord record in records)
+        {
+            if (!CanRecoverPendingAccountDeletion(record))
+                continue;
+
+            string classroomID = record.classroomID;
+            string accountID = record.accountID;
+
+            deletingAccount = true;
+            progressManager.BeginAccountDeletion(accountID);
+
+            try
+            {
+                Debug.Log(
+                    "Resuming interrupted account deletion: " +
+                    accountID + " | Classroom: " + classroomID
+                );
+
+                // Wait for operations that could conflict with deletion.
+                await FirestoreAccountManager.WaitForAccountDownloads();
+                await progressManager.WaitForBackgroundOperations();
+                await FirestoreAccountManager.WaitForAccountOperations(
+                    accountID
+                );
+
+                // Confirm classroom identity before destructive operations.
+                if (DatabaseManager.Instance == null ||
+                    DatabaseManager.Instance.CurrentDatabase != classroomID)
+                {
+                    throw new System.InvalidOperationException(
+                        "Active classroom changed during deletion recovery."
+                    );
+                }
+
+                // Resume Firestore cleanup using the stored classroom ID.
+                await FirestoreAccountManager.DeleteAccountProgress(
+                    accountID,
+                    classroomID: classroomID
+                );
+
+                await FirestoreAccountManager.DeleteAccount(
+                    accountID,
+                    classroomID
+                );
+
+                // A cloud operation can take time. Never touch local files
+                // unless this is still the selected classroom.
+                if (DatabaseManager.Instance == null ||
+                    DatabaseManager.Instance.CurrentDatabase != classroomID)
+                {
+                    throw new System.InvalidOperationException(
+                        "Classroom changed during deletion recovery; local cleanup deferred."
+                    );
+                }
+
+                // Remove local progress.
+                string saveFile = Path.Combine(
+                    Application.persistentDataPath,
+                    "progress_" + accountID + ".json"
+                );
+
+                // Older accounts may use non-unique numeric IDs across
+                // classrooms. Never delete their shared local progress file
+                // during automated recovery without proven ownership.
+                System.Guid uniqueAccountID;
+                if (System.Guid.TryParse(accountID, out uniqueAccountID))
+                {
+                    if (File.Exists(saveFile))
+                        File.Delete(saveFile);
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        "Recovery preserved legacy local progress file for " +
+                        accountID + ": classroom ownership cannot be verified."
+                    );
+                }
+
+                // Remove the account from the local registry.
+                registry.accounts.RemoveAll(
+                    account => account.id == accountID
+                );
+
+                // Remove pending account creation.
+                pendingAccountUploads.accountIDs.Remove(accountID);
+                SavePendingAccountUploads();
+
+                // Remove pending assignment updates for the deleted account.
+                pendingAssignmentUploads.accountIDs.Remove(accountID);
+                SavePendingAssignmentUploads();
+
+                // Remove the deleted student from teacher assignments.
+                foreach (AccountData account in registry.accounts)
+                {
+                    if (account.accountType == AccountType.Teacher &&
+                        account.assignedStudentIDs != null &&
+                        account.assignedStudentIDs.Remove(accountID))
+                    {
+                        // Persist the queue, but don't launch sync until
+                        // the deletion guard has been released.
+                        if (!pendingAssignmentUploads.accountIDs.Contains(account.id))
+                            pendingAssignmentUploads.accountIDs.Add(account.id);
+                    }
+                }
+                SavePendingAssignmentUploads();
+
+                // Clear active account state if necessary.
+                if (CurrentAccount.ActiveAccount != null &&
+                    CurrentAccount.ActiveAccount.id == accountID)
+                {
+                    progressManager.ClearDeletedAccountState(accountID);
+                    CurrentAccount.ActiveAccount = null;
+                }
+
+                if (selectedAccount != null &&
+                    selectedAccount.id == accountID)
+                {
+                    selectedAccount = null;
+                    selectedCard = null;
+                }
+
+                SaveAccount();
+
+                // Only clear the recovery record after cleanup succeeds.
+                ClearAccountPendingDeletion(classroomID, accountID);
+
+                Debug.Log(
+                    "Interrupted account deletion recovered successfully: " +
+                    accountID
+                );
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError(
+                    "Account deletion recovery failed for " +
+                    accountID +
+                    ". Pending deletion record retained for retry. " +
+                    "Error: " + ex
+                );
+            }
+            finally
+            {
+                progressManager.EndAccountDeletion(accountID);
+                deletingAccount = false;
+            }
+        }
+
+        RefreshUI();
+
+        // The recovery guard is now released for all records.
+        if (pendingAssignmentUploads.accountIDs.Count > 0)
+            _ = SynchronizePendingAssignments();
     }
 
     private void SavePendingAccountDeletions()
@@ -1467,61 +1823,116 @@ public class AccountManager : MonoBehaviour
 
     public bool IsAccountPendingDeletion(string accountID)
     {
-        return !string.IsNullOrWhiteSpace(accountID) &&
-               pendingAccountDeletions.accountIDs.Contains(accountID);
+        if (string.IsNullOrWhiteSpace(accountID))
+            return false;
+
+        // Legacy records remain blocked until safely resolved.
+        if (pendingAccountDeletions.accountIDs != null &&
+            pendingAccountDeletions.accountIDs.Contains(accountID))
+        {
+            return true;
+        }
+
+        if (pendingAccountDeletions.records == null)
+        {
+            return false;
+        }
+
+        string classroomID = DatabaseManager.Instance != null ? DatabaseManager.Instance.CurrentDatabase : null;
+
+        // If the Classroom is unknown, block any matching
+        // pending account rather than risk activating it.
+        return pendingAccountDeletions.records.Exists(record => record != null && record.accountID == accountID &&
+            (string.IsNullOrWhiteSpace(classroomID) ||
+            record.classroomID == classroomID)
+        );
     }
 
-    private void MarkAccountPendingDeletion(string accountID)
+    private void MarkAccountPendingDeletion(string classroomID, string accountID)
     {
-        if (string.IsNullOrWhiteSpace(accountID))
-            return;
+        if (string.IsNullOrWhiteSpace(classroomID) || string.IsNullOrWhiteSpace(accountID))
+        {
+            throw new System.ArgumentException("Cannot register pending deletion without " + "a Classroom ID and Account ID.");
+        }
 
-        if (pendingAccountDeletions.accountIDs.Contains(accountID))
-            return;
+        if (pendingAccountDeletions.records == null)
+        {
+            pendingAccountDeletions.records = new List<PendingAccountDeletionRecord>();
+        }
 
-        pendingAccountDeletions.accountIDs.Add(accountID);
+        bool alreadyPending =
+            pendingAccountDeletions.records.Exists(record => record != null && record.classroomID == classroomID && record.accountID == accountID);
+
+        if (alreadyPending)
+        {
+            return;
+        }
+
+        PendingAccountDeletionRecord newRecord = new PendingAccountDeletionRecord
+        {
+            classroomID = classroomID,
+            accountID = accountID
+        };
+
+        pendingAccountDeletions.records.Add(newRecord);
 
         try
         {
             SavePendingAccountDeletions();
 
-            Debug.Log(
-                "Account marked for pending deletion: " + accountID
+            Debug.Log("Account marked for pending deletion: " + accountID + " | Classroom: " + classroomID
             );
         }
+
         catch
         {
-            pendingAccountDeletions.accountIDs.Remove(accountID);
+            pendingAccountDeletions.records.Remove(newRecord);
             throw;
         }
     }
 
-    private void ClearAccountPendingDeletion(string accountID)
+    private void ClearAccountPendingDeletion(string classroomID, string accountID)
     {
-        if (string.IsNullOrWhiteSpace(accountID))
+        if (string.IsNullOrWhiteSpace(classroomID) || string.IsNullOrWhiteSpace(accountID))
+        {
             return;
+        }
 
-        if (!pendingAccountDeletions.accountIDs.Contains(accountID))
+        if (pendingAccountDeletions.records == null)
+        {
             return;
+        }
 
-        pendingAccountDeletions.accountIDs.Remove(accountID);
+        List<PendingAccountDeletionRecord> removedRecords =
+            pendingAccountDeletions.records.FindAll(
+                record => record != null && record.classroomID == classroomID && record.accountID == accountID
+            );
+
+        if (removedRecords.Count == 0)
+        {
+            return;
+        }
+
+        pendingAccountDeletions.records.RemoveAll(
+            record => record != null && record.classroomID == classroomID && record.accountID == accountID
+        );
 
         try
         {
             SavePendingAccountDeletions();
 
-            Debug.Log(
-                "Pending account deletion cleared: " + accountID
-            );
+            Debug.Log("Pending account deletion cleared: " + accountID + " | Classroom: " + classroomID);
         }
+
         catch (System.Exception ex)
         {
-            pendingAccountDeletions.accountIDs.Add(accountID);
+            pendingAccountDeletions.records.AddRange(removedRecords);
 
             Debug.LogError(
-                "Failed to clear pending account deletion for " +
-                accountID + ": " + ex
+                "Failed to clear pending account deletion: " + ex
             );
+
+            throw;
         }
     }
 
@@ -1583,6 +1994,12 @@ public class AccountManager : MonoBehaviour
 
                 if (teacher == null)
                     continue;
+
+                if (DatabaseManager.Instance == null ||
+                teacher.classroomID != DatabaseManager.Instance.CurrentDatabase)
+                {
+                    continue;
+                }
 
                 // An account still awaiting its initial creation upload
                 // will be handled by the existing account queue.
@@ -1672,6 +2089,20 @@ public class AccountManager : MonoBehaviour
             return;
         }
 
+        string synchronizationClassroomID = DatabaseManager.Instance != null
+        ? DatabaseManager.Instance.CurrentDatabase
+        : null;
+
+        if (string.IsNullOrWhiteSpace(synchronizationClassroomID) || synchronizationClassroomID == "DefaultDatabase")
+        {
+            Debug.LogWarning(
+                "Pending account synchronization skipped: " +
+                "No valid classroom is active."
+            );
+
+            return;
+        }
+
         synchronizingPendingAccounts = true;
 
         try
@@ -1682,6 +2113,16 @@ public class AccountManager : MonoBehaviour
 
             foreach (string accountID in pendingIDs)
             {
+                if (DatabaseManager.Instance == null || DatabaseManager.Instance.CurrentDatabase != synchronizationClassroomID)
+                {
+                    Debug.LogWarning(
+                        "Pending account synchronization stopped: " +
+                        "The active classroom changed."
+                    );
+
+                    break;
+                }
+
                 AccountData account = registry.accounts.Find(
                     a => a.id == accountID
                 );
@@ -1693,6 +2134,20 @@ public class AccountManager : MonoBehaviour
                     );
 
                     // Keep the pending ID for investigation.
+                    continue;
+                }
+
+                // Never upload an account into a different classroom.
+                if (account.classroomID != synchronizationClassroomID)
+                {
+                    Debug.LogWarning(
+                        "Pending account upload skipped: Classroom mismatch.\n" +
+                        "Account: " + account.username + "\n" +
+                        "Account Classroom: " + account.classroomID + "\n" +
+                        "Active Classroom: " + synchronizationClassroomID
+                    );
+
+                    // Keep the pending record for its original classroom.
                     continue;
                 }
 
@@ -1718,6 +2173,26 @@ public class AccountManager : MonoBehaviour
                         Debug.LogWarning(
                             "Account upload not yet confirmed by Firestore: " +
                             account.username
+                        );
+
+                        continue;
+                    }
+
+                    if (DatabaseManager.Instance == null || DatabaseManager.Instance.CurrentDatabase != synchronizationClassroomID)
+                    {
+                        Debug.LogWarning(
+                            "Account upload completed, but the classroom changed. " +
+                            "Keeping the pending upload record: " + accountID
+                        );
+
+                        break;
+                    }
+
+                    if (IsAccountPendingDeletion(accountID))
+                    {
+                        Debug.LogWarning(
+                            "Account upload completed, but deletion is now pending: " +
+                            accountID
                         );
 
                         continue;
@@ -1893,7 +2368,7 @@ public class AccountManager : MonoBehaviour
         confirmBtn.onClick.AddListener(ConfirmAssignStudents);
 
         //Confirm Login Button
-        Button loginBtn = 
+        Button loginBtn =
             ui.confirmLoginButton.GetComponent<Button>();
 
         loginBtn.onClick.RemoveAllListeners();
@@ -2040,7 +2515,18 @@ public class PendingAccountUploads
 }
 
 [System.Serializable]
+public class PendingAccountDeletionRecord
+{
+    public string classroomID;
+    public string accountID;
+}
+
+[System.Serializable]
 public class PendingAccountDeletions
 {
+    // Legacy records retained for migration.
     public List<string> accountIDs = new List<string>();
+
+    // New classroom-aware deletion records.
+    public List<PendingAccountDeletionRecord> records = new List<PendingAccountDeletionRecord>();
 }
