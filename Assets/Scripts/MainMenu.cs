@@ -137,6 +137,12 @@ public class MainMenu : MonoBehaviour
 
     public void BackFromOptions()
     {
+        // Only handle Back when the Options menu is actually open.
+        if (!IsOptionsMenuOpen)
+        {
+            return;
+        }
+
         if (optionsMenu == null)
         {
             Debug.LogError("Options menu is not assigned.", this);

@@ -7,3 +7,12 @@ B.
 C.
 D.
 
+ID:FRESH TEST 22
+2. Question 2
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. Angelo "C"
+B.
+C.
+D.
+

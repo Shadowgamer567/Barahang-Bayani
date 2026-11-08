@@ -12,6 +12,8 @@ public class QuizMakerManager : MonoBehaviour
     public GameObject backButton;
     public GameObject accountButton;
     public GameObject mainMenuImage;
+    public GameObject waitSyncPanel;
+    public GameObject syncInputBlocker;
 
     [Header("Quiz Selection")]
     public GameObject currentQuizPanel;
@@ -101,9 +103,29 @@ public class QuizMakerManager : MonoBehaviour
 
     public void OpenQuizMakerPanel()
     {
+        // Reset synchronization UI when opening Quiz Maker.
+        if (waitSyncPanel != null)
+        {
+            waitSyncPanel.SetActive(false);
+        }
+
+        // Ensure Quiz Maker controls are usable when opening.
+        if (syncInputBlocker != null)
+        {
+            syncInputBlocker.SetActive(false);
+        }
+
         QuizMakerPanel.SetActive(true);
         accountButton.SetActive(false);
         backButton.SetActive(true);
+
+        Button backButtonComponent = backButton.GetComponent<Button>();
+
+        if (backButtonComponent != null)
+        {
+            backButtonComponent.interactable = true;
+        }
+
         mainMenuImage.SetActive(false);
     }
 
@@ -128,14 +150,38 @@ public class QuizMakerManager : MonoBehaviour
     public async void CloseQuizMakerPanel()
     {
         if (MainMenu.IsOptionsMenuOpen)
+        {
             return;
+        }
 
         // Prevent the player from triggering another exit
         // while an upload is already running.
         if (isClosingQuizMaker || isDeletingQuiz)
+        {
             return;
+        }
 
         isClosingQuizMaker = true;
+
+        // Keep Back visible, but prevent additional clicks.
+        Button backButtonComponent = backButton.GetComponent<Button>();
+
+        if (backButtonComponent != null)
+        {
+            backButtonComponent.interactable = false;
+        }
+
+        // Prevent interactions with Quiz Maker while synchronizing.
+        if (syncInputBlocker != null)
+        {
+            syncInputBlocker.SetActive(true);
+        }
+
+        // Show the synchronization panel.
+        if (waitSyncPanel != null)
+        {
+            waitSyncPanel.SetActive(true);
+        }
 
         try
         {
@@ -169,18 +215,54 @@ public class QuizMakerManager : MonoBehaviour
             }
 
             QuizMakerPanel.SetActive(false);
+
             accountButton.SetActive(true);
             backButton.SetActive(false);
             mainMenuImage.SetActive(true);
+
+            if (syncInputBlocker != null)
+            {
+                syncInputBlocker.SetActive(false);
+            }
         }
+
         catch (System.Exception ex)
         {
             Debug.LogError(
                 "[Quiz Maker] Error while closing Quiz Maker: " + ex
             );
         }
+
         finally
         {
+            // Always remove synchronization UI,
+            // even if an unexpected error occurs.
+            if (waitSyncPanel != null)
+            {
+                waitSyncPanel.SetActive(false);
+            }
+
+            if (syncInputBlocker != null)
+            {
+                syncInputBlocker.SetActive(false);
+            }
+
+            // Restore Back button interaction if Quiz Maker
+            // remains open because synchronization failed.
+            if (QuizMakerPanel != null && QuizMakerPanel.activeSelf)
+            {
+                if (backButton != null)
+                {
+                    backButton.SetActive(true);
+
+                    Button BackButtonComponent =
+                        backButton.GetComponent<Button>();
+
+                    if (BackButtonComponent != null)
+                        BackButtonComponent.interactable = true;
+                }
+            }
+
             isClosingQuizMaker = false;
         }
     }

@@ -1407,7 +1407,21 @@ public class AccountManager : MonoBehaviour
 
     public void CloseAccountMenu()
     {
+        // Do not handle Back while the Options menu is open.
         if (MainMenu.IsOptionsMenuOpen)
+        {
+            return;
+        }
+
+        // Only close Accounts when the Accounts menu is actually open.
+        bool isAccountMenuOpen =
+            (accountSelectPanel != null && accountSelectPanel.activeSelf) ||
+            (accountManagementPanel != null && accountManagementPanel.activeSelf) ||
+            (createAccountPanel != null && createAccountPanel.activeSelf) ||
+            (teacherInfoPanel != null && teacherInfoPanel.activeSelf) ||
+            (studentInfoPanel != null && studentInfoPanel.activeSelf);
+
+        if (!isAccountMenuOpen)
         {
             return;
         }
