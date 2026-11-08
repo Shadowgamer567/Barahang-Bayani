@@ -1,0 +1,9 @@
+ID:TEST1
+1. aaaaa
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. aaaa "C"
+B.
+C.
+D.
+
