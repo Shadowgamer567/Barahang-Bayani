@@ -27,6 +27,9 @@ public class ProgressData
     public int multipleSelectCorrect;
     public int multipleSelectTotal;
 
+    public int fillInTheBlankCorrect;
+    public int fillInTheBlankTotal;
+
     public List<QuizResultData> pendingQuizResults = new List<QuizResultData>();
 
     public bool quizResultLedgerInitialized = false;

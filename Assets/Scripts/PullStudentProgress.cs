@@ -188,9 +188,13 @@ public class PullStudentProgress : MonoBehaviour
         QuizStats.Instance.typeTotal[InputType.TrueOrFalse] =
             data.trueFalseTotal;
         QuizStats.Instance.typeCorrect[InputType.MultipleSelect] =
-        data.multipleSelectCorrect;
+            data.multipleSelectCorrect;
         QuizStats.Instance.typeTotal[InputType.MultipleSelect] =
             data.multipleSelectTotal;
+        QuizStats.Instance.typeCorrect[InputType.FillInTheBlank] =
+            data.fillInTheBlankCorrect;
+        QuizStats.Instance.typeTotal[InputType.FillInTheBlank] =
+            data.fillInTheBlankTotal;
 
         Debug.Log(
             "Firestore progress applied locally for account '" +

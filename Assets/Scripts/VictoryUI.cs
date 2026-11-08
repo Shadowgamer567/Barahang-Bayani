@@ -8,6 +8,7 @@ public class VictoryUI : MonoBehaviour
     public TextMeshProUGUI identificationText;
     public TextMeshProUGUI trueorfalseText;
     public TextMeshProUGUI multipleselectText;
+    public TextMeshProUGUI fillintheblankText;
     public TextMeshProUGUI totalText;
 
     [Header("Screen Settings")]
@@ -35,6 +36,8 @@ public class VictoryUI : MonoBehaviour
         trueorfalseText.text = $"True or False: {stats.GetTypeCorrect(InputType.TrueOrFalse)} / " + $"{stats.GetTotalType(InputType.TrueOrFalse)}";
 
         multipleselectText.text = $"Multiple Select: {stats.GetTypeCorrect(InputType.MultipleSelect)} / " + $"{stats.GetTotalType(InputType.MultipleSelect)}";
+
+        fillintheblankText.text = $"Fill in the Blank: {stats.GetTypeCorrect(InputType.FillInTheBlank)} / {stats.GetTotalType(InputType.FillInTheBlank)}";
 
         totalText.text = $"Total: {stats.totalCorrect} / {stats.totalQuestions}";
     }

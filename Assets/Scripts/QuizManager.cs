@@ -231,6 +231,7 @@ public class QuizManager : MonoBehaviour
                 break;
 
             case InputType.Identification:
+            case InputType.FillInTheBlank:
                 inputPanel.SetActive(true);
 
                 inputField.text = "";
@@ -361,17 +362,26 @@ public class QuizManager : MonoBehaviour
     public void SubmitIdentification()
     {
         if (answerSubmitted || currentQuestion == null)
+        {
             return;
+        }
+
+        if (currentQuestion.inputType != InputType.Identification && currentQuestion.inputType != InputType.FillInTheBlank)
+        {
+            return;
+        }
 
         answerSubmitted = true;
 
-        string userAnswer = inputField.text.Trim().ToLower();
-        string correct = currentQuestion.correctAnswer.Trim().ToLower();
+        string userAnswer = inputField.text.Trim().ToLowerInvariant();
+        string correctAnswer = currentQuestion.correctAnswer.Trim().ToLowerInvariant();
 
-        bool isCorrect = userAnswer == correct;
+        bool isCorrect = userAnswer == correctAnswer;
 
         OnAnswerEvaluated?.Invoke(isCorrect);
+
         Debug.Log(isCorrect ? "Correct" : "Incorrect");
+
         if (isCorrect)
         {
             QuizStats.Instance.RegisterCorrect(currentQuestion.inputType);
@@ -532,6 +542,11 @@ public class QuizManager : MonoBehaviour
             else if (inputLine.StartsWith("INPUT:MULTIPLE_SELECT"))
             {
                 q.inputType = InputType.MultipleSelect;
+            }
+
+            else if (inputLine.StartsWith("INPUT:FILL_IN_THE_BLANK"))
+            {
+                q.inputType = InputType.FillInTheBlank;
             }
 
             if (q.inputType == InputType.TrueOrFalse)
@@ -790,7 +805,7 @@ public class QuizManager : MonoBehaviour
         }
 
         // ===== IDENTIFICATION =====
-        else if (currentQuestion.inputType == InputType.Identification)
+        else if (currentQuestion.inputType == InputType.Identification || currentQuestion.inputType == InputType.FillInTheBlank)
         {
             Image inputImage = inputPanel.GetComponent<Image>();
 

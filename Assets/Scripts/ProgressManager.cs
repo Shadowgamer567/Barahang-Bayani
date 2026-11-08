@@ -27,6 +27,9 @@ public class ProgressManager : MonoBehaviour
     public int multipleSelectCorrect = 0;
     public int multipleSelectTotal = 0;
 
+    public int fillInTheBlankCorrect = 0;
+    public int fillInTheBlankTotal = 0;
+
     [Header("Pending Quiz Synchronization")]
     public List<QuizResultData> pendingQuizResults = new();
     public bool quizResultLedgerInitialized = false;
@@ -213,6 +216,9 @@ public class ProgressManager : MonoBehaviour
         multipleSelectCorrect = 0;
         multipleSelectTotal = 0;
 
+        fillInTheBlankCorrect = 0;
+        fillInTheBlankTotal = 0;
+
         // Clear synchronization flags.
         isSyncingQuizResults = false;
         isReconcilingProgress = false;
@@ -250,6 +256,9 @@ public class ProgressManager : MonoBehaviour
 
         multipleSelectCorrect = 0;
         multipleSelectTotal = 0;
+
+        fillInTheBlankCorrect = 0;
+        fillInTheBlankTotal = 0;
 
         pendingNewGameReset = false;
         previousPlaythroughId = "";
@@ -307,6 +316,10 @@ public class ProgressManager : MonoBehaviour
             case InputType.MultipleSelect:
                 multipleSelectTotal++;
                 break;
+
+            case InputType.FillInTheBlank:
+                fillInTheBlankTotal++;
+                break;
         }
     }
 
@@ -331,6 +344,10 @@ public class ProgressManager : MonoBehaviour
 
             case InputType.MultipleSelect:
                 multipleSelectCorrect++;
+                break;
+
+            case InputType.FillInTheBlank:
+                fillInTheBlankCorrect++;
                 break;
         }
     }
@@ -381,6 +398,9 @@ public class ProgressManager : MonoBehaviour
         data.multipleSelectCorrect = multipleSelectCorrect;
         data.multipleSelectTotal = multipleSelectTotal;
 
+        data.fillInTheBlankCorrect = fillInTheBlankCorrect;
+        data.fillInTheBlankTotal = fillInTheBlankTotal;
+
         string json = JsonUtility.ToJson(data, true);
 
         File.WriteAllText(savePath, json);
@@ -415,8 +435,7 @@ public class ProgressManager : MonoBehaviour
         string expectedPlaythroughId = playthroughId;
         int operationGeneration = progressGeneration;
 
-        List<string> levelsToUpload =
-            new List<string>(completedLevels);
+        List<string> levelsToUpload =new List<string>(completedLevels);
 
         bool tutorialToUpload = tutorialCompleted;
         string sceneToUpload = lastCampaignScene;
@@ -432,9 +451,7 @@ public class ProgressManager : MonoBehaviour
                     sceneToUpload
                 );
 
-            if (currentAccount == null ||
-                currentAccount.id != accountId ||
-                playthroughId != expectedPlaythroughId ||
+            if (currentAccount == null || currentAccount.id != accountId || playthroughId != expectedPlaythroughId ||
                 progressGeneration != operationGeneration)
             {
                 return;
@@ -695,6 +712,9 @@ public class ProgressManager : MonoBehaviour
         multipleSelectCorrect = data.multipleSelectCorrect;
         multipleSelectTotal = data.multipleSelectTotal;
 
+        fillInTheBlankCorrect = data.fillInTheBlankCorrect;
+        fillInTheBlankTotal = data.fillInTheBlankTotal;
+
         tutorialCompleted = data.tutorialCompleted;
     }
 
@@ -760,6 +780,9 @@ public class ProgressManager : MonoBehaviour
 
         multipleSelectCorrect = 0;
         multipleSelectTotal = 0;
+
+        fillInTheBlankCorrect = 0;
+        fillInTheBlankTotal = 0;
 
         // Clear results of previous playthrough
         pendingQuizResults.Clear();
@@ -1332,6 +1355,14 @@ public class ProgressManager : MonoBehaviour
                         multipleSelectCorrect++;
 
                     break;
+
+                case "FillInTheBlank":
+                    fillInTheBlankTotal++;
+
+                    if (result.isCorrect)
+                        fillInTheBlankCorrect++;
+
+                    break;
             }
         }
     }
@@ -1352,6 +1383,9 @@ public class ProgressManager : MonoBehaviour
 
         multipleSelectCorrect = cloudProgress.multipleSelectCorrect;
         multipleSelectTotal = cloudProgress.multipleSelectTotal;
+
+        fillInTheBlankCorrect = cloudProgress.fillInTheBlankCorrect;
+        fillInTheBlankTotal = cloudProgress.fillInTheBlankTotal;
     }
 
 

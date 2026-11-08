@@ -892,6 +892,10 @@ public class QuizMakerManager : MonoBehaviour
             case 3: //Multiple Select
                 multipleChoicePanel.SetActive(true);
                 break;
+
+            case 4: // Fill in the Blank
+                identificationPanel.SetActive(true);
+                break;
         }
 
         // Reset answer selections when changing input types.
@@ -1016,6 +1020,15 @@ public class QuizMakerManager : MonoBehaviour
 
                     entry += "\n";
                 }
+                break;
+
+            case 4: // Fill in the Blank
+                entry += "INPUT:FILL_IN_THE_BLANK\n";
+
+                entry += "A. " + identificationAnswer.text.Trim() + " \"C\"\n";
+                entry += "B.\n";
+                entry += "C.\n";
+                entry += "D.\n";
                 break;
         }
 
@@ -1178,6 +1191,23 @@ public class QuizMakerManager : MonoBehaviour
 
                     return;
                 }
+                break;
+
+            case 4: // Fill in the Blank
+                if (string.IsNullOrWhiteSpace(identificationAnswer.text))
+                {
+                    Debug.LogWarning("Fill in the Blank requires a correct answer.");
+                    return;
+                }
+
+                int blankCount = question.Split(new string[] { "____" }, System.StringSplitOptions.None).Length - 1;
+
+                if (blankCount != 1)
+                {
+                    Debug.LogWarning("Fill in the Blank requires exactly one ____ placeholder.");
+                    return;
+                }
+
                 break;
         }
 

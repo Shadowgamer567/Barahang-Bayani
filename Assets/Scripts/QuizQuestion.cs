@@ -13,7 +13,8 @@ public enum InputType
     MultipleChoice,
     Identification,
     TrueOrFalse,
-    MultipleSelect
+    MultipleSelect,
+     FillInTheBlank
 }
 
 [System.Serializable]

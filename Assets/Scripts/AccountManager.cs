@@ -1324,13 +1324,15 @@ public class AccountManager : MonoBehaviour
             data.multipleChoiceTotal +
             data.identificationTotal +
             data.trueFalseTotal +
-            data.multipleSelectTotal; ;
+            data.multipleSelectTotal +
+            data.fillInTheBlankTotal;
 
         int totalCorrect =
             data.multipleChoiceCorrect +
             data.identificationCorrect +
             data.trueFalseCorrect +
-            data.multipleSelectCorrect;
+            data.multipleSelectCorrect +
+            data.fillInTheBlankCorrect;
 
         if (totalAnswered == 0)
         {
@@ -1355,6 +1357,10 @@ public class AccountManager : MonoBehaviour
             "Multiple Select: " +
             data.multipleSelectCorrect + "/" +
             data.multipleSelectTotal + "\n\n" +
+
+            "Fill in the Blank: " +
+            data.fillInTheBlankCorrect + "/" +
+            data.fillInTheBlankTotal + "\n\n" +
 
             "Total: " + totalCorrect + "/" + totalAnswered;
     }
@@ -1386,7 +1392,8 @@ public class AccountManager : MonoBehaviour
             "Multiple Choice: " + data.multipleChoiceCorrect + "/" + data.multipleChoiceTotal +
             "\n\n" + "Identification: " + data.identificationCorrect + "/" + data.identificationTotal +
             "\n\n" + "True/False: " + data.trueFalseCorrect + "/" + data.trueFalseTotal +
-            "\n\n" + "Multiple Select: " + data.multipleSelectCorrect + "/" + data.multipleSelectTotal;
+            "\n\n" + "Multiple Select: " + data.multipleSelectCorrect + "/" + data.multipleSelectTotal +
+            "\n\n" + "Fill in the Blank: " + data.fillInTheBlankCorrect + "/" + data.fillInTheBlankTotal;
     }
     public void CloseStudentInfo()
     {

@@ -48,6 +48,12 @@ public class FirestoreProgressManager : MonoBehaviour
         data["multipleSelectTotal"] =
             progress.multipleSelectTotal;
 
+        data["fillInTheBlankCorrect"] =
+            progress.fillInTheBlankCorrect;
+
+        data["fillInTheBlankTotal"] =
+            progress.fillInTheBlankTotal;
+
         data["tutorialCompleted"] = 
             progress.tutorialCompleted;
 
@@ -126,9 +132,11 @@ public class FirestoreProgressManager : MonoBehaviour
                     { "identificationCorrect", progress.identificationCorrect },
                     { "identificationTotal", progress.identificationTotal },
                     { "trueFalseCorrect", progress.trueFalseCorrect },
+                    { "trueFalseTotal", progress.trueFalseTotal },
                     { "multipleSelectCorrect", progress.multipleSelectCorrect },
                     { "multipleSelectTotal", progress.multipleSelectTotal },
-                    { "trueFalseTotal", progress.trueFalseTotal },
+                    { "fillInTheBlankCorrect", progress.fillInTheBlankCorrect },
+                    { "fillInTheBlankTotal", progress.fillInTheBlankTotal },
                     { "tutorialCompleted", progress.tutorialCompleted },
                     { "quizResultLedgerInitialized", progress.quizResultLedgerInitialized }
                     };
@@ -221,8 +229,7 @@ public class FirestoreProgressManager : MonoBehaviour
             });
     }
 
-    public static async Task<ProgressData> DownloadProgress(
-        string accountID)
+    public static async Task<ProgressData> DownloadProgress(string accountID)
     {
         DocumentReference document =
             FirestoreManager.Instance
@@ -322,6 +329,18 @@ public class FirestoreProgressManager : MonoBehaviour
                 snapshot.GetValue<int>("multipleSelectTotal");
         }
 
+        if (snapshot.ContainsField("fillInTheBlankCorrect"))
+        {
+            progress.fillInTheBlankCorrect =
+                snapshot.GetValue<int>("fillInTheBlankCorrect");
+        }
+
+        if (snapshot.ContainsField("fillInTheBlankTotal"))
+        {
+            progress.fillInTheBlankTotal =
+                snapshot.GetValue<int>("fillInTheBlankTotal");
+        }
+
         if (snapshot.ContainsField("tutorialCompleted"))
         {
             progress.tutorialCompleted =
@@ -409,6 +428,8 @@ public class FirestoreProgressManager : MonoBehaviour
                     { "trueFalseTotal", 0 },
                     { "multipleSelectCorrect", 0 },
                     { "multipleSelectTotal", 0 },
+                    { "fillInTheBlankCorrect", 0 },
+                    { "fillInTheBlankTotal", 0 },
                     { "tutorialCompleted", false },
                     { "quizResultLedgerInitialized", true }
                     };
@@ -443,9 +464,9 @@ public class FirestoreProgressManager : MonoBehaviour
                 .Document(accountID);
 
         DocumentReference playthroughDocument =
-        progressDocument
-        .Collection("playthroughs")
-        .Document(result.playthroughId);
+            progressDocument
+                .Collection("playthroughs")
+                .Document(result.playthroughId);
 
         DocumentReference resultDocument =
             QuizResultsCollection(
@@ -516,6 +537,11 @@ public class FirestoreProgressManager : MonoBehaviour
                     case "MultipleSelect":
                         correctField = "multipleSelectCorrect";
                         totalField = "multipleSelectTotal";
+                        break;
+
+                    case "FillInTheBlank":
+                        correctField = "fillInTheBlankCorrect";
+                        totalField = "fillInTheBlankTotal";
                         break;
 
                     default:
@@ -673,6 +699,16 @@ public class FirestoreProgressManager : MonoBehaviour
             snapshot.cloudProgress.multipleSelectTotal =
                 progressSnapshot.ContainsField("multipleSelectTotal")
                     ? progressSnapshot.GetValue<int>("multipleSelectTotal")
+                    : 0;
+
+            snapshot.cloudProgress.fillInTheBlankCorrect =
+                progressSnapshot.ContainsField("fillInTheBlankCorrect")
+                    ? progressSnapshot.GetValue<int>("fillInTheBlankCorrect")
+                    : 0;
+
+            snapshot.cloudProgress.fillInTheBlankTotal =
+                progressSnapshot.ContainsField("fillInTheBlankTotal")
+                    ? progressSnapshot.GetValue<int>("fillInTheBlankTotal")
                     : 0;
 
             snapshot.cloudProgress.trueFalseTotal =

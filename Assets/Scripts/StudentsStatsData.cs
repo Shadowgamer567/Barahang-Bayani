@@ -21,4 +21,7 @@ public class StudentStatsData
 
     public int multipleSelectCorrect;
     public int multipleSelectTotal;
+
+    public int fillInTheBlankCorrect;
+    public int fillInTheBlankTotal;
 }
