@@ -72,7 +72,7 @@ public class VictoryUI : MonoBehaviour
 
         Debug.Log("VictoryUI: Returning to " + returnScene);
 
-        SceneManager.LoadScene(returnScene);
+        SceneTransitionManager.Instance.SwitchScene(returnScene);
     }
 
 
@@ -85,7 +85,7 @@ public class VictoryUI : MonoBehaviour
         }
 
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Level");
+        SceneTransitionManager.Instance.SwitchScene("Level", true);
     }
 
     public void OnContinue()
@@ -123,12 +123,25 @@ public class VictoryUI : MonoBehaviour
         {
             GameManager.Instance.selectedLevel = currentLevel.nextLevel;
 
-            SceneManager.LoadScene("Level");
+            SceneTransitionManager.Instance.SwitchScene("Level", true);
         }
+
         else
         {
-            Debug.Log("No next level, returning to level select");
-            SceneManager.LoadScene("LevelSelect_Rizal");
+            // Return to the previously visited LevelSelect scene.
+            string returnScene = LevelSelectTracker.lastLevelSelectScene;
+
+            // Fallback when testing the Level scene directly.
+            if (string.IsNullOrEmpty(returnScene))
+            {
+                returnScene = "LevelSelect_Rizal";
+
+                Debug.LogWarning("VictoryUI: No previous LevelSelect scene recorded. " +"Using fallback: " + returnScene);
+            }
+
+            Debug.Log("VictoryUI: No next level. Returning to " + returnScene);
+
+            SceneTransitionManager.Instance.SwitchScene(returnScene);
         }
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created

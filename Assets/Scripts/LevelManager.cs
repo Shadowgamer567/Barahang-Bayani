@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -97,14 +98,20 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Loaded Level: " + levelData.levelName);
         Debug.Log("Battles Required: " + levelData.battlesRequired);
 
+        //Reset Victory UI Quiz Stats
         QuizStats.Instance?.ResetStats();
 
         cutsceneManager = FindFirstObjectByType<CutsceneManager>();
 
-        TriggerCutscene(CutsceneTriggerType.Start, 0, () => 
-        { 
-            battleControl.StartBattleSequence();
-        });
+        // Initial level setup is complete.
+        // Notify the transition manager that Level can be revealed.
+        if (SceneTransitionManager.Instance != null)
+        {
+            SceneTransitionManager.Instance.NotifySceneReady("Level");
+        }
+
+        //Wait for Transition to finish before starting opening cutscene
+        StartCoroutine(StartLevelAfterTransition());
     }
 
     void HandleBattleWon()
@@ -283,6 +290,20 @@ public class LevelManager : MonoBehaviour
             battleControl.StartNextBattleManually();
         }
     }
+
+    private IEnumerator StartLevelAfterTransition()
+    {
+        // Wait while the transition manager is covering the screen.
+        while (SceneTransitionManager.IsSceneTransitionPending)
+        {
+            yield return null;
+        }
+
+        // Begin the opening cutscene or first battle
+        // only after the Level is fully visible.
+        TriggerCutscene(CutsceneTriggerType.Start, 0, () => {battleControl.StartBattleSequence();});
+    }
+
 
     // Update is called once per frame
     void Update()

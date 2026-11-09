@@ -30,6 +30,7 @@ public class LevelButton : MonoBehaviour
         {
             Debug.LogWarning("ProgressManager not found, defaulting to locked");
         }
+
         else if (!isUnlocked)
         {
             isUnlocked = ProgressManager.Instance.IsLevelCompleted(levelData.previousLevel.levelName);
@@ -72,9 +73,7 @@ public class LevelButton : MonoBehaviour
             TutorialManager.Instance.currentStage ==TutorialStage.ExploreScrollableContent &&
             SceneManager.GetActiveScene().name == "LevelSelect_Tutorial")
             {
-                TutorialManager.Instance.AdvanceStage(
-                    TutorialStage.BattleTutorial
-                );
+                TutorialManager.Instance.AdvanceStage(TutorialStage.BattleTutorial);
             }
 
         ProgressManager.Instance.lastCampaignScene = SceneManager.GetActiveScene().name;
@@ -83,7 +82,15 @@ public class LevelButton : MonoBehaviour
 
         ProgressManager.Instance.SaveProgress();
 
-        SceneManager.LoadScene("Level");
+        if (SceneTransitionManager.Instance != null)
+        {
+            SceneTransitionManager.Instance.SwitchScene("Level", true);
+        }
+
+        else
+        {
+            Debug.LogError("[Level Selection] SceneTransitionManager not found. " +"Level loading cancelled.");
+        }
     }
 
     // Update is called once per frame
