@@ -119,6 +119,13 @@ public class MainMenu : MonoBehaviour
         accountsButton.SetActive(false);
         optionsBackButton.SetActive(true);
 
+        Button backButtonComponent = optionsBackButton.GetComponent<Button>();
+
+        if (backButtonComponent != null)
+        {
+            backButtonComponent.interactable = true;
+        }
+
         if (optionsBackdrop != null)
         {
             Color backdropColor = optionsBackdrop.color;

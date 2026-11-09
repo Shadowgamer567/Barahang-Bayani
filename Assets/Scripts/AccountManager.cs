@@ -1192,6 +1192,13 @@ public class AccountManager : MonoBehaviour
         accountSelectPanel.SetActive(true);
         ShowAccountManagementPanel();
         backButton.SetActive(true);
+
+        Button backButtonComponent = backButton.GetComponent<Button>();
+
+        if (backButtonComponent != null)
+        {
+            backButtonComponent.interactable = true;
+        }
         classroomPanel.SetActive(true);
 
         Debug.Log("[Account Menu] Account panels activated.");
