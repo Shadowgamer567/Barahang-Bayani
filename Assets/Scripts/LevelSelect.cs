@@ -3,10 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class LevelSelect : MonoBehaviour
 {
+    //Depreacted
+    /*
      public void SelectLevel()
     {
         SceneManager.LoadScene("Level");
     }
+    */
 
     public void SelectLevel_Debug()
     {
@@ -15,7 +18,7 @@ public class LevelSelect : MonoBehaviour
 
     public void SelectLevel_Back()
     {
-        SceneManager.LoadScene("MapMenu");
+        SceneTransitionManager.Instance.SwitchScene("MapMenu", true);
     }
 
 }

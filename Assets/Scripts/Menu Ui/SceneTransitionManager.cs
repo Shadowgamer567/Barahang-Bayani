@@ -26,7 +26,7 @@ public class SceneTransitionManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
 
@@ -142,15 +142,17 @@ public class SceneTransitionManager : MonoBehaviour
         yield return FinishTransition();
     }
 
+
     private IEnumerator FinishTransition()
     {
-        if (loadingAnimation != null)
-        {
-            loadingAnimation.SetActive(false);
-        }
+        Debug.Log("[Scene Transition] Starting fade-out. Alpha: " + fadeCanvasGroup.alpha);
 
-        // Reveal the destination scene.
+        if (loadingAnimation != null)
+            loadingAnimation.SetActive(false);
+
         yield return FadeTo(0f);
+
+        Debug.Log("[Scene Transition] Fade-out finished. Alpha: " + fadeCanvasGroup.alpha);
 
         fadeCanvasGroup.blocksRaycasts = false;
         fadeCanvasGroup.interactable = false;
@@ -160,6 +162,7 @@ public class SceneTransitionManager : MonoBehaviour
 
         Debug.Log("[Scene Transition] Transition completed.");
     }
+
 
     private IEnumerator FadeTo(float targetAlpha)
     {
@@ -175,7 +178,7 @@ public class SceneTransitionManager : MonoBehaviour
 
         while (elapsed < fadeDuration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            elapsed += Mathf.Min(Time.unscaledDeltaTime, 0.05f);
 
             float progress =
                 Mathf.Clamp01(elapsed / fadeDuration);

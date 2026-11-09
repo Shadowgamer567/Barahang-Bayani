@@ -35,9 +35,26 @@ public class PauseManager : MonoBehaviour
         Application.Quit();
     }
 
+
     public void ExitLevel()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MapMenu");
+        isPaused = false;
+
+        // Return to the previously visited LevelSelect scene.
+        string returnScene = LevelSelectTracker.lastLevelSelectScene;
+
+        // Fallback when testing the Level scene directly.
+        if (string.IsNullOrEmpty(returnScene))
+        {
+            returnScene = "LevelSelect_Rizal";
+
+            Debug.LogWarning("PauseManager: No previous LevelSelect scene recorded. " + "Using fallback: " + returnScene);
+        }
+
+        Debug.Log("PauseManager: Returning to " + returnScene);
+
+        SceneTransitionManager.Instance.SwitchScene(returnScene);
     }
+
 }
