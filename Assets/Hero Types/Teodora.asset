@@ -16,7 +16,7 @@ MonoBehaviour:
   maxHp: 0
   shield: 0
   maxShield: 0
-  prefab: {fileID: 0}
+  prefab: {fileID: 5793887613308761351, guid: 46a6f0a524c78ce40a33054ffd8c5ed8, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: 0, z: 0}
   customCards: []
