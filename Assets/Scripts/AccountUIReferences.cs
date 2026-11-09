@@ -15,6 +15,10 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject mainMenu;
     public GameObject cardDeck;
 
+    [Header("Account Synchronization")]
+    public GameObject waitSyncPanel;
+    public GameObject syncInputBlocker;
+
     [Header("Teacher Monitoring")]
     public GameObject assignStudentsButton;
     public GameObject confirmAssignButton;

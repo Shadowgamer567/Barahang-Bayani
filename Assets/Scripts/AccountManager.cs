@@ -43,6 +43,10 @@ public class AccountManager : MonoBehaviour
     public GameObject classroomSelectionPanel;
     public GameObject classroomCreationPanel;
 
+    [Header("Account Synchronization UI")]
+    public GameObject waitSyncPanel;
+    public GameObject syncInputBlocker;
+
     [Header("Teacher Monitoring")]
     public GameObject teacherInfoPanel;
     public GameObject studentInfoPanel;
@@ -1192,6 +1196,16 @@ public class AccountManager : MonoBehaviour
 
         Debug.Log("[Account Menu] Account panels activated.");
 
+        if (syncInputBlocker != null)
+        {
+            syncInputBlocker.SetActive(true);
+        }
+
+        if (waitSyncPanel != null)
+        {
+            waitSyncPanel.SetActive(true);
+            waitSyncPanel.transform.SetAsLastSibling();
+        }
         _ = SynchronizeAccountMenuAsync();
     }
 
@@ -2256,9 +2270,18 @@ public class AccountManager : MonoBehaviour
         if (DatabaseManager.Instance == null ||
             string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase))
         {
-            Debug.LogWarning(
-                "[Account Menu Sync] No active classroom."
-            );
+            Debug.LogWarning("[Account Menu Sync] No active classroom.");
+
+            if (waitSyncPanel != null)
+            {
+                waitSyncPanel.SetActive(false);
+            }
+
+            if (syncInputBlocker != null)
+            {
+                syncInputBlocker.SetActive(false);
+            }
+
             return;
         }
 
@@ -2302,15 +2325,35 @@ public class AccountManager : MonoBehaviour
 
             Debug.Log("[Account Menu Sync] Synchronization finished.");
         }
+
         catch (System.Exception ex)
         {
             Debug.LogError(
                 "[Account Menu Sync] Synchronization failed: " + ex
             );
         }
+
         finally
         {
             isAccountMenuSynchronizing = false;
+
+            if (waitSyncPanel != null)
+            {
+                waitSyncPanel.SetActive(false);
+
+                Debug.Log("[Account Menu Sync] WaitSyncPanel hidden.");
+            }
+
+            if (syncInputBlocker != null)
+            {
+                syncInputBlocker.SetActive(false);
+                Debug.Log("[Account Menu Sync] SyncInputBlocker hidden.");
+            }
+
+            else
+            {
+                Debug.LogError("[Account Menu Sync] WaitSyncPanel reference is NULL!");
+            }
         }
     }
 
@@ -2331,6 +2374,9 @@ public class AccountManager : MonoBehaviour
         classroomSelectionPanel = ui.classroomSelectionPanel;
         classroomCreationPanel = ui.classroomCreationPanel;
         classroomNameInput = ui.classroomNameInput;
+
+        waitSyncPanel = ui.waitSyncPanel;
+        syncInputBlocker = ui.syncInputBlocker;
 
         mainMenu = ui.mainMenu;
 
