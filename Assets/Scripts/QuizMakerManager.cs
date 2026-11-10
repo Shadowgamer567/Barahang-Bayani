@@ -70,6 +70,10 @@ public class QuizMakerManager : MonoBehaviour
     private bool trueFalseAnswer = true;
     private int correctAnswerIndex = 0;
     private bool[] multipleSelectAnswers = new bool[4];
+    private int SelectedQuestionType => questionTypeDropdown.value - 1;
+
+    private int SelectedInputType => inputTypeDropdown.value - 1;
+
     private bool isClosingQuizMaker = false;
     private bool isDeletingQuiz = false;
     public bool IsDeletingQuiz => isDeletingQuiz;
@@ -957,7 +961,7 @@ public class QuizMakerManager : MonoBehaviour
         multipleChoicePanel.SetActive(false);
         trueFalsePanel.SetActive(false);
 
-        switch (inputTypeDropdown.value)
+        switch (SelectedInputType)
         {
             case 0: //Identification
                 identificationPanel.SetActive(true);
@@ -993,7 +997,7 @@ public class QuizMakerManager : MonoBehaviour
         imageButton.SetActive(false);
         audioButton.SetActive(false);
 
-        switch (questionTypeDropdown.value)
+        switch (SelectedQuestionType)
         {
             case 0: //Text
                 break;
@@ -1127,7 +1131,7 @@ public class QuizMakerManager : MonoBehaviour
             return;
         }
 
-        if (inputTypeDropdown.value == 3) // Multiple Select
+        if (SelectedInputType == 3) // Multiple Select
         {
             // Toggle the selected answer independently.
             multipleSelectAnswers[index] = !multipleSelectAnswers[index];
@@ -1157,7 +1161,7 @@ public class QuizMakerManager : MonoBehaviour
 
             bool isCorrect;
 
-            if (inputTypeDropdown.value == 3) // Multiple Select
+            if (SelectedInputType == 3) // Multiple Select
             {
                 isCorrect = i < multipleSelectAnswers.Length && multipleSelectAnswers[i];
             }
@@ -1213,6 +1217,13 @@ public class QuizMakerManager : MonoBehaviour
         if (string.IsNullOrEmpty(question))
         {
             Debug.LogWarning("Question is Empty");
+            return;
+        }
+
+        if (questionTypeDropdown.value == 0 || inputTypeDropdown.value == 0)
+        {
+            Debug.LogWarning( "Please select both a Question Type and an Input Type.");
+
             return;
         }
 
@@ -1543,6 +1554,10 @@ public class QuizMakerManager : MonoBehaviour
     void Start()
     {
         currentQuizText.text = "No quiz selected";
+
+        // Start both dropdowns on their placeholder labels.
+        questionTypeDropdown.value = 0;
+        inputTypeDropdown.value = 0;
 
         correctAnswerIndex = 0;
         multipleSelectAnswers = new bool[4];
