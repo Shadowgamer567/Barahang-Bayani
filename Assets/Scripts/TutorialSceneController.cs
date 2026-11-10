@@ -10,6 +10,7 @@ public class TutorialSceneController : MonoBehaviour
     public GameObject tutorialOverlay;
     public GameObject tutorialSpotlight;
     public Button tutorialClickZoneButton;
+    public Button skipTutorialButton;
 
     [Header("Tutorial Configuration")]
     public TutorialStage introductionStage = TutorialStage.MapIntroduction;
@@ -26,6 +27,11 @@ public class TutorialSceneController : MonoBehaviour
     void Start()
     {
         tutorialClickZoneButton.onClick.AddListener(NextPanel);
+
+        if (skipTutorialButton != null)
+        {
+            skipTutorialButton.gameObject.SetActive(false);
+        }
 
         // Hide every tutorial panel by default.
         foreach (GameObject panel in tutorialPanels)
@@ -71,6 +77,12 @@ public class TutorialSceneController : MonoBehaviour
 
             tutorialClickZoneButton.gameObject.SetActive(true);
 
+            if (skipTutorialButton != null)
+            {
+                skipTutorialButton.gameObject.SetActive(true);
+                skipTutorialButton.onClick.AddListener(SkipTutorial);
+            }
+
             ShowCurrentPanel();
         }
     }
@@ -101,6 +113,11 @@ public class TutorialSceneController : MonoBehaviour
             showingTutorial = false;
 
             tutorialClickZoneButton.gameObject.SetActive(false);
+
+            if (skipTutorialButton != null)
+            {
+                skipTutorialButton.gameObject.SetActive(false);
+            }
 
             TutorialManager.Instance.AdvanceStage(nextStage);
 
@@ -159,11 +176,74 @@ public class TutorialSceneController : MonoBehaviour
         Debug.Log("Final Tutorial: All tutorial sections completed.");
     }
 
+    void SkipTutorial()
+    {
+        Debug.Log("Tutorial skipped by player.");
+
+        showingTutorial = false;
+
+        // Hide all tutorial panels.
+        foreach (GameObject panel in tutorialPanels)
+        {
+            if (panel != null)
+            {
+                panel.SetActive(false);
+            }
+        }
+
+        // Hide tutorial UI elements.
+        tutorialOverlay.SetActive(false);
+
+        if (tutorialSpotlight != null)
+        {
+            tutorialSpotlight.SetActive(false);
+        }
+
+        if (panelSpotlights != null)
+        {
+            foreach (GameObject spotlight in panelSpotlights)
+            {
+                if (spotlight != null)
+                {
+                    spotlight.SetActive(false);
+                }
+            }
+        }
+
+        tutorialClickZoneButton.gameObject.SetActive(false);
+        skipTutorialButton.gameObject.SetActive(false);
+
+        // Mark the tutorial as completed.
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.CompleteTutorial();
+        }
+
+        // Save tutorial completion to the current account.
+        if (ProgressManager.Instance != null)
+        {
+            ProgressManager.Instance.tutorialCompleted = true;
+            ProgressManager.Instance.SaveProgress();
+
+            Debug.Log("Tutorial skip: Completion saved to progress.");
+        }
+
+        else
+        {
+            Debug.LogError("Tutorial skip: ProgressManager not found!");
+        }
+    }
+
     void OnDestroy()
     {
         if (tutorialClickZoneButton != null)
         {
             tutorialClickZoneButton.onClick.RemoveListener(NextPanel);
+        }
+
+        if (skipTutorialButton != null)
+        {
+            skipTutorialButton.onClick.RemoveListener(SkipTutorial);
         }
     }
 
