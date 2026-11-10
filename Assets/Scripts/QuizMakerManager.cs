@@ -1039,7 +1039,7 @@ public class QuizMakerManager : MonoBehaviour
         }
 
         //Input Types
-        switch (inputTypeDropdown.value)
+        switch (SelectedInputType)
         {
             case 0: //Indentification
                 entry += "INPUT:IDENTIFICATION\n";
@@ -1227,7 +1227,7 @@ public class QuizMakerManager : MonoBehaviour
             return;
         }
 
-        switch (inputTypeDropdown.value)
+        switch (SelectedInputType)
         {
             case 0: //Identification
                 if (string.IsNullOrEmpty(identificationAnswer.text.Trim()))
