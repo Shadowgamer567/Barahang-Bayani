@@ -877,8 +877,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Ending your Turn will start the Enemies Turn, where your enemies will all
-    take an action against you
+  m_text: Ending your turn will start the Enemies' Turn, where your enemies will
+    all take an Action against you.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -905,7 +905,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 59.6
+  m_fontSize: 58.2
   m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2573,7 +2573,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &119207775
@@ -6124,7 +6124,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: This is the Full Card Display, which better shows the name and image of
-    the card you've selected
+    the card you've selected.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -6193,7 +6193,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &299473365
@@ -10217,7 +10217,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Action Points determine the number of actions you can take
+  m_text: Action Points determine the number of actions you can take.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -10286,7 +10286,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &482231275
@@ -12039,7 +12039,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 427752880}
   m_HandleRect: {fileID: 427752879}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -13400,7 +13400,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: After answering a question, you will be shown the answer to the question
-    for you to learn from
+    for you to learn from.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -18749,8 +18749,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Button will end your turn, press it when you have insufficient Action
-    Points or are out of Cards to play.
+  m_text: This button will end your turn. Press it when you have insufficient Action
+    Points or are out of cards to play.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -18777,7 +18777,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 57.45
+  m_fontSize: 56.55
   m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -18819,7 +18819,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &817227080
@@ -19751,8 +19751,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Answer Correctly, and your card will perform it's effects. Answer Incorrectly,
-    and your card will do nothing and will still spend your action points and use
+  m_text: Answer correctly, and your card will perform it's effects. Answer incorrectly,
+    and your card will do nothing. It will still spend your action points and use
     the card.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -21494,7 +21494,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: pay attention to what effects your applying and win through strategy
+  m_text: Pay attention to what effects you are applying and win through strategy.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -21563,7 +21563,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &931963147
@@ -25683,7 +25683,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Panel displays all the cards that you can play.
+  m_text: This panel displays all the cards that you can play.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -28182,8 +28182,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Each Card has a different effect and cost a different amount of Action
-    Points to play
+  m_text: Each card has a different effect and cost a different amount of Action
+    Points to play.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -28252,7 +28252,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1173470266
@@ -28320,7 +28320,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You can only play a card if you have sufficient Action Points
+  m_text: You can only play a card if you meet the amount of Action Points.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -28389,7 +28389,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1180354996
@@ -29222,7 +29222,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: Remember answers to questions or find answers in the Stories or Modules
-    to have better chances of answering correctly
+    to have better chances of answering correctly.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -29783,8 +29783,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Panel displays the Health of your Heroes. You are defeated if all
-    heroes lose all their Health
+  m_text: This panel displays the health of your heroes. You are defeated if all
+    heroes lose all their health.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -29853,7 +29853,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1207368694
@@ -31836,7 +31836,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: Quiz Cards will ask you a question and you must answer to proceed. They
-    may ask Mutliple Choice, Identification, or True or False questions
+    may ask Mutliple Choice, Identification, or True or False questions.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -33209,7 +33209,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: It also contains information regarding the reference of the card that could
-    be important later
+    be important later.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -33346,7 +33346,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Level will serve as your introduction to the gameplay.
+  m_text: This level will serve as your introduction to the gameplay.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -33750,7 +33750,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Notice how you card has made an effect on either your heroes or enemies
+  m_text: Notice how you card has made an effect on either your heroes or enemies.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -33887,7 +33887,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Select the Card and play it
+  m_text: Select the card and play it.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -36319,7 +36319,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Select or Enter your Answer
+  m_text: Select or Enter your Answer.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -36676,7 +36676,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1426039618
@@ -37498,7 +37498,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You have played a Quiz Card
+  m_text: You have played a Quiz Card.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -42987,7 +42987,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: And will function as your primary mode of learning.
+  m_text: It will also function as your primary mode of learning.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -43200,8 +43200,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: After all Enemies have had their turn, your Action Points will reset to
-    the max and you will be given new cards to play.
+  m_text: After the enemies ended their turn, your Action Points will be reset and
+    you will be given new cards to play.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -43270,7 +43270,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1675816788
@@ -44761,8 +44761,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: However, you must answer a question for them to work, if you answer incorrectly,
-    the card is used but does nothing
+  m_text: However, you must answer a question for them to work. If you answer incorrectly,
+    the card is used but does nothing.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -47902,7 +47902,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Panel Displays your Action Points.
+  m_text: This panel displays your Action Points.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -47971,7 +47971,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1840773476
@@ -49042,7 +49042,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Click the Card to play it
+  m_text: Click the Card to play it.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -49724,8 +49724,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You got a Quiz Card in your hand. These types of cards are often stronger
-    than regular cards-
+  m_text: You got a Quiz Card in your hand! These types of cards are often stronger
+    than regular cards.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -51551,8 +51551,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Panel displays your Enemies Health, The battle can only be won once
-    all enemies are at 0 Health
+  m_text: This panel displays your enemies health. The battle is only won once all
+    enemies are at O Health.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -51579,7 +51579,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 58.55
+  m_fontSize: 60
   m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -51621,7 +51621,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1988423079
@@ -54953,7 +54953,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Select a Card to Play
+  m_text: Select a Card to Play.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -55022,7 +55022,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2121957675

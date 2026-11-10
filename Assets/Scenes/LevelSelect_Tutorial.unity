@@ -177,10 +177,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: You may now return to the campaign select and play the first campaign.
-    Have Fun
+    Have fun!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1388,7 +1388,7 @@ MonoBehaviour:
   m_text: Click Anywhere to Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2336,7 +2336,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 943886253}
   m_HandleRect: {fileID: 943886252}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2532,7 +2532,7 @@ MonoBehaviour:
   m_text: Click Anywhere to Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2669,7 +2669,7 @@ MonoBehaviour:
   m_text: This button will turn to the previous page.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2855,7 +2855,7 @@ MonoBehaviour:
   m_text: Click Anywhere to Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3619,7 +3619,7 @@ MonoBehaviour:
   m_text: Click Anywhere to Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3848,7 +3848,7 @@ MonoBehaviour:
   m_text: Click Anywhere to Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4222,11 +4222,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: On the Right side of the screen, are the levels within the campaign, each
-    level will unlock after completing the level before it.
+  m_text: On the right side of the screen, are the levels in the campaign, each level
+    will unlock after completing the level before it.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4250,7 +4250,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 51.8
+  m_fontSize: 56.1
   m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4292,7 +4292,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &840893148
@@ -4558,11 +4558,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: On the Left Side of the screen, is a module that will display information
-    on characters and events that transpire during their story
+  m_text: On the left side of the screen, is a module that displays information on
+    characters and events that happen in their story.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4586,7 +4586,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 51.8
+  m_fontSize: 56.1
   m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4628,7 +4628,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &845208394
@@ -5856,10 +5856,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'This Completes the Tutorial for Barahang Bayani. '
+  m_text: 'This completes the Tutorial for Barahang Bayani. '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6231,10 +6231,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: This button will turn the page to display other contents regarding this
-    story
+    story.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6300,7 +6300,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1272388289
@@ -6371,7 +6371,7 @@ MonoBehaviour:
   m_text: Click Anywhere to Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7533,10 +7533,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: This is the Level Select Screen. Here you will select the Level you wish
-    to play-
+    to play.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7602,7 +7602,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1463325435
@@ -10634,10 +10634,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Click on the Level to play it
+  m_text: Click on the level to play it.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10703,7 +10703,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2048654515
@@ -10771,10 +10771,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: and display information that may be helpful to you during gameplay.
+  m_text: It will display information that may be helpful to you during gameplay.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10840,7 +10840,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2059848541
