@@ -106,6 +106,9 @@ public class CutsceneManager : MonoBehaviour
         // Spawn or reuse the character.
         GameObject obj = GetOrCreateCharacter(prefabToSpawn, line.isLeftSide, cutsceneCamera);
 
+        // Automatically frame the spawned character.
+        FrameCharacter(obj, cutsceneCamera);
+
         // Play the pose assigned to this dialogue line.
         Animator characterAnimator = obj.GetComponentInChildren<Animator>();
 
@@ -146,6 +149,79 @@ public class CutsceneManager : MonoBehaviour
         animator.Play(stateHash, 0, 0f);
     }
 
+
+    private void FrameCharacter(GameObject character, Camera camera)
+    {
+        Debug.Log(
+        $"FRAME CHARACTER CALLED | " +
+        $"Character: {(character != null ? character.name : "NULL")} | " +
+        $"Camera: {(camera != null ? camera.name : "NULL")}"
+    );
+
+        if (character == null || camera == null)
+        {
+            return;
+        }
+
+        Renderer[] renderers = character.GetComponentsInChildren<Renderer>();
+
+        bool hasBounds = false;
+        Bounds characterBounds = new Bounds();
+
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer == null || !renderer.enabled)
+            {
+                continue;
+            }
+
+            if (!hasBounds)
+            {
+                characterBounds = renderer.bounds;
+                hasBounds = true;
+            }
+
+            else
+            {
+                characterBounds.Encapsulate(renderer.bounds);
+            }
+        }
+
+        if (!hasBounds)
+        {
+            Debug.LogWarning("Cannot frame character: No enabled renderers found.");
+            return;
+        }
+
+        // Calculate the camera distance needed to fit the character.
+        float verticalHalfAngle = camera.fieldOfView * 0.5f * Mathf.Deg2Rad;
+
+        float horizontalHalfAngle = Mathf.Atan(Mathf.Tan(verticalHalfAngle) * camera.aspect);
+
+        float verticalDistance = characterBounds.extents.y / Mathf.Tan(verticalHalfAngle);
+
+        float horizontalDistance = characterBounds.extents.x / Mathf.Tan(horizontalHalfAngle);
+
+        // Add some breathing room around the character.
+        float padding = 1.15f;
+
+        float distance = Mathf.Max(verticalDistance, horizontalDistance) * padding ;
+
+        distance *= 0.9f;
+
+        // Center the camera on the character's bounds.
+        Vector3 center = characterBounds.center;
+
+        camera.transform.position = center - camera.transform.forward * distance;
+
+        Debug.Log(
+    $"FRAMING RESULT | Bounds: {characterBounds.size} | " +
+    $"Distance: {distance} | " +
+    $"New Camera Position: {camera.transform.position}"
+);
+    }
+
+
     public void EndCutscene()
     {
         ClearCutsceneCharacters();
@@ -157,18 +233,13 @@ public class CutsceneManager : MonoBehaviour
         OnCutsceneFinished?.Invoke();
     }
 
-    private GameObject GetOrCreateCharacter(
-    GameObject prefab,
-    bool isLeftSide,
-    Camera cutsceneCamera)
+    private GameObject GetOrCreateCharacter(GameObject prefab, bool isLeftSide, Camera cutsceneCamera)
     {
         Transform spawn = isLeftSide ? leftSpawn : rightSpawn;
 
-        GameObject currentCharacter =
-            isLeftSide ? leftCharacter : rightCharacter;
+        GameObject currentCharacter = isLeftSide ? leftCharacter : rightCharacter;
 
-        GameObject currentPrefab =
-            isLeftSide ? leftCharacterPrefab : rightCharacterPrefab;
+        GameObject currentPrefab = isLeftSide ? leftCharacterPrefab : rightCharacterPrefab;
 
         // Reuse the existing character if it matches the requested prefab.
         if (currentCharacter != null && currentPrefab == prefab)
@@ -190,15 +261,13 @@ public class CutsceneManager : MonoBehaviour
         // Face the appropriate cutscene camera.
         if (cutsceneCamera != null)
         {
-            Vector3 direction =
-                cutsceneCamera.transform.position - obj.transform.position;
+            Vector3 direction = cutsceneCamera.transform.position - obj.transform.position;
 
             direction.y = 0f;
 
             if (direction.sqrMagnitude > 0.001f)
             {
-                obj.transform.rotation =
-                    Quaternion.LookRotation(direction);
+                obj.transform.rotation = Quaternion.LookRotation(direction);
             }
         }
 
@@ -209,8 +278,7 @@ public class CutsceneManager : MonoBehaviour
         {
             if (cutsceneAnimatorController != null)
             {
-                animator.runtimeAnimatorController =
-                    cutsceneAnimatorController;
+                animator.runtimeAnimatorController = cutsceneAnimatorController;
             }
 
             animator.updateMode = AnimatorUpdateMode.UnscaledTime;
