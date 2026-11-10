@@ -10,7 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51a7dbb6f5fe40e4692f7f58e2facbb0, type: 3}
-  m_Name: 4
+  m_Name: Blumentritt
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
-  heroName: Gregorio Del Pillar
+  heroName: Blumentritt
   maxHp: 40
+  shield: 0
+  maxShield: 0
+  prefab: {fileID: 8609954007204539932, guid: 57f9fb4c596c00548989a7da5ca6433a, type: 3}
+  modelRotationOffset: {x: 0, y: 0, z: 0}
+  modelPositionOffset: {x: 0, y: 0.75, z: 0}
+  customCards: []
+  customCardBackground: {fileID: 21300000, guid: 6aee0d2f39a205f4eb4d483164ebffb6, type: 3}
