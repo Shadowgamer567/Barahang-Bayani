@@ -152,12 +152,6 @@ public class CutsceneManager : MonoBehaviour
 
     private void FrameCharacter(GameObject character, Camera camera)
     {
-        Debug.Log(
-        $"FRAME CHARACTER CALLED | " +
-        $"Character: {(character != null ? character.name : "NULL")} | " +
-        $"Camera: {(camera != null ? camera.name : "NULL")}"
-    );
-
         if (character == null || camera == null)
         {
             return;
@@ -207,18 +201,12 @@ public class CutsceneManager : MonoBehaviour
 
         float distance = Mathf.Max(verticalDistance, horizontalDistance) * padding ;
 
-        distance *= 0.9f;
+        distance *= 0.92f;
 
         // Center the camera on the character's bounds.
         Vector3 center = characterBounds.center;
 
         camera.transform.position = center - camera.transform.forward * distance;
-
-        Debug.Log(
-    $"FRAMING RESULT | Bounds: {characterBounds.size} | " +
-    $"Distance: {distance} | " +
-    $"New Camera Position: {camera.transform.position}"
-);
     }
 
 
