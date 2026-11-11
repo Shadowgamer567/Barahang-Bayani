@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: RizalCampaign
   m_EditorClassIdentifier: Assembly-CSharp::BackgroundSet
   campaignName: RizalCampaign
-  campaignQuizFile: {fileID: 4900000, guid: 5cc20c1c5cdf45848be7935966f3ca6d, type: 3}
-  campaignQuizInfoFile: {fileID: 4900000, guid: 04fb65388f6bfc141a2d03c98242b32d, type: 3}
+  campaignQuizFile: {fileID: 4900000, guid: a462e0b8cd3fedf4b8577f4ab1a58d73, type: 3}
+  campaignQuizInfoFile: {fileID: 4900000, guid: 18c3d1f3c8f80234e9c71c7f6091683e, type: 3}
   generalCards:
   - {fileID: 11400000, guid: ee10609edaff58d46b1ca082abca5c90, type: 2}
   levelsRanges:

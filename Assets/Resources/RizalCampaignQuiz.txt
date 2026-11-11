@@ -1,0 +1,186 @@
+ID:RIZALCAMPAIGNQUIZ1
+1. Who among these is Jose Rizal's sister?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Josephine
+B. Teodora
+C. Leonore
+D. Saturnina "C"
+
+ID:RIZALCAMPAIGNQUIZ2
+2. At what age did Concepcion Rizal or Concha pass away from her illness?
+TYPE:IMAGE:
+INPUT:IDENTIFICATION
+A. Three "C"
+B.
+C.
+D.
+
+ID:RIZALCAMPAIGNQUIZ3
+3. Where did Jose Rizal go in June of 1868?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Calamba, Laguna
+B. Antipolo, Manila "C"
+C. Quezon City
+D. Sta. Cruz, Laguna
+
+ID:RIZALCAMPAIGNQUIZ4
+4. What books did Jose Rizal convince his father to buy?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Universal History "C"
+B. Crime and Punishment
+C. El Filibusterismo
+D. Divine Comedy
+
+ID:RIZALCAMPAIGNQUIZ5
+5. Did Jose Rizal die on December 30, 1896?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+ID:RIZALCAMPAIGNQUIZ6
+6. Is Jose Rizal a National Hero?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+ID:RIZALCAMPAIGNQUIZ7
+7. What is the title of Jose Rizal's last poem?
+TYPE:IMAGE:
+INPUT:IDENTIFICATION
+A. Mi Ultimo Adios "C"
+B.
+C.
+D.
+
+ID:RIZALCAMPAIGNQUIZ8
+8. Which of these novels did Jose Rizal write?
+TYPE:IMAGE:
+INPUT:MULTIPLE_SELECT
+A. The Metamorphosis
+B. El Filibusterismo "C"
+C. Noli Me Tangere "C"
+D. The Plague
+
+ID:RIZALCAMPAIGNQUIZ9
+9. Where was Jose Rizal born?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Sta. Ana, Manila
+B. Cainta, Rizal
+C. Calamba, Laguna "C"
+D. Sta. Cruz, Laguna
+
+ID:RIZALCAMPAIGNQUIZ10
+10. What is Jose Rizal's main profession?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Engineer
+B. Doctor "C"
+C. Soldier
+D. Sailor
+
+ID:RIZALCAMPAIGNQUIZ11
+11. Did Jose Rizal treat his mother's blindness?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+ID:RIZALCAMPAIGNQUIZ12
+12. Who among these were members of La Solidaridad?
+TYPE:IMAGE:
+INPUT:MULTIPLE_SELECT
+A. Jose Rizal "C"
+B. Graciano Lopez Jaena "C"
+C. Ferdinand Marcos
+D. Marcelo Del Pilar "C"
+
+ID:RIZALCAMPAIGNQUIZ13
+13. Was Jose Rizal executed by Spaniards?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSE
+
+ID:RIZALCAMPAIGNQUIZ14
+14. When is Rizal Day celebrated?
+TYPE:IMAGE:
+INPUT:IDENTIFICATION
+A. December 30 "C"
+B.
+C.
+D.
+
+ID:RIZALCAMPAIGNQUIZ15
+15. Where was Jose Rizal exiled?
+TYPE:IMAGE:
+INPUT:IDENTIFICATION
+A. Dapitan "C"
+B.
+C.
+D.
+
+ID:RIZALCAMPAIGNQUIZ16
+16. Is Bagumbayan called Luneta Park?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:TRUE
+
+ID:RIZALCAMPAIGNQUIZ17
+17. Was Dona Teodora rightfully imprisoned?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSE
+
+ID:RIZALCAMPAIGNQUIZ18
+18. Where was Dona Teodora imprisoned?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Santa Cruz, Manila
+B. Fort Santiago
+C. Manila City Jail
+D. Santa Cruz, Laguna "C"
+
+ID:RIZALCAMPAIGNQUIZ19
+19. Who is Jose Rizal's only brother?
+TYPE:IMAGE:
+INPUT:IDENTIFICATION
+A. Paciano Rizal "C"
+B.
+C.
+D.
+
+ID:RIZALCAMPAIGNQUIZ20
+20. Who among these are Jose Rizal's siblings?
+TYPE:IMAGE:
+INPUT:MULTIPLE_SELECT
+A. Saturnina "C"
+B. Trinidad "C"
+C. Juancho
+D. Alberto
+
+ID:RIZALCAMPAIGNQUIZ21
+21. Who is Jose Rizal's closest friend?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Jose Burgos
+B. Manuel Masigan
+C. Ferdinand Blumentritt "C"
+D. Arturo Camps
+
+ID:RIZALCAMPAIGNQUIZ22
+22. Who among these is Dona Teodora's brother?
+TYPE:IMAGE:
+INPUT:MULTIPLE_CHOICE
+A. Jose Bech
+B. Justiniano Cruz
+C. Francisco Mercado
+D. Jose Alberto "C"
+
+ID:RIZALCAMPAIGNQUIZ23
+23. Did Jose Rizal go to South Africa?
+TYPE:IMAGE:
+INPUT:TRUE_OR_FALSE
+ANSWER:FALSE
+
