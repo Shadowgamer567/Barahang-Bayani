@@ -29,6 +29,7 @@ public class AccountManager : MonoBehaviour
     public TMP_InputField classroomNameInput;
 
     private AccountType pendingAccountType;
+    private bool hasPreviousCreateAccountState;
 
     public static AccountManager Instance;
 
@@ -643,6 +644,7 @@ public class AccountManager : MonoBehaviour
             recoveryCodeText.text = pendingRecoveryCode;
 
             accountRecoveryDisplay.SetActive(true);
+            backButton.SetActive(false);
 
             Debug.Log("Account created. Recovery code displayed.");
         }
@@ -673,6 +675,7 @@ public class AccountManager : MonoBehaviour
         accountRecoveryDisplay.SetActive(false);
 
         createAccountPanel.SetActive(false);
+        hasPreviousCreateAccountState = false;
 
         accountSelectPanel.SetActive(true);
 
@@ -1216,24 +1219,18 @@ public class AccountManager : MonoBehaviour
 
     public void OpenCreateStudentMenu()
     {
-        pendingAccountType = AccountType.Student;
-
-        accountSelectPanel.SetActive(false);
-
-        accountManagementPanel.SetActive(false);
-
-        accountRecoveryDisplay.SetActive(false);
-
-        createAccountPanel.SetActive(true);
-
-        classroomPanel.SetActive(false);
-
-        backButton.SetActive(false);
+        OpenCreateAccountMenu(AccountType.Student);
     }
 
     public void OpenCreateTeacherMenu()
     {
-        pendingAccountType = AccountType.Teacher;
+        OpenCreateAccountMenu(AccountType.Teacher);
+    }
+
+    private void OpenCreateAccountMenu(AccountType type)
+    {
+        pendingAccountType = type;
+        hasPreviousCreateAccountState = true;
 
         accountSelectPanel.SetActive(false);
 
@@ -1245,7 +1242,53 @@ public class AccountManager : MonoBehaviour
 
         classroomPanel.SetActive(false);
 
-        backButton.SetActive(false);
+        backButton.SetActive(true);
+        SetAccountBackdropVisible(true);
+    }
+
+    private void ReturnToAccountMenuFromCreate()
+    {
+        if (createAccountPanel == null || !createAccountPanel.activeSelf)
+        {
+            return;
+        }
+
+        createAccountPanel.SetActive(false);
+
+        accountSelectPanel.SetActive(true);
+        accountManagementPanel.SetActive(true);
+        classroomPanel.SetActive(true);
+        backButton.SetActive(true);
+        SetAccountBackdropVisible(true);
+        hasPreviousCreateAccountState = false;
+    }
+
+    private BackdropHandler GetAccountBackdropHandler()
+    {
+        if (accountManagementPanel == null)
+        {
+            Debug.LogError("Account management panel is not assigned.", this);
+            return null;
+        }
+
+        BackdropHandler backdropHandler =
+            accountManagementPanel.GetComponentInChildren<BackdropHandler>(true);
+
+        if (backdropHandler == null)
+        {
+            Debug.LogError("Account management panel requires a BackdropHandler.", accountManagementPanel);
+        }
+
+        return backdropHandler;
+    }
+
+    private void SetAccountBackdropVisible(bool visible)
+    {
+        BackdropHandler backdropHandler = GetAccountBackdropHandler();
+        if (backdropHandler != null)
+        {
+            backdropHandler.SetBackdropVisible(visible);
+        }
     }
 
     public void OpenTeacherInfo(AccountCardUI card)
@@ -1429,6 +1472,16 @@ public class AccountManager : MonoBehaviour
         // Do not handle Back while the Options menu is open.
         if (MainMenu.IsOptionsMenuOpen)
         {
+            return;
+        }
+
+        if (createAccountPanel != null && createAccountPanel.activeSelf)
+        {
+            if (hasPreviousCreateAccountState)
+            {
+                ReturnToAccountMenuFromCreate();
+            }
+
             return;
         }
 
@@ -2438,13 +2491,6 @@ public class AccountManager : MonoBehaviour
 
         accountBtn.onClick.AddListener(OpenAccountMenu);
 
-
-        // Back Button
-        Button backBtn = backButton.GetComponent<Button>();
-
-        backBtn.onClick.RemoveAllListeners();
-
-        backBtn.onClick.AddListener(CloseAccountMenu);
 
         // Open Account Recovery
         accountRecoveryButton.onClick.RemoveAllListeners();
