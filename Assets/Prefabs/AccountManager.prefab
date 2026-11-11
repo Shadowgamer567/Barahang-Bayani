@@ -49,15 +49,52 @@ MonoBehaviour:
   selectedCard: {fileID: 0}
   selectedAccount:
     id: 
+    classroomID: 
     username: 
+    passwordHash: 
+    recoveryCodeHash: 
+    recoveryCodeEnabled: 0
     accountType: 0
+    assignedStudentIDs: []
   accountCardPrefab: {fileID: 7045330002664947850, guid: a4c1e7dc84661374bb58f4691b8f3341, type: 3}
   usernameInputField: {fileID: 0}
+  passwordInputField: {fileID: 0}
+  classroomNameInput: {fileID: 0}
   accountButton: {fileID: 0}
   backButton: {fileID: 0}
   accountSelectPanel: {fileID: 0}
   accountManagementPanel: {fileID: 0}
   createAccountPanel: {fileID: 0}
   mainMenu: {fileID: 0}
+  classroomPanel: {fileID: 0}
+  classroomSelectionPanel: {fileID: 0}
+  classroomCreationPanel: {fileID: 0}
+  waitSyncPanel: {fileID: 0}
+  syncInputBlocker: {fileID: 0}
+  teacherInfoPanel: {fileID: 0}
+  studentInfoPanel: {fileID: 0}
+  assignStudentsButton: {fileID: 0}
+  confirmAssignButton: {fileID: 0}
+  teacherNameText: {fileID: 0}
+  teacherSectionText: {fileID: 0}
+  teacherProgressText: {fileID: 0}
+  teacherMetricsText: {fileID: 0}
+  assignedStudentContainer: {fileID: 0}
+  completedLevelsText: {fileID: 0}
+  quizStatsText: {fileID: 0}
   registry:
     accounts: []
+  loginPanel: {fileID: 0}
+  loginPasswordInput: {fileID: 0}
+  loginUsernameText: {fileID: 0}
+  cardDeck: {fileID: 0}
+  accountRecoveryDisplay: {fileID: 0}
+  recoveryCodeText: {fileID: 0}
+  confirmRecoveryCodeButton: {fileID: 0}
+  accountRecoveryPanel: {fileID: 0}
+  accountRecoveryButton: {fileID: 0}
+  cancelAccountRecoveryButton: {fileID: 0}
+  recoveryCodeInputField: {fileID: 0}
+  newPasswordInputField: {fileID: 0}
+  confirmPasswordInputField: {fileID: 0}
+  confirmAccountRecoveryButton: {fileID: 0}

@@ -32,6 +32,8 @@ public class AccountManager : MonoBehaviour
 
     public static AccountManager Instance;
 
+    private QuizMakerFeedback accountFeedback;
+
     [Header("Panels")]
     public GameObject accountButton;
     public GameObject backButton;
@@ -201,6 +203,7 @@ public class AccountManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(username))
         {
             Debug.LogWarning("No Username Entered");
+            accountFeedback?.ShowFeedback("Please enter a username.");
             return Task.FromResult(false);
         }
 
@@ -209,6 +212,7 @@ public class AccountManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(password))
         {
             Debug.LogWarning("No Password Entered");
+            accountFeedback?.ShowFeedback("Please enter a password.");
             return Task.FromResult(false);
         }
 
@@ -249,9 +253,7 @@ public class AccountManager : MonoBehaviour
             // Only expose the recovery code after local saving succeeds.
             pendingRecoveryCode = recoveryCode;
 
-            Debug.Log(
-                "Created account locally: " + newAccount.username
-            );
+            Debug.Log("Created account locally: " + newAccount.username);
         }
         catch (System.Exception ex)
         {
@@ -259,10 +261,8 @@ public class AccountManager : MonoBehaviour
 
             pendingRecoveryCode = null;
 
-            Debug.LogError(
-                "Failed to save account locally: " + ex.Message
-            );
-
+            Debug.LogError("Failed to save account locally: " + ex.Message);
+            accountFeedback?.ShowFeedback("Account creation failed. Please try again.");
             return Task.FromResult(false);
         }
 
@@ -785,11 +785,8 @@ public class AccountManager : MonoBehaviour
 
         if (IsAccountPendingDeletion(pendingLoginAccount.id))
         {
-            Debug.LogWarning(
-                "Cannot log into account because deletion is pending: " +
-                pendingLoginAccount.id
-            );
-
+            Debug.LogWarning("Cannot log into account because deletion is pending: " + pendingLoginAccount.id);
+            accountFeedback?.ShowFeedback("This account is pending deletion and cannot be accessed.");
             return;
         }
 
@@ -799,6 +796,7 @@ public class AccountManager : MonoBehaviour
         if (enteredHash != pendingLoginAccount.passwordHash)
         {
             Debug.Log("Incorrect Password");
+            accountFeedback?.ShowFeedback("Incorrect password. Please try again.");
             return;
         }
 
@@ -2384,6 +2382,8 @@ public class AccountManager : MonoBehaviour
 
         waitSyncPanel = ui.waitSyncPanel;
         syncInputBlocker = ui.syncInputBlocker;
+
+        accountFeedback = ui.accountFeedback;
 
         mainMenu = ui.mainMenu;
 

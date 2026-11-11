@@ -161,7 +161,6 @@ public class QuizInfoMakerManager : MonoBehaviour
         {
             ShowQuizInfoFeedback("No Quiz Info file path selected.");
             return;
-            
         }
 
         StringBuilder builder = new StringBuilder();
@@ -296,7 +295,9 @@ public class QuizInfoMakerManager : MonoBehaviour
         );
 
         if (paths.Length == 0 || string.IsNullOrEmpty(paths[0]))
+        {
             return;
+        }
 
         try
         {
@@ -335,11 +336,10 @@ public class QuizInfoMakerManager : MonoBehaviour
 
             entry.SetImagePath("Images/" + fileName);
 
-            Debug.Log(
-                "Quiz Info image imported for " +
-                entry.QuestionID + ": " + entry.ImagePath
-            );
+            Debug.Log("Quiz Info image imported for " + entry.QuestionID + ": " + entry.ImagePath);
+            ShowQuizInfoFeedback("Failed to import Quiz Info image.");
         }
+
         catch (Exception ex)
         {
             Debug.LogError("Failed to import Quiz Info image: " + ex.Message);

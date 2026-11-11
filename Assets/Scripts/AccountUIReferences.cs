@@ -19,6 +19,9 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject waitSyncPanel;
     public GameObject syncInputBlocker;
 
+    [Header("Account Feedback")]
+    public QuizMakerFeedback accountFeedback;
+
     [Header("Teacher Monitoring")]
     public GameObject assignStudentsButton;
     public GameObject confirmAssignButton;
