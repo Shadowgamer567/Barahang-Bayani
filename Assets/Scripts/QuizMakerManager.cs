@@ -15,6 +15,9 @@ public class QuizMakerManager : MonoBehaviour
     public GameObject waitSyncPanel;
     public GameObject syncInputBlocker;
 
+    [Header("Feedback")]
+    public QuizMakerFeedback feedback;
+
     [Header("Quiz Selection")]
     public GameObject currentQuizPanel;
     public TMP_Text currentQuizText;
@@ -278,30 +281,25 @@ public class QuizMakerManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(quizName))
         {
-            Debug.LogWarning("Quiz Name is Empty");
+            ShowQuizMakerFeedback("Quiz Name is Empty");
             return;
         }
 
         // Prevent invalid folder and file names.
         if (quizName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||quizName == "." || quizName == "..")
         {
-            Debug.LogWarning("Quiz name contains invalid characters.");
+            ShowQuizMakerFeedback("Quiz name contains invalid characters.");
             return;
         }
 
 
         // Every Quiz Package belongs to the active Classroom.
-        string classroomID =
-            DatabaseManager.Instance != null
-                ? DatabaseManager.Instance.CurrentDatabase
-                : null;
+        string classroomID =DatabaseManager.Instance != null ? DatabaseManager.Instance.CurrentDatabase : null;
 
         if (string.IsNullOrWhiteSpace(classroomID) ||
             classroomID == "DefaultDatabase")
         {
-            Debug.LogWarning(
-                "Select a Classroom before creating a Quiz Package."
-            );
+            ShowQuizMakerFeedback("Select a Classroom before creating a Quiz Package.");
             return;
         }
 
@@ -329,7 +327,7 @@ public class QuizMakerManager : MonoBehaviour
             // Don't accidentally reuse or overwrite an existing package.
             if (Directory.Exists(packageFolder))
             {
-                Debug.LogWarning("A Quiz Package with this name already exists: " + quizName);
+                ShowQuizMakerFeedback("A Quiz Package with this name already exists: " + quizName);
                 {
                     return;
                 }
@@ -350,9 +348,10 @@ public class QuizMakerManager : MonoBehaviour
 
             Debug.Log("Successfully created Quiz Package: " +packageFolder);
         }
+
         catch (System.Exception ex)
         {
-            Debug.LogError("Failed to create Quiz Package: " + ex.Message);
+            ShowQuizMakerFeedback("Failed to create the Quiz Package. Please try again.");
         }
     }
 
@@ -1200,14 +1199,14 @@ public class QuizMakerManager : MonoBehaviour
         //Validate Quiz file is selected
         if (string.IsNullOrEmpty(SelectedQuizPath))
         {
-            Debug.LogWarning("No Quiz Selected");
+            ShowQuizMakerFeedback("Please select a quiz first.");
             return;
         }
 
         //Validate Quiz file exists
         if (!File.Exists(selectedQuizPath))
         {
-            Debug.LogWarning("Selected Quiz File Does not exist");
+            ShowQuizMakerFeedback("The selected quiz file could not be found.");
             return;
         }
 
@@ -1216,14 +1215,13 @@ public class QuizMakerManager : MonoBehaviour
         //Check if Question is empty or null
         if (string.IsNullOrEmpty(question))
         {
-            Debug.LogWarning("Question is Empty");
+            ShowQuizMakerFeedback("Please enter a question.");
             return;
         }
 
         if (questionTypeDropdown.value == 0 || inputTypeDropdown.value == 0)
         {
-            Debug.LogWarning( "Please select both a Question Type and an Input Type.");
-
+            ShowQuizMakerFeedback("Please select both a Question Type and an Input Type.");
             return;
         }
 
@@ -1232,7 +1230,7 @@ public class QuizMakerManager : MonoBehaviour
             case 0: //Identification
                 if (string.IsNullOrEmpty(identificationAnswer.text.Trim()))
                 {
-                    Debug.LogWarning("Identification Answer is empty or Null");
+                    ShowQuizMakerFeedback("Please provide an identification answer.");
                     return;
                 }
 
@@ -1245,7 +1243,7 @@ public class QuizMakerManager : MonoBehaviour
                     string.IsNullOrEmpty(AnswerC.text.Trim()) ||
                     string.IsNullOrEmpty(AnswerD.text.Trim()))
                 {
-                    Debug.LogWarning("All multiple choice answers must be filled.");
+                    ShowQuizMakerFeedback("Please fill in all four multiple-choice answers.");
                     return;
                 }
 
@@ -1262,8 +1260,7 @@ public class QuizMakerManager : MonoBehaviour
                     string.IsNullOrWhiteSpace(AnswerC.text) ||
                     string.IsNullOrWhiteSpace(AnswerD.text))
                 {
-                    Debug.LogWarning( "All Multiple Select answers must be filled.");
-
+                    ShowQuizMakerFeedback("Please fill in all four multiple-select answers.");
                     return;
                 }
 
@@ -1280,7 +1277,7 @@ public class QuizMakerManager : MonoBehaviour
 
                 if (correctCount < 2)
                 {
-                    Debug.LogWarning("Multiple Select requires at least two correct answers.");
+                    ShowQuizMakerFeedback("Multiple Select requires at least two correct answers.");
 
                     return;
                 }
@@ -1289,7 +1286,7 @@ public class QuizMakerManager : MonoBehaviour
             case 4: // Fill in the Blank
                 if (string.IsNullOrWhiteSpace(identificationAnswer.text))
                 {
-                    Debug.LogWarning("Fill in the Blank requires a correct answer.");
+                    ShowQuizMakerFeedback("Please provide the correct answer for the Fill in the Blank question.");
                     return;
                 }
 
@@ -1297,7 +1294,7 @@ public class QuizMakerManager : MonoBehaviour
 
                 if (blankCount != 1)
                 {
-                    Debug.LogWarning("Fill in the Blank requires exactly one ____ placeholder.");
+                    ShowQuizMakerFeedback("Fill in the Blank requires exactly one '____' placeholder in the question.");
                     return;
                 }
 
@@ -1337,6 +1334,17 @@ public class QuizMakerManager : MonoBehaviour
         ClearQuestionFields();
     }
 
+    private void ShowQuizMakerFeedback(string message)
+    {
+        Debug.LogWarning(message);
+
+        if (feedback != null)
+        {
+            feedback.ShowFeedback(message);
+        }
+    }
+
+
     private class RemoveQuestionData
     {
         public string id;
@@ -1350,9 +1358,8 @@ public class QuizMakerManager : MonoBehaviour
         public string answerD;
 
         public string trueFalseAnswer;
-
-
     }
+
     private System.Collections.Generic.List<RemoveQuestionData> ParseQuestionsForRemoval()
     {
         System.Collections.Generic.List<RemoveQuestionData> result = new System.Collections.Generic.List<RemoveQuestionData>();
