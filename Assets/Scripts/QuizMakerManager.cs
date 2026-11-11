@@ -1,9 +1,11 @@
+using Firebase.Firestore;
+using SFB;
 using System.IO;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using SFB;
-using Firebase.Firestore;
+using static UnityEngine.Rendering.ReloadAttribute;
 
 public class QuizMakerManager : MonoBehaviour
 {
@@ -359,7 +361,7 @@ public class QuizMakerManager : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(selectedQuizPath))
         {
-            Debug.LogWarning("No Quiz selected for deletion.");
+            ShowQuizMakerFeedback("No Quiz selected for deletion. Please select a Quiz Package before deleting it");
             return;
         }
 
@@ -371,7 +373,7 @@ public class QuizMakerManager : MonoBehaviour
             "questions",
             System.StringComparison.OrdinalIgnoreCase))
         {
-            Debug.LogWarning("Default Questions.txt cannot be deleted.");
+            ShowQuizMakerFeedback("Default Questions file cannot be deleted.");
             return;
         }
 
@@ -394,26 +396,17 @@ public class QuizMakerManager : MonoBehaviour
         string originalPath = selectedQuizPath;
         string packageID = Path.GetFileNameWithoutExtension(originalPath);
 
-        if (string.Equals(
-            packageID,
-            "questions",
-            System.StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(packageID, "questions", System.StringComparison.OrdinalIgnoreCase))
         {
-            Debug.LogWarning("Default Questions.txt cannot be deleted.");
+            ShowQuizMakerFeedback("Default Questions.txt cannot be deleted.");
             return;
         }
 
-        string classroomID =
-            DatabaseManager.Instance != null
-                ? DatabaseManager.Instance.CurrentDatabase
-                : null;
+        string classroomID = DatabaseManager.Instance != null ? DatabaseManager.Instance.CurrentDatabase : null;
 
-        if (string.IsNullOrWhiteSpace(classroomID) ||
-            classroomID == "DefaultDatabase")
+        if (string.IsNullOrWhiteSpace(classroomID) || classroomID == "DefaultDatabase")
         {
-            Debug.LogWarning(
-                "Select a Classroom before deleting a Quiz Package."
-            );
+            ShowQuizMakerFeedback("Select a Classroom before deleting a Quiz Package.");
             return;
         }
 
@@ -444,38 +437,27 @@ public class QuizMakerManager : MonoBehaviour
                 Path.GetFullPath(expectedQuizFile),
                 System.StringComparison.OrdinalIgnoreCase))
         {
-            Debug.LogWarning(
-                "Deletion blocked: Selected file is not inside " +
-                "the expected Classroom Quiz Package folder."
-            );
+            ShowQuizMakerFeedback("This Quiz Package cannot be deleted from the current Classroom.");
             return;
         }
 
-        if (!Directory.Exists(expectedFolder) ||
-            !File.Exists(expectedQuizFile))
+        if (!Directory.Exists(expectedFolder) || !File.Exists(expectedQuizFile))
         {
-            Debug.LogWarning(
-                "Deletion blocked: Quiz Package files are missing."
-            );
+            ShowQuizMakerFeedback("The Quiz Package files could not be found.");
             return;
         }
 
-        QuizPackageUploadManager uploadManager =
-            FindFirstObjectByType<QuizPackageUploadManager>();
+        QuizPackageUploadManager uploadManager = FindFirstObjectByType<QuizPackageUploadManager>();
 
         if (uploadManager == null)
         {
-            Debug.LogError(
-                "Deletion blocked: QuizPackageUploadManager not found."
-            );
+            ShowQuizMakerFeedback("Unable to delete the Quiz Package. Please try again later.");
             return;
         }
 
         if (uploadManager.IsUploading)
         {
-            Debug.LogWarning(
-                "Deletion blocked: A Quiz Package upload is currently running."
-            );
+            ShowQuizMakerFeedback("Please wait for the current upload to finish before deleting a Quiz Package.");
             return;
         }
 
@@ -523,9 +505,9 @@ public class QuizMakerManager : MonoBehaviour
 
                 if (!markedDeleted)
                 {
-                    Debug.LogWarning(
-                        "Deletion cancelled: Firestore did not confirm deletion."
-                    );
+                    Debug.LogWarning("Deletion cancelled: Firestore did not confirm deletion.");
+                    ShowQuizMakerFeedback("The Quiz Package could not be deleted. Please try again.");
+
                     return;
                 }
             }
@@ -550,10 +532,8 @@ public class QuizMakerManager : MonoBehaviour
 
                 if (!markedDeleted)
                 {
-                    Debug.LogWarning(
-                        "Deletion cancelled: Firestore could not confirm " +
-                        "that this is a local-only Quiz Package."
-                    );
+                    Debug.LogWarning("Deletion cancelled: Firestore could not confirm " +"that this is a local-only Quiz Package.");
+                    ShowQuizMakerFeedback("The Quiz Package could not be deleted. Please try again.");
                     return;
                 }
 
@@ -571,10 +551,8 @@ public class QuizMakerManager : MonoBehaviour
                 selectedQuizPath != originalPath ||
                 SelectedQuizFilePath != originalPath)
             {
-                Debug.LogWarning(
-                    "Local deletion cancelled: The active Classroom " +
-                    "or selected Quiz Package changed during deletion."
-                );
+                Debug.LogWarning("Local deletion cancelled: The active Classroom " +"or selected Quiz Package changed during deletion.");
+                ShowQuizMakerFeedback("The Classroom or selected Quiz Package changed. Please try again.");
                 return;
             }
 
@@ -583,10 +561,8 @@ public class QuizMakerManager : MonoBehaviour
 
             if (!QuizPackageSyncManager.Delete(classroomID, packageID))
             {
-                Debug.LogWarning(
-                    "Quiz Package deleted, but local synchronization " +
-                    "metadata could not be removed."
-                );
+                Debug.LogWarning("Quiz Package deleted, but local synchronization " + "metadata could not be removed.");
+                ShowQuizMakerFeedback("Quiz Package deleted, but its local synchronization data could not be cleared.");
             }
 
             if (selectedQuizPath == originalPath)
@@ -599,12 +575,13 @@ public class QuizMakerManager : MonoBehaviour
                 packageID
             );
         }
+
         catch (System.Exception ex)
         {
-            Debug.LogError(
-                "Quiz Package deletion failed: " + ex
-            );
+            Debug.LogError("Quiz Package deletion failed: " + ex);
+            ShowQuizMakerFeedback("An error occurred while deleting the Quiz Package.");
         }
+
         finally
         {
             isDeletingQuiz = false;
@@ -615,7 +592,7 @@ public class QuizMakerManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(selectedQuizPath))
         {
-            Debug.LogWarning("No Quiz Selected");
+            ShowQuizMakerFeedback("No Quiz Selected");
             return;
         }
 
@@ -624,7 +601,7 @@ public class QuizMakerManager : MonoBehaviour
         // Don't allow the default quiz to be deleted
         if (fileName.ToLower() == "questions")
         {
-            Debug.LogWarning("Questions.txt cannot be deleted.");
+            ShowQuizMakerFeedback("Questions.txt cannot be deleted.");
             return;
         }
 
@@ -646,13 +623,13 @@ public class QuizMakerManager : MonoBehaviour
     {
         if(selectedQuestion.Count == 0)
         {
-            Debug.LogWarning("No questions selected for deletion");
+            ShowQuizMakerFeedback("No questions selected for deletion");
             return;
         }
 
         if (string.IsNullOrEmpty(selectedQuizPath))
         {
-            Debug.LogWarning("Selected Quiz File Does Not Exist");
+            ShowQuizMakerFeedback("Selected Quiz File Does Not Exist");
             return;
         }
 
