@@ -4488,8 +4488,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 598.5337, y: 0.516449}
-  m_SizeDelta: {x: 700.593, y: 272.77}
+  m_AnchoredPosition: {x: 568.44556, y: 0.516449}
+  m_SizeDelta: {x: 640.417, y: 272.77}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &187123700
 MonoBehaviour:
@@ -4543,7 +4543,7 @@ MonoBehaviour:
   m_InputType: 0
   m_AsteriskChar: 42
   m_KeyboardType: 0
-  m_LineType: 0
+  m_LineType: 1
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
   m_CharacterValidation: 0
@@ -19438,7 +19438,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 32.75, y: -116.59003}
-  m_SizeDelta: {x: 2092.5, y: 300}
+  m_SizeDelta: {x: 1856.7, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &698382347
 MonoBehaviour:
@@ -21141,7 +21141,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 57.15
+  m_fontSize: 47.25
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -21690,8 +21690,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 378.57782, y: 48.53279}
-  m_SizeDelta: {x: 613.73, y: 68.803}
+  m_AnchoredPosition: {x: 327.17, y: 48.53279}
+  m_SizeDelta: {x: 510.91, y: 68.803}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &744361238
 MonoBehaviour:
@@ -21916,7 +21916,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 57
+  m_fontSize: 50.9
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -21955,7 +21955,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 83.71721, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -26691,7 +26691,7 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 50
   m_fontStyle: 0
@@ -26705,7 +26705,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 3
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -29296,8 +29296,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 378.57727, y: -58.09828}
-  m_SizeDelta: {x: 613.728, y: 90}
+  m_AnchoredPosition: {x: 327.17, y: -58.09828}
+  m_SizeDelta: {x: 510.9, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1057084530
 MonoBehaviour:
@@ -29347,10 +29347,10 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontSize: 72
-  m_fontSizeBase: 36
+  m_fontSizeBase: 0
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 45
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -33062,7 +33062,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 619242219}
   m_HandleRect: {fileID: 619242218}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -33588,6 +33588,7 @@ MonoBehaviour:
   quizInfoMakerPanel: {fileID: 496037984}
   backButton: {fileID: 510333050}
   quizSelectButton: {fileID: 927621568}
+  feedback: {fileID: 8230108116}
   entryTemplate: {fileID: 698382349}
   entryContent: {fileID: 1800435382}
   confirmEntryButton: {fileID: 193301393}
@@ -38727,8 +38728,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 378.57825, y: -11.032776}
-  m_SizeDelta: {x: 613.73, y: 90}
+  m_AnchoredPosition: {x: 327.16602, y: -11.032776}
+  m_SizeDelta: {x: 510.906, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1452634903
 MonoBehaviour:
@@ -47700,8 +47701,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
   m_Padding:
-    m_Left: 10
-    m_Right: 10
+    m_Left: 0
+    m_Right: 0
     m_Top: 10
     m_Bottom: 10
   m_ChildAlignment: 0

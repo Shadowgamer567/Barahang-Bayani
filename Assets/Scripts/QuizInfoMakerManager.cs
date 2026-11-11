@@ -16,6 +16,9 @@ public class QuizInfoMakerManager : MonoBehaviour
     public GameObject backButton;
     public GameObject quizSelectButton;
 
+    [Header("Feedback")]
+    public QuizMakerFeedback feedback;
+
     [Header("Entry Generation")]
     public QuizInfoEntryUI entryTemplate;
     public Transform entryContent;
@@ -46,13 +49,10 @@ public class QuizInfoMakerManager : MonoBehaviour
     {
         currentQuizPath = QuizMakerManager.SelectedQuizFilePath;
 
-        if (string.IsNullOrEmpty(currentQuizPath) ||
-            !File.Exists(currentQuizPath))
+        if (string.IsNullOrEmpty(currentQuizPath) || !File.Exists(currentQuizPath))
         {
-            Debug.LogWarning("Select an existing quiz file before opening Quiz Info Maker.");
-            {
-                return;
-            }
+            ShowQuizInfoFeedback("Select an existing quiz file before opening Quiz Info Maker.");
+            return;
         }
 
         string folder = Path.GetDirectoryName(currentQuizPath);
@@ -159,10 +159,9 @@ public class QuizInfoMakerManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(currentInfoPath))
         {
-            Debug.LogError("No Quiz Info file path selected.");
-            {
-                return;
-            }
+            ShowQuizInfoFeedback("No Quiz Info file path selected.");
+            return;
+            
         }
 
         StringBuilder builder = new StringBuilder();
@@ -202,6 +201,7 @@ public class QuizInfoMakerManager : MonoBehaviour
         catch (System.Exception ex)
         {
             Debug.LogError("Failed to save Quiz Info: " + ex.Message);
+            ShowQuizInfoFeedback("Failed to Save Quiz Info");
         }
     }
 
@@ -346,4 +346,13 @@ public class QuizInfoMakerManager : MonoBehaviour
         }
     }
 
+    private void ShowQuizInfoFeedback(string message)
+    {
+        Debug.LogWarning(message);
+
+        if (feedback != null)
+        {
+            feedback.ShowFeedback(message);
+        }
+    }
 }
