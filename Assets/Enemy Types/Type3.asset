@@ -16,7 +16,7 @@ MonoBehaviour:
   maxHp: 12
   damage: 5
   maxShield: 0
-  prefab: {fileID: 919132149155446097, guid: d5c108dc7e7bfad4ab6fc9da97b1d69c, type: 3}
+  prefab: {fileID: 3825038894137292323, guid: 30dd0093a10a424459f4d7da23f330a9, type: 3}
   actions:
   - actionType: 0
     value: 7
