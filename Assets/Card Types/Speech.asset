@@ -15,7 +15,7 @@ MonoBehaviour:
   cardName: Speech
   cardShortDesc: Deal 50 Damage to all Enemies
   cardFullDesc: If the Filipino oppression is continued, the Filipinos will rebel
-    against the Spanish Government. -Father Burgos
+    against the Spanish Government. -Father Jose Burgos
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 0

@@ -19,5 +19,6 @@ MonoBehaviour:
   prefab: {fileID: 5793887613308761351, guid: 46a6f0a524c78ce40a33054ffd8c5ed8, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: 0.75, z: 0}
-  customCards: []
+  customCards:
+  - {fileID: 0}
   customCardBackground: {fileID: 21300000, guid: f1c2d78b6cc55414bac62411bca70136, type: 3}
