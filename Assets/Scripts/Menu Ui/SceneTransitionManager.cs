@@ -18,6 +18,10 @@ public class SceneTransitionManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField, Min(0f)] private float fadeDuration = 0.5f;
 
+    [Header("Disclaimer")]
+    [SerializeField] private GameObject disclaimerText;
+    [SerializeField, Min(0f)] private float disclaimerDisplayDuration = 6f;
+
     private bool isTransitioning;
     private bool destinationReady;
     private bool waitForDestinationReady;
@@ -49,6 +53,39 @@ public class SceneTransitionManager : MonoBehaviour
         {
             loadingAnimation.SetActive(false);
         }
+    }
+
+    private IEnumerator Start()
+    {
+        // Keep the screen black while the disclaimer is displayed.
+        fadeCanvasGroup.alpha = 1f;
+        fadeCanvasGroup.blocksRaycasts = true;
+        fadeCanvasGroup.interactable = false;
+
+        if (disclaimerText != null)
+        {
+            disclaimerText.SetActive(true);
+        }
+
+        else
+        {
+            Debug.LogError("[Scene Transition] DisclaimerText is missing.");
+        }
+
+        // Display the disclaimer.
+        yield return new WaitForSecondsRealtime(disclaimerDisplayDuration);
+
+        // Hide the disclaimer before revealing the Main Menu.
+        if (disclaimerText != null)
+        {
+            disclaimerText.SetActive(false);
+        }
+
+        // Reveal the Main Menu.
+        yield return FadeTo(0f);
+
+        fadeCanvasGroup.blocksRaycasts = false;
+        fadeCanvasGroup.interactable = false;
     }
 
     public void SwitchScene(string sceneName)
