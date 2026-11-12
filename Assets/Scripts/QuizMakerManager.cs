@@ -16,6 +16,7 @@ public class QuizMakerManager : MonoBehaviour
     public GameObject mainMenuImage;
     public GameObject waitSyncPanel;
     public GameObject syncInputBlocker;
+    public GameObject title;
 
     [Header("Feedback")]
     public QuizMakerFeedback feedback;
@@ -136,6 +137,11 @@ public class QuizMakerManager : MonoBehaviour
         }
 
         mainMenuImage.SetActive(false);
+
+        if (title != null)
+        {
+            title.SetActive(false);
+        }
     }
 
     public void OpenNewQuizPanel()
@@ -159,6 +165,11 @@ public class QuizMakerManager : MonoBehaviour
     public async void CloseQuizMakerPanel()
     {
         if (MainMenu.IsOptionsMenuOpen)
+        {
+            return;
+        }
+
+        if (QuizMakerPanel == null || !QuizMakerPanel.activeSelf)
         {
             return;
         }
@@ -214,6 +225,7 @@ public class QuizMakerManager : MonoBehaviour
                         );
                     }
                 }
+
                 else
                 {
                     Debug.LogWarning(
@@ -228,6 +240,11 @@ public class QuizMakerManager : MonoBehaviour
             accountButton.SetActive(true);
             backButton.SetActive(false);
             mainMenuImage.SetActive(true);
+
+            if (title != null)
+            {
+                title.SetActive(true);
+            }
 
             if (syncInputBlocker != null)
             {

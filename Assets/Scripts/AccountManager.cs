@@ -2492,7 +2492,28 @@ public class AccountManager : MonoBehaviour
 
         backBtn.onClick.RemoveAllListeners();
 
+        // Account Menu
         backBtn.onClick.AddListener(CloseAccountMenu);
+
+        // Quiz Maker
+        QuizMakerManager quizMaker =
+            FindFirstObjectByType<QuizMakerManager>(FindObjectsInactive.Include);
+
+        if (quizMaker != null)
+        {
+            backBtn.onClick.AddListener(quizMaker.CloseQuizMakerPanel);
+        }
+
+        // Options and Credits
+        MainMenu mainMenuScript =
+            FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
+
+        if (mainMenuScript != null)
+        {
+            backBtn.onClick.AddListener(mainMenuScript.BackFromOptions);
+            backBtn.onClick.AddListener(mainMenuScript.BackFromCredits);
+        }
+
 
         // Open Account Recovery
         accountRecoveryButton.onClick.RemoveAllListeners();

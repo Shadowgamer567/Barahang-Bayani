@@ -10,8 +10,18 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] private GameObject optionsMenu;
     [SerializeField] private Image optionsBackdrop;
-    [SerializeField] private GameObject accountsButton;
+
+    [Header("Credits UI")]
+    [SerializeField] private GameObject creditsPanel;
+    [SerializeField] private GameObject creditsButton;
     [SerializeField] private GameObject optionsBackButton;
+
+    [Header("Main Menu Objects")]
+    [SerializeField] private GameObject accountsButton;
+    [SerializeField] private GameObject title;
+    [SerializeField] private GameObject cardDeck;
+    [SerializeField] private GameObject mainMenuImage;
+    [SerializeField] private GameObject backgroundMenu;
 
     private bool accountsButtonWasActive;
 
@@ -184,6 +194,8 @@ public class MainMenu : MonoBehaviour
         IsOptionsMenuOpen = false;
     }
 
+
+
     public void QuitGame()
     {
         Application.Quit();
@@ -218,5 +230,39 @@ public class MainMenu : MonoBehaviour
         }
 
         SceneTransitionManager.Instance.SwitchScene("LevelSelect_Tutorial");
+    }
+
+    public void OpenCredits()
+    {
+        creditsPanel.SetActive(true);
+
+        // Hide Main Menu UI.
+        accountsButton.SetActive(false);
+        title.SetActive(false);
+        cardDeck.SetActive(false);
+        mainMenuImage.SetActive(false);
+
+        // Show Credits background and navigation.
+        backgroundMenu.SetActive(true);
+        optionsBackButton.SetActive(true);
+    }
+
+    public void BackFromCredits()
+    {
+        if (creditsPanel == null || !creditsPanel.activeSelf)
+            return;
+
+        creditsPanel.SetActive(false);
+
+        // Restore Main Menu UI.
+        accountsButton.SetActive(true);
+        title.SetActive(true);
+        cardDeck.SetActive(true);
+        mainMenuImage.SetActive(true);
+
+        // Restore normal Main Menu background.
+        backgroundMenu.SetActive(false);
+
+        optionsBackButton.SetActive(false);
     }
 }
