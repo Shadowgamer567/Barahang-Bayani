@@ -163,11 +163,6 @@ public class QuizMakerManager : MonoBehaviour
             return;
         }
 
-        if (QuizMakerPanel == null || !QuizMakerPanel.activeSelf)
-        {
-            return;
-        }
-
         // Prevent the player from triggering another exit
         // while an upload is already running.
         if (isClosingQuizMaker || isDeletingQuiz)

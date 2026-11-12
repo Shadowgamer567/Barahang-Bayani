@@ -16,7 +16,7 @@ public class BackdropHandler : MonoBehaviour
         SetBackdropVisible(false);
     }
 
-    public void SetBackdropVisible(bool visible)
+    private void SetBackdropVisible(bool visible)
     {
         if (backdrop == null)
         {
