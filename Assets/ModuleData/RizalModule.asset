@@ -18,14 +18,14 @@ MonoBehaviour:
   titleAlignment: 258
   bodyText: "Jose Rizal (born June 19, 1861, Calamba, Philippines\u2014died December
     30, 1896, Manila) was a patriot, physician, and man of letters who was an inspiration
-    to the Philippine nationalist movement.\r\nEarly life and education\r\n\r\nThe
+    to the Philippine nationalist movement.\n\r\nEarly life and education\r\n\r\nThe
     son of a prosperous landowner, Rizal was educated in Manila and at the University
     of Madrid. A brilliant medical student, he soon committed himself to the reform
     of Spanish rule in his home country, though he never advocated Philippine independence.
-    Most of his writing was done in Europe, where he resided between 1882 and 1892.\r\nLiterary
+    Most of his writing was done in Europe, where he resided between 1882 and 1892.\n\r\nLiterary
     and political efforts\r\n\r\nIn 1887 Rizal published his first novel, Noli me
     tangere (1886; Eng. trans. The Social Cancer), a passionate exposure of the evils
-    of Spanish rule in the Philippines. A sequel, El filibusterismo (1891; Eng. trans.
+    of Spanish rule in the Philippines. A sequel, El Filibusterismo (1891; Eng. trans.
     The Reign of Greed), established his reputation as the leading spokesman of the
     Philippine reform movement. He published an annotated edition (1890; reprinted
     1958) of Antonio Morga\u2019s Sucesos de las Islas Filipinas, hoping to show
@@ -37,7 +37,7 @@ MonoBehaviour:
     friars by Filipino priests, freedom of assembly and expression, and equality
     of Filipinos and Spaniards before the law.\n\nLater years, exile, and execution\nRizal
     returned to the Philippines in 1892. He founded a nonviolent-reform society,
-    the Liga Filipina, in Manila, and was deported to Dapitan in northwest Mindanao.
+    La Liga Filipina, in Manila, and was deported to Dapitan in northwest Mindanao.
     He remained in exile for the next four years. In 1896 the Katipunan, a Filipino
     nationalist secret society, revolted against Spain. Although he had no connections
     with that organization and he had had no part in the insurrection, Rizal was

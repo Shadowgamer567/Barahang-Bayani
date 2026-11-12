@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: General
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTypes
   enemyName: Spanish General
-  maxHp: 30
+  maxHp: 40
   damage: 7
-  maxShield: 10
+  maxShield: 15
   prefab: {fileID: 3825038894137292323, guid: 30dd0093a10a424459f4d7da23f330a9, type: 3}
   actions:
   - actionType: 0

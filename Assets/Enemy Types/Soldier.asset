@@ -15,7 +15,7 @@ MonoBehaviour:
   enemyName: Spanish Soldier
   maxHp: 30
   damage: 4
-  maxShield: 0
+  maxShield: 15
   prefab: {fileID: 6648001815190333361, guid: 1c39cf8b7db9b334fb20d12590d410f6, type: 3}
   actions:
   - actionType: 0
