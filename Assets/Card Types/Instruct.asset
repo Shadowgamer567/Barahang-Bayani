@@ -15,6 +15,7 @@ MonoBehaviour:
   cardName: Instruct
   cardShortDesc: Shield 10 damage to a single target.
   cardFullDesc: As your teacher, I instruct you to brace for the counteragument.
+    -Ferdinand Blumentritt
   cardImage: {fileID: 0}
   effectType: 2
   targetType: 1

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Product Sold!
   cardShortDesc: Attack all enemies for 10 damage.
-  cardFullDesc: Attacked enemies for 10 damage.
+  cardFullDesc: 'Attacked enemies for 10 damage.  '
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 0

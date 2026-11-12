@@ -15,6 +15,7 @@ MonoBehaviour:
   cardName: My Children
   cardShortDesc: Add 17 Shield to a single target.
   cardFullDesc: For my children, I will do anything if it means to protect them.
+    -Dona Teodora
   cardImage: {fileID: 0}
   effectType: 2
   targetType: 1

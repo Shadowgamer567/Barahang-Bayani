@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Scholar's Insight
   cardShortDesc: Piercing, Deal 15 damage. This will prompt a question.
-  cardFullDesc: I know what you're thinking. Unfortunately, it won't work.
+  cardFullDesc: I know what you're thinking. Unfortunately, it won't work. - Ferdinad
+    Blumentritt
   cardImage: {fileID: 0}
-  effectType: 0
+  effectType: 5
   targetType: 0
   damage: 15
   cost: 3

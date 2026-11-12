@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Counterargument
   cardShortDesc: Reduce 1 Enemy Action Value by 5
-  cardFullDesc: I disagree. Your argument is weak. Here's why...
+  cardFullDesc: I disagree. Your argument is weak. Here's why... -Ferdinand Blumentritt
   cardImage: {fileID: 0}
   effectType: 4
   targetType: 1

@@ -15,7 +15,7 @@ MonoBehaviour:
   cardName: Mother's Intuition
   cardShortDesc: Heal 30HP for all heroes.
   cardFullDesc: I have a feeling about your future. I hope that it is wrong. Please
-    stay safe my dear Pepe.
+    stay safe my dear Pepe. -Dona Teodora
   cardImage: {fileID: 0}
   effectType: 1
   targetType: 2

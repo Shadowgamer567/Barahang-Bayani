@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Famlial Love
   cardShortDesc: Increase next Card Value by 10.
-  cardFullDesc: There is nothing more important than family.
+  cardFullDesc: There is nothing more important than family. -Rizal Family
   cardImage: {fileID: 0}
   effectType: 3
   targetType: 3

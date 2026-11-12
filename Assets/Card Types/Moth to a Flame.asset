@@ -15,7 +15,7 @@ MonoBehaviour:
   cardName: Moth to a Flame
   cardShortDesc: Deal 11 Damage to a single target.
   cardFullDesc: "See that you do not behave like the young moth. Don\u2019t become
-    disobedient, or you may get burnt as it did. -Dona Teodora Alonso"
+    disobedient, or you may get burnt as it did. -Dona Teodora "
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 1

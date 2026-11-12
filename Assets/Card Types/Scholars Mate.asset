@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Scholar's Mate
   cardShortDesc: Deal 20 Damage to a single target.
-  cardFullDesc: In less than 6 moves. Easy.
+  cardFullDesc: In less than 6 moves. Easy. -Ferdinand Blumentritt
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 1
