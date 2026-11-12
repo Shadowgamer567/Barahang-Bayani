@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Mother's Intuition
   cardShortDesc: Heal 30HP for all heroes.
-  cardFullDesc: 
+  cardFullDesc: I have a feeling about your future. I hope that it is wrong. Please
+    stay safe my dear Pepe.
   cardImage: {fileID: 0}
   effectType: 1
   targetType: 2
