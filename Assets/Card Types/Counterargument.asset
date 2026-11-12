@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
   m_Name: Counterargument
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: 
-  cardShortDesc: 
-  cardFullDesc: 
+  cardName: Counterargument
+  cardShortDesc: Reduce 1 Enemy Action Value by 5
+  cardFullDesc: I disagree. Your argument is weak. Here's why...
   cardImage: {fileID: 0}
-  effectType: 0
-  targetType: 0
-  damage: 0
-  cost: 0
+  effectType: 4
+  targetType: 1
+  damage: 5
+  cost: 1
   quizCard: 0

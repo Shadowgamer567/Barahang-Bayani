@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Paciano
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
   heroName: Paciano Rizal
-  maxHp: 100
-  shield: 0
-  maxShield: 0
+  maxHp: 60
+  shield: 60
+  maxShield: 100
   prefab: {fileID: 4007942753036210585, guid: 62c352c41f7f81e4a925752cb9a832da, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: -0.75, z: 0}

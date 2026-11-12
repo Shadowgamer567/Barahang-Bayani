@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Teodora
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
   heroName: Teodora Alonso
-  maxHp: 0
-  shield: 0
-  maxShield: 0
+  maxHp: 40
+  shield: 30
+  maxShield: 30
   prefab: {fileID: 5793887613308761351, guid: 46a6f0a524c78ce40a33054ffd8c5ed8, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: 0.75, z: 0}

@@ -159,3 +159,10 @@ DESC:
 False. He went to multiple countries through Europe, Asia, and America but not South Africa.
 [END]
 
+[ID:RIZALCAMPAIGNQUIZ24]
+TITLE: 
+IMAGE: 
+DESC:
+Trinidad is Jose Rizal's youngest sister.
+[END]
+
