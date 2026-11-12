@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
   m_Name: Scholar's Insight
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: 
-  cardShortDesc: 
-  cardFullDesc: 
+  cardName: Scholar's Insight
+  cardShortDesc: Piercing, Deal 15 damage. This will prompt a question.
+  cardFullDesc: I know what you're thinking. Unfortunately, it won't work.
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 0
-  damage: 0
-  cost: 0
+  damage: 15
+  cost: 3
   quizCard: 0

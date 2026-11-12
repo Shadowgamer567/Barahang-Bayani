@@ -10,18 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4cf71bfb80a757c4d9608afd4ca6e2d4, type: 3}
-  m_Name: Spanish
+  m_Name: Soldier
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTypes
-  enemyName: Spanish Conquestor
-  maxHp: 15
-  damage: 3
+  enemyName: Spanish Soldier
+  maxHp: 30
+  damage: 4
   maxShield: 0
-  prefab: {fileID: 5239452982573887266, guid: f028ec07a4f39c6438107414090da673, type: 3}
-  actions: []
+  prefab: {fileID: 6648001815190333361, guid: 1c39cf8b7db9b334fb20d12590d410f6, type: 3}
+  actions:
+  - actionType: 0
+    value: 10
+  - actionType: 0
+    value: 12
+  - actionType: 2
+    value: 5
+  - actionType: 2
+    value: 9
   attackWeight: 5
   healWeight: 3
-  shieldWeight: 3
-  buffWeight: 4
-  debuffWeight: 4
+  shieldWeight: 2.5
+  buffWeight: 2
+  debuffWeight: 2
   modelRotationOffset: {x: 0, y: 0, z: 0}
-  modelPositionOffset: {x: 0, y: 0, z: 0}
+  modelPositionOffset: {x: 0, y: -0.8, z: 0}

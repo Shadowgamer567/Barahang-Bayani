@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
   m_Name: Instruct
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: 
-  cardShortDesc: 
-  cardFullDesc: 
+  cardName: Instruct
+  cardShortDesc: Shield 10 damage to a single target.
+  cardFullDesc: As your teacher, I instruct you to brace for the counteragument.
   cardImage: {fileID: 0}
-  effectType: 0
-  targetType: 0
-  damage: 0
-  cost: 0
+  effectType: 2
+  targetType: 1
+  damage: 10
+  cost: 1
   quizCard: 0

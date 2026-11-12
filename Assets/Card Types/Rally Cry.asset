@@ -19,5 +19,5 @@ MonoBehaviour:
   effectType: 4
   targetType: 0
   damage: 5
-  cost: 1
+  cost: 2
   quizCard: 0
