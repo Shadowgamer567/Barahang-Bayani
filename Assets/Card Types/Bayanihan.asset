@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Bayanihan
   cardShortDesc: Add 15 Shield to all Heroes.
-  cardFullDesc: 
+  cardFullDesc: I will shield thee, for my country!
   cardImage: {fileID: 0}
   effectType: 2
   targetType: 2
