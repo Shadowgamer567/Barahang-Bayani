@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
   m_Name: Filipino Suffering
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: Test 7
-  cardShortDesc: Apply 7 Bleed to All Enemies
-  cardFullDesc: 
+  cardName: Filipino Suffering
+  cardShortDesc: Apply 7 Bleed to All Enemies.
+  cardFullDesc: For generations, we have bled and suffered at the hands of our oppressors.
+    We shall make them feel our pain!
   cardImage: {fileID: 0}
   effectType: 6
   targetType: 0

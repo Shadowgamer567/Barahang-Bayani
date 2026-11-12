@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Poem
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Poem
-  cardShortDesc: Deal 10 Damage to a Single Enemy
-  cardFullDesc: "Farewell, dear Fatherland, clime of the sun caress\u2019d,   Pearl
+  cardShortDesc: Deal 10 Damage to a Single Enemy.
+  cardFullDesc: "Farewell, dear Fatherland, clime of the sun caress\u2019d, Pearl
     of the Orient seas, our Eden lost!   -Jose Rizal"
+  cardImage: {fileID: 0}
+  effectType: 0
   targetType: 1
   damage: 10
   cost: 1

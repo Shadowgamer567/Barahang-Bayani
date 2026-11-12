@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Noli Me Tangere
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Noli Me Tangere
-  cardShortDesc: Deal 20 Damage to Single Target
+  cardShortDesc: Deal 20 Damage to Single Target. This will prompt a question.
   cardFullDesc: 
-  cardImage: {fileID: 21300000, guid: f187843a44a8f704992a53a29d73f438, type: 3}
+  cardImage: {fileID: 21300000, guid: 77f471cdca95cf3428bf59109d4f716d, type: 3}
   effectType: 0
   targetType: 1
   damage: 20

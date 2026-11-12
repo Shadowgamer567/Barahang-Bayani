@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Doctor's Orders
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Doctor's Orders
-  cardShortDesc: Heal Self for 15 HP
+  cardShortDesc: Heal one hero for 12 HP.
   cardFullDesc: 
-  cardImage: {fileID: 21300000, guid: f187843a44a8f704992a53a29d73f438, type: 3}
+  cardImage: {fileID: 0}
   effectType: 1
   targetType: 1
-  damage: 15
+  damage: 12
   cost: 1
   quizCard: 0

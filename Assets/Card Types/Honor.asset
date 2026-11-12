@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Honor
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Honor
-  cardShortDesc: Deal 15 Damage to One Enemy
+  cardShortDesc: Deal 15 Damage to One Enemy.
   cardFullDesc: 
+  cardImage: {fileID: 0}
+  effectType: 0
   targetType: 1
   damage: 15
-  cost: 1
-  quizCard: 1
+  cost: 2
+  quizCard: 0
