@@ -235,6 +235,8 @@ public class BattleControl : MonoBehaviour
     {
         currentstate = BattleState.PlayerTurn;
 
+        UpdateUI();
+
         currentActionPoint = maxActionPoint;
         OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
 
@@ -263,6 +265,8 @@ public class BattleControl : MonoBehaviour
         // Prevent another enemy turn from being started.
         currentstate = BattleState.Busy;
 
+        UpdateUI();
+
         Debug.Log("Starting Enemy Turn");
         StartCoroutine(EnemyTurn());
     }
@@ -276,6 +280,8 @@ public class BattleControl : MonoBehaviour
         }
 
         currentstate = BattleState.Busy;
+
+        UpdateUI();
 
         StartCoroutine(EnemyTurn(true));
     }
@@ -363,6 +369,8 @@ public class BattleControl : MonoBehaviour
         {
             // Resume the existing player turn without resetting resources.
             currentstate = BattleState.PlayerTurn;
+
+            UpdateUI();
 
             Debug.Log(
                 "Enemy penalty turn finished. " +
@@ -1485,6 +1493,11 @@ public class BattleControl : MonoBehaviour
         {
             selectTargetPanel.SetActive(false);
         }
+
+        if (cardPanel != null)
+        {
+            cardPanel.SetActive(true);
+        }
     }
 
     public void StartNextBattleManually()
@@ -1590,8 +1603,6 @@ public class BattleControl : MonoBehaviour
     void UpdateUI()
     {
         bool canEndTurn = currentstate == BattleState.PlayerTurn && !isSelectingTarget;
-
-        endButton.SetActive(currentstate == BattleState.PlayerTurn);
 
         UnityEngine.UI.Button button = endButton.GetComponent<UnityEngine.UI.Button>();
 
