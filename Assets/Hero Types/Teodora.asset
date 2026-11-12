@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51a7dbb6f5fe40e4692f7f58e2facbb0, type: 3}
   m_Name: Teodora
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
-  heroName: 
+  heroName: Teodora Alonso
   maxHp: 0
   shield: 0
   maxShield: 0

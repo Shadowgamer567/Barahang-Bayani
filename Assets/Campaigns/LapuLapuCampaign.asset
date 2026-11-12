@@ -13,4 +13,9 @@ MonoBehaviour:
   m_Name: LapuLapuCampaign
   m_EditorClassIdentifier: Assembly-CSharp::BackgroundSet
   campaignName: 
+  campaignQuizFile: {fileID: 0}
+  campaignQuizInfoFile: {fileID: 0}
+  generalCards:
+  - {fileID: 11400000, guid: 1213ffc6262b23845b7164f33fda68cb, type: 2}
+  - {fileID: 11400000, guid: 0082d682274b65748be0775da9f42056, type: 2}
   levelsRanges: []

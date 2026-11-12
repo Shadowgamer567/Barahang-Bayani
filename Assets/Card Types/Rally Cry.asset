@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Rally Cry
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Rally Cry
-  cardShortDesc: Decrease the value of All Enemies next action by 5
+  cardShortDesc: Decrease the value of All Enemies next action by 5.
   cardFullDesc: 
   cardImage: {fileID: 0}
   effectType: 4

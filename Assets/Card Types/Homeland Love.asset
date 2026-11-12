@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Homeland Love
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Love for the Homeland
-  cardShortDesc: Deal 30 Damage to All Enemies
+  cardShortDesc: Deal 25 Damage to All Enemies.
   cardFullDesc: 
-  cardImage: {fileID: 21300000, guid: f187843a44a8f704992a53a29d73f438, type: 3}
+  cardImage: {fileID: 0}
   effectType: 0
   targetType: 0
-  damage: 30
+  damage: 25
   cost: 5
   quizCard: 0

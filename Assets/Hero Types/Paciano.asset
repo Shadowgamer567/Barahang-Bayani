@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51a7dbb6f5fe40e4692f7f58e2facbb0, type: 3}
   m_Name: Paciano
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
-  heroName: Lapu-Lapu
+  heroName: Paciano Rizal
   maxHp: 100
   shield: 0
   maxShield: 0
