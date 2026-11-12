@@ -1478,14 +1478,12 @@ public class BattleControl : MonoBehaviour
         pendingCard = null;
         pendingHero = null;
 
+        // Restore End Turn button state.
+        UpdateUI();
+
         if (selectTargetPanel != null)
         {
             selectTargetPanel.SetActive(false);
-        }
-
-        if (cardPanel != null)
-        {
-            cardPanel.SetActive(true);
         }
     }
 

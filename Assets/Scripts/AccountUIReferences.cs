@@ -49,6 +49,8 @@ public class AccountUIReferences : MonoBehaviour
 
     public GameObject submitUsernameButton;
 
+    public GameObject cancelCreateAccountButton;
+
     public GameObject deleteAccountButton;
 
     [Header("Login")]

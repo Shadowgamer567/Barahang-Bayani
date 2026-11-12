@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -40,6 +41,7 @@ public class AccountManager : MonoBehaviour
     public GameObject accountSelectPanel;
     public GameObject accountManagementPanel;
     public GameObject createAccountPanel;
+    public GameObject cancelCreateAccountButton;
     public GameObject mainMenu;
     public GameObject classroomPanel;
     public GameObject classroomSelectionPanel;
@@ -1072,18 +1074,24 @@ public class AccountManager : MonoBehaviour
             return;
 
         assigningStudents = true;
-        assigningTeacher = selectedAccount;
+        assigningTeacher = registry.accounts.Find(account => account.id == selectedAccount.id);
+
+        if (assigningTeacher == null)
+        {
+            Debug.LogError("Cannot start student assignment: Teacher was not found in the current account registry.");
+
+            assigningStudents = false;
+            return;
+        }
 
         pendingStudents.Clear();
 
-        if (assigningTeacher.assignedStudentIDs == null)
-            assigningTeacher.assignedStudentIDs = new List<string>();
+        if (assigningTeacher.assignedStudentIDs == null)assigningTeacher.assignedStudentIDs = new List<string>();
 
         // Start with students already assigned to this teacher.
         foreach (AccountData student in registry.accounts)
         {
-            if (student.accountType == AccountType.Student &&
-                assigningTeacher.assignedStudentIDs.Contains(student.id))
+            if (student.accountType == AccountType.Student && assigningTeacher.assignedStudentIDs.Contains(student.id))
             {
                 pendingStudents.Add(student);
             }
@@ -1125,6 +1133,29 @@ public class AccountManager : MonoBehaviour
 
         SaveAccount();
         QueueAssignmentUpload(assigningTeacher.id);
+
+        // Refresh the Assigned Students panel.
+        foreach (Transform child in assignedStudentContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (string studentID in assigningTeacher.assignedStudentIDs)
+        {
+            AccountData student = registry.accounts.Find(account => account.id == studentID);
+
+            if (student == null)
+            {
+                continue;
+            }
+
+            GameObject obj = Instantiate(accountCardPrefab, assignedStudentContainer);
+
+            obj.SetActive(true);
+
+            AccountCardUI ui = obj.GetComponent<AccountCardUI>();
+            ui.Setup(student, AccountCardMode.TeacherStudentView);
+        }
 
         assigningStudents = false;
         assigningTeacher = null;
@@ -1246,6 +1277,27 @@ public class AccountManager : MonoBehaviour
         classroomPanel.SetActive(false);
 
         backButton.SetActive(false);
+    }
+
+    public void CancelCreateAccount()
+    {
+        // Clear the account creation inputs.
+        usernameInputField.text = "";
+        passwordInputField.text = "";
+
+        // Reset the pending account type.
+        pendingAccountType = default;
+
+        // Close the Create Account panel.
+        createAccountPanel.SetActive(false);
+
+        // Return to the account selection screen.
+        accountSelectPanel.SetActive(true);
+        ShowAccountManagementPanel();
+
+        // Restore the Classroom panel and Back button.
+        classroomPanel.SetActive(true);
+        backButton.SetActive(true);
     }
 
     public void OpenTeacherInfo(AccountCardUI card)
@@ -2365,6 +2417,7 @@ public class AccountManager : MonoBehaviour
         accountSelectPanel = ui.accountSelectPanel;
         accountManagementPanel = ui.accountManagementPanel;
         createAccountPanel = ui.createAccountPanel;
+        cancelCreateAccountButton = ui.cancelCreateAccountButton;
 
         teacherInfoPanel = ui.teacherInfoPanel;
         studentInfoPanel = ui.studentInfoPanel;
@@ -2473,6 +2526,14 @@ public class AccountManager : MonoBehaviour
         submitBtn.onClick.RemoveAllListeners();
 
         submitBtn.onClick.AddListener(SubmitUsername);
+
+        // Cancel Create Account Button
+        Button cancelCreateBtn =
+            ui.cancelCreateAccountButton.GetComponent<Button>();
+
+        cancelCreateBtn.onClick.RemoveAllListeners();
+
+        cancelCreateBtn.onClick.AddListener(CancelCreateAccount);
 
         // Confirm Recovery Code Button
         confirmRecoveryCodeButton.onClick.RemoveAllListeners();
