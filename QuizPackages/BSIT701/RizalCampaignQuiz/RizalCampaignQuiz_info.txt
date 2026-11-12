@@ -9,105 +9,105 @@ Saturnina is Jose Rizal's eldest sister.
 TITLE: 
 IMAGE: 
 DESC:
-
+Concepcion Rizal or Concha passed away at the age of three.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ3]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal went to Antipolo, Manila in June of 1868.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ4]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal convinced his father to buy him a set of Cesare Cantu's Universal History Books.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ5]
 TITLE: 
 IMAGE: 
 DESC:
-
+True. Jose Rizal died on December 30, 1896.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ6]
 TITLE: 
 IMAGE: 
 DESC:
-
+True. Jose Rizal is a National Hero.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ7]
 TITLE: 
 IMAGE: 
 DESC:
-
+The title of Jose Rizal's last poem is "Mi Ultimo Adios".
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ8]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal wrote two (2) novels. Noli Me Tangere and El Filibusterismo.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ9]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal was born in Calamba, Laguna.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ10]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal studied medicine, so he was a doctor.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ11]
 TITLE: 
 IMAGE: 
 DESC:
-
+True. Jose Rizal treated his mother's blindness.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ12]
 TITLE: 
 IMAGE: 
 DESC:
-
+The members of La Solidaridad in the question are: Jose Rizal, Graciano Lopez Jaena, and Marcelo H. Del Pilar.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ13]
 TITLE: 
 IMAGE: 
 DESC:
-False. He was executed by Filipinos who didn't want to execute him but were forcerd to.
+False. He was executed by Filipinos who didn't want to execute him but were forced to.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ14]
 TITLE: 
 IMAGE: 
 DESC:
-
+Rizal Day is celebrated on the day of his execution. December 30.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ15]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal was exiled in Dapitan.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ16]
 TITLE: 
 IMAGE: 
 DESC:
-
+True. Bagumbayan is the historical name of the area and now commonly known as Luneta Park or Rizal Park.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ17]
@@ -121,35 +121,35 @@ False. Dona Teodora was wrongfully imprisoned as she did not commit any crimes.
 TITLE: 
 IMAGE: 
 DESC:
-
+Dona Teodora was imprisoned in Santa Cruz, Laguna.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ19]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal's only brother is named Paciano Rizal.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ20]
 TITLE: 
 IMAGE: 
 DESC:
-
+Among these, Jose Rizal's siblings are: Saturnina and Trinidad.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ21]
 TITLE: 
 IMAGE: 
 DESC:
-
+Jose Rizal's closest friend was Ferdinand Blumentritt. He exchanged many letters despite having met only once and Jose Rizal wrote a letter to Blumentritt as he was about to be executed.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ22]
 TITLE: 
 IMAGE: 
 DESC:
-
+Dona Teodora's brother is Don Jose Alberto.
 [END]
 
 [ID:RIZALCAMPAIGNQUIZ23]
