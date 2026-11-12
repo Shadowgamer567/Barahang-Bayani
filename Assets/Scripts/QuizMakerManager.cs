@@ -999,7 +999,7 @@ public class QuizMakerManager : MonoBehaviour
         entry += number + ". " + quizQuestionInputField.text.Trim() + "\n";
 
         //Question Types
-        switch (questionTypeDropdown.value)
+        switch (SelectedQuestionType)
         {
             case 0:
                 entry += "TYPE:TEXT\n";
