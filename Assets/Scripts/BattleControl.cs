@@ -246,8 +246,7 @@ public class BattleControl : MonoBehaviour
     public void endPlayersTurn()
     {
         // Prevent ending the turn during required tutorial card interactions.
-        TutorialBattleController tutorial =
-            FindFirstObjectByType<TutorialBattleController>();
+        TutorialBattleController tutorial = FindFirstObjectByType<TutorialBattleController>();
 
         if (tutorial != null && tutorial.BlockEndTurn)
         {
@@ -255,8 +254,9 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
-        if (currentstate != BattleState.PlayerTurn)
+        if (currentstate != BattleState.PlayerTurn || isSelectingTarget)
         {
+            Debug.Log("Cannot end turn while selecting a target.");
             return;
         }
 
@@ -923,6 +923,7 @@ public class BattleControl : MonoBehaviour
         currentstate = BattleState.Lose;
 
         isSelectingTarget = false;
+        UpdateUI();
         pendingCard = null;
         pendingHero = null;
 
@@ -1337,7 +1338,6 @@ public class BattleControl : MonoBehaviour
             return true;
         }
 
-
         if (card.targetType == TargetType.AllEnemies || card.targetType == TargetType.AllHeroes || card.targetType == TargetType.Self)
         {
             HeroStats selectedHero = GetHeroForCard(card);
@@ -1355,6 +1355,8 @@ public class BattleControl : MonoBehaviour
             isSelectingTarget = true;
             pendingCard = card;
             pendingHero = GetHeroForCard(card);
+
+            UpdateUI();
 
             cardPanel.SetActive(false);
 
@@ -1399,6 +1401,8 @@ public class BattleControl : MonoBehaviour
             pendingCard = card;
             pendingHero = GetHeroForCard(card);
             isSelectingTarget = true;
+
+            UpdateUI();
 
             if (cardPanel != null)
             {
@@ -1587,7 +1591,16 @@ public class BattleControl : MonoBehaviour
 
     void UpdateUI()
     {
+        bool canEndTurn = currentstate == BattleState.PlayerTurn && !isSelectingTarget;
+
         endButton.SetActive(currentstate == BattleState.PlayerTurn);
+
+        UnityEngine.UI.Button button = endButton.GetComponent<UnityEngine.UI.Button>();
+
+        if (button != null)
+        {
+            button.interactable = canEndTurn;
+        }
     }
 
     public void StartBattleSequence()

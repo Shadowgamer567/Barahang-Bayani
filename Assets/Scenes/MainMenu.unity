@@ -52051,7 +52051,8 @@ MonoBehaviour:
     replace formal education. It does not provide any formal or credible credentials
     upon completion. Creative liberties have been taken to improve storytelling,
     therefore, the events and representations in this game are not entirely historically
-    accurate and should not be taken as definitive historical fact.'
+    accurate and should not be taken as definitive historical fact. Any data created
+    while in use of this game is protected and safely stored '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

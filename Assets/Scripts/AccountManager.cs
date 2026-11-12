@@ -2120,29 +2120,26 @@ public class AccountManager : MonoBehaviour
         }
 
         if (synchronizingPendingAccounts)
-            return;
-
-        if (pendingAccountUploads.accountIDs.Count == 0)
-            return;
-
-        if (FirestoreManager.Instance == null)
         {
-            Debug.LogWarning(
-                "Account synchronization skipped: Firestore is not initialized."
-            );
             return;
         }
 
-        string synchronizationClassroomID = DatabaseManager.Instance != null
-        ? DatabaseManager.Instance.CurrentDatabase
-        : null;
+        if (pendingAccountUploads.accountIDs.Count == 0)
+        {
+            return;
+        }
+
+        if (FirestoreManager.Instance == null)
+        {
+            Debug.LogWarning("Account synchronization skipped: Firestore is not initialized.");
+            return;
+        }
+
+        string synchronizationClassroomID = DatabaseManager.Instance != null ? DatabaseManager.Instance.CurrentDatabase : null;
 
         if (string.IsNullOrWhiteSpace(synchronizationClassroomID) || synchronizationClassroomID == "DefaultDatabase")
         {
-            Debug.LogWarning(
-                "Pending account synchronization skipped: " +
-                "No valid classroom is active."
-            );
+            Debug.LogWarning("Pending account synchronization skipped: " + "No valid classroom is active.");
 
             return;
         }
@@ -2152,30 +2149,23 @@ public class AccountManager : MonoBehaviour
         try
         {
             // Snapshot the queue so changes do not affect iteration.
-            List<string> pendingIDs =
-                new List<string>(pendingAccountUploads.accountIDs);
+            List<string> pendingIDs = new List<string>(pendingAccountUploads.accountIDs);
 
             foreach (string accountID in pendingIDs)
             {
                 if (DatabaseManager.Instance == null || DatabaseManager.Instance.CurrentDatabase != synchronizationClassroomID)
                 {
-                    Debug.LogWarning(
-                        "Pending account synchronization stopped: " +
-                        "The active classroom changed."
+                    Debug.LogWarning("Pending account synchronization stopped: " +"The active classroom changed."
                     );
 
                     break;
                 }
 
-                AccountData account = registry.accounts.Find(
-                    a => a.id == accountID
-                );
+                AccountData account = registry.accounts.Find(a => a.id == accountID);
 
                 if (account == null)
                 {
-                    Debug.LogWarning(
-                        "Pending account not found locally: " + accountID
-                    );
+                    Debug.LogWarning("Pending account not found locally: " + accountID);
 
                     // Keep the pending ID for investigation.
                     continue;
@@ -2197,10 +2187,7 @@ public class AccountManager : MonoBehaviour
 
                 if (IsAccountPendingDeletion(accountID))
                 {
-                    Debug.LogWarning(
-                        "Skipping pending account upload because deletion is pending: " +
-                        accountID
-                    );
+                    Debug.LogWarning("Skipping pending account upload because deletion is pending: " + accountID);
 
                     continue;
                 }
@@ -2214,9 +2201,7 @@ public class AccountManager : MonoBehaviour
 
                     if (!uploaded)
                     {
-                        Debug.LogWarning(
-                            "Account upload not yet confirmed by Firestore: " +
-                            account.username
+                        Debug.LogWarning("Account upload not yet confirmed by Firestore: " + account.username
                         );
 
                         continue;
@@ -2224,20 +2209,14 @@ public class AccountManager : MonoBehaviour
 
                     if (DatabaseManager.Instance == null || DatabaseManager.Instance.CurrentDatabase != synchronizationClassroomID)
                     {
-                        Debug.LogWarning(
-                            "Account upload completed, but the classroom changed. " +
-                            "Keeping the pending upload record: " + accountID
-                        );
+                        Debug.LogWarning("Account upload completed, but the classroom changed. " + "Keeping the pending upload record: " + accountID);
 
                         break;
                     }
 
                     if (IsAccountPendingDeletion(accountID))
                     {
-                        Debug.LogWarning(
-                            "Account upload completed, but deletion is now pending: " +
-                            accountID
-                        );
+                        Debug.LogWarning("Account upload completed, but deletion is now pending: " + accountID);
 
                         continue;
                     }
@@ -2246,21 +2225,18 @@ public class AccountManager : MonoBehaviour
                     pendingAccountUploads.accountIDs.Remove(accountID);
                     SavePendingAccountUploads();
 
-                    Debug.Log(
-                        "Pending account synchronized: " + account.username
-                    );
+                    Debug.Log("Pending account synchronized: " + account.username);
                 }
+
                 catch (System.Exception ex)
                 {
-                    Debug.LogWarning(
-                        "Account synchronization failed for " +
-                        account.username + ": " + ex.Message
-                    );
+                    Debug.LogWarning("Account synchronization failed for " + account.username + ": " + ex.Message);
 
                     // Preserve the pending entry for the next attempt.
                 }
             }
         }
+
         finally
         {
             synchronizingPendingAccounts = false;
@@ -2270,96 +2246,115 @@ public class AccountManager : MonoBehaviour
     private async Task SynchronizeAccountMenuAsync()
     {
         if (isAccountMenuSynchronizing)
+        {
             return;
+        }
 
-        if (DatabaseManager.Instance == null ||
-            string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase))
+        if (DatabaseManager.Instance == null || string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase))
         {
             Debug.LogWarning("[Account Menu Sync] No active classroom.");
-
-            if (waitSyncPanel != null)
-            {
-                waitSyncPanel.SetActive(false);
-            }
-
-            if (syncInputBlocker != null)
-            {
-                syncInputBlocker.SetActive(false);
-            }
-
+            HideAccountSyncUI();
             return;
         }
 
         isAccountMenuSynchronizing = true;
 
+        Task syncTask = RunAccountMenuSynchronizationAsync();
+
         try
         {
-            Debug.Log("[Account Menu Sync] Starting synchronization.");
+            Task completedTask = await Task.WhenAny(
+                syncTask,
+                Task.Delay(15000)
+            );
 
-            // 1. Accounts and pending account changes.
-            if (FirestoreAccountManager.Instance != null)
+            if (completedTask == syncTask)
             {
-                await FirestoreAccountManager.Instance.DownloadAccounts();
+                await syncTask;
+                isAccountMenuSynchronizing = false;
             }
 
-            // 2. Progress for the currently active account.
-            if (ProgressManager.Instance != null &&
-                ProgressManager.Instance.HasActiveAccount)
-            {
-                await ProgressManager.Instance.LoadProgressForActiveAccount();
-            }
-
-            // 3. Quiz Packages for the active classroom.
-            QuizPackageDownloadManager quizManager =
-                FindFirstObjectByType<QuizPackageDownloadManager>(
-                    FindObjectsInactive.Include
-                );
-
-            if (quizManager != null)
-            {
-                await quizManager.SyncActiveClassroomPackagesAsync();
-            }
             else
             {
-                Debug.LogWarning(
-                    "[Account Menu Sync] Quiz Package Download Manager not found."
+                Debug.LogWarning("[Account Menu Sync] Wait limit reached. " + "Synchronization is continuing in the background."
                 );
+
+                _ = ReleaseSyncLockWhenFinished(syncTask);
             }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("[Account Menu Sync] Synchronization failed: " + ex);
+            isAccountMenuSynchronizing = false;
+        }
 
-            RefreshUI();
+        finally
+        {
+            HideAccountSyncUI();
+        }
+    }
 
-            Debug.Log("[Account Menu Sync] Synchronization finished.");
+    private async Task RunAccountMenuSynchronizationAsync()
+    {
+        Debug.Log("[Account Menu Sync] Starting synchronization.");
+
+        // 1. Accounts and pending account changes.
+        if (FirestoreAccountManager.Instance != null)
+        {
+            await FirestoreAccountManager.Instance.DownloadAccounts();
+        }
+
+        // 2. Progress for the currently active account.
+        if (ProgressManager.Instance != null && ProgressManager.Instance.HasActiveAccount)
+        {
+            await ProgressManager.Instance.LoadProgressForActiveAccount();
+        }
+
+        // 3. Quiz Packages for the active classroom.
+        QuizPackageDownloadManager quizManager = FindFirstObjectByType<QuizPackageDownloadManager>(FindObjectsInactive.Include);
+
+        if (quizManager != null)
+        {
+            await quizManager.SyncActiveClassroomPackagesAsync();
+        }
+
+        else
+        {
+            Debug.LogWarning("[Account Menu Sync] Quiz Package Download Manager not found.");
+        }
+
+        RefreshUI();
+
+        Debug.Log("[Account Menu Sync] Synchronization finished.");
+    }
+
+    private async Task ReleaseSyncLockWhenFinished(Task syncTask)
+    {
+        try
+        {
+            await syncTask;
         }
 
         catch (System.Exception ex)
         {
-            Debug.LogError(
-                "[Account Menu Sync] Synchronization failed: " + ex
-            );
+            Debug.LogError("[Account Menu Sync] Background synchronization failed: " + ex);
         }
 
         finally
         {
             isAccountMenuSynchronizing = false;
 
-            if (waitSyncPanel != null)
-            {
-                waitSyncPanel.SetActive(false);
-
-                Debug.Log("[Account Menu Sync] WaitSyncPanel hidden.");
-            }
-
-            if (syncInputBlocker != null)
-            {
-                syncInputBlocker.SetActive(false);
-                Debug.Log("[Account Menu Sync] SyncInputBlocker hidden.");
-            }
-
-            else
-            {
-                Debug.LogError("[Account Menu Sync] WaitSyncPanel reference is NULL!");
-            }
+            Debug.Log("[Account Menu Sync] Background synchronization ended.");
         }
+    }
+
+    private void HideAccountSyncUI()
+    {
+        if (waitSyncPanel != null)
+            waitSyncPanel.SetActive(false);
+
+        if (syncInputBlocker != null)
+            syncInputBlocker.SetActive(false);
     }
 
     public void ConnectUI(AccountUIReferences ui)
