@@ -15,7 +15,7 @@ MonoBehaviour:
   heroName: Blumentritt
   maxHp: 30
   shield: 70
-  maxShield: 70
+  maxShield: 100
   prefab: {fileID: 8609954007204539932, guid: 57f9fb4c596c00548989a7da5ca6433a, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: 0.75, z: 0}

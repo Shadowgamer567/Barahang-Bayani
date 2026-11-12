@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Justice
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Justice
-  cardShortDesc: Deal 15 Damage to All Enemies.
+  cardShortDesc: Deal 15 Damage to all enemies.
   cardFullDesc: I seek the path of Justice. -Paciano Rizal
   cardImage: {fileID: 0}
   effectType: 0

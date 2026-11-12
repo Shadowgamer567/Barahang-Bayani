@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: El FiliBusterismo
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: El FiliBusterismo
-  cardShortDesc: Deal 30 Damage to All Enemies. This will prompt a question.
+  cardShortDesc: Deal 30 Damage to all enemies. This will prompt a question.
   cardFullDesc: Rebel against oppression! -Jose Rizal
   cardImage: {fileID: 21300000, guid: b2f54b9b9e76af54ea6deef7fc9e6cf2, type: 3}
   effectType: 0

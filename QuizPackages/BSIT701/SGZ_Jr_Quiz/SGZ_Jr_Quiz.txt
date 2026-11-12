@@ -1,0 +1,9 @@
+ID:SGZ_JR_QUIZ1
+1. What are the vowels of the alphabet?
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. aeiou "C"
+B.
+C.
+D.
+

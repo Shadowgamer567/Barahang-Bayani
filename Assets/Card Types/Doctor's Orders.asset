@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Doctor's Orders
   cardShortDesc: Heal one hero for 12 HP.
-  cardFullDesc: Listen to your doctor. Your wounds will heal as per his instructions.
-    -Blumentritt
+  cardFullDesc: Listen to me, your doctor. Your wounds will heal if you listen to
+    my instructions. -Jose Rizal
   cardImage: {fileID: 0}
   effectType: 1
   targetType: 1

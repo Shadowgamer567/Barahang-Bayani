@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Brush Stroke
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Brush Stroke
-  cardShortDesc: Deal 6 Damage to all Enemies
+  cardShortDesc: Deal 6 Damage to all enemies.
   cardFullDesc: A stroke of a paintbrush paints a canvas. -Jose Rizal
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 0
   damage: 6
-  cost: 1
+  cost: 0
   quizCard: 0

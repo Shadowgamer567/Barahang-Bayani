@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Novel
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Novel
-  cardShortDesc: Deal 7 Damage to a Single Enemy.
+  cardShortDesc: Deal 10 Damage to a single enemy.
   cardFullDesc: The Reign of Greed. -Jose Rizal
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 1
-  damage: 7
+  damage: 10
   cost: 1
   quizCard: 0

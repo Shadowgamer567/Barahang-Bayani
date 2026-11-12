@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Filipino Suffering
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Filipino Suffering
-  cardShortDesc: Apply 7 Bleed to All Enemies.
+  cardShortDesc: Apply 7 Bleed to all enemies.
   cardFullDesc: For generations, we have bled and suffered at the hands of our oppressors.
     We shall make them feel our pain!
   cardImage: {fileID: 0}

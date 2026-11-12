@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Moth to a Flame
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Moth to a Flame
-  cardShortDesc: Deal 11 Damage to a single target.
+  cardShortDesc: Deal 11 Damage to a single enemy.
   cardFullDesc: "See that you do not behave like the young moth. Don\u2019t become
     disobedient, or you may get burnt as it did. -Dona Teodora "
   cardImage: {fileID: 0}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Honor
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Honor
-  cardShortDesc: Deal 15 Damage to One Enemy.
+  cardShortDesc: Deal 15 Damage to a single enemy.
   cardFullDesc: I will honor thee! -Paciano Rizal
   cardImage: {fileID: 0}
   effectType: 0

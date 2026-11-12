@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
-  m_Name: Product Sold
+  m_Name: Mothers Care
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: Product Sold!
-  cardShortDesc: Attack all enemies for 10 damage.
-  cardFullDesc: 'Attacked enemies for 10 damage.  '
+  cardName: Mother's Care
+  cardShortDesc: Heal 12HP for all heroes.
+  cardFullDesc: I care about my children, so much so that I will do anything for
+    them. -Dona Teodora
   cardImage: {fileID: 0}
-  effectType: 0
-  targetType: 0
-  damage: 10
+  effectType: 1
+  targetType: 2
+  damage: 12
   cost: 1
   quizCard: 0

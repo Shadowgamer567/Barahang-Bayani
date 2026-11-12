@@ -1,0 +1,7 @@
+[ID:SGZ_JR_QUIZ1]
+TITLE: Vowels of alphabet
+IMAGE: 
+DESC:
+The vowels of the alphabet is aeiou.
+[END]
+

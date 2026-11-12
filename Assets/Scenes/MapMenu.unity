@@ -177,7 +177,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: Greetings, Welcome to Barahang Bayani. An educational card game about the
-    Philippine's National Heroes and historical events
+    Philippine's National Heroes and historical events.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -2412,8 +2412,14 @@ MonoBehaviour:
   loadGame: {fileID: 0}
   optionsMenu: {fileID: 0}
   optionsBackdrop: {fileID: 0}
-  accountsButton: {fileID: 0}
+  creditsPanel: {fileID: 0}
+  creditsButton: {fileID: 0}
   optionsBackButton: {fileID: 0}
+  accountsButton: {fileID: 0}
+  title: {fileID: 0}
+  cardDeck: {fileID: 0}
+  mainMenuImage: {fileID: 0}
+  backgroundMenu: {fileID: 0}
 --- !u!1 &1025605554
 GameObject:
   m_ObjectHideFlags: 0
@@ -3112,8 +3118,14 @@ MonoBehaviour:
   loadGame: {fileID: 0}
   optionsMenu: {fileID: 0}
   optionsBackdrop: {fileID: 0}
-  accountsButton: {fileID: 0}
+  creditsPanel: {fileID: 0}
+  creditsButton: {fileID: 0}
   optionsBackButton: {fileID: 0}
+  accountsButton: {fileID: 0}
+  title: {fileID: 0}
+  cardDeck: {fileID: 0}
+  mainMenuImage: {fileID: 0}
+  backgroundMenu: {fileID: 0}
 --- !u!1 &1262087116
 GameObject:
   m_ObjectHideFlags: 0
@@ -3365,8 +3377,14 @@ MonoBehaviour:
   loadGame: {fileID: 0}
   optionsMenu: {fileID: 0}
   optionsBackdrop: {fileID: 0}
-  accountsButton: {fileID: 0}
+  creditsPanel: {fileID: 0}
+  creditsButton: {fileID: 0}
   optionsBackButton: {fileID: 0}
+  accountsButton: {fileID: 0}
+  title: {fileID: 0}
+  cardDeck: {fileID: 0}
+  mainMenuImage: {fileID: 0}
+  backgroundMenu: {fileID: 0}
 --- !u!114 &1337217514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3670,7 +3688,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: The books you see here contain the stories and events of Philippine's history
+  m_text: The books you see here contain the stories and events of the Philippines'
+    history.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -4050,7 +4069,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Each book is a campaign for you to play. Click the book to view it's contents
+  m_text: Each book is a campaign for you to play. Click the book to view it's contents.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Noli Me Tangere
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Noli Me Tangere
-  cardShortDesc: Deal 20 Damage to Single Target. This will prompt a question.
+  cardShortDesc: Deal 20 Damage to a single enemy. This will prompt a question.
   cardFullDesc: Touch me Not! -Jose Rizal
   cardImage: {fileID: 21300000, guid: 77f471cdca95cf3428bf59109d4f716d, type: 3}
   effectType: 0

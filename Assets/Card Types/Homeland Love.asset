@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0517ebb953817e44384838472e09b9ea, type: 3}
   m_Name: Homeland Love
   m_EditorClassIdentifier: Assembly-CSharp::CardType
-  cardName: Love for the Homeland
-  cardShortDesc: Deal 25 Damage to All Enemies.
+  cardName: Love for my Homeland
+  cardShortDesc: Deal 25 Damage to all enemies.
   cardFullDesc: For my homeland, as my brother would have wanted. I will love it
     as he did. -Paciano Rizal
   cardImage: {fileID: 0}
