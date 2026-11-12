@@ -35,7 +35,7 @@ ID:RIZAL5
 5. Who was Jose Rizal's Uncle who was his teacher?
 TYPE:TEXT
 INPUT:IDENTIFICATION
-A. Jose Alberto Alonso "C"
+A. Jose Alberto "C"
 B. Rufino Collantes
 C. Leoncio Lopez
 D. Manuel de Quintos Alonso
