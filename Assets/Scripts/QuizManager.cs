@@ -29,7 +29,6 @@ public class QuizManager : MonoBehaviour
     public GameObject submitButton;
     public GameObject multipleSelectSubmitButton;
 
-
     public GameObject endButton;
     public GameObject inputPanel;
     public GameObject truthPanel;
@@ -59,11 +58,15 @@ public class QuizManager : MonoBehaviour
     private bool answerSubmitted = false;
     private bool[] selectedMultipleAnswers = new bool[4];
     public bool blockInfoPanelDismissal = false;
+    private bool usingCustomQuizForCurrentSession = false;
+
     private int pendingDamage;
     private CardType pendingQuizCard;
 
     public List<QuizQuestion> questions = new List<QuizQuestion>();
     public Dictionary<string, QuizInfoData> infoDatabase = new Dictionary<string, QuizInfoData>();
+
+
 
     public void StartQuiz(QuizQuestion question, CardType card, BattleControl battle)
     {
@@ -150,14 +153,12 @@ public class QuizManager : MonoBehaviour
                 imageObject.SetActive(true);
                 questionImage.gameObject.SetActive(true);
 
-                string selectedQuiz = QuizMakerManager.SelectedQuizFilePath;
-
-                if (!string.IsNullOrEmpty(selectedQuiz) &&
-                    question.imagePath.StartsWith("Images/", StringComparison.OrdinalIgnoreCase))
+                if (usingCustomQuizForCurrentSession && question.imagePath.StartsWith("Images/", StringComparison.OrdinalIgnoreCase))
                 {
                     // Load image from the selected Quiz Package.
                     StartCoroutine(LoadPackageImage(question.imagePath));
                 }
+
                 else
                 {
                     // Existing campaign / legacy image loading.
@@ -183,17 +184,13 @@ public class QuizManager : MonoBehaviour
                 audioSource.Stop();
                 audioSource.clip = null;
 
-                string selectedAudioQuiz = QuizMakerManager.SelectedQuizFilePath;
-
-                if (!string.IsNullOrEmpty(selectedAudioQuiz) &&
-                    !string.IsNullOrEmpty(question.audioPath) &&
-                    question.audioPath.StartsWith(
-                        "Sounds/",
+                if (usingCustomQuizForCurrentSession && !string.IsNullOrEmpty(question.audioPath) && question.audioPath.StartsWith("Sounds/",
                         StringComparison.OrdinalIgnoreCase))
                 {
                     // Load audio from the selected Quiz Package.
                     StartCoroutine(LoadPackageAudio(question.audioPath));
                 }
+
                 else
                 {
                     // Preserve existing campaign audio loading.
@@ -438,44 +435,8 @@ public class QuizManager : MonoBehaviour
         Debug.Log("QuizManager initialized. Quiz Info will load with the selected quiz.");
     }
 
-    public void LoadQuestions(BackgroundSet campaign)
+    public void ParseQuestions(string quizText)
     {
-        questions.Clear();
-
-        // Load the matching Quiz Info for the selected quiz.
-        LoadQuizInfo(campaign);
-
-        string quizText;
-
-        // Custom quiz selected in Quiz Maker overrides campaign files.
-        string customPath = QuizMakerManager.SelectedQuizFilePath;
-
-        if (!string.IsNullOrEmpty(customPath))
-        {
-            if (!File.Exists(customPath))
-            {
-                Debug.LogError("Selected custom quiz file not found: " + customPath);
-                return;
-            }
-
-            quizText = File.ReadAllText(customPath);
-
-            Debug.Log("Loading custom quiz file: " + customPath);
-        }
-        else
-        {
-            // No custom selection: use the current campaign's file.
-            if (campaign == null || campaign.campaignQuizFile == null)
-            {
-                Debug.LogError("No quiz file assigned to the current campaign.");
-                return;
-            }
-
-            quizText = campaign.campaignQuizFile.text;
-
-            Debug.Log("Loading campaign quiz: " + campaign.campaignName);
-        }
-
         string[] lines = quizText.Split('\n');
 
         for (int i = 0; i < lines.Length;)
@@ -621,15 +582,74 @@ public class QuizManager : MonoBehaviour
         }
     }
 
+    public void LoadQuestions(BackgroundSet campaign)
+    {
+        questions.Clear();
+        infoDatabase.Clear();
 
-    void LoadQuizInfo(BackgroundSet campaign)
+        usingCustomQuizForCurrentSession = false;
+
+        string customPath = QuizMakerManager.SelectedQuizFilePath;
+
+        // Try the selected custom quiz first.
+        if (!string.IsNullOrEmpty(customPath) && File.Exists(customPath))
+        {
+            string customQuizText = File.ReadAllText(customPath);
+
+            Debug.Log("Loading custom quiz file: " + customPath);
+
+            ParseQuestions(customQuizText);
+
+            if (questions.Count > 0)
+            {
+                usingCustomQuizForCurrentSession = true;
+
+                Debug.Log("Custom quiz loaded successfully. Questions: " + questions.Count);
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "The selected custom quiz contains no questions. " +
+                    "Falling back to the campaign quiz."
+                );
+            }
+        }
+
+        // Fall back to the campaign quiz if no custom quiz was selected
+        // or if the selected custom quiz contained no questions.
+        if (questions.Count == 0)
+        {
+            questions.Clear();
+
+            if (campaign == null || campaign.campaignQuizFile == null)
+            {
+                Debug.LogError("No quiz file assigned to the current campaign.");
+                return;
+            }
+
+            Debug.Log("Loading campaign quiz: " + campaign.campaignName);
+
+            ParseQuestions(campaign.campaignQuizFile.text);
+
+            if (questions.Count == 0)
+            {
+                Debug.LogError("The campaign quiz also contains no questions.");
+                return;
+            }
+        }
+
+        // Load Quiz Info from the source actually used.
+        LoadQuizInfo(campaign, usingCustomQuizForCurrentSession);
+    }
+
+    void LoadQuizInfo(BackgroundSet campaign, bool useCustomQuiz)
     {
         infoDatabase.Clear();
 
         string infoContent;
         string customQuizPath = QuizMakerManager.SelectedQuizFilePath;
 
-        if (!string.IsNullOrEmpty(customQuizPath))
+        if (useCustomQuiz && !string.IsNullOrEmpty(customQuizPath))
         {
             // Custom Quiz Package: locate its companion Info file.
             string folder = Path.GetDirectoryName(customQuizPath);
@@ -860,14 +880,13 @@ public class QuizManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(info.imagePath))
             {
-                string selectedQuiz = QuizMakerManager.SelectedQuizFilePath;
-
-                if (!string.IsNullOrEmpty(selectedQuiz) &&
+                if (usingCustomQuizForCurrentSession &&
                     info.imagePath.StartsWith("Images/", StringComparison.OrdinalIgnoreCase))
                 {
                     // Load the image from the selected Quiz Package.
                     yield return StartCoroutine(LoadPackageInfoImage(info.imagePath));
                 }
+
                 else
                 {
                     // Preserve the original Resources image loading.
