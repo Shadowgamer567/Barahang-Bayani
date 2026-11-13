@@ -1,146 +1,120 @@
-# Barahang Bayani — Game Feature Guide
+# Barahang Bayani: Game Features
 
-This guide describes the features represented in the Unity project: the player-facing game, classroom and account tools, quiz authoring and synchronization, saved progress, and supporting presentation systems. It is based on the project scripts, scenes, and data assets. Features that depend on Firebase or scene setup require those services and references to be configured in the running build.
+Barahang Bayani is a learning game where you explore campaigns, answer quiz questions, and play card battles with a team of Filipino historical characters. This guide describes the main things players, students, and teachers can do in the game.
 
-## 1. Game at a glance
+## Playing the game
 
-Barahang Bayani is a campaign-based educational card battler. The player progresses through a map and levels, watches story scenes, and fights enemy groups with a team of Filipino historical characters. Quiz cards present curriculum questions during combat; the project records quiz performance alongside campaign progress.
+### Accounts
 
-The main configured scenes are `MainMenu`, `MapMenu`, `LevelSelect_Tutorial`, `LevelSelect_Rizal`, and `Level`. `BackgroundTemplates` is a presentation/template scene. Unity recovery scenes under `Assets/_Recovery` are editor recovery artifacts, not normal destinations in the player flow.
+Accounts keep each player's progress and quiz results separate. There are two types:
 
-## 2. Player walkthrough
+- **Student:** plays the campaigns and completes quizzes. A student's progress can be shared with an assigned teacher.
+- **Teacher:** manages a list of students and reviews their campaign and quiz progress.
 
-### Choose an account
+#### Create an account
 
-The main menu requires an active account before starting or loading a game. Open the account menu, select a saved student or teacher account, or create one. Account creation asks for a username and password; an account can also have a recovery code. The account menu can switch accounts, show account details, and remove an account.
+Open **Accounts**, choose **Create Student** or **Create Teacher**, then enter a username and password. When the account is created, the game displays a recovery code. Write it down somewhere safe before confirming the screen; you need that code if you forget the password. Then select the new account and enter its password to use it.
 
-### Start or resume
+#### Select or switch accounts
 
-- **Play / new game:** resets the active account's playthrough, starts the tutorial, and opens the map.
-- **Load game:** loads the selected account's progress and returns to its saved campaign scene. If tutorial completion is not recorded, the tutorial starts again.
-- **Options:** opens the settings view, including audio controls where connected in the scene.
-- **Credits / quit:** opens credits or closes the application in a built player.
+Open **Accounts** and choose the account you want. Enter its password to sign in. The game then loads that account's saved progress. To switch players, return to the account list and sign in to another account. Use **Play** for a fresh playthrough on the selected account or **Load Game** to continue its saved progress.
 
-Starting a new game resets completed-level and tutorial progress for that account. It does not mean that other accounts' progress is reset.
+#### Recover access or remove an account
 
-### Map, campaign, and level selection
+If you forget a password, choose that account's recovery option, enter its recovery code, and set a new password. Without the recovery code, the built-in recovery flow cannot reset the password. The account menu also lets you delete an account; deletion removes that account's game data from this installation and, when connected, its online records.
 
-The map provides campaign/module information panels and campaign navigation. Tutorial selection is enforced while the tutorial requires it; the Rizal campaign selection is blocked until that requirement is complete. Level selection buttons open the selected level, while locked/completed presentation is driven by account progress and the level assets.
+#### Teacher accounts
 
-Campaigns and levels are data-driven. `BackgroundSet` supplies campaign identity, quiz resources, and level-specific scenery/ground materials. `LevelData` specifies the level name, scene, required number of battles, campaign, heroes, possible enemies, and links to previous/next levels. The project contains Tutorial, Rizal, and Lapu-Lapu campaign assets and multiple level assets; which items are reachable depends on the configured maps and scene buttons.
+Open a teacher's details to see their classroom and assigned students. Use **Assign Students** to select student accounts and confirm the list. Select an assigned student to view completed levels and quiz scores by question type. These lists contain accounts available in the selected classroom.
 
-### Battle loop
+### Start or continue
 
-1. The player turn begins with the configured action points (AP) and a refilled hand.
-2. Click a card to inspect its full description. Confirm to play or cancel to return it to the hand.
-3. A card spends its AP cost when accepted. If AP is insufficient, the game shows a warning and does not play the card.
-4. Single-target cards ask for a valid enemy or hero target, depending on the effect. Area and self-targeting cards resolve directly.
-5. After card play, choose **End Turn**. Enemies perform their actions, then a new player turn begins with refreshed AP and cards.
-6. Defeat the required enemy groups to finish the level. If every hero falls, the battle is lost.
+- **Play** starts a new game and begins the tutorial.
+- **Load Game** continues the selected account's saved game.
+- **Options** opens the settings, including sound controls.
+- **Credits** shows the people behind the game.
+- **Quit** closes the game.
 
-Card effects include damage, piercing damage (bypasses shields), bleed damage over time, healing, shields, buffs, and debuffs. Cards can target all enemies, a single target, all heroes, or the acting hero. Heroes and enemies have health and shield displays; effect icons and combat text communicate active effects and results. Enemy behavior is selected from configured attack, heal, shield, buff, and debuff actions with per-enemy action weights.
+Starting a new game resets the selected account's campaign progress.
 
-The battle log records card and enemy actions. Character animations, hit/death feedback, card hover/transition animations, battle sounds, and AP display support the combat UI.
+### Campaigns and levels
 
-### Quiz cards
+Travel through the map to choose a campaign. The tutorial teaches the basics. The game also includes campaign content about José Rizal and Lapu-Lapu. Campaign screens can include background information and learning materials.
 
-Playing a quiz card pauses the battle and opens a random question from the active quiz set. Questions can be text, image, or audio. Answer formats are multiple choice, multiple select, identification, true/false, and fill-in-the-blank. Audio questions provide a playback control. Multiple-select answers must match the complete correct-answer set. Text entry is trimmed and compared without case sensitivity.
+Choose a level to begin its battles. Some levels have a story scene before or after a battle. Finish the required battles to complete a level and unlock the next step in the campaign.
 
-After submission, the game highlights correct and incorrect answers and may show a linked information panel (title, image, and explanation). Quiz totals and correct answers are recorded overall and by answer format. A correct answer activates the quiz card. An incorrect answer leaves the card effect inactive and gives enemies a penalty turn; the player's remaining AP and hand are preserved. Quiz questions are randomly selected, so a question may recur.
+### Battles
 
-At the end of a level, victory/defeat screens show quiz totals broken down by answer format. Victory offers return, retry, and continue where a next level exists. Defeat offers the available retry/return flow. The tutorial can temporarily restrict some battle and victory actions until its steps are complete.
+Take turns using cards to defeat enemies and protect your heroes. A normal player turn starts with **5 action points (AP)** and up to **5 cards**. Each card costs AP; click one to preview it, then confirm to play. You can’t play a card if you have fewer AP than it costs. If you run out of AP, you can’t play more cards that turn—click **End Turn** to let the enemies act. AP refills at the start of your next turn. Unused AP does not carry over, and cards left in your hand stay there for the next turn.
 
-### Pause and navigation
+Some cards need a target: attacks and weakening effects target enemies, while healing and shields target heroes. Other cards affect a whole group or the hero using them. Regular shields absorb damage first; piercing and bleed damage bypass shields. Bleed deals damage when you end your turn.
 
-Press **Esc** during battle to pause or resume. The pause menu can resume, exit to the last level-selection screen, or quit the application. The victory return action also returns to the last level-selection screen. These routes have a Rizal level-select fallback for direct scene testing.
+Click **End Turn** when ready. Each living enemy takes an action, such as attacking a random hero, healing, or shielding. Your next turn then starts with refreshed AP and enough cards to refill your hand. If a quiz-card answer is wrong, enemies take an extra turn; your remaining AP and cards are preserved. A correct answer activates the card.
 
-## 3. Tutorial, story, and learning content
+Defeat all enemies in the level's required battles to win. If all heroes fall, you lose. The battle log and character indicators show actions, health, shields, and effects. Press **Esc** to pause or resume.
 
-The tutorial is a staged guide that tracks tutorial completion and coordinates map, battle, and victory instructions. A spotlight/mask can focus attention on a UI element, and tutorial battle rules can constrain which cards or actions are available at each step. New-game and loaded-progress flows decide whether to start, resume, or skip it.
+### Quizzes in battle
 
-Cutscenes are authored as ordered dialogue lines. A line can use a hero, enemy, or narrator; character lines can set a name, side, and pose (idle, talking, thinking, surprised, happy, angry, or sad). The cutscene manager displays dialogue, spawns/framed character models, advances on user input, and restores the game UI when the scene ends. Level data associates start, after-battle, and end cutscenes with trigger points.
+Some cards ask a quiz question. Questions can be written, shown as an image, or played as audio. You may be asked to choose one answer, choose all correct answers, type an answer, fill in a blank, or answer true or false.
 
-Module information panels show a configured title, description, and image. The reusable scrollable-content data supports styled text and images, image placement above/below/hidden, explicit/native/panel-width sizing, aspect-ratio preservation, padding, and spacing.
+After you answer, the game shows which answers were right and may display a short explanation or related image. Correct answers activate the card. If you answer incorrectly, the card does not activate and the enemies get an extra turn. Your remaining action points and cards stay available.
 
-## 4. Accounts, classrooms, and teacher tools
+Quiz questions are chosen at random, so you may see the same question again. The game keeps track of your results by question type. At the end of a level, you can review your quiz results.
 
-### Account types
+### Pause and battle results
 
-The account model has **Student** and **Teacher** roles. Account cards are selectable, and login checks the password. Password visibility controls are available on login/create forms. Recovery uses a generated recovery code to set a new password. Usernames, password hashes, recovery hashes, account role, classroom, and teacher-assigned student IDs are represented in account data.
+Press **Esc** during a battle to pause or resume. From the pause menu, you can return to the level screen or quit.
 
-The account UI supports creating and deleting accounts, selecting the active account, login, recovery, and viewing student/teacher information. Teacher views can display assigned students and their progress/quiz metrics. Teachers can select students and confirm assignment to their teacher account. Student detail views expose completed-level and quiz-stat summaries.
+After a victory, you can return to the level screen, retry the level, or continue to the next level when one is available. After a defeat, you can return or retry where those choices are available.
+
+## Tutorial and story
+
+The tutorial guides you through the map and battle basics. It may ask you to perform specific actions before continuing.
+
+Story scenes use dialogue from heroes, enemies, and a narrator. Characters can appear with different expressions or poses. Click to move through the dialogue.
+
+Learning panels can show a topic's title, description, and image. Some panels let you scroll through formatted text and pictures.
+
+## Student and teacher features
 
 ### Classrooms
 
-The active classroom is selected from Firestore-backed classroom records or created by name. Switching classroom updates the current database context, downloads that classroom's accounts, refreshes the account UI, and handles pending account deletion recovery. A valid active classroom is required for quiz package authoring and synchronization.
+Choose a classroom to access its student accounts and shared quizzes. A teacher can create a classroom when that feature is available. Classroom features need an internet connection and the game's online service to be set up.
 
-### Online account/progress services
+### Teacher tools
 
-Firebase Authentication and Firestore are used for online services. Account and progress operations include downloading/uploading accounts, teacher/student assignments, uploading/downloading campaign progress, and recording quiz results. Local pending-operation records support retry/reconciliation when sync is interrupted. Firebase/network availability and correct service configuration are required for cloud operations; local play/progress files are also used.
+Teacher accounts can view assigned students, check their progress and quiz results, and assign students to the teacher. Student details can include completed levels and quiz performance.
 
-## 5. Quiz Maker and quiz packages
+### Saving progress
 
-### Create and edit a package
+The game saves completed levels, tutorial progress, the last campaign you visited, and quiz results to the selected account. It can also synchronize progress online when the service is available. If a connection is interrupted, unsent results can be kept for a later sync.
 
-The Quiz Maker stores packages beneath the active classroom folder in the app's persistent data location. Creating a package makes a folder with a quiz text file, companion `_info.txt` file, and `Images` and `Sounds` folders. Package names must be valid and unique within that classroom.
+## Creating and sharing quizzes
 
-Select a package, then add questions by entering the prompt, choosing a display type (text/image/audio) and response type, and supplying the answer data. Multiple-choice requires four answer options and one correct answer. Multiple-select requires four options and at least two correct options. Identification and fill-in-the-blank require a correct text answer; fill-in-the-blank requires exactly one `____` marker. True/false records the correct boolean. Image/audio prompts can attach media from the file picker.
+The Quiz Maker lets you create quiz packages for a classroom. A package can contain questions, answer choices, images, audio, and optional explanations.
 
-The editor can list/select questions, delete selected questions, remove a package (with confirmation), and select/deselect the package for play. Deleting a synced package coordinates remote deletion state with local cleanup. Closing the editor can synchronize pending package work.
+To create questions, choose how the question is presented and how the player answers it. Supported answer styles are:
 
-### Quiz info / explanations
+- Multiple choice, with one correct answer
+- Multiple select, with multiple correct answers
+- Identification, where the player types an answer
+- True or false
+- Fill in the blank, using one blank in the question
 
-Quiz Info Maker creates or edits an entry associated with each question ID. Entries can contain a title, image path, and explanatory text. After an answer, this extra context can appear in the quiz info panel. This is optional; missing info does not prevent a question from being loaded.
+You can add or remove questions, attach images or audio, and write an explanation for a question. Explanations can include a title and image, and may appear after the player answers.
 
-### Upload, download, and update
+Quiz packages can be shared through the classroom's online service. Teachers can publish a package, and players can download or update published packages. Sharing requires an internet connection and the online service to be configured. Packages have a size limit of 20 MB.
 
-Quiz package sync uses Firestore, the active classroom, Firebase authentication, and a selected local package. Upload publishes a version of the package; downloads discover published packages and can install or update a local copy. Local sync metadata records the package's classroom/version relationship. The uploader checks for version conflicts and validates integrity using file hashes; the package upload limit is 20 MiB. Package data is chunked for storage, and incomplete/pending updates have recovery handling. Deleted or incomplete remote versions are excluded from normal package discovery.
+Select a custom quiz package before starting a game to use its questions in battle. If no usable custom quiz is selected, the game uses the campaign's questions.
 
-For a custom quiz to be used in battle, select it in the Quiz Maker before entering the game flow that loads the quiz. If no custom package is selected, or it has no usable questions, the active campaign's quiz is used as the fallback.
+## Characters and content
 
-## 6. Progress and statistics
+The game includes historical heroes such as José Rizal, Lapu-Lapu, Teodora, Paciano, and Ferdinand Blumentritt. Enemies include soldiers, priests, generals, and conquistadors. Each level determines which heroes and enemies appear.
 
-Progress is associated with the active account. It tracks completed levels, tutorial completion, the last campaign scene, lifetime question/correct counts by input format, and pending quiz results for synchronization. Local JSON progress is written under Unity's persistent data path; Firestore is used for cloud progress when configured. On load, the project reconciles local and cloud state and preserves unsent quiz results during sync recovery.
+The card collection includes attacks, defense, healing, and other effects. Campaigns, levels, story scenes, quizzes, and learning materials provide the content for each playthrough.
 
-Within a level, victory can require multiple battles as defined by `battlesRequired`. Completing the requirement records the level and opens the victory screen. The level assets link to the next level where one exists. A retry reloads the current level; continue loads the linked next level or returns to selection when the chain ends.
+## Helpful notes
 
-Quiz statistics are also kept for the current level/session and displayed on the result screen: multiple choice, identification, true/false, multiple select, fill-in-the-blank, and total correct/questions.
-
-## 7. Audio, visual, and interaction features
-
-- Scene transitions support fade effects and optional scene-ready synchronization.
-- Main-menu presentation includes a shuffled card/deck animation and backdrop handling.
-- Background tiles and ground materials can vary by campaign/level; foliage sway scripts animate environmental objects.
-- Sound handlers cover scene music, button sounds, card sounds, battle sounds, and answer feedback. Volume groups can be set and persisted.
-- Cards, account entries, enemy/hero panels, effect indicators, and battle log are generated or refreshed from game state.
-- Input is primarily mouse-driven UI and target selection, with **Esc** as the battle pause shortcut.
-
-## 8. Project content and editor support
-
-The project includes data assets for heroes (Rizal, Lapu-Lapu, Teodora, Paciano, Blumentritt), enemies (including soldier, priest, general, conquistador), cards, levels, campaigns, cutscenes, modules, and quizzes. These ScriptableObject assets let the game content be configured separately from the battle and UI code.
-
-An editor inspector for card assets supports authoring card data. Debug/test helpers exist for damage, Firestore operations, battle logs, and quiz package discovery/download/upload/recovery. These are development support features and are not part of the normal player flow. Third-party asset and package folders (Firebase, External Dependency Manager, Standalone File Browser, Sketchfab importer, fonts, models, textures, and animations) provide integrations or content; they are not separate in-game modes.
-
-## 9. Feature map by system
-
-| System | Main responsibilities |
-| --- | --- |
-| Main menu and scene transitions | Play/load, options, credits, quit, campaign navigation, fades, ready signals |
-| Account manager | Student/teacher accounts, login, recovery, selection, deletion, teacher/student views and assignment |
-| Classroom and Firebase managers | Classroom selection/creation, account/progress/assignment/quiz package cloud access |
-| Progress manager | Per-account level/tutorial progress, local saves, cloud sync, quiz-result queue and reconciliation |
-| Level and campaign managers | Level setup, required battle count, level completion, victory/defeat, retry/continue |
-| Battle controller | Turns, AP, enemy AI/actions, card resolution, targeting, win/loss, battle log |
-| Cards and combat UI | Card data/effects/targets, hand draw/refill, preview/confirmation, hero/enemy panels, effect indicators |
-| Quiz manager and Quiz Maker | Question presentation/scoring, text/image/audio questions, five answer formats, authoring and quiz info |
-| Package upload/download/sync | Classroom package publishing, install/update, integrity checks, deletion and recovery |
-| Tutorial and cutscenes | Staged onboarding, guided battle actions, dialogue, character staging and poses |
-| Presentation and audio | Map/background motion, animation relays, transitions, sound effects, volume settings |
-
-## 10. Practical setup notes
-
-- Use a Unity Editor version compatible with `ProjectSettings/ProjectVersion.txt` and open the project through `Barahang-Bayani.slnx` or Unity Hub.
-- Cloud classrooms, accounts, progress, and quiz packages need Firebase configuration and an authenticated session. A missing/offline backend can prevent those online actions.
-- Quiz package features require a selected non-default classroom. The local package is selected separately from the campaign quiz fallback.
-- Exact button visibility and accessibility depend on scene/prefab references. This document describes implemented code/data capabilities, not a guarantee that every feature is exposed in every build.
-- `isBossLevel` is marked unused in level data. The project has boss-related content assets, but that flag does not currently drive a distinct boss-level flow.
+- The tutorial is the best place to learn how cards, turns, and quizzes work.
+- Quiz packages and classroom tools require an active classroom. Online sharing and syncing require a working internet connection and online service.
+- Some features may not appear in every version of the game.
