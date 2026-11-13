@@ -4814,11 +4814,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "**CREDITS**\n\n<size=34><b>DEVELOPMENT TEAM</b></size>\n\nPatino, Rozl
-    Angelo M.\nPedro, Jasper James V.\nDela Cruz, Stephen Dave\nRoberto, Sangueza
-    L. Jr.\n\n<size=34><b>GAME DESIGN</b></size>\n\nPatino, Rozl Angelo M.\nPedro,
-    Jasper James V.\nDela Cruz, Stephen Dave\n\n<size=34><b>ARTWORK AND VISUAL ASSETS</b></size>\n\nJasper,
-    James Pedro V.\nPatino, Rozl Angelo M.\n\n<size=34><b>MUSIC AND SOUND</b></size>\n\nPedro,
+  m_text: "\nCREDITS\n\n<size=34><b>DEVELOPMENT TEAM</b></size>\n\nPatino, Rozl Angelo
+    M.\nPedro, Jasper James V.\nDela Cruz, Stephen Dave\nRoberto, Sangueza L. Jr.\n\n<size=34><b>GAME
+    DESIGN</b></size>\n\nPatino, Rozl Angelo M.\nPedro, Jasper James V.\nDela Cruz,
+    Stephen Dave\n\n<size=34><b>ARTWORK AND VISUAL ASSETS</b></size>\n\nPedro, Jasper
+    James V.\nPatino, Rozl Angelo M.\n\n<size=34><b>MUSIC AND SOUND</b></size>\n\nPedro,
     Jasper James V.\n\n<size=34><b>HISTORICAL REFERENCES</b></size>\n\nProject Gutenberg,
     for archiving of historical texts and publishing it for public use.\n\nJose Rizal,
     for writing memoirs about his life experiences.\n\nAustin Craig, for being the
