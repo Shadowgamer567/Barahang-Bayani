@@ -35572,7 +35572,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 960d398be28d8ab47bcf1d0d2000950e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e89fc1181bd19934c84ff3a22f923929, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -51127,8 +51127,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: You played "Slash", dealing 5 damage to Soldier #1.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 6ac6a62f9c05cf24c8f7bf9abf879375, type: 2}
-  m_sharedMaterial: {fileID: 4423985902234278582, guid: 6ac6a62f9c05cf24c8f7bf9abf879375, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
+  m_sharedMaterial: {fileID: 689147838298557037, guid: 884bfa3fd3120f34e9ccfc809476f749, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
