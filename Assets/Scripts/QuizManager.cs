@@ -435,13 +435,15 @@ public class QuizManager : MonoBehaviour
             SoundVolumeControl.RegisterSource(audioSource, AudioVolumeGroup.Sfx, audioSource.volume);
         }
 
-        Debug.Log("Loaded Quiz Info");
-        LoadQuizInfo();
+        Debug.Log("QuizManager initialized. Quiz Info will load with the selected quiz.");
     }
 
     public void LoadQuestions(BackgroundSet campaign)
     {
         questions.Clear();
+
+        // Load the matching Quiz Info for the selected quiz.
+        LoadQuizInfo(campaign);
 
         string quizText;
 
@@ -620,7 +622,7 @@ public class QuizManager : MonoBehaviour
     }
 
 
-    void LoadQuizInfo()
+    void LoadQuizInfo(BackgroundSet campaign)
     {
         infoDatabase.Clear();
 
@@ -645,20 +647,19 @@ public class QuizManager : MonoBehaviour
 
             Debug.Log("Loading custom Quiz Info: " + infoPath);
         }
+
         else
         {
             // Default campaign Quiz Info.
-            TextAsset file = Resources.Load<TextAsset>("quizinfo");
-
-            if (file == null)
+            if (campaign == null || campaign.campaignQuizInfoFile == null)
             {
-                Debug.LogWarning("Default Quiz Info file not found.");
+                Debug.LogWarning("Quiz Info file is not assigned to the selected campaign.");
                 return;
             }
 
-            infoContent = file.text;
+            infoContent = campaign.campaignQuizInfoFile.text;
 
-            Debug.Log("Loading default Quiz Info.");
+            Debug.Log("Loading Quiz Info for campaign: " + campaign.campaignName);
         }
 
         string[] lines = infoContent.Split('\n');
