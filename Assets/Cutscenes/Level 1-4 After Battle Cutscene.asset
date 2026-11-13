@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "I left Bi\xF1an on December 17, 1870. I was nine back then, first
       time seeing what a steamer really was. It seemed to me most beautiful and in
@@ -34,7 +34,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: Oh! How happy I was to see the shore! At once I wanted to jump into
       the first banca. A deckhand took me in his arms and put me into the captain's
@@ -44,7 +44,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I jumped in and soon found myself again in our home, happy in love
       of my family. Here end my recollections of that period of mingled sadness and
@@ -53,7 +53,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: Finally, I'm home.
     isLeftSide: 0

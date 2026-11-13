@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: Somehow, I don't know how, I won against him. He hit the chairs near
       him and fell to the ground. I let him go, making him lose his confidence. Maybe
@@ -25,7 +25,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I don't want to take up time telling how many beatings I got, nor try
       to tell how much it hurt. I used to win in competitions, as no one was better
@@ -37,7 +37,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: Near the house of my schoolmaster lived his father-in-law, generally
       called Juancho. Juancho let me help him with his paintings, and in turn I learned

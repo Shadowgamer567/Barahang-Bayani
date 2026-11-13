@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: Some days after my return to Kalamba, my parents decided I should stay
       for a while, and later, I should go to Manila. I wanted to study with a teacher
@@ -25,7 +25,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: At the time, an uncle of mine, Don Jose Alberto, returned from Europe.
       He found that during his absence, his wife had left his home and abandoned
@@ -35,7 +35,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "They went to live in Bi\xF1an. Only a few days later my aunt plotted
       with a Guardia Civil officer who was a friend of ours. She accused her husband
@@ -45,7 +45,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "I don't want to tell the how much it hurt which we all, nine sisters
       and brothers, felt. Our mother\u2019s arrest, we knew, was unjust. The men
@@ -56,7 +56,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: At first, the alcalde mayor believed the accusation. He was unfair
       in every way and treated my mother rudely, even brutally. Finally, he persuaded
@@ -67,7 +67,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: I didn't do anything wrong! I didn't poison her! I helped looked for
       her when she was missing. I was even the one to convince Don Jose to take her
@@ -85,7 +85,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: You are all wrong. I never did anything wrong.
     isLeftSide: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Your statement is telling me to agree to the crimes that I have never
       committed. I won't sign your agreement. Leave my children out of this, they
@@ -119,7 +119,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Ah... My children...
     isLeftSide: 0
@@ -134,21 +134,21 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: ...
     isLeftSide: 0
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: ...
     isLeftSide: 0
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Will you truly set me free and that I can go home?
     isLeftSide: 0
@@ -162,7 +162,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Fine. If it's for my children...
     isLeftSide: 0
@@ -177,7 +177,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Aaahh.... my children... forgive me.
     isLeftSide: 0

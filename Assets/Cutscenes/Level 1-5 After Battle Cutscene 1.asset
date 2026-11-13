@@ -24,7 +24,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: The case became involved until the same alcalde asked pardon for her.
       But this was only when the matter was before the Supreme Court. He asked for
@@ -44,7 +44,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I found out for the first time what examinations were like. My examinations
       were in Christian doctrine, arithmetic and reading, in San Juan de Letran College.
@@ -55,7 +55,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I found out for the first time what examinations were like. My examinations
       were in Christian doctrine, arithmetic and reading, in San Juan de Letran College.
@@ -66,7 +66,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Narrator
     speakerType: 2
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: With Chapter III Complete. Let's start with the next chapter.
     isLeftSide: 0

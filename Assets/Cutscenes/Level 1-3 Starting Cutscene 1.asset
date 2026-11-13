@@ -26,7 +26,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "We reached Bi\xF1an by nightfall, and went to an aunt\u2019s house
       where I was to live. When the moon came up, a cousin took me around the town.
@@ -35,7 +35,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: My brother left me to the schoolmaster. I was a bit nervous at first,
       until he talked to me.

@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: As I had hoped, I was taken to the Jesuit priest at that time in charge
       of the Ateneo Municipal. He was Father Magin Fernando. At first he was unwilling
@@ -27,7 +27,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I dressed myself in the uniform like the other students, wearing a
       white coat, or americana, and a necktie, and entered the chapel of the Jesuit
@@ -36,7 +36,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I dressed myself in the uniform like the other students, wearing a
       white coat, or americana, and a necktie, and entered the chapel of the Jesuit
@@ -45,7 +45,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "In Jesuit colleges they divide the boys into two groups or \u201Cempires,\u201D\u2014one
       Roman and the other Greek. These two \u201Cempires\u201D are always at war.
@@ -55,7 +55,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "The \u201CEmperor\u201D wins his place by doing the best work and
       standing the highest of anyone in his group. I was put at the end of the line.
@@ -64,7 +64,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "After the religious exercises, I went out and found my brother waiting
       to take me to my lodgings, which were about twenty-five minutes\u2019 walk
@@ -74,7 +74,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "After the religious exercises, I went out and found my brother waiting
       to take me to my lodgings, which were about twenty-five minutes\u2019 walk
@@ -84,7 +84,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I lodged in a small house on Calle Caraballo, near an estero. The house
       consisted of a dining room, a sala, a bedroom and a kitchen. An awning covered
@@ -96,7 +96,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I lodged in a small house on Calle Caraballo, near an estero. The house
       consisted of a dining room, a sala, a bedroom and a kitchen. An awning covered
@@ -108,7 +108,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: By the end of the first week, I was going up in the class. Then I began
       to spend the siesta-time studying at Santa Isabel College. For this, I paid
@@ -117,9 +117,9 @@ MonoBehaviour:
     isLeftSide: 0
     pose: 0
   - speakerName: 'Opposing '
-    speakerType: 0
+    speakerType: 1
     hero: {fileID: 0}
-    enemy: {fileID: 0}
+    enemy: {fileID: 11400000, guid: 30089ce6c05fb8443ac124cbe58ffc7f, type: 2}
     Dialogue: It's the Emperor! Get him!
     isLeftSide: 0
     pose: 0

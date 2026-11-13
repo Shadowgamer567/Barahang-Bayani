@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "How pleased I was when I won my first prize, a religious picture!
       In the first quarter I gained another prize, with the grade \u201CExcellent.\u201D
@@ -27,7 +27,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "I spent the vacation at home and went with my eldest sister, Nening,
       to Tanawan, for the town festival. This was in 1873. But our pleasure was marred
@@ -40,7 +40,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "After vacation was over, I returned to Manila and enrolled in the
       second year. Then I hunted lodgings in the Walled City. Nothing new happened
@@ -51,7 +51,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I again went alone to visit my mother in prison. Like another Joseph,
       I prophesied to her from a dream that her release would take place within three
@@ -60,7 +60,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: 'At this time, I began to devote my leisure to reading novels. Under
       the pretext that I should have to study general history, I convinced my father
@@ -71,7 +71,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I would have won the medal if I had not made mistakes, which I spoke
       very poorly. This gave the medal to the Spanish lad who spoke his mother tongue
