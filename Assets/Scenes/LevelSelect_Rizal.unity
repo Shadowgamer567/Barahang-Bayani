@@ -5640,7 +5640,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 186880457}
   m_Direction: 2
   m_Value: 1.0000006
-  m_Size: 0.82133734
+  m_Size: 0.8213373
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6665,8 +6665,6 @@ MonoBehaviour:
   scrollSensitivity: 20
   contentItems:
   - {fileID: 11400000, guid: 7b498a2db4cb4f244869a4381d2e6691, type: 2}
-  - {fileID: 11400000, guid: d486d01527888124481100672b360c7f, type: 2}
-  - {fileID: 11400000, guid: b7677a4e76736834b9a93fa342228232, type: 2}
 --- !u!114 &1335920135
 MonoBehaviour:
   m_ObjectHideFlags: 0
