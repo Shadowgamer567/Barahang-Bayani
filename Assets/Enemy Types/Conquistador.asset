@@ -15,6 +15,7 @@ MonoBehaviour:
   enemyName: Spanish Conquestor
   maxHp: 15
   damage: 3
+  shield: 0
   maxShield: 0
   prefab: {fileID: 5239452982573887266, guid: f028ec07a4f39c6438107414090da673, type: 3}
   actions: []
@@ -24,4 +25,4 @@ MonoBehaviour:
   buffWeight: 4
   debuffWeight: 4
   modelRotationOffset: {x: 0, y: 0, z: 0}
-  modelPositionOffset: {x: 0, y: 0, z: 0}
+  modelPositionOffset: {x: 0, y: -0.8, z: 0}
