@@ -26,5 +26,5 @@ MonoBehaviour:
   - startLevel: 1
     endLevel: 1
     prefabs:
-    - {fileID: 2994760290788007504, guid: 8c1b21252a7a8f44c9112cdda28bb8f7, type: 3}
-    groundMaterial: {fileID: 2100000, guid: 20a0ad5f44fd20448ae15c7b4adf83af, type: 2}
+    - {fileID: 3723255703188040558, guid: bea6b597be13882418807ff9027e3ff8, type: 3}
+    groundMaterial: {fileID: 2100000, guid: 228645c3e86a92d428d8bb2bc2cabc8d, type: 2}
