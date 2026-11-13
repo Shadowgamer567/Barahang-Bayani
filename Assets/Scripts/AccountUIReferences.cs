@@ -60,6 +60,10 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject confirmLoginButton;
     public GameObject cancelLoginButton;
 
+    [Header("Password Visibility")]
+    public Button loginShowPasswordButton;
+    public Button createShowPasswordButton;
+
     [Header("ClassroomPanel")]
     public GameObject classroomPanel;
     public GameObject openClassroomSelectionButton;

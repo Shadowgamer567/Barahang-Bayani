@@ -88,6 +88,9 @@ public class AccountManager : MonoBehaviour
     public TMP_InputField loginPasswordInput;
     public TMP_Text loginUsernameText;
 
+    private bool isLoginPasswordVisible = false;
+    private bool isCreatePasswordVisible = false;
+
     public GameObject cardDeck;
 
     [Header("Recovery Code Display")]
@@ -1299,6 +1302,42 @@ public class AccountManager : MonoBehaviour
         backButton.SetActive(true);
     }
 
+    public void ToggleLoginPasswordVisibility()
+    {
+        isLoginPasswordVisible = !isLoginPasswordVisible;
+
+        loginPasswordInput.contentType = isLoginPasswordVisible
+            ? TMP_InputField.ContentType.Standard
+            : TMP_InputField.ContentType.Password;
+
+        PasswordVisibility passwordVisibility = loginPasswordInput.GetComponent<PasswordVisibility>();
+
+        if (passwordVisibility != null)
+        {
+            passwordVisibility.SetPasswordVisible(isLoginPasswordVisible);
+        }
+
+        loginPasswordInput.ForceLabelUpdate();
+    }
+
+    public void ToggleCreatePasswordVisibility()
+    {
+        isCreatePasswordVisible = !isCreatePasswordVisible;
+
+        passwordInputField.contentType = isCreatePasswordVisible
+            ? TMP_InputField.ContentType.Standard
+            : TMP_InputField.ContentType.Password;
+
+        PasswordVisibility passwordVisibility = passwordInputField.GetComponent<PasswordVisibility>();
+
+        if (passwordVisibility != null)
+        {
+            passwordVisibility.SetPasswordVisible(isCreatePasswordVisible);
+        }
+
+        passwordInputField.ForceLabelUpdate();
+    }
+
     public void OpenTeacherInfo(AccountCardUI card)
     {
         AccountData account = card.GetAccountData();
@@ -2484,6 +2523,16 @@ public class AccountManager : MonoBehaviour
         accountBtn.onClick.RemoveAllListeners();
 
         accountBtn.onClick.AddListener(OpenAccountMenu);
+
+        //Password Visibility Button
+        Button loginShowPasswordBtn = ui.loginShowPasswordButton;
+        Button createShowPasswordBtn = ui.createShowPasswordButton;
+
+        loginShowPasswordBtn.onClick.RemoveAllListeners();
+        loginShowPasswordBtn.onClick.AddListener(ToggleLoginPasswordVisibility);
+
+        createShowPasswordBtn.onClick.RemoveAllListeners();
+        createShowPasswordBtn.onClick.AddListener(ToggleCreatePasswordVisibility);
 
 
         // Back Button
