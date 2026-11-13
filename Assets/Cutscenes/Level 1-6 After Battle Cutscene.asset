@@ -23,8 +23,8 @@ MonoBehaviour:
       because of something my teacher said. Unfortunately, this continued until the
       end of the year and I gained only second place in all my subjects. This gave
       me the grade of \u201CExcellent\u201D but without any prize."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 4
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -36,8 +36,8 @@ MonoBehaviour:
       of the term in which I held second place. I thought with what joy I would surprise
       her. Instead, we wept in each other\u2019s arms. We had not seen each other
       for more than a year."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 4
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -47,8 +47,8 @@ MonoBehaviour:
       that year. My professor was the same as in the previous year; but I had different
       schoolmates. Among them I found three who had been with me in Bi\xF1an. At
       the end of this year, I won a medal and returned to my town."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -56,8 +56,8 @@ MonoBehaviour:
     Dialogue: I again went alone to visit my mother in prison. Like another Joseph,
       I prophesied to her from a dream that her release would take place within three
       months. This prediction happened to come true.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -67,8 +67,8 @@ MonoBehaviour:
       to buy me a set of Cesar Cantu y Dios'' histories. I learned a lot by reading
       them. Despite half applying myself and my mediocre Spanish, I was able to win
       prizes in the quarterly examination. '
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -76,5 +76,5 @@ MonoBehaviour:
     Dialogue: I would have won the medal if I had not made mistakes, which I spoke
       very poorly. This gave the medal to the Spanish lad who spoke his mother tongue
       better than I could. Thus, I finished my third year.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2

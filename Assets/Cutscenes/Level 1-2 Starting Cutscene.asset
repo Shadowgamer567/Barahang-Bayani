@@ -20,8 +20,8 @@ MonoBehaviour:
     Dialogue: "When I first woke up as a baby, I found myself in a village. I felt
       the sun and heard the voices of my parents. After that, I don\u2019t remember
       much from my baby days."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -31,12 +31,12 @@ MonoBehaviour:
       I took my supper at the roof of the house. My nurse, who was very fond of me,
       used to threaten to leave me to terrible but imaginary beings if I did not
       eat.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "My memories of that time\u2026 I\u2019m remembering some of them now."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2

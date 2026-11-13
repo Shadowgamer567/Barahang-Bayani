@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "Bi\xF1an is a town near my hometown in Kalamba. My father was born
       in Bi\xF1an, and wished for me to continue studying Latin there. He sent me
@@ -23,7 +23,7 @@ MonoBehaviour:
       hard and sad for all of us; I managed to hide my own tears, even though I was
       only nine. "
     isLeftSide: 0
-    pose: 0
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -31,15 +31,15 @@ MonoBehaviour:
     Dialogue: "We reached Bi\xF1an by nightfall, and went to an aunt\u2019s house
       where I was to live. When the moon came up, a cousin took me around the town.
       Bi\xF1an appeared to me large and wealthy but neither attractive nor cheerful."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: My brother left me to the schoolmaster. I was a bit nervous at first,
       until he talked to me.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: Teacher
     speakerType: 2
@@ -47,40 +47,40 @@ MonoBehaviour:
     enemy: {fileID: 0}
     Dialogue: You, do you speak Spanish?
     isLeftSide: 0
-    pose: 0
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: A little, sir.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Teacher
     speakerType: 2
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: Do you know Latin?
     isLeftSide: 0
-    pose: 0
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: A little, sir.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "These answers got the teacher\u2019s son to start making fun of me.
       Somehow or another, we ended up fighting."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: Hoo boy, I didn't want things to end like this.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 5

@@ -31,7 +31,7 @@ MonoBehaviour:
       in the cabin, but a Frenchman, Arturo Camps, who was a friend of my father,
       looked after me. The journey seemed very long but we finally arrived at Kalamba.
     isLeftSide: 0
-    pose: 0
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -40,8 +40,8 @@ MonoBehaviour:
       the first banca. A deckhand took me in his arms and put me into the captain's
       boat. Then the Frenchman came and four sailors rowed us ashore. It's impossible
       to describe how happy I was when I saw a servant waiting for us in the carriage.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 4
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -50,7 +50,7 @@ MonoBehaviour:
       of my family. Here end my recollections of that period of mingled sadness and
       gladness., in which for the first time, I came to know anybody of foreign birth.
     isLeftSide: 0
-    pose: 0
+    pose: 2
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}

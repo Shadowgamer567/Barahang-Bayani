@@ -21,7 +21,7 @@ MonoBehaviour:
       for a while, and later, I should go to Manila. I wanted to study with a teacher
       of the town, even though I could learn no more than multiplication, so I entered
       the village school.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
@@ -31,8 +31,8 @@ MonoBehaviour:
       He found that during his absence, his wife had left his home and abandoned
       her children. He nervously looked for his wife and, at my mother's earnest
       request, he took her back.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -41,8 +41,8 @@ MonoBehaviour:
       with a Guardia Civil officer who was a friend of ours. She accused her husband
       of poisoning her and charged that my mother was an accomplice. On this charge,
       the alcalde sent my mother to prison."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -52,8 +52,8 @@ MonoBehaviour:
       who arrested her pretended to be friends and had often been our guests. Ever
       though I was a child, I didn't trust making friends. We later learned that
       our mother, who was away from us, was ill."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -63,8 +63,8 @@ MonoBehaviour:
       her to confess to what they wished by promising to set her free and to let
       her see her children. What mother could resist that? What mother would not
       sacrifice life itself for her children?
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 5
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
@@ -72,33 +72,33 @@ MonoBehaviour:
     Dialogue: I didn't do anything wrong! I didn't poison her! I helped looked for
       her when she was missing. I was even the one to convince Don Jose to take her
       back because he was really worried!
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 5
   - speakerName: Alcalde Mayor
     speakerType: 1
     hero: {fileID: 0}
-    enemy: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
     Dialogue: Those are just your words, but can you even provide evidence for that?
       In the scene of the crime you committed, there is poison and your sister-in-law
       is ill. We have made our decision.
     isLeftSide: 0
-    pose: 0
+    pose: 1
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: You are all wrong. I never did anything wrong.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: Alcalde Mayor
     speakerType: 1
     hero: {fileID: 0}
-    enemy: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
     Dialogue: We can argue about this all day and it will go nowhere. I'll make this
       easier for you. If you sign a statement then we can make it so that you're
       free to be released and you get to see your children safe in a matter of days.
     isLeftSide: 0
-    pose: 0
+    pose: 5
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
@@ -106,12 +106,12 @@ MonoBehaviour:
     Dialogue: Your statement is telling me to agree to the crimes that I have never
       committed. I won't sign your agreement. Leave my children out of this, they
       were never even involved in the crime I never committed.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: Alcalde Mayor
     speakerType: 1
     hero: {fileID: 0}
-    enemy: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
     Dialogue: 'I won''t do anything to your children. But your children will surely
       miss you, what if you take way too long and they can''t ever see you again
       for a long time? Sign it with a signature. '
@@ -122,41 +122,41 @@ MonoBehaviour:
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Ah... My children...
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: Alcalde Mayor
     speakerType: 1
     hero: {fileID: 0}
-    enemy: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
     Dialogue: "I can wait how long I want to, this does not affect me. Rot in prison,
       that is your choice. Months, perhaps even longer, Do\xF1a Teodora. "
     isLeftSide: 0
+    pose: 1
+  - speakerName: "Do\xF1a Teodora"
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: ...
+    isLeftSide: 1
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: ...
-    isLeftSide: 0
-    pose: 0
-  - speakerName: "Do\xF1a Teodora"
-    speakerType: 0
-    hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
-    enemy: {fileID: 0}
-    Dialogue: ...
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: "Do\xF1a Teodora"
     speakerType: 0
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Will you truly set me free and that I can go home?
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 0
   - speakerName: Alcalde Mayor
     speakerType: 1
     hero: {fileID: 0}
-    enemy: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
     Dialogue: I give you my promise.
     isLeftSide: 0
     pose: 0
@@ -165,8 +165,8 @@ MonoBehaviour:
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Fine. If it's for my children...
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 6
   - speakerName: Narrator
     speakerType: 2
     hero: {fileID: 0}
@@ -180,8 +180,8 @@ MonoBehaviour:
     hero: {fileID: 11400000, guid: 7036c57c2506a5b43a8d94f11812db85, type: 2}
     enemy: {fileID: 0}
     Dialogue: Aaahh.... my children... forgive me.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 6
   - speakerName: Narrator
     speakerType: 2
     hero: {fileID: 0}

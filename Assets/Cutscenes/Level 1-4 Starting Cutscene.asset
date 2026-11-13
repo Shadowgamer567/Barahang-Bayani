@@ -24,7 +24,7 @@ MonoBehaviour:
       where I ate a plate of rice and two dried sardines. There was class work until
       ten and after lunch a study period.
     isLeftSide: 0
-    pose: 0
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -34,8 +34,8 @@ MonoBehaviour:
       took up the remainder of the afternoon. At night came supper, one or two plates
       of rice with fish. In the evening we had prayers and then, if it was moonlight,
       a cousin and I would play in the street with the others."
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -43,8 +43,8 @@ MonoBehaviour:
     Dialogue: Fortunately, I was never ill while away from home. From time to time,
       I went to my own village. How long the trip seemed going, and how short coming
       back!
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -53,5 +53,5 @@ MonoBehaviour:
       to read. Finally came a letter from my sister Saturnina which announced that
       the steamer would stop for me on a certain day. I said my goodbyes to my friends
       and teacher. I expressed my sadness in leaving and gratitude for his instruction.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 2

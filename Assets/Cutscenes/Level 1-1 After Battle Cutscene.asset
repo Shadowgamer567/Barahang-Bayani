@@ -19,9 +19,11 @@ MonoBehaviour:
     enemy: {fileID: 0}
     Dialogue: With this done, we now enter the life and story of Jose Rizal.
     isLeftSide: 0
+    pose: 0
   - speakerName: Narrator
     speakerType: 2
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: 'Chapter I: My Birth and Earliest Years in Kalamba'
     isLeftSide: 0
+    pose: 0

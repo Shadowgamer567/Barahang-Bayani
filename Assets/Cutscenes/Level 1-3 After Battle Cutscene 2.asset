@@ -21,8 +21,8 @@ MonoBehaviour:
       him and fell to the ground. I let him go, making him lose his confidence. Maybe
       because of my small size, my classmate thought that I was smart at fighting.
       A boy challenged me and I accepted but lost, almost breaking my head.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -33,8 +33,8 @@ MonoBehaviour:
       But every friend that I have were very kind to me that I didn't too much about
       their teasing. Later, some of them were my schoolmates in Manila and came my
       turn to tease.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 5
   - speakerName: Jose Rizal
     speakerType: 0
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
@@ -43,5 +43,5 @@ MonoBehaviour:
       called Juancho. Juancho let me help him with his paintings, and in turn I learned
       how to paint from him. I had liked this style of art that our classmates called
       Jose Guevarra, another pupil, and myself the class painters.
-    isLeftSide: 0
-    pose: 0
+    isLeftSide: 1
+    pose: 1
