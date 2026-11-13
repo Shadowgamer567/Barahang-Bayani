@@ -265,6 +265,9 @@ public class BattleControl : MonoBehaviour
         // Prevent another enemy turn from being started.
         currentstate = BattleState.Busy;
 
+        // Decay hero shield overflow at the end of the player's turn.
+        DecayShieldOverflow(true, false);
+
         UpdateUI();
 
         Debug.Log("Starting Enemy Turn");
@@ -323,12 +326,7 @@ public class BattleControl : MonoBehaviour
 
             if (enemy != null)
             {
-                Debug.Log(
-                    enemy.name +
-                    " | Active: " + enemy.gameObject.activeInHierarchy +
-                    " | Dead: " + enemy.isDead +
-                    " | HP: " + enemy.currentHP
-                );
+                Debug.Log(enemy.name + " | Active: " + enemy.gameObject.activeInHierarchy + " | Dead: " + enemy.isDead + " | HP: " + enemy.currentHP);
             }
 
             EnemyAction action = ChooseEnemyAction(enemy);
@@ -377,8 +375,12 @@ public class BattleControl : MonoBehaviour
                 "Player resumes with " + currentActionPoint + " AP."
             );
         }
+
         else
         {
+            // Decay enemy shield overflow after their normal turn.
+            DecayShieldOverflow(false, true);
+
             // Normal enemy turn: start a fresh player turn.
             StartPlayerTurn();
         }
@@ -1216,6 +1218,34 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    private void DecayShieldOverflow(bool decayHeroes, bool decayEnemies)
+    {
+        if (decayHeroes && heroes != null)
+        {
+            foreach (HeroStats hero in heroes)
+            {
+                if (hero == null || !hero.gameObject.activeInHierarchy || hero.IsDead())
+                {
+                    continue;
+                }
+
+                hero.DecayShieldOverflow();
+            }
+        }
+
+        if (decayEnemies && enemies != null)
+        {
+            foreach (EnemyStats enemy in enemies)
+            {
+                if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead)
+                {
+                    continue;
+                }
+
+                enemy.DecayShieldOverflow();
+            }
+        }
+    }
 
     //Handles Modifier Usage for all 3 Targeting Types 
     private void ModifierEffectHandler(CardType card, HeroStats actingHero)

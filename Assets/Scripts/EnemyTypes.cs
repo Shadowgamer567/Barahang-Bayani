@@ -6,6 +6,7 @@ public class EnemyTypes : ScriptableObject
     public string enemyName;
     public int maxHp;
     public int damage;
+    public int shield;
     public int maxShield;
     public GameObject prefab;
     public EnemyAction[] actions;

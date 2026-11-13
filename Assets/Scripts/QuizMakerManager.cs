@@ -1554,7 +1554,30 @@ public class QuizMakerManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currentQuizText.text = "No quiz selected";
+        // Restore the previously selected quiz.
+        if (!string.IsNullOrEmpty(SelectedQuizFilePath) && File.Exists(SelectedQuizFilePath))
+        {
+            selectedQuizPath = SelectedQuizFilePath;
+            SelectedQuizName = Path.GetFileNameWithoutExtension(selectedQuizPath);
+
+            if (currentQuizText != null)
+            {
+                currentQuizText.text = SelectedQuizName;
+            }
+        }
+
+        else
+        {
+            // Clear invalid or missing selections.
+            selectedQuizPath = null;
+            SelectedQuizFilePath = null;
+            SelectedQuizName = null;
+
+            if (currentQuizText != null)
+            {
+                currentQuizText.text = "No quiz selected";
+            }
+        }
 
         // Start both dropdowns on their placeholder labels.
         questionTypeDropdown.value = 0;

@@ -230,12 +230,17 @@ public class UIMain : MonoBehaviour
                 enemypanel[i].hpText.text = $"{enemy.currentHP} / {enemy.enemyType.maxHp}";
 
                 float maxShield = Mathf.Max(1, enemy.enemyType.maxShield);
-                float targetShield = (float)enemy.shield / maxShield;
+                float targetShield = Mathf.Clamp01((float)enemy.shield / maxShield);
 
                 enemydisplayedShield[i] = Mathf.Lerp(enemydisplayedShield[i], targetShield, Time.deltaTime * 8f);
 
                 enemypanel[i].shieldFill.fillAmount = enemydisplayedShield[i];
-                enemypanel[i].shieldText.text = $"{enemy.shield} / {enemy.enemyType.maxShield}";
+
+                int overflow = Mathf.Max(0, enemy.shield - enemy.enemyType.maxShield);
+
+                enemypanel[i].shieldText.text = overflow > 0
+                    ? $"{enemy.shield} / {enemy.enemyType.maxShield} (+{overflow})"
+                    : $"{enemy.shield} / {enemy.enemyType.maxShield}";
 
                 // Each enemy has its own action modifier.
                 ActionModifier enemyModifier = enemy.GetComponent<ActionModifier>();
@@ -290,12 +295,17 @@ public class UIMain : MonoBehaviour
 
                 // SHIELD
                 float maxShield = Mathf.Max(1, hero.heroType.maxShield);
-                float targetShield = (float)hero.shield / maxShield;
+                float targetShield = Mathf.Clamp01((float)hero.shield / maxShield);
 
-                herodisplayedShield[i] = Mathf.Lerp(herodisplayedShield[i], targetShield, Time.deltaTime * 8f);
+                herodisplayedShield[i] = Mathf.Lerp(herodisplayedShield[i],targetShield,Time.deltaTime * 8f);
 
                 heropanel[i].shieldFill.fillAmount = herodisplayedShield[i];
-                heropanel[i].shieldText.text = $"{hero.shield} / {hero.heroType.maxShield}";
+
+                int overflow = Mathf.Max(0, hero.shield - hero.heroType.maxShield);
+
+                heropanel[i].shieldText.text = overflow > 0
+                    ? $"{hero.shield} / {hero.heroType.maxShield} (+{overflow})"
+                    : $"{hero.shield} / {hero.heroType.maxShield}";
 
 
                 // MODIFIER

@@ -52,7 +52,7 @@ public class EnemyStats : MonoBehaviour
         battle = FindFirstObjectByType<BattleControl>();
 
         currentHP = enemyType.maxHp;
-        shield = enemyType.maxShield;
+        shield = Mathf.Max(0, enemyType.shield);
 
         attack = enemyType.damage;
         bleedValue = 0;
@@ -83,7 +83,7 @@ public class EnemyStats : MonoBehaviour
         }
 
         currentHP = enemyType.maxHp;
-        shield = enemyType.maxShield;
+        shield = Mathf.Max(0, enemyType.shield);
         attack = enemyType.damage;
 
         bleedValue = 0;
@@ -119,26 +119,23 @@ public class EnemyStats : MonoBehaviour
         amount = Mathf.Max(0, amount);
 
         Debug.Log(name + " RECEIVED DAMAGE CALL");
-        int previousHP = currentHP;
 
-        if (shield > 0 && !bypassShield)
+        int previousHP = currentHP;
+        int shieldDamage = 0;
+        int remainingDamage = amount;
+
+        if (!bypassShield)
         {
-            int shieldDamage = Mathf.Min(shield, amount);
+            shieldDamage = Mathf.Min(shield, amount);
             shield -= shieldDamage;
 
-            int excessDamage = amount - shieldDamage;
-
-            if(excessDamage > 0)
-            {
-                currentHP -= excessDamage;
-            }
+            remainingDamage -= shieldDamage;
         }
 
-        else
+        if (remainingDamage > 0)
         {
-            currentHP -= amount;
+            currentHP -= remainingDamage;
         }
-        Debug.Log(name + " HP AFTER DAMAGE: " + currentHP);
 
         currentHP = Mathf.Max(currentHP, 0);
         shield = Mathf.Max(shield, 0);
@@ -148,7 +145,9 @@ public class EnemyStats : MonoBehaviour
             OnHpLost?.Invoke();
         }
 
-        Debug.Log(name + " took damage: " + amount + " | HP: " + currentHP + " | Shield: " + shield);
+        Debug.Log(name + " took " + amount + " damage | Shield Damage: " + shieldDamage + " | HP Damage: " + remainingDamage + " | HP: " + currentHP +
+            " | Shield: " + shield
+        );
 
         if (animationRelay != null && currentHP > 0)
         {
@@ -160,8 +159,8 @@ public class EnemyStats : MonoBehaviour
             isDead = true;
             Debug.Log(name + " ENTERING DEATH");
             isDying = true;
-            
-            foreach(var c in GetComponentsInChildren<Collider>())
+
+            foreach (var c in GetComponentsInChildren<Collider>())
             {
                 c.enabled = false;
             }
@@ -251,14 +250,44 @@ public class EnemyStats : MonoBehaviour
 
     public void AddShield(int amount)
     {
-        shield += amount;
-
-        if (amount > 0)
+        if (isDead || isDying || !gameObject.activeInHierarchy)
         {
-            OnShieldGained?.Invoke();
+            return;
         }
 
-        Debug.Log(name + " gained shield " + amount);
+        amount = Mathf.Max(0, amount);
+
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        shield += amount;
+
+        OnShieldGained?.Invoke();
+
+        Debug.Log(name + " gained " + amount + " shield | Total Shield: " + shield);
+    }
+
+    public void DecayShieldOverflow()
+    {
+        int maxShield = Mathf.Max(0, enemyType.maxShield);
+
+        if (shield <= maxShield)
+        {
+            return;
+        }
+
+        int overflow = shield - maxShield;
+        int remainingOverflow = Mathf.CeilToInt(overflow / 2f);
+
+        shield = maxShield + remainingOverflow;
+
+        Debug.Log(
+            name + " shield overflow decayed. " +
+            "Remaining Shield: " + shield +
+            " | Max Shield: " + maxShield
+        );
     }
 
     /*

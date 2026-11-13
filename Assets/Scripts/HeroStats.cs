@@ -33,7 +33,7 @@ public class HeroStats : MonoBehaviour
         }
 
         currentHP = heroType.maxHp;
-        shield = heroType.maxShield;
+        shield = Mathf.Max(0, heroType.shield);
 
         LoadModel();
     }
@@ -45,24 +45,24 @@ public class HeroStats : MonoBehaviour
             return;
         }
 
+        amount = Mathf.Max(0, amount);
+
         int previousHP = currentHP;
 
-        if (shield > 0)
-        {
-            int shieldDamage = Mathf.Min(shield, amount);
-            shield -= shieldDamage;
+        // Normal damage consumes all available shield first,
+        // including temporary overflow.
+        int shieldDamage = Mathf.Min(shield, amount);
+        shield -= shieldDamage;
 
-            int remaining = amount - shieldDamage;
+        int remainingDamage = amount - shieldDamage;
 
-            if (remaining > 0)
-            {
-                currentHP -= remaining;
-            }
-        }
-        else
+        if (remainingDamage > 0)
         {
-            currentHP -= amount;
+            currentHP -= remainingDamage;
         }
+
+        currentHP = Mathf.Max(0, currentHP);
+        shield = Mathf.Max(0, shield);
 
         if (currentHP < previousHP)
         {
@@ -74,11 +74,8 @@ public class HeroStats : MonoBehaviour
             animationRelay.Play(CharacterAnimationType.Damaged);
         }
 
-
         if (currentHP <= 0)
         {
-            currentHP = 0;
-
             // Remove this hero's custom cards from future draws.
             CardPanelManager cardManager = FindFirstObjectByType<CardPanelManager>();
 
@@ -96,6 +93,7 @@ public class HeroStats : MonoBehaviour
             {
                 animationRelay.Play(CharacterAnimationType.Death);
             }
+
             else
             {
                 gameObject.SetActive(false);
@@ -130,16 +128,40 @@ public class HeroStats : MonoBehaviour
             return;
         }
 
+        if (!gameObject.activeInHierarchy || IsDead())
+        {
+            return;
+        }
+
         amount = Mathf.Max(0, amount);
+
+        if (amount <= 0)
+        {
+            return;
+        }
 
         shield += amount;
 
-        if (amount > 0)
-        {
-            OnShieldGained?.Invoke();
-        }
+        OnShieldGained?.Invoke();
 
         Debug.Log(name + " gained " + amount + " shield | Total Shield: " + shield);
+    }
+
+    public void DecayShieldOverflow()
+    {
+        int maxShield = Mathf.Max(0, heroType.maxShield);
+
+        if (shield <= maxShield)
+        {
+            return;
+        }
+
+        int overflow = shield - maxShield;
+        int remainingOverflow = Mathf.CeilToInt(overflow / 2f);
+
+        shield = maxShield + remainingOverflow;
+
+        Debug.Log(name + " shield overflow decayed. " + "Remaining Shield: " + shield + " | Max Shield: " + maxShield);
     }
 
     /*
