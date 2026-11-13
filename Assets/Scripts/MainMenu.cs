@@ -243,8 +243,16 @@ public class MainMenu : MonoBehaviour
         mainMenuImage.SetActive(false);
 
         // Show Credits background and navigation.
+        // Show Credits background and navigation.
         backgroundMenu.SetActive(true);
         optionsBackButton.SetActive(true);
+
+        Button backButtonComponent = optionsBackButton.GetComponent<Button>();
+
+        if (backButtonComponent != null)
+        {
+            backButtonComponent.interactable = true;
+        }
     }
 
     public void BackFromCredits()
