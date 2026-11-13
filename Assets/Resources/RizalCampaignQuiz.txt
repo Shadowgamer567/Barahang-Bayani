@@ -1,5 +1,5 @@
 ID:RIZALCAMPAIGNQUIZ1
-1. Who among these is Jose Rizal's sister?
+1. Who among these is Jose Rizal's sister? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Josephine
@@ -8,7 +8,7 @@ C. Leonore
 D. Saturnina "C"
 
 ID:RIZALCAMPAIGNQUIZ2
-2. At what age did Concepcion Rizal or Concha pass away from her illness?
+2. At what age did Concepcion Rizal or Concha pass away from her illness? 
 TYPE:TEXT
 INPUT:IDENTIFICATION
 A. Three "C"
@@ -17,7 +17,7 @@ C.
 D.
 
 ID:RIZALCAMPAIGNQUIZ3
-3. Where did Jose Rizal go in June of 1868?
+3. Where did Jose Rizal go in June of 1868? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Calamba, Laguna
@@ -26,7 +26,7 @@ C. Quezon City
 D. Sta. Cruz, Laguna
 
 ID:RIZALCAMPAIGNQUIZ4
-4. What books did Jose Rizal convince his father to buy?
+4. What books did Jose Rizal convince his father to buy? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Universal History "C"
@@ -35,19 +35,19 @@ C. El Filibusterismo
 D. Divine Comedy
 
 ID:RIZALCAMPAIGNQUIZ5
-5. Did Jose Rizal die on December 30, 1896?
+5. Did Jose Rizal die on December 30, 1896? 
 TYPE:TEXT
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
 ID:RIZALCAMPAIGNQUIZ6
-6. Is Jose Rizal a National Hero?
+6. Is Jose Rizal a National Hero? 
 TYPE:TEXT
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
 ID:RIZALCAMPAIGNQUIZ7
-7. What is the title of Jose Rizal's last poem?
+7. What is the title of Jose Rizal's last poem? 
 TYPE:TEXT
 INPUT:IDENTIFICATION
 A. Mi Ultimo Adios "C"
@@ -56,7 +56,7 @@ C.
 D.
 
 ID:RIZALCAMPAIGNQUIZ8
-8. Which of these novels did Jose Rizal write?
+8. Which of these novels did Jose Rizal write? Select multiple answers.
 TYPE:TEXT
 INPUT:MULTIPLE_SELECT
 A. The Metamorphosis
@@ -65,7 +65,7 @@ C. Noli Me Tangere "C"
 D. The Plague
 
 ID:RIZALCAMPAIGNQUIZ9
-9. Where was Jose Rizal born?
+9. Where was Jose Rizal born? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Sta. Ana, Manila
@@ -74,7 +74,7 @@ C. Calamba, Laguna "C"
 D. Sta. Cruz, Laguna
 
 ID:RIZALCAMPAIGNQUIZ10
-10. What is Jose Rizal's main profession?
+10. What is Jose Rizal's main profession? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Engineer
@@ -89,7 +89,7 @@ INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
 
 ID:RIZALCAMPAIGNQUIZ12
-12. Who among these were members of La Solidaridad?
+12. Who among these were members of La Solidaridad? Select multiple answers.
 TYPE:TEXT
 INPUT:MULTIPLE_SELECT
 A. Jose Rizal "C"
@@ -134,7 +134,7 @@ INPUT:TRUE_OR_FALSE
 ANSWER:FALSE
 
 ID:RIZALCAMPAIGNQUIZ18
-18. Where was Dona Teodora imprisoned?
+18. Where was Dona Teodora imprisoned? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Santa Cruz, Manila
@@ -152,7 +152,7 @@ C.
 D.
 
 ID:RIZALCAMPAIGNQUIZ20
-20. Who among these are Jose Rizal's siblings?
+20. Who among these are Jose Rizal's siblings? Select multiple answers.
 TYPE:TEXT
 INPUT:MULTIPLE_SELECT
 A. Saturnina "C"
@@ -161,7 +161,7 @@ C. Juancho
 D. Alberto
 
 ID:RIZALCAMPAIGNQUIZ21
-21. Who is Jose Rizal's closest friend?
+21. Who is Jose Rizal's closest friend? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Jose Burgos
@@ -170,7 +170,7 @@ C. Ferdinand Blumentritt "C"
 D. Arturo Camps
 
 ID:RIZALCAMPAIGNQUIZ22
-22. Who among these is Dona Teodora's brother?
+22. Who among these is Dona Teodora's brother? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Jose Bech
