@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Novel
   cardShortDesc: Deal 10 Damage to a single enemy.
-  cardFullDesc: The Reign of Greed. -Jose Rizal
+  cardFullDesc: The Reign of Greed. I criticize the abuse that Spanish authorities
+    have in our homeland. -Jose Rizal
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 1

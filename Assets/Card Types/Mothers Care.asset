@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Mothers Care
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Mother's Care
-  cardShortDesc: Heal 12HP for all heroes.
+  cardShortDesc: Heal 7HP for all heroes.
   cardFullDesc: I care about my children, so much so that I will do anything for
     them. -Dona Teodora
   cardImage: {fileID: 0}
   effectType: 1
   targetType: 2
-  damage: 12
-  cost: 1
+  damage: 7
+  cost: 0
   quizCard: 0

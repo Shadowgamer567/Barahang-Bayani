@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeroType
   heroName: Lapu Lapu
   maxHp: 80
-  shield: 10
-  maxShield: 100
+  shield: 20
+  maxShield: 60
   prefab: {fileID: 3756510690599694611, guid: 5c83a01086dd3154bb2f926b75fe35e2, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: -0.75, z: 0}
   customCards:
   - {fileID: 11400000, guid: 9a7e68bbb8a5ae146839bf6de4eab88e, type: 2}
+  - {fileID: 11400000, guid: f42c64b1067243b49a295bd291914420, type: 2}
   - {fileID: 11400000, guid: f2d38b7d5a0af3a45ab7a15547534a94, type: 2}
+  - {fileID: 11400000, guid: 7bee7eef22f71a04292bdebd3f776a18, type: 2}
   customCardBackground: {fileID: 21300000, guid: 76b87e60f68900648b0a4c5aefeda7d5, type: 3}

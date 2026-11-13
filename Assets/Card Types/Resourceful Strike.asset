@@ -19,6 +19,6 @@ MonoBehaviour:
   cardImage: {fileID: 0}
   effectType: 0
   targetType: 1
-  damage: 15
+  damage: 20
   cost: 2
   quizCard: 0

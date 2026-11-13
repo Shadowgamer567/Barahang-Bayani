@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Counterargument
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Counterargument
-  cardShortDesc: Reduce one enemy's Action Value by 5.
+  cardShortDesc: Reduce one enemy's Action Value by 10.
   cardFullDesc: I disagree. Your argument is weak. Here's why... -Ferdinand Blumentritt
   cardImage: {fileID: 0}
   effectType: 4
   targetType: 1
-  damage: 5
+  damage: 10
   cost: 1
   quizCard: 0

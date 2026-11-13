@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Rally Cry
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Rally Cry
-  cardShortDesc: Decrease the value of all enemies next action by 5.
-  cardFullDesc: Brothers! Stand up to fight! For our homeland! -Paciano Rizal
+  cardShortDesc: Decrease the Action Value of all enemies next action by 10.
+  cardFullDesc: Brothers! Stand up and fight! For our homeland! -Paciano Rizal
   cardImage: {fileID: 0}
   effectType: 4
   targetType: 0
-  damage: 5
-  cost: 1
+  damage: 10
+  cost: 2
   quizCard: 0

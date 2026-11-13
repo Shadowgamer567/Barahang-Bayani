@@ -15,7 +15,7 @@ MonoBehaviour:
   line:
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: I had nine sisters and a brother. Our father was a model parent. He
       gave us the education that was suitable in a family that was neither rich nor
@@ -26,7 +26,7 @@ MonoBehaviour:
     pose: 0
   - speakerName: Jose Rizal
     speakerType: 0
-    hero: {fileID: 0}
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: "At night I prayed along with my mother and siblings. Afterwards, we
       went to the roof to enjoy the moonlight; and our nurse would tell us stories.

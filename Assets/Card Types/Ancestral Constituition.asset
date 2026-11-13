@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Ancestral Constituition
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Ancestral Constitution
-  cardShortDesc: Self-Heal for 20HP.
-  cardFullDesc: I don't know why, but the blood in my body prevent me from going
+  cardShortDesc: Self-Heal for 15HP.
+  cardFullDesc: I don't know why, but the blood in my body prevents me from going
     down. -Lapu Lapu
   cardImage: {fileID: 0}
   effectType: 1
   targetType: 3
-  damage: 20
-  cost: 1
+  damage: 15
+  cost: 0
   quizCard: 0

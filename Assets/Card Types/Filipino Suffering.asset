@@ -15,10 +15,10 @@ MonoBehaviour:
   cardName: Filipino Suffering
   cardShortDesc: Apply 7 Bleed to all enemies.
   cardFullDesc: For generations, we have bled and suffered at the hands of our oppressors.
-    We shall make them feel our pain!
+    We shall make them feel our pain! -Filipino Rebel
   cardImage: {fileID: 0}
   effectType: 6
   targetType: 0
   damage: 7
-  cost: 3
+  cost: 2
   quizCard: 0

@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Primal Guard
   cardShortDesc: Add 30 Shield to self.
-  cardFullDesc: With my experience in training, I know how to block your attacks.
+  cardFullDesc: With my experience in training. I know how to block your attacks.
     -Lapu Lapu
   cardImage: {fileID: 0}
   effectType: 2
   targetType: 3
-  damage: 15
+  damage: 30
   cost: 2
   quizCard: 0

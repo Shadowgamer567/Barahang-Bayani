@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Instruct
   m_EditorClassIdentifier: Assembly-CSharp::CardType
   cardName: Instruct
-  cardShortDesc: Shield 10 damage to a single enemy.
+  cardShortDesc: Shield 10 damage to a single hero.
   cardFullDesc: As your teacher, I instruct you to brace for their counteragument.
     -Ferdinand Blumentritt
   cardImage: {fileID: 0}

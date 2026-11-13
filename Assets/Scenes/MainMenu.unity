@@ -4792,7 +4792,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 491.5, y: -15}
-  m_SizeDelta: {x: 953, y: 1907.91}
+  m_SizeDelta: {x: 953, y: 2859.33}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &176486574
 MonoBehaviour:
@@ -4814,64 +4814,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '**CREDITS**
-
-
-    <size=34><b>DEVELOPMENT TEAM</b></size>
-
-
-    Patino,
-    Rozl Angelo M.
-
-    Jasper, James Pedro V.
-
-    Dela Cruz, Stephen Dave
-
-    Roberto,
-    Sangueza Jr L.
-
-
-    <size=34><b>GAME DESIGN</b></size>
-
-
-    Patino, Rozl Angelo
-    M.
-
-    Jasper, James Pedro V.
-
-    Dela Cruz, Stephen Dave
-
-
-    <size=34><b>ARTWORK
-    AND VISUAL ASSETS</b></size>
-
-
-    Jasper, James Pedro V.
-
-    Patino, Rozl Angelo
-    M.
-
-
-    <size=34><b>MUSIC AND SOUND</b></size>
-
-
-    Jasper, James Pedro V.
-
-
-    <size=34><b>HISTORICAL
-    REFERENCES</b></size>
-
-
-    To be added
-
-
-    <size=34><b>SPECIAL THANKS</b></size>
-
-
-    Anton
-    Jerard Villacorte
-
-    Jervic Sabanal'
+  m_text: "**CREDITS**\n\n<size=34><b>DEVELOPMENT TEAM</b></size>\n\nPatino, Rozl
+    Angelo M.\nPedro, Jasper James V.\nDela Cruz, Stephen Dave\nRoberto, Sangueza
+    L. Jr.\n\n<size=34><b>GAME DESIGN</b></size>\n\nPatino, Rozl Angelo M.\nPedro,
+    Jasper James V.\nDela Cruz, Stephen Dave\n\n<size=34><b>ARTWORK AND VISUAL ASSETS</b></size>\n\nJasper,
+    James Pedro V.\nPatino, Rozl Angelo M.\n\n<size=34><b>MUSIC AND SOUND</b></size>\n\nPedro,
+    Jasper James V.\n\n<size=34><b>HISTORICAL REFERENCES</b></size>\n\nProject Gutenberg,
+    for archiving of historical texts and publishing it for public use.\n\nJose Rizal,
+    for writing memoirs about his life experiences.\n\nAustin Craig, for being the
+    biographer that documented Jose Rizal's ancestry and life.\n\njoserizal.com for
+    documenting comprehensive content about Jose Rizal.\n\nKahimyang Project, for
+    publishing articles related to Jose Rizal and the people related to him. \n\n<size=34><b>SPECIAL
+    THANKS</b></size>\n\nFilemon P. Javier Elementary School\n\nAnton Jerard Villacorte\nJervic
+    Sabanal"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
   m_sharedMaterial: {fileID: -4303045520502380536, guid: a8ab65ac32a328d4186fb5c44efc41c5, type: 2}
@@ -5700,7 +5655,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1415663635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.47586215}
+  m_AnchorMin: {x: 0, y: 0.6483922}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -27217,7 +27172,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 197872789}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.52413785
+  m_Size: 0.35160783
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -42969,7 +42924,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1543154309
 RectTransform:
   m_ObjectHideFlags: 0
@@ -42988,7 +42943,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1937.91}
+  m_SizeDelta: {x: 0, y: 2889.33}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1543154310
 MonoBehaviour:
