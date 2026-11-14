@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-14 Starting Cutscene
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I hurried to Hong Kong as soon as I could, and sent my parents a letter
+      asking permission to join them. My brother-in-law Manuel Hidalgo was deported
+      under the governor of La Laguna, stating that Filipinos were mistaken in thinking
+      that the new Civic Code gave them any rights.
+    isLeftSide: 0
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: When I arrived there, I learned that my brother Paciano had been released
+      from exile in Mindoro, but that three of my sisters had been summoned with
+      the probability of deportation.
+    isLeftSide: 0
+    pose: 3
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: A trap was set for us to get me into the government's hands. They targeted
+      my mother and sister. I was angry at this fact, but I remained where I am as
+      my parents told me to not come to Manila.
+    isLeftSide: 0
+    pose: 5
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I was already acquainted with most of the Filipino colony, including
+      Jose M. Basa, who was a fearsome fellow who managed to get out of proclamations.
+      He helped me with a few things, one of which was a case against me. I am grateful
+      for that.
+    isLeftSide: 0
+    pose: 4
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Eventually then, a free portion of my family came to Hong Kong. I was
+      licensed to practice medicine in the colony, operating as an oculist with notable
+      success.
+    isLeftSide: 1
+    pose: 4
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I went on a voyage to British North Borneo and with Mr. Pryor, to look
+      over vacant lands which were offered to me by the Company, for a Filipino colony.
+      I hope that the people from Calamba can at least thrive here, without being
+      in constant threat or living in fear when the Spaniards come their way.
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Another Governor-General succeeded General Wyler, who I know is General
+      Despujol. I applauded his efforts in regards to seeking reform. I eventually
+      had the opportunity to talk to him in his place. On the way there, I was with
+      my sister Lucia. We had made our way to the residency of the Governor-General.
+    isLeftSide: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: 'We then talked about different things, and eventually ended up asking
+      if I were to still go with my original plan of letting the Filipino colony
+      settle at North Borneo. I stood firm with my decision that they will stay there,
+      as the land troubles at Calamba left them with uncertainty in the trust of
+      the government in the Philippines. '
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I wanted them to at least live free without worry of being victims
+      of abuse in power. The bitterness in both parties could not be easily forgotten.
+    isLeftSide: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I wanted them to at least live free without worry of being victims
+      of abuse in power. The bitterness in both parties could not be easily forgotten.
+    isLeftSide: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "With the General respecting my decision, he then brought up the five
+      \"Poor Friars\" handbills. He said he found them in the roll of my bedding
+      sent with Rizal\u2019s baggage to the custom house, and asked whose they could
+      be."
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Rizal answered that of course the General knew that the bedding belonged
+      to his sister Lucia, but she was no fool and would not have secreted in a place
+      where they were certain to be found five little papers which, hidden within
+      her camisa or placed in her stocking, would have been absolutely sure to come
+      in unnoticed.
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Because of that, I was ordered to be taken prisoner to Fort Santiago.
+      I do not know why I had been framed for a crime I did not commit, but I could
+      do nothing about it. As they were firm in their decision. Instead of me going
+      home with my family in Hong Kong, I am deported to Dapitan.
+    isLeftSide: 1
+    pose: 6
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Because of that, I was ordered to be taken prisoner to Fort Santiago.
+      I do not know why I had been framed for a crime I did not commit, but I could
+      do nothing about it. As they were firm in their decision. Instead of me going
+      home with my family in Hong Kong, I am deported to Dapitan.
+    isLeftSide: 1
+    pose: 6
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Chapter VI The Period of Propaganda. End.
+    isLeftSide: 1
+    pose: 6
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Chapter VII The Execution of Rizal. Start.
+    isLeftSide: 1
+    pose: 6

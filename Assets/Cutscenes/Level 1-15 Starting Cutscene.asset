@@ -1,0 +1,592 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-15 Starting Cutscene
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: They lodged Jose Rizal in a room in Fort Santiago. With that, the Governor-General
+      began the composition of one of the most extraordinary official documents ever
+      issued in this land where the strangest governmental acts have abounded. It
+      is apology, argument, and attack all in one and was published in the Official
+      Gazette, where it occupied most of an entire issue.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Despujol writes Rizal\u2019s custodian, as jailer, to allow the exile
+      in no circumstances to see this number of the Gazette or to know its contents,
+      and suggests several evasions to assist the subordinate\u2019s power of invention."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: With the arrest of Jose Rizal. Public outrage was very high. Different
+      parts of the world that Jose Rizal has traveled, made strong statements that
+      criticized Despujol. Because of this, any hope of Despujol's political endeavors,
+      never succeeded. The arrest of Jose Rizal, sparked the fire to Andres Bonifacio's
+      Katipunan society, to change the country through a revolution. To change the
+      country to its former glory.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Rizal embarked on the steamer, where he was to be taken to his place
+      of exile. Even though he was heavily guarded, he risked dropping a note, which
+      a Filipino ilipino found and took, as it directed, to Mrs. Rizal\u2019s cousin,
+      Vicenta Leyba, who lived in Calle Jos\xE9, Trozo. Thus the family were advised
+      of his departure."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: After an uneventful trip the steamer reached Dapitan, in the northeast
+      of the large island of Mindanao, on a dark and rainy evening. The officer in
+      charge of the expedition took Doctor Rizal ashore with some papers relating
+      to him and delivered all to the commandant, Ricardo Carnicero
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'Rizal was to reside either with the commandant or with the Jesuit
+      parish priest, if the latter would take him into the convento. But while the
+      exile had learned with pleasure that he was to meet priests who were refined
+      and learned, as well as associated with his happier school days. '
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: He did not know that these priests were planning to restore him to
+      his childhood faith and had mapped out a plan of action which should first
+      make him feel his loneliness. So he was denied residence with the priest unless
+      he would declare himself genuinely in sympathy with Spain.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: So Rizal, a good Catholic, was compelled to board with the commandant
+      instead of with the priest because he was unwilling to make hypocritical professions
+      of admiration for Spain. The commandant and Rizal soon became good friends,
+      but in order to retain his position Carnicero had to write to the Governor-General
+      in a different strain.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The correspondence tells the facts in the main, but of course they
+      are colored throughout to conform to Despujol\u2019s character. The commandant
+      is always represented as deceiving his prisoner and gaining his confidence
+      only to betray him, but Rizal seems never to have experienced anything but
+      straightforward dealing."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Rizal\u2019s earliest letter from Dapitan speaks almost enthusiastically
+      of the place, describing the climate as exceptional for the tropics, his situation
+      as agreeable, and saying that he could be quite content if his family and his
+      books were there."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'Next Rizal acquired a piece of property at Talisay, a little bay close
+      to Dapitan, and at once became interested in his farm. Soon he built a house
+      and moved into it, gathering a number of boy assistants for him, and before
+      long he had a school. '
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: A hospital also was put up for his patients and these in time became
+      a source of revenue, as people from a distance came to the oculist for treatment
+      and paid liberally.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Jose Rizal remunerated his pupils\u2019 work with gifts of clothing,
+      books and other useful memorabilia. Sometimes the rewards were cartridges,
+      and those who had accumulated enough were permitted to accompany him in his
+      hunting expeditions. \r\n"
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The dignity of labor was practically inculcated by requiring everyone
+      to make himself useful, and this was really the first school of the type, combining
+      the use of English, nature study and industrial instruction.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Father Francisco Sanchez, Rizal\u2019s instructor in rhetoric in the
+      Ateneo, made a long visit to Dapitan and brought with him some surveyor\u2019s
+      instruments, which his former pupil was delighted to assist him in using. Together
+      they ran the levels for a water system for the town, which was later, with
+      the aid of the lay Jesuit, Brother Tildot, carried to completion."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: This same water system is now being restored and enlarged with artesian
+      wells by the present insular, provincial and municipal governments jointly,
+      as part of the memorial to Rizal in this place of his exile.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "On Sundays, Father Sanchez and Rizal conducted a school for the people
+      after mass. As part of this education it was intended to make raised maps in
+      the plaza of the chief city of the eight principal islands of the Philippines,
+      but on account of Father Sanchez\u2019s being called away, only one. Mindanao
+      was completed; it has been restored with a concrete sidewalk and balustrade
+      about it, while the plaza is a national park."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Among Rizal\u2019s patients was a blind American named Taufer, fairly
+      well to do, who had been engineer of the pumping plant of the Hongkong Fire
+      Department. He was a man of bravery, for he held a diploma for helping to rescue
+      five Spaniards from a shipwreck in Hongkong harbor."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: And he was not less kind-hearted, for he and his wife, a Portuguese,
+      had adopted and brought up as their own the infant daughter of a poor Irish
+      woman who had died in Hongkong, leaving a considerable family to her husband,
+      a corporal in the British Army on service there.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "This girl had known Rizal, \u201Cthe Spanish doctor,\u201D as he was
+      called there, in Hongkong, and persuaded her adopted father that possibly the
+      Dapitan exile might restore his lost eyesight. So with the two girls and his
+      wife, Mr. Taufer set out for Mindanao. At Manila his own daughter fell in love
+      with a Filipino engineer, a Mr. Sunico, now owner of a foundry in Manila, and,
+      marrying, remained there."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: But the party reached Dapitan with its original number, for they were
+      joined by a good-looking mestiza from the South who was unofficially connected
+      with one of the canons of the Manila cathedral.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Josefina Bracken, the Irish girl, was lively, capable and of congenial
+      temperament, and as there no longer existed any reason against his marriage,
+      for Rizal considered his political days over, they agreed to become husband
+      and wife.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The priest was asked to perform the ceremony, but said the Bishop
+      of Cebu must give his consent, and offered to write him. Rizal at first feared
+      that some political retraction would be asked, but when assured that only his
+      religious beliefs would be investigated, promptly submitted a statement which
+      Father Obach says covered about the same ground as the earliest published of
+      the retractions said to have been made on the eve of Rizal\u2019s death."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "This document, inclosed with the priest\u2019s letter, was ready for
+      the mail when Rizal came hurrying in to reclaim it. The marriage was off, for
+      Mr. Taufer had taken his family and gone to Manila."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "It resulted in Josefina returning to Manila with him, but after a
+      while Mr Taufer listened to reason and she went back to Dapitan, after a short
+      stay in Manila with Rizal\u2019s family, to whom she had carried his letter
+      of introduction, taking considerable housekeeping furniture with her."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Further consideration changed Rizal\u2019s opinion as to marriage,
+      possibly because the second time the priest may not have been so liberal in
+      his requirements."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The mother, too, seems to have suggested that as Spanish law had established
+      civil marriage in the Philippines, and as the local government had not provided
+      any way for people to avail themselves of the right, because the governor-general
+      had pigeon-holed the royal decree, it would be less sinful for the two to consider
+      themselves civilly married than for Rizal to do violence to his conscience
+      by making any sort of political retraction.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Any marriage so bought would be just as little a sacrament as an absolutely
+      civil marriage, and the latter was free from hypocrisy.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "So as man and wife Rizal and Josefina lived together in Talisay. Father
+      Obach sought to prejudice public feeling in the town against the exile for
+      the \u201Cscandal,\u201D though other scandals happening with less reason were
+      going on unrebuked."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The pages of \u201CDapitan\u201D, which some have considered to be
+      the first chapter of an unfinished novel, may reasonably be considered no more
+      than Rizal\u2019s rejoinder to Father Obach, written in sarcastic vein and
+      primarily for Carnicero\u2019s amusement, unless some date of writing earlier
+      than this should hereafter be found for them."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Josefina and Jose Rizal had their misgivings, but in the end, they
+      tried to be faithful to each other. Jose Rizal in all this time, had many chances
+      to escape, but chose not to as it would mean that it is a sign.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Notice of the granting of his request came to Rizal just when repeated
+      disappointments had caused him to prepare for staying in Dapitan. Immediately
+      he disposed of his salable possessions, including a Japanese tea set and large
+      mirror now among the Rizal relics preserved by the government, and a piece
+      of outlying land.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Despite the short notice all was ready for the trip in time, and,
+      attended by some of his schoolboys as well as by Josefina and Rizal\u2019s
+      niece, the daughter of his youngest sister, Soledad, whom Josefina wished to
+      adopt, the party set out for Manila."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The steamer from Dapitan reached Manila a little too late for the
+      mail boat for Spain, and Rizal obtained permission to await the next sailing
+      on board the cruiser Castilla, in the bay. Here he was treated like a guest
+      and more than once the Spanish captain invited members of Rizal\u2019s family
+      to be his guests at dinner\u2014Josefina with little Maria Luisa, the niece
+      and the schoolboys, for whom positions had been obtained, in Manila."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The alleged uprising of the Katipunan occurred during this time. Blanco
+      had known of the Katipunan but realized that so long as interested parties
+      were using it as a source of revenue, its activities would not go much beyond
+      speechmaking.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The rabble was not so far-seeing, and from high authorities came advice
+      that the country was in a fever and could only be saved by blood-letting. Rizal
+      was eventually blamed for the cause of the Katipunan to rise up and start rebelling,
+      and he was brought to Fort Santiago for execution.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Eventually, Rizal reached Manila on November 3 and was at once transferred
+      to Fort Santiago, at first being held in a dungeon \u201Cincomunicado\u201D
+      and later occupying a small cell on the ground floor. "
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Its furnishings had to be supplied by himself and they consisted of
+      a small rattan table, a high-backed chair, a steamer chair of the same material,
+      and a cot of the kind used by Spanish officers\u2014canvas top and collapsible
+      frame which closed up lengthwise."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: His meals were sent in by his family, being carried by one of his former
+      pupils at Dapitan, and such cooking or heating as was necessary was done on
+      an alcohol lamp which had been presented to him in Paris by Mrs. Tavera.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "An unsuccessful effort had been made earlier to get evidence against
+      Rizal by torturing his brother Paciano. For hours the elder brother had been
+      seated at a table in the headquarters of the political police, a thumbscrew
+      on one hand and pen in the other, while before him was a confession which would
+      implicate Jos\xE9 Rizal in the Katipunan uprising."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The paper remained unsigned, though Paciano was hung up by the elbows
+      till he was insensible, and then cut down so that the fall might revive him.
+      Three days of this maltreatment made him so ill that there was no possibility
+      of his signing anything, and he was carted home.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'Rizal did not approve of the rebellion and desired to issue a manifesto
+      to those of his countrymen who had been deceived into believing that he was
+      their leader. But the proclamation was not political, for it contained none
+      of those fulsomely flattering phrases which passed for patriotism in the feverish
+      days of 1896. '
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The address was not allowed to be made public but it was passed on
+      to the prosecutor to form another count in the indictment of Jos\xE9 Rizal
+      for not esteeming Spanish civilization."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Finally a court-martial was convened for Rizal\u2019s trial, in the
+      Cuartel de Espa\xF1a. No trained counsel was allowed to defend him, but a list
+      of young army officers was presented from which he might select a nominal defender."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Among the names was one which was familiar, Luis Taviel de Andrade,
+      and he proved to be the brother of Rizal\u2019s companion during his visit
+      to the Philippines in 1887\u201388. The young man did his best and risked unpopularity
+      in order to be loyal to his client. His defense reads pitiably weak these days
+      but it was risky then to say even so much."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The claims were very much so absurd that the decision was to have
+      Jose Rizal executed, on top of the additional charges placed against him. His
+      family waited long outside the Governor-General\u2019s place to ask for a pardon,
+      but in vain; General Polavieja had to pay the price of his appointment and
+      refused to see them."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The mother and sisters, however, were permitted to say farewell to
+      Rizal in the chapel, under the eyes of the death-watch. The prisoner had been
+      given the unusual privilege of not being tied, but he was not allowed to approach
+      near his relatives, really for fear that he might pass some writing to them\u2014the
+      pretext was made that Rizal might thus obtain the means for committing suicide."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "To his sister Trinidad Rizal spoke of having nothing to give her by
+      way of remembrance except the alcohol cooking lamp which he had been using,
+      a gift, as he mentioned, from Mrs. Tavera. Then he added quickly, in English,
+      so that the listening guard would not understand, \u201CThere is something
+      inside.\u201D"
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Jose Rizal greeted his old instructors and asked to be formally married
+      to Josefina Bracken, and asked to be allowed to confess. The Jesuits told him
+      that they needed to assess how far his beliefs conformed to Roman Catholic
+      teachings. Eventually, Rizal, the priests, and all the Spanish officials present
+      knelt at the altar, at Rizal\u2019s suggestion, while he read his retraction
+      aloud."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "Afterwards he put on a blue scapular, kissed the image of the Sacred
+      Heart he had carved years before, heard mass as when a student in the Ateneo,
+      took communion, and read his \xE0-Kempis or prayed in the intervals. At six
+      Josefina entered and was married to him by Father Balanguer."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: A bit of time has passed. He said his good-byes to Josefina. Then he
+      made his journey from the Fort to the place of execution, Bagumbayan Field,
+      now called Luneta. Troops held back the crowds and left a large square for
+      the tragedy, while artillery behind them was ready to suppress any attempt
+      at rescuing the prisoner.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "None came, however, for though Rizal\u2019s brother Paciano had joined
+      the insurrectionary forces in Cavite when the death sentence showed there was
+      no more hope for Jos\xE9, he had discouraged the demonstration that had been
+      planned as soon as he learned how scantily the insurgents were armed, hardly
+      a score of serviceable firearms being in the possession of their entire \u201Carmy.\u201D"
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: "The firing squad was of Filipino soldiers, while behind them, better
+      armed, were Spaniards in case they tried to evade the fratricidal part assigned
+      to them. Then as the volley came, with a last supreme effort of will power,
+      he turned and fell face upwards, thus receiving the subsequent \u201Cshots
+      of grace\u201D which ended his life, so that in form as well as fact he did
+      not die a traitor\u2019s death."
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: 'In his last words, he uttered:'
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Consummatum est!
+    isLeftSide: 0
+    pose: 1
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: Translating to "It is done."
+    isLeftSide: 0
+    pose: 1
+  - speakerName: Narrator
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The troops defiled past the dead body, as though reviewed by it, for
+      the most commanding figure of all was that which lay lifeless, but the center
+      of all eyes.
+    isLeftSide: 0
+    pose: 1
