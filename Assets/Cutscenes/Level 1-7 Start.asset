@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-7 Start
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: When I next returned to Manila for my fourth year, I found my former
+      landlady's house full. I had to take a room in the house with my brother. My
+      life was not so free as before, as I was under close supervision. The regular
+      hours, however, were better for me. I prayed and played with my landlord's
+      children.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "A little later during my fifth year, my mother was proved innocent
+      and she was set free. She came to embrace me as soon as she was free. After
+      the vacation, in that memorable year of my mother\u2019s release, I again had
+      my lodgings in the Walled City. The house was in Calle Solana and belonged
+      to a priest. My mother had not wanted me to return to Manila, saying that I
+      already had sufficient education.\""
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "Did she have a presentiment of what was going to happen to me? Can
+      it be that a mother\u2019s heart gives her double vision?"
+    isLeftSide: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I still wasn't sure about my future profession. My father wanted me
+      to study metaphysics, so I enrolled in that course. But my interest was so
+      slight that I did not even buy a copy of the textbook. A former schoolmate,
+      who had finished his course three months before, was my only intimate friend.
+      He lived in the same street as I did. My companions in the house were from
+      Batangas and had only recently arrived in Manila
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: What shall I do for the future?
+    isLeftSide: 1
+    pose: 2

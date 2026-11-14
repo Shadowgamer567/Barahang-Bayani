@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-6 End
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "How pleased I was when I won my first prize, a religious picture!
+      In the first quarter I gained another prize, with the grade \u201CExcellent.\u201D
+      After that I did not care to apply myself. I had foolishly become dissatisfied
+      because of something my teacher said. Unfortunately, this continued until the
+      end of the year and I gained only second place in all my subjects. This gave
+      me the grade of \u201CExcellent\u201D but without any prize."
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "I spent the vacation at home and went with my eldest sister, Nening,
+      to Tanawan, for the town festival. This was in 1873. But our pleasure was marred
+      by the fact that our mother was not with us. I had gone alone to see my mother
+      without first sending word either to her or to my father. This was at the close
+      of the term in which I held second place. I thought with what joy I would surprise
+      her. Instead, we wept in each other\u2019s arms. We had not seen each other
+      for more than a year."
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "After vacation was over, I returned to Manila and enrolled in the
+      second year. Then I hunted for lodgings in the Walled City. Nothing new happened
+      that year. My professor was the same as in the previous year; but I had different
+      schoolmates. Among them I found three who had been with me in Bi\xF1an. At
+      the end of this year, I won a medal and returned to my town."
+    isLeftSide: 1
+    pose: 1

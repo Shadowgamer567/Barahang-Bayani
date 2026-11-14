@@ -1,0 +1,153 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-11 Start
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "I lived in the third floor of a corner lodging house not very far
+      from the University; I put the finishing touches to what I previously wrote
+      on my novel, and there I wrote the latter half of \u201CNoli Me Tangere\u201D
+      The German influence, and absence from the Philippines for so long a time,
+      had modified my early radical views, and the book had now become less an effort
+      to arouse the Spanish sense of justice than a means of education for Filipinos
+      by pointing out their shortcomings."
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "The printer of \u201CNoli Me Tangere\u201D lived in a neighboring
+      street, and, like most printers in Germany, worked for a very moderate compensation,
+      so that the volume of over four hundred pages cost less than a fourth of what
+      it would have done in England, or one half of what it would cost in economical
+      Spain."
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Yet even at such a modest price, I was delayed in the publication until
+      one fortunate morning he received a visit from a countryman, Doctor Maximo
+      Viola, who invited me to take a pedestrian trip. I responded that my interests
+      kept me in Berlin at that time as I was awaiting funds from home with which
+      to publish a book I had just completed, and showed him the manuscript.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Doctor Viola was very interested and offered to use the money he had
+      put aside for the trip to help pay the publisher. So the work went ahead, and
+      when the delayed remittance from my family arrived, I repaid the obligation.
+      Then we sallied forth on our trip
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: After a considerable tour of the historic spots and scenic places in
+      Germany, we arrived at Dresden, where I was warmly greeted by Doctor A. B.
+      Meyer, the Director of the Royal Saxony Ethnographical Institute. He was an
+      authority upon Philippine matters, for some years before he had visited the
+      Islands to make a study of the people. With a countryman resident in the Philippines,
+      Doctor Meyer made careful and thorough scientific investigations, and his conclusions
+      were more favorable to the Filipinos than the published views of many of the
+      unscientific Spanish observers
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: In Austrian territory we first visited Doctor Ferdinand Blumentritt,
+      whom I had known by reputation for many years and with whom I had long corresponded
+      through regular exchange of letters.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Ferdinand Blumentritt
+    speakerType: 0
+    hero: {fileID: 11400000, guid: b24d169703cccb744be0cce9c4863fb5, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: My dear friend! We finally met at last! How long have I wished to meet
+      you!
+    isLeftSide: 0
+    pose: 1
+  - speakerName: 
+    speakerType: 2
+    hero: {fileID: 0}
+    enemy: {fileID: 0}
+    Dialogue: The two friends greet each other with a deep strong hug and continue
+      on with their conversation.
+    isLeftSide: 0
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Likewise my dear friend! I have truly enjoyed our exchanges, sharing
+      fervent discussion
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Likewise my dear friend! I have truly enjoyed our exchanges, sharing
+      fervent discussion
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Ferdinand Blumentritt
+    speakerType: 0
+    hero: {fileID: 11400000, guid: b24d169703cccb744be0cce9c4863fb5, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Come, come! Let me show you around!
+    isLeftSide: 0
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: We stayed at the Hotel Roderkrebs, but were guests at the table of
+      the Austrian professor, whose wife gave them appetizing demonstrations of the
+      characteristic cookery of Hungary.
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I was very much interested in a gathering of tourists, arranged to
+      make known the beauties of that picturesque region, sometimes called the Austrian
+      Switzerland, and I delivered an address upon this occasion. I anticipate that
+      there is a present interest in attracting tourists to the Philippines as an
+      economic benefit to the country.
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I enjoyed my time with finally meeting a very dear friend of mine.
+      At first, we just instinctively knew who we were looking for. We discussed
+      many things, not just Philippine matters. Among these discussions, I drew a
+      simple pencil sketch of my dear friend, in hopes that I would remember him.
+      I do hope that Mr. Maximo enjoyed himself as I did.
+    isLeftSide: 1
+    pose: 1

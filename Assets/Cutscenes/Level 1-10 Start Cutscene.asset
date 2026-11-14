@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-10 Start Cutscene
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 2
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: 'In Madrid, a number of young Filipinos were intense enthusiasts over
+      political agitation, and with the carelessness of the youth, were careless
+      of what they said or how they said it. A sort of social club had been organized
+      by older Filipinos and Spaniards interested in the Philippines, with the idea
+      of quietly assisting toward improved insular conditions, but it became so radical
+      under the influence of this younger majority, that its conservative members
+      were compelled to drop out and the club broke up. '
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 2
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: At first the project was severely criticised; later a few conformed
+      to the plan, and Rizal believed that his scheme was in a fair way of accomplishment.
+      At the meeting to discuss the details, however, each member of the company
+      wanted to write about the Filipino woman, and the rest of the subjects scarcely
+      interested any of them. I was disgusted with this trifling and dropped the
+      affair, nor did I ever again seem to take any very enthusiastic interest in
+      such popular movements.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 2
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: In my stay in Madrid, I have come across a second-hand copy, in two
+      volumes, of a French novel, which I bought to improve my knowledge of that
+      language. One may disagree or agree with its teachings and concede or dispute
+      its literary merits, it cannot be denied that it was the most powerful book
+      in its effects on the century. The book that I wrote in my diary affected me
+      powerfully, with a tremendous sympathy for the unfortunates that made me willing
+      to risk everything on their behalf.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 2
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Stories which I could get from my companions were written down and
+      revised, until finally the half had been prepared of what was finally the novel.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 2
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: In 1884, I had begun my studies in English; I had been studying French
+      during and since my voyage to Spain; Italian was acquired apparently at a time
+      when the exposition of Genoa had attracted Spanish interest toward Italy, and
+      largely through the reading of Italian translations of works which he knew
+      in other languages
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 2
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: German, too, I had started to study, but had not advanced far with
+      it. Thus I was then preparing myself for the travels through Europe which I
+      had intended to make from the time when I first left my home, for I well knew
+      that it was only by knowing the language of a country that it would be possible
+      for me to study the people, see in what way they differed from his own, and
+      find out which of their customs and what lessons from their history might be
+      of advantage to the Filipinos.
+    isLeftSide: 1
+    pose: 1
