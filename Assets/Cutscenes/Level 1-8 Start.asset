@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-8 Start
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I have decided to ask the school principal for advice. By the time
+      his reply arrived, I had already made my choice. I have decided to take on
+      medicine as I wanted to heal my mother's failing eyesight, though I was already
+      studying agriculture as well. I took on double the work, and I got my degree
+      of land surveyor and agricultural expert. Even though I was complete, I could
+      not receive my diploma as I was not of age by then
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I participated in a competition by a society known as Liceo Literario-Artistica.
+      This was open to both Filipinos and Spaniards. There was a dispute as to who
+      the winner of the prize was. I won second, I was given a certificate. Though
+      what happened, I will speak no more of it.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: By then, I became a student in the University of Santo Tomas. I became
+      a student in order to pursue my goal of becoming a doctor, to heal my mother's
+      eyesight. Eventually, I grew dissatisfied with the matters at the University
+      and I decided to continue my education outside of the islands.
+    isLeftSide: 1
+    pose: 4
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: One night, I passed by the barracks of the Civil Guard and saw a large
+      shadowy figure in the dark but I did not recognise who it was, and passed without
+      paying any attention to it. That figure was a lieutenant of the Civil Guard.
+      Without warning, he drew his sword and wounded my back.
+    isLeftSide: 1
+    pose: 0
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Ouch!! That hurt!! What did I do!?
+    isLeftSide: 1
+    pose: 3
+  - speakerName: Spanish Lieutenant
+    speakerType: 1
+    hero: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
+    Dialogue: You did not greet me when you passed my barrack. I am the lieutenant
+      of the Civil Guard!
+    isLeftSide: 0
+    pose: 5
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I did not know that you were an important figure! Forgive me for not
+      addressing you sooner! But wounding my back is uncalled for!
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Spanish Lieutenant
+    speakerType: 1
+    hero: {fileID: 0}
+    enemy: {fileID: 11400000, guid: f3d423f71b12283438f5bb4da2b0efa2, type: 2}
+    Dialogue: It is your fault for not recognising my status.
+    isLeftSide: 0
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I would like to see the Governor General!
+    isLeftSide: 1
+    pose: 0

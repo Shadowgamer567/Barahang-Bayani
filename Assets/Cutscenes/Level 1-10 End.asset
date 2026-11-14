@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-10 End
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: 'In 1885, having completed the second of my two courses, with my credentials
+      of licentiate in medicine and also in philosophy and literature, I made a trip
+      through the country provinces to study the Spanish peasant, for the rural people,
+      I thought, being agriculturists, would be most like the farmer folk of my native
+      land. I just hope that my countrymen do not suffer in comparison, for the Spanish
+      peasants had not greatly changed from the day when they were so masterfully
+      described by '
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: "In the fall of '85, I found myself in Paris, studying art, visiting
+      the various museums and associating with the Lunas, the Taveras and other Filipino
+      residents of the French capital. In Paris a fourth of \u201CNoli Me Tangere\u201D
+      was written, and I specialized in ophthalmology, devoting my attention to those
+      eye troubles that were most prevalent in the Philippines and least understood."
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: My mother's growing blindness made me covet the skill which might enable
+      me to restore her sight. So successfully did I study that I became the favorite
+      pupil of Doctor L. de Weckert, the leading authority among the oculists of
+      France, and author of a three-volume standard work. Around this time, I found
+      myself very interested in Ferdinand Blumentritt's studies of the Philippines
+      and wrote to him directly, as it housed genuine interest for the country, and
+      not mere interest for a novelty project. Mr. Ferdinand wrote back, and we kept
+      on exchanging letters regularly.
+    isLeftSide: 1
+    pose: 6
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I then went to Germany, having continued my studies in its language
+      in France, and was present at Heidelberg on the 500th anniversary of the foundation
+      of the university. Since I had no passport, I could only attend a few lectures,
+      but could not formally enroll myself in the university. I lived in one of the
+      student boarding houses, with a number of law students, and was offered membership
+      in the Chess Club. I accepted, and it allowed me to better understand the people
+      of the town
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: From Heidelberg, to Leipzig, and a little later, to Berlin. I became
+      acquainted with a number of men who had studied the Philippines and knew it
+      as none whom he had ever met previously. Chief among these was Doctor Jagor,
+      the author of the book which ten years before had inspired in him his life
+      purpose of preparing his people for the time when America should come to the
+      Philippines.
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: Then there was Doctor Rudolf Virchow, head of the Anthropological Society
+      and one of the greatest scientists in the world. Virchow was of intensely democratic
+      ideals, he was a statesman as well as a scientist, and my interest in the history
+      of his country and in everything else which concerned it, and his sincere earnestness,
+      so intelligently directed toward helping his country, made Rizal at once a
+      prime favorite.
+    isLeftSide: 1
+    pose: 2

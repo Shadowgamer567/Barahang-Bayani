@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c5f8bea1b438d4687ad9b712e77c3e, type: 3}
+  m_Name: Level 1-9 Start
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  line:
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: My brother Paciano gave me 700 pesos for my journey. I appreciate his
+      support. In turn, I will make good use of this money during my voyage. My sister
+      Saturnina gave me a valuable diamond ring which might help me when there's
+      an emergency. I will treasure this and make this my reminder, to keep holding
+      on
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: A distant relative secured me a passport, as it is a necessity if I
+      want to leave the country. In there, my name is Jose Mercado so that there
+      will be no issues that will arise on my journey. I eventually left Calamba.
+      I made my way to the steamer, changing horses twice in five hours. The next
+      morning, I embarked on the steamer, made a pencil sketch of Manila, as it will
+      be a long time before I return to my homeland
+    isLeftSide: 1
+    pose: 1
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: My journey started off with me going to Singapore. I was surprised
+      at the fact that the natives of the land were confident in their rights and
+      not fearful of the authorities. It made me admire them in a way, as we Filipinos
+      are afraid of the Spaniards
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: When I arrived in Singapore, I transferred to a French mail Steamer
+      and had an interesting time making myself understood when I was on board. I
+      studied a bit of French, though it didn't help the Frenchmen understand what
+      I wanted to say. I resorted to speaking in Latin, made signs, and in extreme
+      cases, drew pictures. It interested the officers from the cartoon class and
+      I was given the freedom to roam around the ship and my voyage went smoothly.
+    isLeftSide: 1
+    pose: 2
+  - speakerName: Jose Rizal
+    speakerType: 0
+    hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
+    enemy: {fileID: 0}
+    Dialogue: I disembarked at Marseilles, saw a bit of the famous port, then made
+      my way to Barcelona. In comparison to when I arrived at Marseilles, they were
+      very courteous of tourists. The Spanish disregarded tourists, which left a
+      smidge of a sour taste in my mouth. I digress
+    isLeftSide: 1
+    pose: 0
