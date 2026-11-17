@@ -36,6 +36,8 @@ public class BattleControl : MonoBehaviour
     [SerializeField] private Vector3 activeCharacterArrowOffset = new Vector3(0f, 0.3f, 0f);
     [SerializeField, Min(0.1f)] private float activeCharacterArrowScale = 0.8f;
     [SerializeField, Min(0f)] private float turnTransitionDelay = 0.5f;
+    [Header("Turn State UI")]
+    [SerializeField] private GameObject penaltyTurnPanel;
 
     public CardType pendingCard;
     public HeroStats pendingHero;
@@ -106,6 +108,7 @@ public class BattleControl : MonoBehaviour
     void Start()
     {
         SetEnemiesActive(false);
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
         CreateTurnOrderDisplay();
     }
 
@@ -139,7 +142,8 @@ public class BattleControl : MonoBehaviour
         Busy,
         Win,
         Lose,
-        ForcedTurnEnd
+        ForcedTurnEnd,
+        PenaltyTurn
     }
 
     void CacheEnemies()
@@ -204,6 +208,8 @@ public class BattleControl : MonoBehaviour
     void SetupEnemies()
     {
         battleAlreadyWon = false; 
+        // A new battle starts with a full AP pool on its first hero turn.
+        currentActionPoint = 0;
 
         int enemyCount = Random.Range(levelData.minEnemies, levelData.maxEnemies + 1);
 
@@ -359,7 +365,10 @@ public class BattleControl : MonoBehaviour
                 continue;
 
             bool isActive = i == turnIndex &&
-                ((actor.hero != null && actor.hero == activeHero) || (actor.enemy != null && currentstate == BattleState.Busy));
+                ((actor.hero != null && actor.hero == activeHero &&
+                  (currentstate == BattleState.PlayerTurn || currentstate == BattleState.ForcedTurnEnd)) ||
+                 (actor.enemy != null &&
+                  (currentstate == BattleState.Busy || currentstate == BattleState.PenaltyTurn)));
             if (isActive) activeIndex = visibleRow;
             string line = actor.Name + "  <size=85%>(SPD " + actor.Speed + ")</size>";
             text.AppendLine().Append(isActive ? "<b>" + line + "</b>" : line);
@@ -428,7 +437,8 @@ public class BattleControl : MonoBehaviour
         activeHero = hero;
         SetActiveWorldArrow(hero.currentModel != null ? hero.currentModel.transform : hero.transform);
         currentstate = BattleState.PlayerTurn;
-        currentActionPoint = maxActionPoint;
+        if (currentActionPoint <= 0)
+            currentActionPoint = maxActionPoint;
         OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
         FindFirstObjectByType<CardPanelManager>()?.RefillToMax();
         SetCardsInteractable(true);
@@ -519,7 +529,9 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
-        currentstate = BattleState.Busy;
+        currentstate = BattleState.PenaltyTurn;
+        SetCardsInteractable(false);
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(true);
 
         UpdateUI();
         UpdateTurnOrderDisplay();
@@ -550,11 +562,15 @@ public class BattleControl : MonoBehaviour
     {
         if (battleLog != null) battleLog.AddLog("--- Enemy Penalty Turn ---");
         bool acted = false;
+        int resumeTurnIndex = turnIndex;
         foreach (EnemyStats enemy in enemies)
         {
             if (!IsAlive(enemy)) continue;
             if (turnTransitionDelay > 0f)
                 yield return new WaitForSecondsRealtime(turnTransitionDelay);
+            int penaltyActorIndex = turnOrder.FindIndex(actor => actor.enemy == enemy);
+            if (penaltyActorIndex >= 0) turnIndex = penaltyActorIndex;
+            UpdateTurnOrderDisplay();
             SetActiveWorldArrow(enemy.currentModel != null ? enemy.currentModel.transform : enemy.transform);
             EnemyAction action = ChooseEnemyAction(enemy) ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
             ExecuteEnemyAction(enemy, action);
@@ -563,7 +579,10 @@ public class BattleControl : MonoBehaviour
         }
         if (acted && turnTransitionDelay > 0f)
             yield return new WaitForSecondsRealtime(turnTransitionDelay);
+        turnIndex = resumeTurnIndex;
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
         currentstate = BattleState.PlayerTurn;
+        SetCardsInteractable(currentActionPoint > 0);
         if (IsAlive(activeHero))
             SetActiveWorldArrow(activeHero.currentModel != null ? activeHero.currentModel.transform : activeHero.transform);
         UpdateUI();
@@ -1206,6 +1225,7 @@ public class BattleControl : MonoBehaviour
 
         currentstate = BattleState.Lose;
         SetActiveWorldArrow(null);
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
 
         isSelectingTarget = false;
         UpdateUI();
