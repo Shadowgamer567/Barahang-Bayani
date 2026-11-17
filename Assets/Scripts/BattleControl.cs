@@ -92,7 +92,7 @@ public class BattleControl : MonoBehaviour
         public HeroStats hero;
         public EnemyStats enemy;
         public int Speed => hero != null ? hero.Speed : enemy != null ? enemy.Speed : 0;
-        public string Name => hero != null ? hero.heroType.heroName : enemy != null ? enemy.enemyType.enemyName : "Unknown";
+        public string Name => hero != null ? hero.heroType.heroName : enemy != null ? enemy.DisplayName : "Unknown";
     }
     private readonly List<TurnActor> turnOrder = new List<TurnActor>();
     private int turnIndex = -1;
@@ -225,6 +225,8 @@ public class BattleControl : MonoBehaviour
             }
         }
 
+        AssignEnemyDisplayNames();
+
         if (uiMain != null)
         {
             Debug.Log("Using UI Object: " + uiMain.gameObject.name);
@@ -233,6 +235,30 @@ public class BattleControl : MonoBehaviour
         }
 
         InitializeTurnOrder();
+    }
+
+    private void AssignEnemyDisplayNames()
+    {
+        Dictionary<EnemyTypes, int> totals = new Dictionary<EnemyTypes, int>();
+        Dictionary<EnemyTypes, int> numbers = new Dictionary<EnemyTypes, int>();
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (!IsAlive(enemy) || enemy.enemyType == null) continue;
+            totals.TryGetValue(enemy.enemyType, out int total);
+            totals[enemy.enemyType] = total + 1;
+        }
+
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (!IsAlive(enemy) || enemy.enemyType == null) continue;
+            numbers.TryGetValue(enemy.enemyType, out int number);
+            number++;
+            numbers[enemy.enemyType] = number;
+            string displayName = totals[enemy.enemyType] > 1
+                ? enemy.enemyType.enemyName + " " + number
+                : enemy.enemyType.enemyName;
+            enemy.SetDisplayName(displayName);
+        }
     }
 
     private void InitializeTurnOrder()
@@ -644,7 +670,7 @@ public class BattleControl : MonoBehaviour
 
     void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
     {
-        string enemyName = enemy.enemyType.enemyName;
+        string enemyName = enemy.DisplayName;
 
         switch (action.actionType)
         {
@@ -701,9 +727,9 @@ public class BattleControl : MonoBehaviour
                 {
                     Debug.Log(
                         "[Enemy AI EXECUTED] " +
-                        enemy.enemyType.enemyName +
+                        enemy.DisplayName +
                         " used SHIELD on " +
-                        shieldTarget.enemyType.enemyName +
+                        shieldTarget.DisplayName +
                         " (" + shieldTarget.gameObject.name + ")" +
                         " | Target HP: " + shieldTarget.currentHP +
                         " | Target Shield Before: " + shieldTarget.shield
@@ -723,7 +749,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Shield, granting " + $"{actualShield} Shield to " + $"{shieldTarget.enemyType.enemyName}.");
+                        battleLog.AddLog($"{enemyName} used Shield, granting " + $"{actualShield} Shield to " + $"{shieldTarget.DisplayName}.");
                     }
                 }
                 break;
@@ -744,7 +770,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Heal, restoring " +$"{actualHeal} HP to " + $"{healTarget.enemyType.enemyName}.");
+                        battleLog.AddLog($"{enemyName} used Heal, restoring " +$"{actualHeal} HP to " + $"{healTarget.DisplayName}.");
                     }
                 }
                 break;
@@ -761,7 +787,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Buff, increasing " + $"{buffTarget.enemyType.enemyName}'s " +
+                        battleLog.AddLog($"{enemyName} used Buff, increasing " + $"{buffTarget.DisplayName}'s " +
                             $"next action value by {buffAmount}.");
                     }
 
@@ -1113,7 +1139,7 @@ public class BattleControl : MonoBehaviour
             Debug.Log(
                 "[Enemy AI Targeting] " +
                 "Action: " + actionType +
-                " | Selected: " + bestTarget.enemyType.enemyName +
+                " | Selected: " + bestTarget.DisplayName +
                 " (" + bestTarget.gameObject.name + ")" +
                 " | HP: " + bestTarget.currentHP +
                 "/" + bestTarget.enemyType.maxHp +
@@ -1310,7 +1336,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null && !suppressLog)
                     {
-                        string targetName = targetEnemy.enemyType.enemyName;
+                        string targetName = targetEnemy.DisplayName;
 
                         if (shieldDamage > 0 && hpDamage > 0)
                         {
@@ -1348,7 +1374,7 @@ public class BattleControl : MonoBehaviour
                     if (battleLog != null && !suppressLog)
                     {
                         battleLog.AddLog($"You played \"{card.cardName}\", " + $"dealing {actualDamage} Piercing Damage " +
-                            $"to {targetEnemy.enemyType.enemyName}, " +
+                            $"to {targetEnemy.DisplayName}, " +
                             $"ignoring Shield."
                         );
                     }
@@ -1368,7 +1394,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null && !suppressLog)
                     {
-                        battleLog.AddLog($"You played \"{card.cardName}\", " + $"applying {finalBleed} Bleed to " + $"{targetEnemy.enemyType.enemyName}.");
+                        battleLog.AddLog($"You played \"{card.cardName}\", " + $"applying {finalBleed} Bleed to " + $"{targetEnemy.DisplayName}.");
                     }
 
                     Debug.Log(actingHero.name + " applied " + finalBleed + " Bleed to " +targetEnemy.name);
@@ -1434,7 +1460,7 @@ public class BattleControl : MonoBehaviour
                     if (battleLog != null && !suppressLog)
                     {
                         battleLog.AddLog($"You played \"{card.cardName}\", reducing " +
-                            $"{targetEnemy.enemyType.enemyName}'s next action value by {debuffAmount}.");
+                            $"{targetEnemy.DisplayName}'s next action value by {debuffAmount}.");
                     }
                 }
                 break;
@@ -1464,7 +1490,7 @@ public class BattleControl : MonoBehaviour
 
             if (battleLog != null && actualDamage > 0)
             {
-                battleLog.AddLog( $"{enemy.enemyType.enemyName} suffered " + $"{actualDamage} Bleed Damage, ignoring Shield. " + $"Remaining Bleed: {enemy.BleedValue}."
+                battleLog.AddLog( $"{enemy.DisplayName} suffered " + $"{actualDamage} Bleed Damage, ignoring Shield. " + $"Remaining Bleed: {enemy.BleedValue}."
                 );
             }
         }

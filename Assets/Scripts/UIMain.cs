@@ -201,7 +201,9 @@ public class UIMain : MonoBehaviour
             enemydisplayedHP[i] = 1f;
             enemydisplayedShield[i] = 1f;
         }
+
     }
+
     void UpdateEnemyUI()
     {
         if (enemypanel == null || enemies == null)
@@ -221,7 +223,7 @@ public class UIMain : MonoBehaviour
             if (enemy != null && enemy.gameObject.activeInHierarchy)
             {
                 enemypanel[i].enemyPanel.SetActive(true);
-                enemypanel[i].EnemyName.text = enemy.enemyType.enemyName + "  SPD " + enemy.Speed;
+                enemypanel[i].EnemyName.text = enemy.DisplayName + "  SPD " + enemy.Speed;
 
                 float targetHP = (float)enemy.currentHP / enemy.enemyType.maxHp;
                 enemydisplayedHP[i] = Mathf.Lerp(enemydisplayedHP[i], targetHP, Time.deltaTime * 8f);

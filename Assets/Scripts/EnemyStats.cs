@@ -10,6 +10,7 @@ public class EnemyStats : MonoBehaviour
     public static event System.Action OnHealed;
 
     public EnemyTypes enemyType;
+    public string DisplayName { get; private set; }
     public GameObject uiObject;
     public EnemyUI ui;
     public EnemyAction[] action => enemyType != null ? enemyType.actions : null;
@@ -87,6 +88,7 @@ public class EnemyStats : MonoBehaviour
         }
 
         currentHP = enemyType.maxHp;
+        DisplayName = enemyType.enemyName;
         shield = Mathf.Max(0, enemyType.shield);
         attack = enemyType.damage;
 
@@ -106,6 +108,11 @@ public class EnemyStats : MonoBehaviour
         {
             Debug.LogWarning("ActionModifier missing on enemy: " + name);
         }
+    }
+
+    public void SetDisplayName(string value)
+    {
+        DisplayName = string.IsNullOrWhiteSpace(value) && enemyType != null ? enemyType.enemyName : value;
     }
 
     void Awake()
