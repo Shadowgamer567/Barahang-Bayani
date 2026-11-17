@@ -16,3 +16,12 @@ B.
 C.
 D.
 
+ID:FRESH TEST 33
+3. New Test
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. Something "C"
+B.
+C.
+D.
+

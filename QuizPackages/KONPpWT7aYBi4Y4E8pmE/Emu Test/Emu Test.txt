@@ -1,0 +1,36 @@
+ID:EMU TEST1
+1. Test
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. 12 "C"
+B.
+C.
+D.
+
+ID:EMU TEST2
+2. Test 2
+TYPE:IMAGE:Images/Adult Sucrose.jpg
+INPUT:IDENTIFICATION
+A. 13 "C"
+B.
+C.
+D.
+
+ID:EMU TEST3
+3. Test 3
+TYPE:IMAGE:Images/noelle.png
+INPUT:IDENTIFICATION
+A. 15 "C"
+B.
+C.
+D.
+
+ID:EMU TEST4
+4. Tes 6
+TYPE:AUDIO:Sounds/test_audio.wav
+INPUT:IDENTIFICATION
+A. 16 "C"
+B.
+C.
+D.
+
