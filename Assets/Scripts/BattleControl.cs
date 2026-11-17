@@ -6,6 +6,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using System.Linq;
+using TMPro;
+using UnityEngine.UI;
 
 public class BattleControl : MonoBehaviour
 {
@@ -20,6 +23,21 @@ public class BattleControl : MonoBehaviour
 
     [Header("Battle Log")]
     public BattleLogManager battleLog;
+
+    [Header("Turn Order UI")]
+    [SerializeField] private Color activeTurnColor = new Color(1f, 0.83f, 0.36f, 1f);
+    [SerializeField] private string turnOrderTitle = "TURN ORDER";
+    [SerializeField] private RectTransform turnOrderPanel;
+    [SerializeField] private TextMeshProUGUI turnOrderLabel;
+    [SerializeField] private Image turnOrderArrowImage;
+    [SerializeField] private Vector2 turnOrderArrowOffset = new Vector2(18f, -50f);
+    [SerializeField, Min(1f)] private float turnOrderRowSpacing = 26f;
+    [SerializeField] private Sprite activeCharacterArrowSprite;
+    [SerializeField] private Vector3 activeCharacterArrowOffset = new Vector3(0f, 0.3f, 0f);
+    [SerializeField, Min(0.1f)] private float activeCharacterArrowScale = 0.8f;
+    [SerializeField, Min(0f)] private float turnTransitionDelay = 0.5f;
+    [Header("Turn State UI")]
+    [SerializeField] private GameObject penaltyTurnPanel;
 
     public CardType pendingCard;
     public HeroStats pendingHero;
@@ -71,10 +89,27 @@ public class BattleControl : MonoBehaviour
 
     EnemyStats[] enemies;
     HeroStats[] heroes;
+    private class TurnActor
+    {
+        public HeroStats hero;
+        public EnemyStats enemy;
+        public int Speed => hero != null ? hero.Speed : enemy != null ? enemy.Speed : 0;
+        public string Name => hero != null ? hero.heroType.heroName : enemy != null ? enemy.DisplayName : "Unknown";
+    }
+    private readonly List<TurnActor> turnOrder = new List<TurnActor>();
+    private int turnIndex = -1;
+    private HeroStats activeHero;
+    private Transform activeWorldArrowTarget;
+    private Transform activeWorldArrowHeadTarget;
+    private GameObject activeWorldArrowObject;
+    private SpriteRenderer activeWorldArrowRenderer;
+    private bool autoEndTurnPending;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         SetEnemiesActive(false);
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
+        CreateTurnOrderDisplay();
     }
 
     public void Initialize(LevelData data)
@@ -106,7 +141,9 @@ public class BattleControl : MonoBehaviour
         EnemyTurn,
         Busy,
         Win,
-        Lose
+        Lose,
+        ForcedTurnEnd,
+        PenaltyTurn
     }
 
     void CacheEnemies()
@@ -171,6 +208,8 @@ public class BattleControl : MonoBehaviour
     void SetupEnemies()
     {
         battleAlreadyWon = false; 
+        // A new battle starts with a full AP pool on its first hero turn.
+        currentActionPoint = 0;
 
         int enemyCount = Random.Range(levelData.minEnemies, levelData.maxEnemies + 1);
 
@@ -192,12 +231,221 @@ public class BattleControl : MonoBehaviour
             }
         }
 
+        AssignEnemyDisplayNames();
+
         if (uiMain != null)
         {
             Debug.Log("Using UI Object: " + uiMain.gameObject.name);
 
             uiMain.GenerateEnemyPanels(enemies);
         }
+
+        InitializeTurnOrder();
+    }
+
+    private void AssignEnemyDisplayNames()
+    {
+        Dictionary<EnemyTypes, int> totals = new Dictionary<EnemyTypes, int>();
+        Dictionary<EnemyTypes, int> numbers = new Dictionary<EnemyTypes, int>();
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (!IsAlive(enemy) || enemy.enemyType == null) continue;
+            totals.TryGetValue(enemy.enemyType, out int total);
+            totals[enemy.enemyType] = total + 1;
+        }
+
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (!IsAlive(enemy) || enemy.enemyType == null) continue;
+            numbers.TryGetValue(enemy.enemyType, out int number);
+            number++;
+            numbers[enemy.enemyType] = number;
+            string displayName = totals[enemy.enemyType] > 1
+                ? enemy.enemyType.enemyName + " " + number
+                : enemy.enemyType.enemyName;
+            enemy.SetDisplayName(displayName);
+        }
+    }
+
+    private void InitializeTurnOrder()
+    {
+        RebuildTurnOrder();
+        turnIndex = -1;
+        UpdateTurnOrderDisplay();
+    }
+
+    private void RebuildTurnOrder()
+    {
+        turnOrder.Clear();
+        foreach (HeroStats hero in heroes)
+            if (IsAlive(hero)) { hero.RollSpeed(); turnOrder.Add(new TurnActor { hero = hero }); }
+        foreach (EnemyStats enemy in enemies)
+            if (IsAlive(enemy)) { enemy.RollSpeed(); turnOrder.Add(new TurnActor { enemy = enemy }); }
+        // LINQ's stable ordering preserves team/list order when Speed is tied.
+        var sorted = turnOrder.OrderByDescending(actor => actor.Speed).ToList();
+        turnOrder.Clear();
+        turnOrder.AddRange(sorted);
+        Debug.Log("Turn order: " + string.Join(" -> ", turnOrder.Select(actor => actor.Name + " (" + actor.Speed + ")")));
+    }
+
+    private void CreateTurnOrderDisplay()
+    {
+        if (turnOrderLabel != null)
+        {
+            CreateFallbackTurnOrderArrow();
+            return;
+        }
+        Canvas canvas = endButton != null ? endButton.GetComponentInParent<Canvas>() : null;
+        if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogWarning("Turn order UI: No Canvas found in the battle scene.");
+            return;
+        }
+
+        GameObject panel = new GameObject("Turn Order Panel", typeof(RectTransform), typeof(Image));
+        panel.transform.SetParent(canvas.transform, false);
+        RectTransform panelRect = panel.GetComponent<RectTransform>();
+        panelRect.anchorMin = new Vector2(0f, 1f);
+        panelRect.anchorMax = new Vector2(0f, 1f);
+        panelRect.pivot = new Vector2(0f, 1f);
+        panelRect.anchoredPosition = new Vector2(24f, -24f);
+        panelRect.sizeDelta = new Vector2(280f, 250f);
+        Image panelImage = panel.GetComponent<Image>();
+        panelImage.color = new Color(0.05f, 0.07f, 0.1f, 0.82f);
+        panelImage.raycastTarget = false;
+        turnOrderPanel = panelRect;
+
+        GameObject labelObject = new GameObject("Turn Order Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        labelObject.transform.SetParent(panel.transform, false);
+        RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+        labelRect.anchorMin = Vector2.zero;
+        labelRect.anchorMax = Vector2.one;
+        labelRect.offsetMin = new Vector2(14f, 12f);
+        labelRect.offsetMax = new Vector2(-14f, -12f);
+
+        turnOrderLabel = labelObject.GetComponent<TextMeshProUGUI>();
+        turnOrderLabel.font = TMP_Settings.defaultFontAsset;
+        turnOrderLabel.fontSize = 22f;
+        turnOrderLabel.color = Color.white;
+        turnOrderLabel.alignment = TextAlignmentOptions.TopLeft;
+        turnOrderLabel.textWrappingMode = TextWrappingModes.NoWrap;
+        turnOrderLabel.richText = true;
+        turnOrderLabel.raycastTarget = false;
+        turnOrderLabel.text = turnOrderTitle + "\nWaiting for battle...";
+        CreateFallbackTurnOrderArrow();
+    }
+
+    private void CreateFallbackTurnOrderArrow()
+    {
+        if (turnOrderArrowImage != null || turnOrderPanel == null) return;
+        GameObject arrowObject = new GameObject("TurnOrderArrow", typeof(RectTransform), typeof(Image));
+        arrowObject.transform.SetParent(turnOrderPanel, false);
+        turnOrderArrowImage = arrowObject.GetComponent<Image>();
+        turnOrderArrowImage.raycastTarget = false;
+        RectTransform arrowRect = arrowObject.GetComponent<RectTransform>();
+        arrowRect.anchorMin = new Vector2(0f, 1f);
+        arrowRect.anchorMax = new Vector2(0f, 1f);
+        arrowRect.pivot = new Vector2(0.5f, 0.5f);
+        arrowRect.sizeDelta = new Vector2(24f, 24f);
+    }
+
+    private void UpdateTurnOrderDisplay()
+    {
+        if (turnOrderLabel == null) return;
+        string headerColor = UnityEngine.ColorUtility.ToHtmlStringRGB(turnOrderLabel.color);
+        System.Text.StringBuilder text = new System.Text.StringBuilder("<b><color=#" + headerColor + ">" + turnOrderTitle + "</color></b>");
+        int activeIndex = -1;
+        int visibleRow = 0;
+        for (int i = 0; i < turnOrder.Count; i++)
+        {
+            TurnActor actor = turnOrder[i];
+            if ((actor.hero != null && !IsAlive(actor.hero)) ||
+                (actor.enemy != null && !IsAlive(actor.enemy)))
+                continue;
+
+            bool isActive = i == turnIndex &&
+                ((actor.hero != null && actor.hero == activeHero &&
+                  (currentstate == BattleState.PlayerTurn || currentstate == BattleState.ForcedTurnEnd)) ||
+                 (actor.enemy != null &&
+                  (currentstate == BattleState.Busy || currentstate == BattleState.PenaltyTurn)));
+            if (isActive) activeIndex = visibleRow;
+            string line = actor.Name + "  <size=85%>(SPD " + actor.Speed + ")</size>";
+            text.AppendLine().Append(isActive ? "<b>" + line + "</b>" : line);
+            visibleRow++;
+        }
+        turnOrderLabel.text = text.ToString();
+        if (turnOrderArrowImage != null)
+        {
+            turnOrderArrowImage.color = activeTurnColor;
+            turnOrderArrowImage.gameObject.SetActive(activeIndex >= 0);
+            if (activeIndex >= 0)
+            {
+                turnOrderArrowImage.rectTransform.anchoredPosition =
+                    turnOrderArrowOffset + Vector2.down * (turnOrderRowSpacing * activeIndex);
+            }
+        }
+    }
+
+    private bool IsAlive(HeroStats hero) => hero != null && hero.gameObject.activeInHierarchy && !hero.IsDead();
+    private bool IsAlive(EnemyStats enemy) => enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead && enemy.currentHP > 0;
+
+    private void AdvanceTurn()
+    {
+        if (isLevelFinished || battleAlreadyWon || CheckLoseCondition()) return;
+        if (turnOrder.Count == 0) InitializeTurnOrder();
+        if (turnOrder.Count == 0) return;
+
+        int checkedActors = 0;
+        do
+        {
+            turnIndex++;
+            if (turnIndex >= turnOrder.Count)
+            {
+                turnIndex = 0;
+                ProcessEnemyBleedEffects();
+                if (battleAlreadyWon || isLevelFinished) return;
+                DecayShieldOverflow(true, true);
+                RebuildTurnOrder();
+                turnIndex = -1;
+                turnIndex++;
+                UpdateTurnOrderDisplay();
+                if (turnOrder.Count == 0) return;
+            }
+            TurnActor actor = turnOrder[turnIndex];
+            if (actor.hero != null && IsAlive(actor.hero))
+            {
+                StartHeroTurn(actor.hero);
+                return;
+            }
+            if (actor.enemy != null && IsAlive(actor.enemy))
+            {
+                activeHero = null;
+                SetActiveWorldArrow(actor.enemy.currentModel != null ? actor.enemy.currentModel.transform : actor.enemy.transform);
+                currentstate = BattleState.Busy;
+                UpdateUI();
+                UpdateTurnOrderDisplay();
+                StartCoroutine(EnemyActorTurn(actor.enemy));
+                return;
+            }
+            checkedActors++;
+        } while (checkedActors <= turnOrder.Count);
+    }
+
+    private void StartHeroTurn(HeroStats hero)
+    {
+        activeHero = hero;
+        SetActiveWorldArrow(hero.currentModel != null ? hero.currentModel.transform : hero.transform);
+        currentstate = BattleState.PlayerTurn;
+        if (currentActionPoint <= 0)
+            currentActionPoint = maxActionPoint;
+        OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
+        FindFirstObjectByType<CardPanelManager>()?.RefillToMax();
+        SetCardsInteractable(true);
+        if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
+        if (battleLog != null) battleLog.AddLog("--- " + hero.heroType.heroName + "'s Turn (Speed " + hero.Speed + ") ---");
+        UpdateUI();
+        UpdateTurnOrderDisplay();
     }
 
     void SetEnemiesActive(bool state)
@@ -233,30 +481,27 @@ public class BattleControl : MonoBehaviour
 
     public void StartPlayerTurn()
     {
-        currentstate = BattleState.PlayerTurn;
-
-        UpdateUI();
-
-        currentActionPoint = maxActionPoint;
-        OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
-
-        Debug.Log("AP reset to Max");
-
-        FindFirstObjectByType<CardPanelManager>()?.RefillToMax();
+        if (turnOrder.Count == 0) InitializeTurnOrder();
+        AdvanceTurn();
     }
 
     public void endPlayersTurn()
     {
-        // Prevent ending the turn during required tutorial card interactions.
-        TutorialBattleController tutorial = FindFirstObjectByType<TutorialBattleController>();
+        EndPlayersTurnInternal(false, false);
+    }
 
+    private void EndPlayersTurnInternal(bool automatic, bool transitionDelayElapsed)
+    {
+        // Prevent ending the turn during required tutorial card interactions.
+        TutorialBattleController tutorial = automatic ? null : FindFirstObjectByType<TutorialBattleController>();
         if (tutorial != null && tutorial.BlockEndTurn)
         {
             Debug.Log("Tutorial: End Turn is currently blocked.");
             return;
         }
 
-        if (currentstate != BattleState.PlayerTurn || isSelectingTarget)
+        if ((currentstate != BattleState.PlayerTurn &&
+             !(automatic && currentstate == BattleState.ForcedTurnEnd)) || isSelectingTarget)
         {
             Debug.Log("Cannot end turn while selecting a target.");
             return;
@@ -264,14 +509,16 @@ public class BattleControl : MonoBehaviour
 
         // Prevent another enemy turn from being started.
         currentstate = BattleState.Busy;
+        if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
 
         // Decay hero shield overflow at the end of the player's turn.
-        DecayShieldOverflow(true, false);
+        if (activeHero != null) activeHero.DecayShieldOverflow();
 
         UpdateUI();
 
-        Debug.Log("Starting Enemy Turn");
-        StartCoroutine(EnemyTurn());
+        Debug.Log("Advancing to next turn actor");
+        if (transitionDelayElapsed) AdvanceTurn();
+        else StartCoroutine(AdvanceTurnAfterDelay());
     }
 
     public void StartQuizPenaltyTurn()
@@ -282,11 +529,64 @@ public class BattleControl : MonoBehaviour
             return;
         }
 
-        currentstate = BattleState.Busy;
+        currentstate = BattleState.PenaltyTurn;
+        SetCardsInteractable(false);
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(true);
 
         UpdateUI();
+        UpdateTurnOrderDisplay();
 
-        StartCoroutine(EnemyTurn(true));
+        StartCoroutine(EnemyPenaltyTurn());
+    }
+
+    private IEnumerator EnemyActorTurn(EnemyStats enemy)
+    {
+        if (IsAlive(enemy))
+        {
+            EnemyAction action = ChooseEnemyAction(enemy) ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
+            ExecuteEnemyAction(enemy, action);
+        }
+        if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
+        if (IsAlive(enemy)) enemy.DecayShieldOverflow();
+        if (turnTransitionDelay > 0f) yield return new WaitForSecondsRealtime(turnTransitionDelay);
+        AdvanceTurn();
+    }
+
+    private IEnumerator AdvanceTurnAfterDelay()
+    {
+        if (turnTransitionDelay > 0f) yield return new WaitForSecondsRealtime(turnTransitionDelay);
+        AdvanceTurn();
+    }
+
+    private IEnumerator EnemyPenaltyTurn()
+    {
+        if (battleLog != null) battleLog.AddLog("--- Enemy Penalty Turn ---");
+        bool acted = false;
+        int resumeTurnIndex = turnIndex;
+        foreach (EnemyStats enemy in enemies)
+        {
+            if (!IsAlive(enemy)) continue;
+            if (turnTransitionDelay > 0f)
+                yield return new WaitForSecondsRealtime(turnTransitionDelay);
+            int penaltyActorIndex = turnOrder.FindIndex(actor => actor.enemy == enemy);
+            if (penaltyActorIndex >= 0) turnIndex = penaltyActorIndex;
+            UpdateTurnOrderDisplay();
+            SetActiveWorldArrow(enemy.currentModel != null ? enemy.currentModel.transform : enemy.transform);
+            EnemyAction action = ChooseEnemyAction(enemy) ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
+            ExecuteEnemyAction(enemy, action);
+            if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
+            acted = true;
+        }
+        if (acted && turnTransitionDelay > 0f)
+            yield return new WaitForSecondsRealtime(turnTransitionDelay);
+        turnIndex = resumeTurnIndex;
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
+        currentstate = BattleState.PlayerTurn;
+        SetCardsInteractable(currentActionPoint > 0);
+        if (IsAlive(activeHero))
+            SetActiveWorldArrow(activeHero.currentModel != null ? activeHero.currentModel.transform : activeHero.transform);
+        UpdateUI();
+        if (battleLog != null && activeHero != null) battleLog.AddLog(activeHero.heroType.heroName + " resumes with " + currentActionPoint + " AP.");
     }
 
     IEnumerator EnemyTurn(bool isPenaltyTurn = false)
@@ -389,7 +689,7 @@ public class BattleControl : MonoBehaviour
 
     void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
     {
-        string enemyName = enemy.enemyType.enemyName;
+        string enemyName = enemy.DisplayName;
 
         switch (action.actionType)
         {
@@ -446,9 +746,9 @@ public class BattleControl : MonoBehaviour
                 {
                     Debug.Log(
                         "[Enemy AI EXECUTED] " +
-                        enemy.enemyType.enemyName +
+                        enemy.DisplayName +
                         " used SHIELD on " +
-                        shieldTarget.enemyType.enemyName +
+                        shieldTarget.DisplayName +
                         " (" + shieldTarget.gameObject.name + ")" +
                         " | Target HP: " + shieldTarget.currentHP +
                         " | Target Shield Before: " + shieldTarget.shield
@@ -468,7 +768,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Shield, granting " + $"{actualShield} Shield to " + $"{shieldTarget.enemyType.enemyName}.");
+                        battleLog.AddLog($"{enemyName} used Shield, granting " + $"{actualShield} Shield to " + $"{shieldTarget.DisplayName}.");
                     }
                 }
                 break;
@@ -489,7 +789,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Heal, restoring " +$"{actualHeal} HP to " + $"{healTarget.enemyType.enemyName}.");
+                        battleLog.AddLog($"{enemyName} used Heal, restoring " +$"{actualHeal} HP to " + $"{healTarget.DisplayName}.");
                     }
                 }
                 break;
@@ -506,7 +806,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Buff, increasing " + $"{buffTarget.enemyType.enemyName}'s " +
+                        battleLog.AddLog($"{enemyName} used Buff, increasing " + $"{buffTarget.DisplayName}'s " +
                             $"next action value by {buffAmount}.");
                     }
 
@@ -794,15 +1094,8 @@ public class BattleControl : MonoBehaviour
             }
         }
 
-        // General cards are performed by a random surviving hero.
-        HeroStats randomHero = GetRandomAliveHero();
-
-        if (randomHero != null)
-        {
-            Debug.Log("GENERAL CARD: " + card.cardName +" | Random Hero: " + randomHero.heroType.heroName);
-        }
-
-        return randomHero;
+        // Shared cards are played by the hero whose turn is active.
+        return IsAlive(activeHero) ? activeHero : null;
     }
 
 
@@ -865,7 +1158,7 @@ public class BattleControl : MonoBehaviour
             Debug.Log(
                 "[Enemy AI Targeting] " +
                 "Action: " + actionType +
-                " | Selected: " + bestTarget.enemyType.enemyName +
+                " | Selected: " + bestTarget.DisplayName +
                 " (" + bestTarget.gameObject.name + ")" +
                 " | HP: " + bestTarget.currentHP +
                 "/" + bestTarget.enemyType.maxHp +
@@ -931,6 +1224,8 @@ public class BattleControl : MonoBehaviour
         }
 
         currentstate = BattleState.Lose;
+        SetActiveWorldArrow(null);
+        if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
 
         isSelectingTarget = false;
         UpdateUI();
@@ -974,6 +1269,7 @@ public class BattleControl : MonoBehaviour
         if (aliveEnemies <= 0 && !battleAlreadyWon)
         {
             battleAlreadyWon = true;
+            SetActiveWorldArrow(null);
             Debug.Log("Battle Won");
 
             nextbattletriggered = true;
@@ -1060,7 +1356,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null && !suppressLog)
                     {
-                        string targetName = targetEnemy.enemyType.enemyName;
+                        string targetName = targetEnemy.DisplayName;
 
                         if (shieldDamage > 0 && hpDamage > 0)
                         {
@@ -1098,7 +1394,7 @@ public class BattleControl : MonoBehaviour
                     if (battleLog != null && !suppressLog)
                     {
                         battleLog.AddLog($"You played \"{card.cardName}\", " + $"dealing {actualDamage} Piercing Damage " +
-                            $"to {targetEnemy.enemyType.enemyName}, " +
+                            $"to {targetEnemy.DisplayName}, " +
                             $"ignoring Shield."
                         );
                     }
@@ -1118,7 +1414,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null && !suppressLog)
                     {
-                        battleLog.AddLog($"You played \"{card.cardName}\", " + $"applying {finalBleed} Bleed to " + $"{targetEnemy.enemyType.enemyName}.");
+                        battleLog.AddLog($"You played \"{card.cardName}\", " + $"applying {finalBleed} Bleed to " + $"{targetEnemy.DisplayName}.");
                     }
 
                     Debug.Log(actingHero.name + " applied " + finalBleed + " Bleed to " +targetEnemy.name);
@@ -1184,11 +1480,13 @@ public class BattleControl : MonoBehaviour
                     if (battleLog != null && !suppressLog)
                     {
                         battleLog.AddLog($"You played \"{card.cardName}\", reducing " +
-                            $"{targetEnemy.enemyType.enemyName}'s next action value by {debuffAmount}.");
+                            $"{targetEnemy.DisplayName}'s next action value by {debuffAmount}.");
                     }
                 }
                 break;
         }
+
+        UpdateTurnOrderDisplay();
     }
 
     private void ProcessEnemyBleedEffects()
@@ -1212,7 +1510,7 @@ public class BattleControl : MonoBehaviour
 
             if (battleLog != null && actualDamage > 0)
             {
-                battleLog.AddLog( $"{enemy.enemyType.enemyName} suffered " + $"{actualDamage} Bleed Damage, ignoring Shield. " + $"Remaining Bleed: {enemy.BleedValue}."
+                battleLog.AddLog( $"{enemy.DisplayName} suffered " + $"{actualDamage} Bleed Damage, ignoring Shield. " + $"Remaining Bleed: {enemy.BleedValue}."
                 );
             }
         }
@@ -1350,6 +1648,13 @@ public class BattleControl : MonoBehaviour
     public bool HandleCardPlay(CardType card, CardUI cardUI)
     {
         Debug.Log("HandleCardPlay CALLED with: " + card.cardName + " | " + card.targetType);
+
+        HeroStats cardHero = GetHeroForCard(card);
+        if (cardHero == null || cardHero != activeHero)
+        {
+            Debug.Log("That hero's card can only be used on their turn.");
+            return false;
+        }
 
         if (!TrySpendAP(card.cost))
         {
@@ -1562,6 +1867,14 @@ public class BattleControl : MonoBehaviour
 
     private void Update()
     {
+        UpdateActiveWorldArrow();
+
+        if (!autoEndTurnPending && currentstate == BattleState.PlayerTurn && currentActionPoint <= 0 &&
+            !isSelectingTarget && activeCardAnimationRelay == null && !IsQuizInteractionOpen())
+        {
+            StartCoroutine(AutoEndTurnAtZeroAP());
+        }
+
         //Debug Damage Button
         /*if (Keyboard.current.slashKey.wasPressedThisFrame)
         {
@@ -1600,6 +1913,138 @@ public class BattleControl : MonoBehaviour
         }
     }
 
+    private bool IsQuizInteractionOpen()
+    {
+        QuizManager quizManager = FindFirstObjectByType<QuizManager>();
+        return quizManager != null &&
+            ((quizManager.quizPanel != null && quizManager.quizPanel.activeInHierarchy) ||
+             (quizManager.quizInfoPanel != null && quizManager.quizInfoPanel.activeInHierarchy));
+    }
+
+    private IEnumerator AutoEndTurnAtZeroAP()
+    {
+        autoEndTurnPending = true;
+        currentstate = BattleState.ForcedTurnEnd;
+        SetCardsInteractable(false);
+        if (notEnoughAPPanel != null)
+        {
+            StopCoroutine(nameof(ShowAPWarning));
+            notEnoughAPPanel.SetActive(true);
+        }
+        UpdateUI();
+        UpdateTurnOrderDisplay();
+
+        if (turnTransitionDelay > 0f)
+            yield return new WaitForSecondsRealtime(turnTransitionDelay);
+
+        if (currentstate == BattleState.ForcedTurnEnd && currentActionPoint <= 0 &&
+            !isSelectingTarget && activeCardAnimationRelay == null && !IsQuizInteractionOpen())
+        {
+            EndPlayersTurnInternal(true, true);
+        }
+        autoEndTurnPending = false;
+    }
+
+    private void SetCardsInteractable(bool interactable)
+    {
+        CardUI[] cards = FindObjectsByType<CardUI>(FindObjectsSortMode.None);
+        foreach (CardUI card in cards)
+        {
+            if (card != null && card.button != null)
+                card.button.interactable = interactable;
+        }
+    }
+
+    private void SetActiveWorldArrow(Transform target)
+    {
+        activeWorldArrowTarget = target;
+        activeWorldArrowHeadTarget = target != null ? FindCharacterHead(target) : null;
+        if (target == null)
+        {
+            if (activeWorldArrowObject != null) activeWorldArrowObject.SetActive(false);
+            return;
+        }
+
+        if (activeWorldArrowObject == null)
+        {
+            Sprite sprite = activeCharacterArrowSprite != null
+                ? activeCharacterArrowSprite
+                : turnOrderArrowImage != null ? turnOrderArrowImage.sprite : null;
+            if (sprite == null) return;
+
+            activeWorldArrowObject = new GameObject("Active Character Turn Arrow");
+            activeWorldArrowRenderer = activeWorldArrowObject.AddComponent<SpriteRenderer>();
+            activeWorldArrowRenderer.sprite = sprite;
+            activeWorldArrowRenderer.sortingOrder = short.MaxValue;
+            activeWorldArrowRenderer.color = activeTurnColor;
+            activeWorldArrowObject.transform.localScale = Vector3.one * activeCharacterArrowScale;
+        }
+
+        activeWorldArrowObject.SetActive(true);
+        UpdateActiveWorldArrow();
+    }
+
+    private Transform FindCharacterHead(Transform characterRoot)
+    {
+        foreach (Animator animator in characterRoot.GetComponentsInChildren<Animator>(true))
+        {
+            if (animator.isHuman)
+            {
+                Transform humanoidHead = animator.GetBoneTransform(HumanBodyBones.Head);
+                if (humanoidHead != null) return humanoidHead;
+            }
+        }
+
+        Transform firstHeadMatch = null;
+        foreach (Transform child in characterRoot.GetComponentsInChildren<Transform>(true))
+        {
+            string normalizedName = child.name.ToLowerInvariant().Replace("_", "").Replace(" ", "");
+            if (normalizedName == "head" || normalizedName.EndsWith(":head") || normalizedName.EndsWith(".head"))
+                return child;
+            if (firstHeadMatch == null && normalizedName.Contains("head"))
+                firstHeadMatch = child;
+        }
+        return firstHeadMatch;
+    }
+
+    private void UpdateActiveWorldArrow()
+    {
+        if (activeWorldArrowObject == null || activeWorldArrowTarget == null || !activeWorldArrowTarget.gameObject.activeInHierarchy)
+        {
+            if (activeWorldArrowObject != null) activeWorldArrowObject.SetActive(false);
+            return;
+        }
+
+        Bounds bounds = new Bounds(activeWorldArrowTarget.position, Vector3.zero);
+        bool foundRenderer = false;
+        foreach (Renderer modelRenderer in activeWorldArrowTarget.GetComponentsInChildren<Renderer>())
+        {
+            if (!modelRenderer.enabled) continue;
+            if (!foundRenderer) { bounds = modelRenderer.bounds; foundRenderer = true; }
+            else bounds.Encapsulate(modelRenderer.bounds);
+        }
+
+        Vector3 arrowPosition = activeWorldArrowHeadTarget != null
+            ? activeWorldArrowHeadTarget.position
+            : activeWorldArrowTarget.position;
+        float modelTop = foundRenderer ? bounds.max.y : activeWorldArrowTarget.position.y + 1.8f;
+        float headTop = activeWorldArrowHeadTarget != null ? activeWorldArrowHeadTarget.position.y + 0.25f : modelTop;
+        arrowPosition.y = Mathf.Max(modelTop, headTop);
+        Vector3 offset = activeCharacterArrowOffset;
+        offset.y = Mathf.Max(0f, offset.y);
+        arrowPosition += offset;
+        activeWorldArrowObject.transform.position = arrowPosition;
+        activeWorldArrowRenderer.color = activeTurnColor;
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            Vector3 toCamera = (mainCamera.transform.position - arrowPosition).normalized;
+            activeWorldArrowObject.transform.rotation =
+                Quaternion.LookRotation(toCamera, mainCamera.transform.up) * Quaternion.Euler(0f, 0f, -90f);
+        }
+    }
+
     private string GetCardEffectLogDescription(CardType card, int value)
     {
         switch (card.effectType)
@@ -1632,6 +2077,7 @@ public class BattleControl : MonoBehaviour
 
     void UpdateUI()
     {
+        UpdateTurnOrderDisplay();
         bool canEndTurn = currentstate == BattleState.PlayerTurn && !isSelectingTarget;
 
         UnityEngine.UI.Button button = endButton.GetComponent<UnityEngine.UI.Button>();

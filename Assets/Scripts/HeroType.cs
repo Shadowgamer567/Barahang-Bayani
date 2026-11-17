@@ -5,6 +5,7 @@ public class HeroType : ScriptableObject
 {
     public string heroName;
     public int maxHp;
+    [Min(1)] public int speed = 5;
     public int shield;
     public int maxShield;
     public GameObject prefab;

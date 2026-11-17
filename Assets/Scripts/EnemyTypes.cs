@@ -5,6 +5,7 @@ public class EnemyTypes : ScriptableObject
 {
     public string enemyName;
     public int maxHp;
+    [Min(1)] public int speed = 5;
     public int damage;
     public int shield;
     public int maxShield;

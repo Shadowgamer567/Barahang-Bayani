@@ -16,6 +16,10 @@ public class HeroStats : MonoBehaviour
     private CharacterAnimationRelay animationRelay;
 
     public int currentHP;
+    [SerializeField, Min(1)] private int rolledSpeed = 1;
+    public int Speed => rolledSpeed;
+    public int MaxSpeed => heroType != null ? Mathf.Max(1, heroType.speed) : 1;
+    public void RollSpeed() => rolledSpeed = Random.Range(1, MaxSpeed + 1);
     public int attack;
     public int shield;
 
