@@ -45,11 +45,11 @@ Choose a level to begin its battles. Some levels have a story scene before or af
 
 ### Battles
 
-Take turns using cards to defeat enemies and protect your heroes. A normal player turn starts with **5 action points (AP)** and up to **5 cards**. Each card costs AP; click one to preview it, then confirm to play. You can’t play a card if you have fewer AP than it costs. If you run out of AP, you can’t play more cards that turn—click **End Turn** to let the enemies act. AP refills at the start of your next turn. Unused AP does not carry over, and cards left in your hand stay there for the next turn.
+Take turns using cards to defeat enemies and protect your heroes. Every hero and enemy has a maximum Speed stat. At the start of each round, each living unit rolls a random Speed from 1 up to that maximum, then turns are ordered from highest roll to lowest. Ties follow the battle roster order. Each hero turn starts with **5 action points (AP)** and up to **5 cards**. That hero can play cards until they run out of AP, then click **End Turn** to pass to the next hero or enemy. AP refills and the hand refills toward five cards at the start of each hero's next turn. Unused AP does not carry over.
 
-Some cards need a target: attacks and weakening effects target enemies, while healing and shields target heroes. Other cards affect a whole group or the hero using them. Regular shields absorb damage first; piercing and bleed damage bypass shields. Bleed deals damage when you end your turn.
+Some cards need a target: attacks and weakening effects target enemies, while healing and shields target heroes. Other cards affect a whole group or the hero using them. Regular shields absorb damage first; piercing and bleed damage bypass shields. Bleed deals damage at the end of each full turn order.
 
-Click **End Turn** when ready. Each living enemy takes an action, such as attacking a random hero, healing, or shielding. Your next turn then starts with refreshed AP and enough cards to refill your hand. If a quiz-card answer is wrong, enemies take an extra turn; your remaining AP and cards are preserved. A correct answer activates the card.
+Click **End Turn** when ready. The next actor in the Speed order takes their turn. Each enemy takes one action, such as attacking a random hero, healing, or shielding. If a quiz-card answer is wrong, every living enemy takes one penalty action, then the interrupted hero resumes with their remaining AP and cards. A correct answer activates the card.
 
 Defeat all enemies in the level's required battles to win. If all heroes fall, you lose. The battle log and character indicators show actions, health, shields, and effects. Press **Esc** to pause or resume.
 

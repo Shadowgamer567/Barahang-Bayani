@@ -24,6 +24,10 @@ public class EnemyStats : MonoBehaviour
     //public GameObject selectionIndicator;
 
     public int currentHP;
+    [SerializeField, Min(1)] private int rolledSpeed = 1;
+    public int Speed => rolledSpeed;
+    public int MaxSpeed => enemyType != null ? Mathf.Max(1, enemyType.speed) : 1;
+    public void RollSpeed() => rolledSpeed = Random.Range(1, MaxSpeed + 1);
     public int shield;
     public int attack;
 
