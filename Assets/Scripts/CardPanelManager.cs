@@ -66,14 +66,24 @@ public class CardPanelManager : MonoBehaviour
     }
     */
 
-    public void DrawCard()
+    public void DrawCard(int maxAffordableCost = int.MaxValue)
     {
         if(cardPool == null || cardPool.Count == 0)
         {
             return;
         }
 
-        CardPoolEntry entry = cardPool[Random.Range(0, cardPool.Count)];
+        List<CardPoolEntry> affordableCards = new List<CardPoolEntry>();
+        foreach (CardPoolEntry candidate in cardPool)
+        {
+            if (candidate != null && candidate.card != null && candidate.card.cost <= maxAffordableCost)
+                affordableCards.Add(candidate);
+        }
+
+        if (affordableCards.Count == 0)
+            return;
+
+        CardPoolEntry entry = affordableCards[Random.Range(0, affordableCards.Count)];
 
         GameObject obj = Instantiate(cardTemplate, cardContainer);
         obj.SetActive(true);
@@ -177,14 +187,14 @@ public class CardPanelManager : MonoBehaviour
         return true;
     }
 
-    public void RefillToMax()
+    public void RefillToMax(int maxAffordableCost = int.MaxValue)
     {
         int currentCards = cardContainer.childCount;
         int needed = cardCount - currentCards;
 
         for (int i = 0; i < needed; i++)
         {
-            DrawCard();
+            DrawCard(maxAffordableCost);
         }
 
         if (cardContainer.childCount > currentCards)

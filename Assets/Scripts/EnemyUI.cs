@@ -7,8 +7,11 @@ using UnityEngine.UI;
 public class EnemyUI : MonoBehaviour
 {
     public Image hpFill;
+    [SerializeField, Range(0f, 1f)] private float lowHealthThreshold = 0.25f;
+    [SerializeField] private Color lowHealthColor = Color.red;
 
     float currentDisplayHP = 1f;
+    private Color normalHpColor;
 
     EnemyStats enemy;
 
@@ -16,6 +19,7 @@ public class EnemyUI : MonoBehaviour
     void Start()
     {
         enemy = GetComponentInParent<EnemyStats>();
+        if (hpFill != null) normalHpColor = hpFill.color;
     }
 
     // Update is called once per frame
@@ -52,6 +56,7 @@ public class EnemyUI : MonoBehaviour
 
         currentDisplayHP = Mathf.Lerp(currentDisplayHP, hpPercent, Time.deltaTime * speed);
         hpFill.fillAmount = currentDisplayHP;
+        hpFill.color = hpPercent <= lowHealthThreshold ? lowHealthColor : normalHpColor;
     }
 
     private void LateUpdate()

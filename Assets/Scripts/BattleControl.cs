@@ -59,6 +59,7 @@ public class BattleControl : MonoBehaviour
     private bool battleSequenceRunning = false;
 
     private bool battleAlreadyWon = false;
+    private bool resetActionPointsOnNextHeroTurn = true;
 
     public System.Action<int, int> OnAPChanged;
 
@@ -210,6 +211,7 @@ public class BattleControl : MonoBehaviour
         battleAlreadyWon = false; 
         // A new battle starts with a full AP pool on its first hero turn.
         currentActionPoint = 0;
+        resetActionPointsOnNextHeroTurn = true;
 
         int enemyCount = Random.Range(levelData.minEnemies, levelData.maxEnemies + 1);
 
@@ -437,10 +439,13 @@ public class BattleControl : MonoBehaviour
         activeHero = hero;
         SetActiveWorldArrow(hero.currentModel != null ? hero.currentModel.transform : hero.transform);
         currentstate = BattleState.PlayerTurn;
-        if (currentActionPoint <= 0)
+        if (resetActionPointsOnNextHeroTurn)
+        {
             currentActionPoint = maxActionPoint;
+            resetActionPointsOnNextHeroTurn = false;
+        }
         OnAPChanged?.Invoke(currentActionPoint, maxActionPoint);
-        FindFirstObjectByType<CardPanelManager>()?.RefillToMax();
+        FindFirstObjectByType<CardPanelManager>()?.RefillToMax(currentActionPoint);
         SetCardsInteractable(true);
         if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
         if (battleLog != null) battleLog.AddLog("--- " + hero.heroType.heroName + "'s Turn (Speed " + hero.Speed + ") ---");
@@ -513,6 +518,7 @@ public class BattleControl : MonoBehaviour
 
         // Decay hero shield overflow at the end of the player's turn.
         if (activeHero != null) activeHero.DecayShieldOverflow();
+        resetActionPointsOnNextHeroTurn = currentActionPoint <= 0 || !HasPlayableCardInHand();
 
         UpdateUI();
 
@@ -572,7 +578,7 @@ public class BattleControl : MonoBehaviour
             if (penaltyActorIndex >= 0) turnIndex = penaltyActorIndex;
             UpdateTurnOrderDisplay();
             SetActiveWorldArrow(enemy.currentModel != null ? enemy.currentModel.transform : enemy.transform);
-            EnemyAction action = ChooseEnemyAction(enemy) ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
+            EnemyAction action = GetStrongestPenaltyAttack(enemy);
             ExecuteEnemyAction(enemy, action);
             if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
             acted = true;
@@ -694,20 +700,28 @@ public class BattleControl : MonoBehaviour
         switch (action.actionType)
         {
             case EnemyActionType.Attack:
-                HeroStats target = GetRandomAliveHero();
+                HeroStats target = SelectHeroAttackTarget(enemy, action);
 
                 if (target != null)
                 {
                     int baseDamage = enemy.attack;
                     int actionBonus = action.value;
 
+                    int pendingBuff = enemy.PendingActionModifier;
                     int finalDamage = enemy.GetModifiedActionValue(Mathf.Max(0, baseDamage + actionBonus));
 
                     int previousHP = target.currentHP;
                     int previousShield = target.shield;
 
                     enemy.PlayAnimation(CharacterAnimationType.Attack);
-                    target.TakeDamage(finalDamage);
+                    int livingEnemyCount = enemies == null ? 0 : enemies.Count(IsAlive);
+                    bool lastStandAttack = livingEnemyCount > 0 && livingEnemyCount <= 2;
+                    bool shieldBreakingAttack = pendingBuff > 0 || lastStandAttack;
+                    int shieldDamageMultiplier = shieldBreakingAttack && target.shield > 0 ? 3 : 1;
+                    int piercingDamage = lastStandAttack && target.shield > 0 && finalDamage > 0
+                        ? Mathf.Max(1, finalDamage / 2)
+                        : 0;
+                    target.TakeDamage(finalDamage, shieldDamageMultiplier, piercingDamage);
 
                     int hpDamage = Mathf.Max(0, previousHP - target.currentHP);
 
@@ -739,7 +753,7 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case EnemyActionType.Shield:
-                EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield);
+                EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield, enemy);
                 
                 //Temp Debug
                 if (shieldTarget != null)
@@ -774,7 +788,7 @@ public class BattleControl : MonoBehaviour
                 break;
 
             case EnemyActionType.Heal:
-                EnemyStats healTarget = SelectEnemyAllyTarget(EnemyActionType.Heal);
+                EnemyStats healTarget = SelectEnemyAllyTarget(EnemyActionType.Heal, enemy);
 
                 if (healTarget != null)
                 {
@@ -794,8 +808,28 @@ public class BattleControl : MonoBehaviour
                 }
                 break;
 
+            case EnemyActionType.PartyHeal:
+                int partyHeal = enemy.GetModifiedActionValue(action.value);
+                int totalPartyHealing = 0;
+                int healedEnemyCount = 0;
+                enemy.PlayAnimation(CharacterAnimationType.Action);
+                foreach (EnemyStats ally in enemies)
+                {
+                    if (!IsAlive(ally)) continue;
+                    int previousHP = ally.currentHP;
+                    ally.Heal(partyHeal);
+                    int actualHeal = ally.currentHP - previousHP;
+                    totalPartyHealing += actualHeal;
+                    if (actualHeal > 0) healedEnemyCount++;
+                }
+
+                if (battleLog != null)
+                    battleLog.AddLog($"{enemyName} used Rallying Benediction, restoring {totalPartyHealing} HP across its ranks.");
+                Debug.Log($"{enemyName} used Rallying Benediction, healing {healedEnemyCount} allies for {totalPartyHealing} total HP.");
+                break;
+
             case EnemyActionType.Buff:
-                EnemyStats buffTarget = SelectEnemyAllyTarget(EnemyActionType.Buff);
+                EnemyStats buffTarget = SelectBuffTarget(enemy);
 
                 if (buffTarget != null)
                 {
@@ -816,6 +850,9 @@ public class BattleControl : MonoBehaviour
 
             case EnemyActionType.Debuff:
                 int debuffAmount = Mathf.Abs(action.value);
+                // Clear a hero team's positive pending modifier before applying the debuff.
+                if (playerModifier != null && playerModifier.PendingModifier > 0)
+                    debuffAmount += playerModifier.PendingModifier;
 
                 enemy.PlayAnimation(CharacterAnimationType.Action);
                 AddPlayerModifier(-debuffAmount);
@@ -835,6 +872,27 @@ public class BattleControl : MonoBehaviour
         if (enemy == null || enemy.action == null || enemy.action.Length == 0)
         {
             return null;
+        }
+
+        // Immediately counter a positive pending hero modifier with a debuff.
+        // A negative modifier already means the heroes are debuffed.
+        if (playerModifier != null && playerModifier.PendingModifier > 0)
+        {
+            foreach (EnemyAction action in enemy.action)
+                if (action != null && action.actionType == EnemyActionType.Debuff && action.value != 0)
+                    return action;
+        }
+
+        int lowHealthEnemyCount = CountLowHealthEnemies();
+        if (lowHealthEnemyCount > 2)
+        {
+            EnemyAction strongestPartyHeal = null;
+            foreach (EnemyAction candidate in enemy.action)
+                if (candidate != null && candidate.actionType == EnemyActionType.PartyHeal &&
+                    candidate.value + enemy.PendingActionModifier > 0 &&
+                    (strongestPartyHeal == null || candidate.value > strongestPartyHeal.value))
+                    strongestPartyHeal = candidate;
+            if (strongestPartyHeal != null) return strongestPartyHeal;
         }
 
         List<EnemyAction> validActions = new List<EnemyAction>();
@@ -877,6 +935,10 @@ public class BattleControl : MonoBehaviour
                 case EnemyActionType.Debuff:
                     weight = enemy.enemyType.debuffWeight;
                     break;
+
+                case EnemyActionType.PartyHeal:
+                    weight = enemy.enemyType.healWeight;
+                    break;
             }
 
             if (weight <= 0f)
@@ -887,11 +949,18 @@ public class BattleControl : MonoBehaviour
             switch (action.actionType)
             {
                 case EnemyActionType.Attack:
-                    weight = 5f;
+                    HeroStats attackTarget = SelectHeroAttackTarget(enemy, action);
+                    if (attackTarget == null) continue;
+                    int expectedDamage = Mathf.Max(0, enemy.attack + action.value + enemy.PendingActionModifier);
+                    int expectedHpDamage = Mathf.Max(0, expectedDamage - attackTarget.shield);
+                    int targetHp = attackTarget.currentHP;
+                    // Prefer attacks that remove more HP and finish off a hero.
+                    weight *= 1f + Mathf.Min(expectedHpDamage, targetHp) * 0.12f;
+                    if (expectedHpDamage >= targetHp) weight *= 3f;
                     break;
 
                 case EnemyActionType.Heal:
-                    EnemyStats healTarget = SelectEnemyAllyTarget(EnemyActionType.Heal);
+                    EnemyStats healTarget = SelectEnemyAllyTarget(EnemyActionType.Heal, enemy);
 
                     // No injured ally means healing is unnecessary.
                     if (healTarget == null)
@@ -901,69 +970,42 @@ public class BattleControl : MonoBehaviour
 
                     float healthRatio = (float)healTarget.currentHP / Mathf.Max(1, healTarget.enemyType.maxHp);
 
-                    if (healthRatio <= 0.25f)
-                    {
-                        weight *= 4f;
-                    }
-
-                    else if (healthRatio <= 0.50f)
-                    {
-                        weight *= 2.5f;
-                    }
-
-                    else
-                    {
-                        weight *= 1f;
-                    }
+                    int healAmount = Mathf.Max(0, action.value + enemy.PendingActionModifier);
+                    if (healAmount <= 0) continue;
+                    float missingRatio = 1f - healthRatio;
+                    weight *= 1f + missingRatio * 5f;
+                    if (healthRatio <= 0.25f) weight *= 2f;
 
                     break;
 
+                case EnemyActionType.PartyHeal:
+                    // Reserve the party-wide heal for moments when a group needs it.
+                    continue;
+
                 case EnemyActionType.Shield:
-                    EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield);
+                    EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield, enemy);
 
                     if (shieldTarget == null)
                     {
                         continue;
                     }
+                    if (action.value + enemy.PendingActionModifier <= 0) continue;
                     float shieldHealthRatio = (float)shieldTarget.currentHP / Mathf.Max(1, shieldTarget.enemyType.maxHp);
-
-                    if (shieldHealthRatio <= 0.30f)
-                    {
-                        // Critically injured ally: prioritize protection.
-                        weight *= 3f;
-                    }
-
-                    else if (shieldTarget.shield <= 0)
-                    {
-                        // No protection available.
-                        weight *= 2f;
-                    }
-
-                    else if (shieldTarget.shield < 5)
-                    {
-                        // Some protection, but still vulnerable.
-                        weight *= 1f;
-                    }
-
-                    else
-                    {
-                        // Already protected: Shield is less attractive.
-                        weight *= 0.35f;
-                    }
+                    weight *= 2f + (1f - shieldHealthRatio) * 3f;
 
                     break;
 
                 case EnemyActionType.Buff:
-                    EnemyStats buffTarget = SelectEnemyAllyTarget(EnemyActionType.Buff);
+                    EnemyStats buffTarget = SelectBuffTarget(enemy);
 
                     if (buffTarget == null)
                     {
                         continue;
                     }
 
-                    // Buff is useful, but generally less urgent than
-                    // healing or protecting a critically injured ally.
-                    weight = 4f;
+                    if (action.value <= 0) continue;
+                    // Coordinate buffs with an ally that has not acted yet.
+                    weight *= 2f + Mathf.Min(4, buffTarget.attack) * 0.25f;
                     break;
 
                 case EnemyActionType.Debuff:
@@ -1029,6 +1071,36 @@ public class BattleControl : MonoBehaviour
         }
 
         return validActions[validActions.Count - 1];
+    }
+
+    private int CountLowHealthEnemies()
+    {
+        if (enemies == null) return 0;
+        int count = 0;
+        foreach (EnemyStats candidate in enemies)
+        {
+            if (IsAlive(candidate) && candidate.enemyType != null &&
+                (float)candidate.currentHP / Mathf.Max(1, candidate.enemyType.maxHp) <= 0.5f)
+                count++;
+        }
+        return count;
+    }
+
+    private EnemyAction GetStrongestPenaltyAttack(EnemyStats enemy)
+    {
+        EnemyAction strongest = null;
+        if (enemy != null && enemy.action != null)
+        {
+            foreach (EnemyAction action in enemy.action)
+            {
+                if (action == null || action.actionType != EnemyActionType.Attack) continue;
+                if (strongest == null || action.value > strongest.value) strongest = action;
+            }
+        }
+
+        // Penalty turns always attack, even for enemies whose normal action list
+        // has no attack entry.
+        return strongest ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
     }
 
     HeroStats GetRandomAliveHero()
@@ -1099,80 +1171,73 @@ public class BattleControl : MonoBehaviour
     }
 
 
-    private EnemyStats SelectEnemyAllyTarget(EnemyActionType actionType)
+    private HeroStats SelectHeroAttackTarget(EnemyStats attacker, EnemyAction action)
+    {
+        HeroStats bestTarget = null;
+        float bestScore = float.MinValue;
+        int predictedDamage = Mathf.Max(0, attacker.attack + action.value + attacker.PendingActionModifier);
+
+        if (heroes == null) return null;
+        foreach (HeroStats hero in heroes)
+        {
+            if (!IsAlive(hero)) continue;
+            int hpDamage = Mathf.Min(hero.currentHP, Mathf.Max(0, predictedDamage - hero.shield));
+            float score = hpDamage * 2f + Mathf.Min(hero.shield, predictedDamage) * 0.25f;
+            if (hpDamage >= hero.currentHP && hpDamage > 0) score += 100f;
+            score += 1f - (float)hero.currentHP / Mathf.Max(1, hero.heroType.maxHp);
+            if (score > bestScore) { bestScore = score; bestTarget = hero; }
+        }
+        return bestTarget;
+    }
+
+    private EnemyStats SelectBuffTarget(EnemyStats actingEnemy)
     {
         EnemyStats bestTarget = null;
-
-        foreach (EnemyStats enemy in enemies)
+        float bestScore = float.MinValue;
+        foreach (EnemyStats candidate in enemies)
         {
-            if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead || enemy.currentHP <= 0 || enemy.enemyType == null)
-            {
-                continue;
-            }
-
-            switch (actionType)
-            {
-                case EnemyActionType.Heal:
-                    // Only consider injured enemies.
-                    if (enemy.currentHP >= enemy.enemyType.maxHp)
-                    {
-                        continue;
-                    }
-
-                    // Prioritize the lowest HP percentage.
-                    if (bestTarget == null || (float)enemy.currentHP / Mathf.Max(1, enemy.enemyType.maxHp) <
-                        (float)bestTarget.currentHP / Mathf.Max(1, bestTarget.enemyType.maxHp))
-                    {
-                        bestTarget = enemy;
-                    }
-
-                    break;
-
-                case EnemyActionType.Shield:
-                    // Prioritize enemies with the least combined HP and Shield.
-                    if (bestTarget == null || enemy.currentHP + enemy.shield < bestTarget.currentHP + bestTarget.shield)
-                    {
-                        bestTarget = enemy;
-                    }
-                    break;
-
-                case EnemyActionType.Buff:
-                    // Avoid allies that already have a positive buff.
-                    if (enemy.PendingActionModifier > 0)
-                    {
-                        continue;
-                    }
-
-                    // Prefer allies with the highest attack.
-                    if (bestTarget == null || enemy.attack > bestTarget.attack)
-                    {
-                        bestTarget = enemy;
-                    }
-                    break;
-            }
+            if (!IsAlive(candidate) || candidate == actingEnemy || candidate.PendingActionModifier > 0 || !HasAttackAction(candidate)) continue;
+            int actorIndex = turnOrder.FindIndex(actor => actor.enemy == candidate);
+            if (actorIndex <= turnIndex) continue;
+            float score = candidate.attack + candidate.Speed * 0.1f;
+            if (score > bestScore) { bestScore = score; bestTarget = candidate; }
         }
+        return bestTarget;
+    }
 
-        //Temp Debug
-        if (bestTarget != null)
+    private bool HasAttackAction(EnemyStats enemy)
+    {
+        if (enemy == null || enemy.action == null) return false;
+        foreach (EnemyAction action in enemy.action)
+            if (action != null && action.actionType == EnemyActionType.Attack) return true;
+        return false;
+    }
+
+    private EnemyStats SelectEnemyAllyTarget(EnemyActionType actionType, EnemyStats actingEnemy = null)
+    {
+        EnemyStats bestTarget = null;
+        float bestScore = float.MinValue;
+
+        foreach (EnemyStats candidate in enemies)
         {
-            Debug.Log(
-                "[Enemy AI Targeting] " +
-                "Action: " + actionType +
-                " | Selected: " + bestTarget.DisplayName +
-                " (" + bestTarget.gameObject.name + ")" +
-                " | HP: " + bestTarget.currentHP +
-                "/" + bestTarget.enemyType.maxHp +
-                " | Shield: " + bestTarget.shield +
-                " | Pending Modifier: " + bestTarget.PendingActionModifier
-            );
-        }
-        else
-        {
-            Debug.Log(
-                "[Enemy AI Targeting] " +
-                "Action: " + actionType +
-                " | No eligible target found."
-            );
+            if (!IsAlive(candidate) || candidate.enemyType == null) continue;
+            if (actionType == EnemyActionType.Heal)
+            {
+                if (candidate.currentHP >= candidate.enemyType.maxHp) continue;
+                float missing = 1f - (float)candidate.currentHP / Mathf.Max(1, candidate.enemyType.maxHp);
+                float score = missing * 100f + Mathf.Min(candidate.enemyType.maxHp - candidate.currentHP, 20) * 0.1f;
+                if (candidate != actingEnemy) score += 5f;
+                if (score > bestScore) { bestScore = score; bestTarget = candidate; }
+            }
+            else if (actionType == EnemyActionType.Shield)
+            {
+                // Shield is only spent when it can protect an unshielded ally.
+                if (candidate.shield > 0) continue;
+                float healthRatio = (float)candidate.currentHP / Mathf.Max(1, candidate.enemyType.maxHp);
+                float score = (1f - healthRatio) * 100f;
+                if (candidate != actingEnemy) score += 5f;
+                if (score > bestScore) { bestScore = score; bestTarget = candidate; }
+            }
         }
 
         return bestTarget;
@@ -1953,6 +2018,20 @@ public class BattleControl : MonoBehaviour
             if (card != null && card.button != null)
                 card.button.interactable = interactable;
         }
+    }
+
+    private bool HasPlayableCardInHand()
+    {
+        CardPanelManager cardManager = FindFirstObjectByType<CardPanelManager>();
+        if (cardManager == null || cardManager.cardContainer == null) return false;
+
+        foreach (Transform cardTransform in cardManager.cardContainer)
+        {
+            CardUI card = cardTransform.GetComponent<CardUI>();
+            if (card != null && card.Type != null && card.Type.cost <= currentActionPoint)
+                return true;
+        }
+        return false;
     }
 
     private void SetActiveWorldArrow(Transform target)

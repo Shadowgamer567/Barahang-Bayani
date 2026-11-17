@@ -32,6 +32,8 @@ MonoBehaviour:
     value: 9
   - actionType: 0
     value: 12
+  - actionType: 5
+    value: 8
   attackWeight: 5
   healWeight: 2
   shieldWeight: 3

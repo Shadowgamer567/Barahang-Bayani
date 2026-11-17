@@ -42,7 +42,7 @@ public class HeroStats : MonoBehaviour
         LoadModel();
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, int shieldDamageMultiplier = 1, int piercingDamage = 0)
     {
         if (IsDead())
         {
@@ -50,15 +50,17 @@ public class HeroStats : MonoBehaviour
         }
 
         amount = Mathf.Max(0, amount);
+        piercingDamage = Mathf.Max(0, piercingDamage);
 
         int previousHP = currentHP;
 
         // Normal damage consumes all available shield first,
         // including temporary overflow.
-        int shieldDamage = Mathf.Min(shield, amount);
+        shieldDamageMultiplier = Mathf.Max(1, shieldDamageMultiplier);
+        int shieldDamage = Mathf.Min(shield, amount * shieldDamageMultiplier);
         shield -= shieldDamage;
 
-        int remainingDamage = amount - shieldDamage;
+        int remainingDamage = Mathf.Max(0, amount - shieldDamage) + piercingDamage;
 
         if (remainingDamage > 0)
         {
