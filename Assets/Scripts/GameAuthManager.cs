@@ -37,9 +37,33 @@ public class GameAuthManager : MonoBehaviour
         FirebaseManager.Auth.CurrentUser != null &&
         !FirebaseManager.Auth.CurrentUser.IsAnonymous;
 
+    // StudentUID is retained as a compatibility alias for older progress code.
+    // The authenticated identity may be either a Student or a Teacher.
     public string StudentUID { get; private set; }
+    public string UserUID => StudentUID;
     public string Username { get; private set; }
     public string Role { get; private set; }
+    public string SelectedClassroomID { get; private set; } = "";
+
+    public bool IsStudent => string.Equals(Role, "Student", StringComparison.OrdinalIgnoreCase);
+    public bool IsTeacher => string.Equals(Role, "Teacher", StringComparison.OrdinalIgnoreCase);
+
+    public void SetSelectedClassroom(string classroomID)
+    {
+        if (string.IsNullOrWhiteSpace(classroomID))
+            throw new ArgumentException("A valid website classroom ID is required.", nameof(classroomID));
+
+        if (!IsSignedIn)
+            throw new InvalidOperationException("Cannot select a classroom without a website session.");
+
+        SelectedClassroomID = classroomID.Trim();
+
+        if (CurrentAccount.ActiveAccount != null)
+            CurrentAccount.ActiveAccount.classroomID = SelectedClassroomID;
+
+        if (ProgressManager.Instance != null && CurrentAccount.ActiveAccount != null)
+            ProgressManager.Instance.SetActiveAccount(CurrentAccount.ActiveAccount);
+    }
 
 #if UNITY_EDITOR
     private const bool USE_EMULATOR = true;
@@ -298,6 +322,15 @@ public class GameAuthManager : MonoBehaviour
             StudentUID = result.uid;
             Username = result.username;
             Role = result.role;
+            SelectedClassroomID = "";
+
+            if (!IsStudent && !IsTeacher)
+            {
+                FirebaseManager.Auth.SignOut();
+                Debug.LogError("Website returned an unsupported game role: " + Role);
+                IsSigningIn = false;
+                yield break;
+            }
 
             // Supply the existing progress manager with a lightweight session
             // identity. This does not create or upload a legacy account record.
@@ -305,16 +338,23 @@ public class GameAuthManager : MonoBehaviour
             {
                 id = StudentUID,
                 username = Username,
-                accountType = Role == "Teacher" ? AccountType.Teacher : AccountType.Student,
-                classroomID = DatabaseManager.Instance != null
-                    ? DatabaseManager.Instance.CurrentDatabase
-                    : ""
+                accountType = IsTeacher ? AccountType.Teacher : AccountType.Student,
+                // Do not inherit a classroom left by a previous local account.
+                classroomID = ""
             };
 
             CurrentAccount.ActiveAccount = session;
 
             if (ProgressManager.Instance != null)
                 ProgressManager.Instance.SetActiveAccount(session);
+
+            // Switch the existing account area to its website-authenticated
+            // mode, then let the classroom manager request authorized rooms.
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.OpenWebsiteAccountMenu();
+
+            if (FirestoreClassroomManager.Instance != null)
+                FirestoreClassroomManager.Instance.OpenClassroomSelection();
 
             Debug.Log("Website game sign-in successful. UID: " + StudentUID +
                 " | Role: " + Role);

@@ -1,24 +1,32 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Threading.Tasks;
-using Firebase.Firestore;
-using TMPro;
-using System.Linq.Expressions;
 
+/// <summary>
+/// Loads and selects only classrooms that the authenticated website user is
+/// authorized to access. Classroom creation is delegated to the website's
+/// createClassroom callable function.
+/// </summary>
 public class FirestoreClassroomManager : MonoBehaviour
 {
     public static FirestoreClassroomManager Instance;
 
-    private bool selectingClassroom = false;
+    private bool selectingClassroom;
+    private bool loadingClassrooms;
+    private readonly List<WebsiteClassroomData> availableClassrooms = new List<WebsiteClassroomData>();
 
     public bool IsSelectingClassroom => selectingClassroom;
+    public bool IsLoadingClassrooms => loadingClassrooms;
 
     [Header("Classroom UI")]
     public GameObject classroomSelectionPanel;
     public Transform classroomContainer;
     public GameObject classroomCardPrefab;
     public TMP_Text currentClassroomText;
+    public GameObject openClassroomCreationButton;
 
     [Header("Classroom Creation UI")]
     public GameObject classroomCreationPanel;
@@ -26,215 +34,168 @@ public class FirestoreClassroomManager : MonoBehaviour
     public Button confirmCreationButton;
     public Button cancelCreationButton;
 
-
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-
             DontDestroyOnLoad(gameObject);
         }
-
         else
         {
             Destroy(gameObject);
         }
     }
 
-    public async Task<bool> CreateClassroom(string classroomID)
+    public async void LoadClassrooms()
     {
-        if (string.IsNullOrWhiteSpace(classroomID))
+        if (loadingClassrooms)
+            return;
+
+        if (!ValidateUIReferences())
+            return;
+
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn)
         {
-            Debug.LogError("Classroom ID cannot be empty.");
-            return false;
+            Debug.LogWarning("Classroom loading requires a signed-in website account.");
+            auth?.BeginWebsiteLogin();
+            return;
         }
 
-        classroomID = classroomID.Trim();
-
-        DocumentReference classroomRef = FirestoreManager.Instance.DB.Collection("Classroom").Document(classroomID);
+        loadingClassrooms = true;
+        ClearClassroomCards();
+        availableClassrooms.Clear();
 
         try
         {
-            DocumentSnapshot snapshot = await classroomRef.GetSnapshotAsync();
+            string functionName;
+            if (auth.IsStudent)
+                functionName = "getMyClassrooms";
+            else if (auth.IsTeacher)
+                functionName = "getTeacherClassrooms";
+            else
+                throw new InvalidOperationException("This website account role cannot access the game.");
 
-            if (snapshot.Exists)
+            WebsiteClassroomListResult result =
+                await WebsiteCallableClient.CallAsync<WebsiteClassroomListResult>(functionName);
+
+            if (result == null || !result.success)
+                throw new Exception("The website did not return a successful classroom response.");
+
+            if (result.classrooms != null)
+                availableClassrooms.AddRange(result.classrooms);
+
+            foreach (WebsiteClassroomData classroom in availableClassrooms)
             {
-                Debug.LogWarning("Classroom Already Exists:" + classroomID);
-                return false;
+                if (classroom == null || string.IsNullOrWhiteSpace(classroom.id))
+                    continue;
+
+                GameObject cardObject = Instantiate(classroomCardPrefab, classroomContainer);
+                cardObject.SetActive(true);
+
+                ClassroomCardUI card = cardObject.GetComponent<ClassroomCardUI>();
+                if (card == null)
+                {
+                    Debug.LogError("Classroom card prefab is missing ClassroomCardUI.");
+                    Destroy(cardObject);
+                    continue;
+                }
+
+                string displayName = string.IsNullOrWhiteSpace(classroom.name)
+                    ? classroom.id
+                    : classroom.name;
+                card.Setup(classroom.id, displayName);
             }
 
-            Dictionary<string, object> data = new Dictionary<string, object>();
+            if (openClassroomCreationButton != null)
+                openClassroomCreationButton.SetActive(auth.IsTeacher);
 
-            data["created"] = true;
-
-            await FirestoreManager.Instance.DB
-                .Collection("Classroom")
-                .Document(classroomID)
-                .SetAsync(data);
-
-            Debug.Log("Classroom created: " + classroomID);
-
-            return true;
+            Debug.Log("Loaded " + availableClassrooms.Count +
+                " authorized website classroom(s) for " + auth.Role + ".");
         }
-
-        catch (System.Exception e)
+        catch (Exception exception)
         {
-            Debug.LogError("Failed to create classroom: " + e.Message);
-            return false;
+            Debug.LogError("Failed to load website classrooms: " + exception);
         }
-    }
-
-    public async void LoadClassrooms()
-    {
-        if (classroomContainer == null)
+        finally
         {
-            Debug.LogError("Classroom container is not assigned.");
-            return;
+            loadingClassrooms = false;
         }
-
-        if (classroomCardPrefab == null)
-        {
-            Debug.LogError("Classroom card prefab is not assigned.");
-            return;
-        }
-
-        QuerySnapshot snapshot = await FirestoreManager.Instance.DB
-            .Collection("Classroom")
-            .GetSnapshotAsync();
-
-        // Clear existing classroom cards
-        for (int i = classroomContainer.childCount - 1; i >= 0; i--)
-        {
-            Destroy(classroomContainer.GetChild(i).gameObject);
-        }
-
-        foreach (DocumentSnapshot document in snapshot.Documents)
-        {
-            GameObject obj =
-                Instantiate(classroomCardPrefab, classroomContainer);
-
-            obj.SetActive(true);
-
-            ClassroomCardUI card =
-                obj.GetComponent<ClassroomCardUI>();
-
-            if (card == null)
-            {
-                Debug.LogError(
-                    "ClassroomCard prefab is missing ClassroomCardUI."
-                );
-
-                continue;
-            }
-
-            card.Setup(document.Id);
-        }
-
-        Debug.Log(
-            "Loaded " + snapshot.Count + " classrooms from Firestore."
-        );
     }
 
     public void OpenClassroomSelection()
     {
         if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
-        {
-            Debug.LogWarning("Cannot open classroom selection during account deletion.");
             return;
-        }
 
         if (classroomSelectionPanel == null)
         {
+            Debug.LogError("Classroom selection panel is not assigned.");
             return;
         }
 
         classroomSelectionPanel.SetActive(true);
-
         LoadClassrooms();
     }
 
     public void CloseClassroomSelection()
     {
-        if (classroomSelectionPanel == null)
-            return;
-
-        classroomSelectionPanel.SetActive(false);
+        if (classroomSelectionPanel != null)
+            classroomSelectionPanel.SetActive(false);
     }
 
     public async void SelectClassroom(string classroomID)
     {
-        if (selectingClassroom)
-        {
-            Debug.LogWarning(
-                "Classroom selection blocked: " +
-                "Another classroom selection is still in progress."
-            );
+        if (selectingClassroom || string.IsNullOrWhiteSpace(classroomID))
+            return;
 
+        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+            return;
+
+        // A classroom card is not trusted by itself. The ID must be present in
+        // the list returned for the currently authenticated website account.
+        WebsiteClassroomData selected = availableClassrooms.Find(
+            item => item != null && string.Equals(item.id, classroomID, StringComparison.Ordinal));
+
+        if (selected == null)
+        {
+            Debug.LogError("Rejected classroom selection: it was not returned for this website user.");
             return;
         }
 
-        if (ProgressManager.Instance != null &&
-            ProgressManager.Instance.IsAccountDeletionInProgress)
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn)
         {
-            Debug.LogWarning(
-                "Cannot switch classrooms while account deletion is in progress."
-            );
-
+            Debug.LogError("Cannot select a classroom without an authenticated website session.");
             return;
         }
-
-        if (string.IsNullOrWhiteSpace(classroomID))
-            return;
 
         selectingClassroom = true;
-
         try
         {
-            Debug.Log("Selecting Classroom: " + classroomID);
-
-            // Wait for an earlier account download before
-            // changing the active classroom.
-            await FirestoreAccountManager.WaitForAccountDownloads();
-
-            // Recheck after waiting because deletion may have started.
-            if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
-            {
-                Debug.LogWarning("Classroom selection cancelled: " + "Account deletion started while waiting.");
-
-                return;
-            }
-
-            DatabaseManager.Instance.SetDatabase(classroomID);
+            DatabaseManager.Instance.SetDatabase(selected.id);
+            auth.SetSelectedClassroom(selected.id);
 
             if (currentClassroomText != null)
-            {
-                currentClassroomText.text = classroomID;
-            }
+                currentClassroomText.text = string.IsNullOrWhiteSpace(selected.name)
+                    ? selected.id
+                    : selected.name;
 
             CloseClassroomSelection();
 
-            await FirestoreAccountManager.Instance.DownloadAccounts();
+            // The account database is intentionally not downloaded here.
+            // Progress loading is kept out of this stage until its production
+            // security path has been implemented and tested.
+            Debug.Log("Selected authorized website classroom: " + selected.id +
+                " | User: " + auth.UserUID + " | Role: " + auth.Role);
 
-            if (AccountManager.Instance != null)
-            {
-                // Check for interrupted account deletions
-                // belonging to the newly selected classroom.
-                AccountManager.Instance.CheckPendingDeletionsForActiveClassroom();
-
-                await AccountManager.Instance.RecoverPendingAccountDeletions();
-
-                AccountManager.Instance.RefreshUI();
-            }
-
-            Debug.Log("Classroom switched successfully: " + classroomID);
+            AccountManager.Instance?.ContinueAfterWebsiteClassroomSelected();
         }
-
-        catch (System.Exception ex)
+        catch (Exception exception)
         {
-            Debug.LogError("Failed to select classroom " + classroomID + ": " + ex);
+            Debug.LogError("Failed to select website classroom: " + exception);
         }
-
         finally
         {
             selectingClassroom = false;
@@ -243,44 +204,104 @@ public class FirestoreClassroomManager : MonoBehaviour
 
     public async void ConfirmClassroomCreation()
     {
-        if(classroomNameInput == null)
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
         {
-            Debug.Log("Classroom name input is not assigned");
+            Debug.LogWarning("Only an authenticated website teacher can create a classroom.");
             return;
         }
 
-        string classroomID = classroomNameInput.text.Trim();
-
-        if (string.IsNullOrWhiteSpace(classroomID))
+        if (classroomNameInput == null)
         {
-            Debug.LogWarning("Please Enter a classroom name");
+            Debug.LogError("Classroom name input is not assigned.");
             return;
         }
 
-        bool created = await CreateClassroom(classroomID);
-
-        if (!created)
+        string classroomName = classroomNameInput.text.Trim();
+        if (string.IsNullOrWhiteSpace(classroomName))
         {
-            Debug.LogWarning("Classroom creation unsuccesful. Please try another name");
+            Debug.LogWarning("Please enter a classroom name.");
             return;
         }
 
-        classroomNameInput.text = "";
-
-        if (classroomCreationPanel != null) 
+        try
         {
-            classroomCreationPanel.SetActive(false);
-            Debug.Log("Closing Creation Panel");
-        }
+            WebsiteCreateClassroomRequest payload = new WebsiteCreateClassroomRequest
+            {
+                name = classroomName
+            };
 
-        SelectClassroom(classroomID);
+            WebsiteCreateClassroomResult result =
+                await WebsiteCallableClient.CallAsync<WebsiteCreateClassroomResult>(
+                    "createClassroom", JsonUtility.ToJson(payload));
+
+            if (result == null || !result.success || result.classroom == null ||
+                string.IsNullOrWhiteSpace(result.classroom.id))
+            {
+                throw new Exception("The website did not return the created classroom details.");
+            }
+
+            classroomNameInput.text = "";
+            if (classroomCreationPanel != null)
+                classroomCreationPanel.SetActive(false);
+
+            // Refresh the server-authorized list before selecting the new ID.
+            await LoadClassroomsAsync();
+            SelectClassroom(result.classroom.id);
+
+            Debug.Log("Website classroom created: " + result.classroom.name +
+                " | Access code: " + result.classroom.accessCode);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError("Website classroom creation failed: " + exception);
+        }
+    }
+
+    private async Task LoadClassroomsAsync()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+        string functionName = auth.IsTeacher ? "getTeacherClassrooms" : "getMyClassrooms";
+        WebsiteClassroomListResult result =
+            await WebsiteCallableClient.CallAsync<WebsiteClassroomListResult>(functionName);
+
+        if (result == null || !result.success)
+            throw new Exception("The website did not return a successful classroom response.");
+
+        availableClassrooms.Clear();
+        if (result != null && result.classrooms != null)
+            availableClassrooms.AddRange(result.classrooms);
+
+        if (openClassroomCreationButton != null)
+            openClassroomCreationButton.SetActive(auth.IsTeacher);
+
+        ClearClassroomCards();
+        foreach (WebsiteClassroomData classroom in availableClassrooms)
+        {
+            if (classroom == null || string.IsNullOrWhiteSpace(classroom.id))
+                continue;
+
+            GameObject cardObject = Instantiate(classroomCardPrefab, classroomContainer);
+            cardObject.SetActive(true);
+            ClassroomCardUI card = cardObject.GetComponent<ClassroomCardUI>();
+            if (card != null)
+                card.Setup(classroom.id, string.IsNullOrWhiteSpace(classroom.name) ? classroom.id : classroom.name);
+            else
+                Destroy(cardObject);
+        }
     }
 
     public void OpenClassroomCreation()
     {
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
+        {
+            Debug.LogWarning("Classroom creation is available only to website teachers.");
+            return;
+        }
+
         if (classroomSelectionPanel != null)
             classroomSelectionPanel.SetActive(false);
-
         if (classroomCreationPanel != null)
             classroomCreationPanel.SetActive(true);
     }
@@ -289,97 +310,76 @@ public class FirestoreClassroomManager : MonoBehaviour
     {
         if (classroomCreationPanel != null)
             classroomCreationPanel.SetActive(false);
-
         if (classroomSelectionPanel != null)
             classroomSelectionPanel.SetActive(true);
-
         if (classroomNameInput != null)
             classroomNameInput.text = "";
     }
 
     public void ConnectClassroomButtons(AccountUIReferences ui)
     {
-        Debug.Log("=== Connecting Classroom Buttons ===");
-
         ConnectButton(ui.openClassroomSelectionButton, OpenClassroomSelection, "Open Classroom Selection");
-
         ConnectButton(ui.openClassroomCreationButton, OpenClassroomCreation, "Open Classroom Creation");
-
         ConnectButton(ui.cancelCreationButton, CancelClassroomCreation, "Cancel Classroom Creation");
-
         ConnectButton(ui.cancelClassroomSelectionButton, CloseClassroomSelection, "Cancel Classroom Selection");
-
-        ConnectButton(ui.confirmCreationButton, ConfirmClassroomCreation, "Confirm Create Classroom");
+        ConnectButton(ui.confirmCreationButton, ConfirmClassroomCreation, "Confirm Classroom Creation");
     }
 
-    private void ConnectButton(
-        GameObject buttonObject,
-        UnityEngine.Events.UnityAction action,
-        string buttonName)
+    private void ConnectButton(GameObject buttonObject, UnityEngine.Events.UnityAction action, string buttonName)
     {
         if (buttonObject == null)
         {
-            Debug.LogError(buttonName + ": UI reference is NULL!");
+            Debug.LogWarning(buttonName + ": UI reference is not assigned.");
             return;
         }
 
         Button button = buttonObject.GetComponent<Button>();
-
         if (button == null)
         {
-            Debug.LogError(
-                buttonName + ": No Button component on " +
-                buttonObject.name
-            );
+            Debug.LogError(buttonName + ": No Button component on " + buttonObject.name);
             return;
         }
 
         button.onClick.RemoveListener(action);
         button.onClick.AddListener(action);
-
-        Debug.Log(
-            buttonName + ": Connected to " +
-            buttonObject.name +
-            " | Active: " + buttonObject.activeInHierarchy +
-            " | Interactable: " + button.interactable
-        );
     }
 
     public void ConnectUI(AccountUIReferences ui)
     {
-        // Classroom selection
         classroomSelectionPanel = ui.classroomSelectionPanel;
         classroomContainer = ui.classroomContainer;
         classroomCardPrefab = ui.classroomCardPrefab;
         currentClassroomText = ui.currentClassroomNameText;
+        openClassroomCreationButton = ui.openClassroomCreationButton;
 
-        // Classroom creation
         classroomCreationPanel = ui.classroomCreationPanel;
         classroomNameInput = ui.classroomNameInput;
 
-        // Restore the displayed classroom name
-        if (currentClassroomText != null &&
-            DatabaseManager.Instance != null)
+        if (currentClassroomText != null && GameAuthManager.Instance != null &&
+            !string.IsNullOrWhiteSpace(GameAuthManager.Instance.SelectedClassroomID))
         {
-            currentClassroomText.text =
-                DatabaseManager.Instance.CurrentDatabase;
+            WebsiteClassroomData selected = availableClassrooms.Find(
+                item => item != null && item.id == GameAuthManager.Instance.SelectedClassroomID);
+            currentClassroomText.text = selected != null ? selected.name : GameAuthManager.Instance.SelectedClassroomID;
         }
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Start()
+    private bool ValidateUIReferences()
     {
-        if (currentClassroomText != null &&
-            DatabaseManager.Instance != null)
+        if (classroomContainer == null || classroomCardPrefab == null)
         {
-            currentClassroomText.text =
-                DatabaseManager.Instance.CurrentDatabase;
+            Debug.LogError("Classroom container or classroom card prefab is not assigned.");
+            return false;
         }
+        return true;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ClearClassroomCards()
     {
-        
+        if (classroomContainer == null)
+            return;
+
+        for (int i = classroomContainer.childCount - 1; i >= 0; i--)
+            Destroy(classroomContainer.GetChild(i).gameObject);
     }
 }

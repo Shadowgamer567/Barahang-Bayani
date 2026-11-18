@@ -11,9 +11,16 @@ public class ClassroomCardUI : MonoBehaviour
 
     public void Setup(string classroomID)
     {
+        Setup(classroomID, classroomID);
+    }
+
+    public void Setup(string classroomID, string classroomName)
+    {
         this.classroomID = classroomID;
 
-        classroomNameText.text = classroomID;
+        classroomNameText.text = string.IsNullOrWhiteSpace(classroomName)
+            ? classroomID
+            : classroomName;
 
         Button button = GetComponent<Button>();
 

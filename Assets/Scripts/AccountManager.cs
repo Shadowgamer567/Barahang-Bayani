@@ -137,23 +137,18 @@ public class AccountManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-
             DontDestroyOnLoad(gameObject);
-
-            EnsureAccountsFileExists();
         }
-
         else
         {
             Destroy(gameObject);
+            return;
         }
 
-        EnsureAccountsFileExists();
-        LoadPendingAccountUploads();
-        LoadPendingAssignmentUploads();
-        LoadPendingAccountDeletions();
-
-        CheckInterruptedAccountDeletions();
+        // The old Unity-local account registry and its pending upload/delete
+        // queues are retired. Website authentication now owns user identity.
+        // Existing local files are left untouched for backup/rollback, but are
+        // no longer loaded or synchronized by the active account flow.
     }
 
     public void LoadAccount()
@@ -1188,6 +1183,26 @@ public class AccountManager : MonoBehaviour
         OpenAccountMenu();
     }
 
+    public void ContinueAfterWebsiteClassroomSelected()
+    {
+        if (waitingToStartGame)
+        {
+            waitingToStartGame = false;
+            MainMenu.StartNewGame();
+            return;
+        }
+
+        if (waitingToLoadGame)
+        {
+            waitingToLoadGame = false;
+            MainMenu mainMenuScript = FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
+            if (mainMenuScript != null)
+                mainMenuScript.LoadGame();
+            else
+                Debug.LogError("AccountManager: MainMenu script not found after website classroom selection.");
+        }
+    }
+
     void HideAllPanels()
     {
         if (accountSelectPanel != null)
@@ -1211,40 +1226,55 @@ public class AccountManager : MonoBehaviour
 
     public void OpenAccountMenu()
     {
-        Debug.Log("[Account Menu] OpenAccountMenu entered.");
+        GameAuthManager websiteAuth = GameAuthManager.Instance;
+        if (websiteAuth == null || !websiteAuth.IsSignedIn)
+        {
+            Debug.Log("[Account Menu] Starting website authentication.");
+            if (websiteAuth != null)
+                websiteAuth.BeginWebsiteLogin();
+            else
+                Debug.LogError("GameAuthManager is not present in the scene.");
+            return;
+        }
+
+        OpenWebsiteAccountMenu();
+        FirestoreClassroomManager.Instance?.OpenClassroomSelection();
+    }
+
+    /// <summary>
+    /// Opens the game account area for the authenticated website identity.
+    /// The old local account creation/selection panels are deliberately not
+    /// shown; website authentication is the only account entry point.
+    /// </summary>
+    public void OpenWebsiteAccountMenu()
+    {
+        Debug.Log("[Account Menu] Opening website account session.");
 
         HideAllPanels();
-        Debug.Log("[Account Menu] Existing panels hidden.");
 
-        mainMenu.SetActive(false);
-        cardDeck.SetActive(false);
-        accountButton.SetActive(false);
+        if (mainMenu != null) mainMenu.SetActive(false);
+        if (cardDeck != null) cardDeck.SetActive(false);
+        if (accountButton != null) accountButton.SetActive(false);
 
-        accountSelectPanel.SetActive(true);
-        ShowAccountManagementPanel();
-        backButton.SetActive(true);
+        if (accountSelectPanel != null) accountSelectPanel.SetActive(false);
+        if (accountManagementPanel != null) accountManagementPanel.SetActive(false);
+        if (createAccountPanel != null) createAccountPanel.SetActive(false);
+        if (classroomSelectionPanel != null) classroomSelectionPanel.SetActive(false);
+        if (classroomCreationPanel != null) classroomCreationPanel.SetActive(false);
+        if (teacherInfoPanel != null) teacherInfoPanel.SetActive(false);
+        if (studentInfoPanel != null) studentInfoPanel.SetActive(false);
+        if (classroomPanel != null) classroomPanel.SetActive(true);
 
-        Button backButtonComponent = backButton.GetComponent<Button>();
-
-        if (backButtonComponent != null)
+        if (backButton != null)
         {
-            backButtonComponent.interactable = true;
-        }
-        classroomPanel.SetActive(true);
-
-        Debug.Log("[Account Menu] Account panels activated.");
-
-        if (syncInputBlocker != null)
-        {
-            syncInputBlocker.SetActive(true);
+            backButton.SetActive(true);
+            Button backButtonComponent = backButton.GetComponent<Button>();
+            if (backButtonComponent != null)
+                backButtonComponent.interactable = true;
         }
 
-        if (waitSyncPanel != null)
-        {
-            waitSyncPanel.SetActive(true);
-            waitSyncPanel.transform.SetAsLastSibling();
-        }
-        _ = SynchronizeAccountMenuAsync();
+        if (syncInputBlocker != null) syncInputBlocker.SetActive(false);
+        if (waitSyncPanel != null) waitSyncPanel.SetActive(false);
     }
 
     public void OpenCreateStudentMenu()
@@ -1528,7 +1558,10 @@ public class AccountManager : MonoBehaviour
             (accountManagementPanel != null && accountManagementPanel.activeSelf) ||
             (createAccountPanel != null && createAccountPanel.activeSelf) ||
             (teacherInfoPanel != null && teacherInfoPanel.activeSelf) ||
-            (studentInfoPanel != null && studentInfoPanel.activeSelf);
+            (studentInfoPanel != null && studentInfoPanel.activeSelf) ||
+            (classroomPanel != null && classroomPanel.activeSelf) ||
+            (classroomSelectionPanel != null && classroomSelectionPanel.activeSelf) ||
+            (classroomCreationPanel != null && classroomCreationPanel.activeSelf);
 
         if (!isAccountMenuOpen)
         {
@@ -1558,6 +1591,11 @@ public class AccountManager : MonoBehaviour
         cardDeck.SetActive(true);
 
         classroomPanel.SetActive(false);
+
+        if (classroomSelectionPanel != null)
+            classroomSelectionPanel.SetActive(false);
+        if (classroomCreationPanel != null)
+            classroomCreationPanel.SetActive(false);
     }
 
     public void SelectTeacherStudent(AccountCardUI card)
@@ -2388,13 +2426,9 @@ public class AccountManager : MonoBehaviour
     {
         Debug.Log("[Account Menu Sync] Starting synchronization.");
 
-        // 1. Accounts and pending account changes.
-        if (FirestoreAccountManager.Instance != null)
-        {
-            await FirestoreAccountManager.Instance.DownloadAccounts();
-        }
-
-        // 2. Progress for the currently active account.
+        // Website accounts are authoritative. Do not download or synchronize
+        // the retired Unity-local account collection from this menu.
+        // 1. Progress for the authenticated website user.
         if (ProgressManager.Instance != null && ProgressManager.Instance.HasActiveAccount)
         {
             await ProgressManager.Instance.LoadProgressForActiveAccount();
@@ -2413,9 +2447,7 @@ public class AccountManager : MonoBehaviour
             Debug.LogWarning("[Account Menu Sync] Quiz Package Download Manager not found.");
         }
 
-        RefreshUI();
-
-        Debug.Log("[Account Menu Sync] Synchronization finished.");
+        Debug.Log("[Account Menu Sync] Website-user progress and quiz synchronization finished.");
     }
 
     private async Task ReleaseSyncLockWhenFinished(Task syncTask)

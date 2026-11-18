@@ -2017,7 +2017,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &105239133
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5211,9 +5211,9 @@ RectTransform:
   m_Father: {fileID: 1875623039}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &184642519
 MonoBehaviour:
@@ -6351,9 +6351,9 @@ RectTransform:
   m_Father: {fileID: 2075981172}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &205878228
 MonoBehaviour:
@@ -8499,6 +8499,7 @@ MonoBehaviour:
   classroomContainer: {fileID: 763733621}
   classroomCardPrefab: {fileID: 565912339}
   currentClassroomText: {fileID: 1534028038}
+  openClassroomCreationButton: {fileID: 0}
   classroomCreationPanel: {fileID: 521441260}
   classroomNameInput: {fileID: 1751837715}
   confirmCreationButton: {fileID: 711617620}
@@ -8788,6 +8789,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 280942423}
   m_CullTransparentMesh: 1
+--- !u!1 &281236443
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 281236445}
+  - component: {fileID: 281236444}
+  m_Layer: 0
+  m_Name: GameAuthManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &281236444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281236443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19b94b5e1ced85045a635c3585a72995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameAuthManager
+  productionLoginUrl: https://barahangbayani.web.app/
+  emulatorLoginUrl: http://127.0.0.1:5500/
+  productionRedeemUrl: https://us-central1-barahangbayani.cloudfunctions.net/redeemGameAuthCode
+  emulatorRedeemUrl: http://127.0.0.1:5001/barahangbayani/us-central1/redeemGameAuthCode
+  signOutOnStartup: 1
+--- !u!4 &281236445
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281236443}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 390.3192, y: 256.08893, z: 446.06976}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &282603012
 GameObject:
   m_ObjectHideFlags: 0
@@ -15465,7 +15515,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &510333051
 RectTransform:
   m_ObjectHideFlags: 0
@@ -16422,8 +16472,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 300}
+  m_AnchoredPosition: {x: 0, y: -0.000009855224}
+  m_SizeDelta: {x: 0.5629883, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &536900298
 MonoBehaviour:
@@ -28783,7 +28833,7 @@ RectTransform:
   m_Father: {fileID: 806577963}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -36779,7 +36829,7 @@ RectTransform:
   m_Father: {fileID: 1338444065}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -36853,10 +36903,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 536900297}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 720, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 360, y: -31.715}
+  m_SizeDelta: {x: 720, y: 63.43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1242907225
 MonoBehaviour:
@@ -48674,7 +48724,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.000020662346}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1697249862
@@ -60963,3 +61013,4 @@ SceneRoots:
   - {fileID: 7079646572826817027}
   - {fileID: 1784880699}
   - {fileID: 1661978414}
+  - {fileID: 281236445}

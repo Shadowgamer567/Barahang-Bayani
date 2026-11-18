@@ -27,11 +27,30 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn)
+        {
+            Debug.Log("A website login is required before starting a game.");
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.PromptForAccountThenStartGame();
+            else
+                auth?.BeginWebsiteLogin();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(auth.SelectedClassroomID))
+        {
+            Debug.Log("Select an authorized website classroom before starting a game.");
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.PromptForAccountThenStartGame();
+            else
+                FirestoreClassroomManager.Instance?.OpenClassroomSelection();
+            return;
+        }
+
         if (CurrentAccount.ActiveAccount == null)
         {
-            Debug.LogError("Select or Create an Account");
-
-            AccountManager.Instance.PromptForAccountThenStartGame();
+            Debug.LogError("Website session identity has not been initialized.");
             return;
         }
 
@@ -49,12 +68,30 @@ public class MainMenu : MonoBehaviour
 
     public async void LoadGame()
     {
-        // Check if an account is currently selected.
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn)
+        {
+            Debug.Log("A website login is required before loading a game.");
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.PromptForAccountThenLoadGame();
+            else
+                auth?.BeginWebsiteLogin();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(auth.SelectedClassroomID))
+        {
+            Debug.Log("Select an authorized website classroom before loading a game.");
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.PromptForAccountThenLoadGame();
+            else
+                FirestoreClassroomManager.Instance?.OpenClassroomSelection();
+            return;
+        }
+
         if (CurrentAccount.ActiveAccount == null)
         {
-            Debug.LogError("Select or Create an Account");
-
-            AccountManager.Instance.PromptForAccountThenLoadGame();
+            Debug.LogError("Website session identity has not been initialized.");
             return;
         }
 
