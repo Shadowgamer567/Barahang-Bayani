@@ -57,11 +57,33 @@ public class MainMenu : MonoBehaviour
         StartNewGame();
     }
 
-    public static void StartNewGame()
+    public static async void StartNewGame()
     {
-        ProgressManager.Instance.NewGame();
+        ProgressManager progress = ProgressManager.Instance;
+        if (progress == null)
+        {
+            Debug.LogError("Cannot start New Game: ProgressManager is missing.");
+            return;
+        }
 
-        TutorialManager.Instance.StartTutorial();
+        bool resetConfirmed = await progress.StartNewGameAndWaitForCloudAsync();
+        if (!resetConfirmed)
+        {
+            Debug.LogError(
+                "New Game was not started because Firestore did not confirm the playthrough reset. " +
+                "Check the connection and try again."
+            );
+            return;
+        }
+
+        if (TutorialManager.Instance != null)
+            TutorialManager.Instance.StartTutorial();
+
+        if (SceneTransitionManager.Instance == null)
+        {
+            Debug.LogError("Cannot start New Game: SceneTransitionManager is missing.");
+            return;
+        }
 
         SceneTransitionManager.Instance.SwitchScene("MapMenu", true);
     }

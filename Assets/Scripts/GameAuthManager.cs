@@ -23,19 +23,42 @@ public class GameAuthManager : MonoBehaviour
     [SerializeField] private string emulatorLoginUrl = "http://127.0.0.1:5500/";
 
     [Header("Cloud Function")]
-    [SerializeField] private string productionRedeemUrl =
+    [SerializeField]
+    private string productionRedeemUrl =
         "https://us-central1-barahangbayani.cloudfunctions.net/redeemGameAuthCode";
 
-    [SerializeField] private string emulatorRedeemUrl =
+    [SerializeField]
+    private string emulatorRedeemUrl =
         "http://127.0.0.1:5001/barahangbayani/us-central1/redeemGameAuthCode";
 
     [Header("Session")]
-    [SerializeField] private bool signOutOnStartup = true;
+    // Keep Firebase's persisted authentication session across launches.
+    // Explicit logout clears both Firebase auth and the local offline identity.
 
     public bool IsSigningIn { get; private set; }
-    public bool IsSignedIn => FirebaseManager.Auth != null &&
+    public bool IsOnlineAuthenticated => FirebaseManager.Auth != null &&
         FirebaseManager.Auth.CurrentUser != null &&
         !FirebaseManager.Auth.CurrentUser.IsAnonymous;
+
+    // IsSignedIn means the player has an active game identity. It may be a
+    // cached identity while offline; protected cloud calls must use
+    // IsOnlineAuthenticated instead.
+    public bool IsSignedIn => IsOnlineAuthenticated || IsOfflineSession;
+    public bool IsOfflineSession { get; private set; }
+
+    private const string CachedSessionFileName = "cached_game_session.json";
+    private string CachedSessionPath =>
+        System.IO.Path.Combine(Application.persistentDataPath, CachedSessionFileName);
+
+    [Serializable]
+    private class CachedGameSession
+    {
+        public string uid;
+        public string username;
+        public string role;
+        public string createdAt;
+        public string classroomID;
+    }
 
     // StudentUID is retained as a compatibility alias for older progress code.
     // The authenticated identity may be either a Student or a Teacher.
@@ -43,10 +66,51 @@ public class GameAuthManager : MonoBehaviour
     public string UserUID => StudentUID;
     public string Username { get; private set; }
     public string Role { get; private set; }
+    public string CreatedAt { get; private set; }
     public string SelectedClassroomID { get; private set; } = "";
 
     public bool IsStudent => string.Equals(Role, "Student", StringComparison.OrdinalIgnoreCase);
     public bool IsTeacher => string.Equals(Role, "Teacher", StringComparison.OrdinalIgnoreCase);
+
+    public void SignOut()
+    {
+        StopListener();
+
+        if (FirebaseManager.Auth != null &&
+            FirebaseManager.Auth.CurrentUser != null)
+        {
+            FirebaseManager.Auth.SignOut();
+        }
+
+        IsOfflineSession = false;
+        DeleteCachedSession();
+
+        StudentUID = string.Empty;
+        Username = string.Empty;
+        Role = string.Empty;
+        CreatedAt = string.Empty;
+        SelectedClassroomID = string.Empty;
+
+        CurrentAccount.ActiveAccount = null;
+        ProgressManager.Instance?.ClearActiveAccount();
+
+        if (DatabaseManager.Instance != null)
+            DatabaseManager.Instance.SetDatabase("DefaultDatabase");
+
+        Debug.Log("Website game session signed out.");
+    }
+
+    public void ClearSelectedClassroom()
+    {
+        SelectedClassroomID = string.Empty;
+
+        if (CurrentAccount.ActiveAccount != null)
+            CurrentAccount.ActiveAccount.classroomID = string.Empty;
+
+        // Do not clear the authenticated user or their local progress session.
+        // A classroom must be selected before any classroom-scoped Firestore
+        // progress operation can run.
+    }
 
     public void SetSelectedClassroom(string classroomID)
     {
@@ -54,9 +118,10 @@ public class GameAuthManager : MonoBehaviour
             throw new ArgumentException("A valid website classroom ID is required.", nameof(classroomID));
 
         if (!IsSignedIn)
-            throw new InvalidOperationException("Cannot select a classroom without a website session.");
+            throw new InvalidOperationException("Cannot select a classroom without an account session.");
 
         SelectedClassroomID = classroomID.Trim();
+        SaveCachedSession();
 
         if (CurrentAccount.ActiveAccount != null)
             CurrentAccount.ActiveAccount.classroomID = SelectedClassroomID;
@@ -106,6 +171,7 @@ public class GameAuthManager : MonoBehaviour
         public string uid;
         public string username;
         public string role;
+        public string createdAt;
     }
 
     [Serializable]
@@ -135,15 +201,143 @@ public class GameAuthManager : MonoBehaviour
 
     private async void Start()
     {
-        if (!await FirebaseManager.WaitUntilReady())
+        bool firebaseReady = await FirebaseManager.WaitUntilReady();
+
+        // Firebase may be unavailable offline. Restore the locally cached
+        // identity so the player can continue using downloaded content/saves.
+        if (!firebaseReady)
         {
-            Debug.LogError("Game sign-in unavailable because Firebase did not initialize.");
+            RestoreCachedOfflineSession();
             return;
         }
 
-        if (signOutOnStartup && FirebaseManager.Auth.CurrentUser != null)
+        // Firebase Auth persists its session. If the persisted user matches
+        // our cached website identity, restore the profile metadata locally.
+        CachedGameSession cached = ReadCachedSession();
+        if (FirebaseManager.Auth.CurrentUser != null && cached != null &&
+            FirebaseManager.Auth.CurrentUser.UserId == cached.uid)
         {
-            FirebaseManager.Auth.SignOut();
+            bool currentlyOffline = Application.internetReachability == NetworkReachability.NotReachable;
+            RestoreCachedIdentity(cached, offline: currentlyOffline);
+            Debug.Log(currentlyOffline
+                ? "Restored cached identity for offline gameplay."
+                : "Restored persisted website authentication session.");
+            return;
+        }
+
+        // Do not silently sign out a valid Firebase session at startup.
+        // If no Firebase user exists, a cached identity may still be used
+        // for local-only offline gameplay.
+        if (cached != null)
+            RestoreCachedOfflineSession(cached);
+    }
+
+    private void RestoreCachedOfflineSession()
+    {
+        RestoreCachedOfflineSession(ReadCachedSession());
+    }
+
+    private void RestoreCachedOfflineSession(CachedGameSession cached)
+    {
+        if (cached == null || string.IsNullOrWhiteSpace(cached.uid) ||
+            (!string.Equals(cached.role, "Student", StringComparison.OrdinalIgnoreCase) &&
+             !string.Equals(cached.role, "Teacher", StringComparison.OrdinalIgnoreCase)))
+        {
+            Debug.LogWarning("No valid cached account session is available for offline play.");
+            return;
+        }
+
+        RestoreCachedIdentity(cached, offline: true);
+        Debug.LogWarning("Offline session restored. Cloud synchronization is paused until the account reconnects.");
+    }
+
+    private void RestoreCachedIdentity(CachedGameSession cached, bool offline)
+    {
+        StudentUID = cached.uid;
+        Username = cached.username;
+        Role = cached.role;
+        CreatedAt = cached.createdAt;
+        SelectedClassroomID = cached.classroomID ?? string.Empty;
+        IsOfflineSession = offline;
+
+        AccountData session = new AccountData
+        {
+            id = StudentUID,
+            username = Username,
+            accountType = IsTeacher ? AccountType.Teacher : AccountType.Student,
+            classroomID = SelectedClassroomID
+        };
+
+        CurrentAccount.ActiveAccount = session;
+        if (ProgressManager.Instance != null)
+            ProgressManager.Instance.SetActiveAccount(session);
+
+        if (!string.IsNullOrWhiteSpace(SelectedClassroomID) && DatabaseManager.Instance != null)
+            DatabaseManager.Instance.SetDatabase(SelectedClassroomID);
+
+        if (AccountManager.Instance != null)
+        {
+            AccountManager.Instance.OpenWebsiteAccountMenu();
+            if (offline && AccountManager.Instance.classroomSelectionPanel != null)
+                AccountManager.Instance.classroomSelectionPanel.SetActive(false);
+        }
+
+        // Load the local save immediately. Do not call cloud endpoints from
+        // this restoration path.
+        if (ProgressManager.Instance != null)
+            ProgressManager.Instance.LoadProgress();
+    }
+
+    private CachedGameSession ReadCachedSession()
+    {
+        try
+        {
+            if (!System.IO.File.Exists(CachedSessionPath))
+                return null;
+
+            return JsonUtility.FromJson<CachedGameSession>(
+                System.IO.File.ReadAllText(CachedSessionPath));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("Could not read cached game session: " + ex.Message);
+            return null;
+        }
+    }
+
+    private void SaveCachedSession()
+    {
+        if (string.IsNullOrWhiteSpace(StudentUID) || string.IsNullOrWhiteSpace(Role))
+            return;
+
+        try
+        {
+            CachedGameSession cached = new CachedGameSession
+            {
+                uid = StudentUID,
+                username = Username,
+                role = Role,
+                createdAt = CreatedAt,
+                classroomID = SelectedClassroomID
+            };
+            System.IO.File.WriteAllText(CachedSessionPath, JsonUtility.ToJson(cached, true));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Failed to save cached game session: " + ex.Message);
+        }
+    }
+
+    private void DeleteCachedSession()
+    {
+        try
+        {
+            if (System.IO.File.Exists(CachedSessionPath))
+                System.IO.File.Delete(CachedSessionPath);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Failed to clear cached game session: " + ex.Message);
         }
     }
 
@@ -322,7 +516,10 @@ public class GameAuthManager : MonoBehaviour
             StudentUID = result.uid;
             Username = result.username;
             Role = result.role;
+            CreatedAt = result.createdAt;
             SelectedClassroomID = "";
+            IsOfflineSession = false;
+            SaveCachedSession();
 
             if (!IsStudent && !IsTeacher)
             {
@@ -360,6 +557,26 @@ public class GameAuthManager : MonoBehaviour
                 " | Role: " + Role);
 
             IsSigningIn = false;
+        }
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus || !IsOnlineAuthenticated ||
+            Application.internetReachability == NetworkReachability.NotReachable)
+            return;
+
+        if (IsOfflineSession)
+        {
+            IsOfflineSession = false;
+            Debug.Log("Connectivity restored. Resuming cloud progress synchronization.");
+        }
+
+        if (ProgressManager.Instance != null &&
+            CurrentAccount.ActiveAccount != null &&
+            !string.IsNullOrWhiteSpace(SelectedClassroomID))
+        {
+            _ = ProgressManager.Instance.LoadProgressForActiveAccount();
         }
     }
 

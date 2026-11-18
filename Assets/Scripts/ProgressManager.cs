@@ -56,7 +56,7 @@ public class ProgressManager : MonoBehaviour
 
     private void Start()
     {
-        
+
     }
 
     void Awake()
@@ -234,6 +234,22 @@ public class ProgressManager : MonoBehaviour
         );
     }
 
+    public void ClearActiveAccount()
+    {
+        progressGeneration++;
+        currentAccount = null;
+        savePath = string.Empty;
+        completedLevels = new List<string>();
+        lastCampaignScene = "MapMenu";
+        tutorialCompleted = false;
+        playthroughId = string.Empty;
+        previousPlaythroughId = string.Empty;
+        pendingNewGameReset = false;
+        pendingQuizResults = new List<QuizResultData>();
+        quizResultLedgerInitialized = false;
+        QuizStats.Instance?.ResetStats();
+    }
+
     public void SetActiveAccount(AccountData account)
     {
         progressGeneration++;
@@ -353,6 +369,13 @@ public class ProgressManager : MonoBehaviour
     }
 
 
+    private bool CanSynchronizeWithCloud()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+        return (auth == null || auth.IsOnlineAuthenticated) &&
+            Application.internetReachability != NetworkReachability.NotReachable;
+    }
+
     public void SaveProgress(bool uploadToFirestore = true)
     {
         if (IsAccountDeletionInProgress)
@@ -368,7 +391,7 @@ public class ProgressManager : MonoBehaviour
         }
 
         ProgressData data = new ProgressData();
-        
+
         data.tutorialCompleted = tutorialCompleted;
 
         data.username = currentAccount.username;
@@ -415,6 +438,9 @@ public class ProgressManager : MonoBehaviour
 
     private async Task SyncCampaignProgress()
     {
+        if (!CanSynchronizeWithCloud())
+            return; // Local save remains intact; sync can resume online.
+
         if (IsAccountDeletionInProgress)
         {
             return;
@@ -435,7 +461,7 @@ public class ProgressManager : MonoBehaviour
         string expectedPlaythroughId = playthroughId;
         int operationGeneration = progressGeneration;
 
-        List<string> levelsToUpload =new List<string>(completedLevels);
+        List<string> levelsToUpload = new List<string>(completedLevels);
 
         bool tutorialToUpload = tutorialCompleted;
         string sceneToUpload = lastCampaignScene;
@@ -574,6 +600,15 @@ public class ProgressManager : MonoBehaviour
 
         int operationGeneration = progressGeneration;
 
+        // Offline sessions must never call protected cloud endpoints. Load the
+        // existing local save and leave pending results queued for later sync.
+        if (!CanSynchronizeWithCloud())
+        {
+            LoadProgress();
+            Debug.Log("Loaded local progress for offline gameplay: " + currentAccount.username);
+            return true;
+        }
+
         try
         {
             ProgressData cloudProgress = await FirestoreProgressManager.DownloadProgress(accountId);
@@ -581,10 +616,10 @@ public class ProgressManager : MonoBehaviour
             if (currentAccount == null ||
                 currentAccount.id != accountId ||
                 progressGeneration != operationGeneration)
-                {
-                    Debug.LogWarning("Progress loading cancelled: Account session changed.");
-                    return false;
-                }
+            {
+                Debug.LogWarning("Progress loading cancelled: Account session changed.");
+                return false;
+            }
 
 
             ProgressData localProgress = ReadLocalProgress();
@@ -599,6 +634,12 @@ public class ProgressManager : MonoBehaviour
                 );
 
                 ApplyProgress(localProgress);
+
+                // If connectivity has returned since the reset was created
+                // offline, submit the preserved reset to the server now.
+                if (CanSynchronizeWithCloud())
+                    await RetryPendingNewGameResetInternal();
+
                 StartAutomaticQuizSynchronization();
                 return true;
             }
@@ -675,9 +716,9 @@ public class ProgressManager : MonoBehaviour
         if (currentAccount == null ||
             currentAccount.id != accountId ||
             progressGeneration != operationGeneration)
-            {
-                return false;
-            }
+        {
+            return false;
+        }
 
         LoadProgress();
         StartAutomaticQuizSynchronization();
@@ -716,6 +757,59 @@ public class ProgressManager : MonoBehaviour
         fillInTheBlankTotal = data.fillInTheBlankTotal;
 
         tutorialCompleted = data.tutorialCompleted;
+    }
+
+    /// <summary>
+    /// Starts a new playthrough only after the current cloud playthrough has
+    /// been loaded and the replacement has been confirmed by Firestore.
+    /// </summary>
+    public async Task<bool> StartNewGameAndWaitForCloudAsync()
+    {
+        if (!CanSynchronizeWithCloud())
+        {
+            if (currentAccount == null || IsAccountDeletionInProgress ||
+                isResettingPlaythrough || pendingNewGameReset)
+                return false;
+
+            // Use the locally saved playthrough as the baseline. The reset is
+            // marked pending and retained until an online server confirms it.
+            LoadProgress();
+            NewGame(false);
+            return pendingNewGameReset;
+        }
+
+        if (currentAccount == null || IsAccountDeletionInProgress ||
+            isResettingPlaythrough || pendingNewGameReset)
+        {
+            Debug.LogWarning("New Game cannot start: account state is not ready.");
+            return false;
+        }
+
+        // Load the cloud playthrough first so ResetPlaythrough receives the
+        // actual previousPlaythroughId for returning players.
+        bool loaded = await LoadProgressForActiveAccount();
+        if (!loaded || currentAccount == null)
+            return false;
+
+        if (pendingNewGameReset)
+            return await RetryPendingNewGameResetInternal();
+
+        NewGame(false);
+        if (!pendingNewGameReset)
+            return false;
+
+        string accountId = currentAccount.id;
+        string oldPlaythroughId = previousPlaythroughId;
+        string newPlaythroughId = playthroughId;
+        int operationGeneration = progressGeneration;
+
+        bool confirmed = await UploadNewGameProgress(
+            accountId, oldPlaythroughId, newPlaythroughId, operationGeneration);
+
+        return confirmed && !pendingNewGameReset &&
+            currentAccount != null && currentAccount.id == accountId &&
+            playthroughId == newPlaythroughId &&
+            progressGeneration == operationGeneration;
     }
 
     public void NewGame(bool uploadToFirestore = true)
@@ -831,7 +925,7 @@ public class ProgressManager : MonoBehaviour
         );
     }
 
-    private async Task UploadNewGameProgress(
+    private async Task<bool> UploadNewGameProgress(
         string accountId,
         string oldPlaythroughId,
         string newPlaythroughId,
@@ -842,7 +936,7 @@ public class ProgressManager : MonoBehaviour
             Debug.LogWarning(
                 "New Game upload skipped: Another reset is running."
             );
-            return;
+            return false;
         }
 
         if (currentAccount == null ||
@@ -850,7 +944,7 @@ public class ProgressManager : MonoBehaviour
             playthroughId != newPlaythroughId ||
             progressGeneration != operationGeneration)
         {
-            return;
+            return false;
         }
 
         isResettingPlaythrough = true;
@@ -866,7 +960,7 @@ public class ProgressManager : MonoBehaviour
                 Debug.LogWarning(
                     "New Game upload cancelled: Invalid local reset data."
                 );
-                return;
+                return false;
             }
 
             bool success =
@@ -883,12 +977,14 @@ public class ProgressManager : MonoBehaviour
                     newPlaythroughId,
                     operationGeneration
                 );
+                return !pendingNewGameReset;
             }
             else
             {
                 Debug.LogWarning(
                     "New Game reset was not confirmed. It remains pending."
                 );
+                return false;
             }
         }
         catch (System.Exception e)
@@ -896,6 +992,7 @@ public class ProgressManager : MonoBehaviour
             Debug.LogWarning(
                 "New Game reset upload failed: " + e.Message
             );
+            return false;
         }
         finally
         {
@@ -905,7 +1002,7 @@ public class ProgressManager : MonoBehaviour
 
     public Task<bool> RetryPendingNewGameReset()
     {
-        if (currentAccount != null &&IsAccountBlockedFromSync(currentAccount.id))
+        if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
         {
             Debug.LogWarning(
                 "New-game reset retry blocked: Account is pending deletion."
@@ -1025,7 +1122,10 @@ public class ProgressManager : MonoBehaviour
 
     public async Task<bool> SynchronizeQuizProgress()
     {
-        if (currentAccount != null &&IsAccountBlockedFromSync(currentAccount.id))
+        if (!CanSynchronizeWithCloud())
+            return false;
+
+        if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
         {
             Debug.LogWarning("Quiz progress synchronization blocked: Account is pending deletion.");
             return false;
@@ -1444,6 +1544,9 @@ public class ProgressManager : MonoBehaviour
 
     public async Task<bool> ReconcileQuizProgressInternal()
     {
+        if (!CanSynchronizeWithCloud())
+            return false;
+
         if (IsAccountDeletionInProgress)
         {
             Debug.LogWarning("Quiz reconciliation skipped: Account deletion in progress.");
@@ -1456,7 +1559,7 @@ public class ProgressManager : MonoBehaviour
             return false;
         }
 
-        if (currentAccount == null ||string.IsNullOrEmpty(playthroughId) || !quizResultLedgerInitialized)
+        if (currentAccount == null || string.IsNullOrEmpty(playthroughId) || !quizResultLedgerInitialized)
         {
             Debug.LogWarning("Quiz reconciliation skipped: No initialized playthrough.");
             return false;
@@ -1500,12 +1603,12 @@ public class ProgressManager : MonoBehaviour
                     );
 
             // Reject results if the active account or playthrough changed.
-            if (IsDeletingAccount(accountId) || 
+            if (IsDeletingAccount(accountId) ||
             currentAccount == null ||
             currentAccount.id != accountId ||
             playthroughId != activePlaythroughId ||
             progressGeneration != operationGeneration)
-{
+            {
                 Debug.LogWarning("Reconciliation cancelled: Account or playthrough session changed.");
                 return false;
             }
@@ -1609,6 +1712,9 @@ public class ProgressManager : MonoBehaviour
 
     public async Task SyncPendingQuizResultsInternal()
     {
+        if (!CanSynchronizeWithCloud())
+            return; // Keep all pending quiz results for the next online session.
+
         if (currentAccount != null && IsAccountBlockedFromSync(currentAccount.id))
         {
             Debug.LogWarning("Quiz synchronization blocked: Account is pending deletion.");
@@ -1661,10 +1767,10 @@ public class ProgressManager : MonoBehaviour
 
             foreach (QuizResultData result in resultsToSync)
             {
-                if (IsDeletingAccount(accountId)||
+                if (IsDeletingAccount(accountId) ||
                     currentAccount == null ||
                     currentAccount.id != accountId ||
-                    playthroughId != activePlaythroughId || 
+                    playthroughId != activePlaythroughId ||
                     progressGeneration != operationGeneration)
                 {
                     Debug.LogWarning("Synchronization stopped: Active account or playthrough changed.");
@@ -1694,7 +1800,7 @@ public class ProgressManager : MonoBehaviour
                     // Confirm the active account/playthrough is still unchanged.
                     if (currentAccount == null ||
                         currentAccount.id != accountId ||
-                        playthroughId != activePlaythroughId || 
+                        playthroughId != activePlaythroughId ||
                         progressGeneration != operationGeneration)
                     {
                         return;
@@ -1834,6 +1940,6 @@ public class ProgressManager : MonoBehaviour
 
     private void Update()
     {
-        
+
     }
 }

@@ -108,6 +108,42 @@ public class FirestoreClassroomManager : MonoBehaviour
                 card.Setup(classroom.id, displayName);
             }
 
+            // Automatically select a classroom if none is selected
+            // or if the previous selection is no longer available.
+            string currentSelectedID = auth.SelectedClassroomID;
+
+            WebsiteClassroomData classroomToSelect = null;
+
+            if (!string.IsNullOrWhiteSpace(currentSelectedID))
+            {
+                classroomToSelect = availableClassrooms.Find(
+                    item => item != null && item.id == currentSelectedID
+                );
+            }
+
+            // If there is no valid previous selection, use the first available classroom.
+            if (classroomToSelect == null)
+            {
+                classroomToSelect = availableClassrooms.Find(
+                    item => item != null && !string.IsNullOrWhiteSpace(item.id)
+                );
+            }
+
+            if (classroomToSelect != null)
+            {
+                SelectClassroom(classroomToSelect.id);
+            }
+            else
+            {
+                // No classrooms are available. Keep the selected classroom empty.
+                auth.ClearSelectedClassroom();
+                if (DatabaseManager.Instance != null)
+                    DatabaseManager.Instance.SetDatabase("DefaultDatabase");
+
+                if (currentClassroomText != null)
+                    currentClassroomText.text = "No Classroom Selected";
+            }
+
             if (openClassroomCreationButton != null)
                 openClassroomCreationButton.SetActive(auth.IsTeacher);
 
@@ -126,7 +162,8 @@ public class FirestoreClassroomManager : MonoBehaviour
 
     public void OpenClassroomSelection()
     {
-        if (ProgressManager.Instance != null && ProgressManager.Instance.IsAccountDeletionInProgress)
+        if (ProgressManager.Instance != null &&
+            ProgressManager.Instance.IsAccountDeletionInProgress)
             return;
 
         if (classroomSelectionPanel == null)
@@ -135,14 +172,16 @@ public class FirestoreClassroomManager : MonoBehaviour
             return;
         }
 
+        // Keep the Account Menu visible.
         classroomSelectionPanel.SetActive(true);
+
         LoadClassrooms();
     }
 
     public void CloseClassroomSelection()
     {
-        if (classroomSelectionPanel != null)
-            classroomSelectionPanel.SetActive(false);
+        // Classroom selection is now part of the Account Menu.
+        // Do not close the entire classroom area when a classroom is selected.
     }
 
     public async void SelectClassroom(string classroomID)
@@ -181,8 +220,6 @@ public class FirestoreClassroomManager : MonoBehaviour
                 currentClassroomText.text = string.IsNullOrWhiteSpace(selected.name)
                     ? selected.id
                     : selected.name;
-
-            CloseClassroomSelection();
 
             // The account database is intentionally not downloaded here.
             // Progress loading is kept out of this stage until its production
@@ -294,14 +331,13 @@ public class FirestoreClassroomManager : MonoBehaviour
     public void OpenClassroomCreation()
     {
         GameAuthManager auth = GameAuthManager.Instance;
+
         if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
         {
             Debug.LogWarning("Classroom creation is available only to website teachers.");
             return;
         }
 
-        if (classroomSelectionPanel != null)
-            classroomSelectionPanel.SetActive(false);
         if (classroomCreationPanel != null)
             classroomCreationPanel.SetActive(true);
     }
@@ -310,8 +346,7 @@ public class FirestoreClassroomManager : MonoBehaviour
     {
         if (classroomCreationPanel != null)
             classroomCreationPanel.SetActive(false);
-        if (classroomSelectionPanel != null)
-            classroomSelectionPanel.SetActive(true);
+
         if (classroomNameInput != null)
             classroomNameInput.text = "";
     }

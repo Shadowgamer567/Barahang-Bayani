@@ -26,6 +26,20 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject assignStudentsButton;
     public GameObject confirmAssignButton;
 
+    [Header("Teacher Progress Display")]
+    public GameObject teacherTeacherButton;
+    public GameObject teacherStudentButton;
+
+    [Header("Teacher Student Progress")]
+    public Transform studentProgressContainer;
+    public GameObject studentProgressCardPrefab;
+
+    public GameObject progressScrollView;
+    public GameObject studentSelectScrollView;
+
+    [Header("Progress View")]
+    public GameObject progressDismissArea;
+
     [Header("Containers")]
     public Transform studentContainer;
     public Transform teacherContainer;
@@ -42,6 +56,8 @@ public class AccountUIReferences : MonoBehaviour
     public TMP_Text teacherMetricsText;
     public TextMeshProUGUI quizStatsText;
 
+    public TMP_Text accountDetailsText;
+
     [Header("Buttons")]
     public GameObject createStudentButton;
 
@@ -52,6 +68,10 @@ public class AccountUIReferences : MonoBehaviour
     public GameObject cancelCreateAccountButton;
 
     public GameObject deleteAccountButton;
+
+    public GameObject loginSignupButton;
+
+    public GameObject logoutButton;
 
     [Header("Login")]
     public GameObject loginPanel;
@@ -96,6 +116,8 @@ public class AccountUIReferences : MonoBehaviour
     public TMP_InputField confirmPasswordInputField;
     public Button confirmAccountRecoveryButton;
 
+    [Header("Progress Display")]
+    public TMP_Text progressDisplayText;
 
     void Start()
     {
@@ -119,6 +141,16 @@ public class AccountUIReferences : MonoBehaviour
         else
         {
             Debug.LogError("FirestoreClassroomManager.Instance is Null");
+        }
+
+        if (TeacherStudentProgressManager.Instance != null)
+        {
+            TeacherStudentProgressManager.Instance.ConnectUI(this);
+        }
+
+        if (TeacherStudentProgressManager.Instance != null)
+        {
+            TeacherStudentProgressManager.Instance.ConnectUI(this);
         }
     }
 }

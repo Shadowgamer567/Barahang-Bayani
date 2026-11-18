@@ -57,6 +57,8 @@ public class AccountManager : MonoBehaviour
     public GameObject assignStudentsButton;
     public GameObject confirmAssignButton;
 
+    public GameObject progressDismissArea;
+
     private bool assigningStudents = false;
     public bool IsAssigningStudents => assigningStudents;
 
@@ -110,6 +112,18 @@ public class AccountManager : MonoBehaviour
     private string pendingRecoveryCode;
     private bool creatingAccount = false;
     private bool synchronizingPendingAccounts = false;
+
+    [Header("Website Account Details")]
+    public TMP_Text accountDetailsText;
+    public GameObject loginSignupButton;
+    public GameObject logoutButton;
+
+    [Header("Teacher Progress Display")]
+    public GameObject teacherTeacherButton;
+    public GameObject teacherStudentButton;
+
+    public GameObject progressScrollView;
+    public GameObject studentSelectScrollView;
 
     private string registryPath => Application.persistentDataPath + "/accounts.json";
 
@@ -1183,8 +1197,18 @@ public class AccountManager : MonoBehaviour
         OpenAccountMenu();
     }
 
+
     public void ContinueAfterWebsiteClassroomSelected()
     {
+        // Load the authenticated student's own progress
+        // after selecting an authorized classroom.
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth != null && auth.IsSignedIn && auth.IsStudent)
+        {
+            TeacherStudentProgressManager.Instance?.LoadStudentOwnProgress();
+        }
+
         if (waitingToStartGame)
         {
             waitingToStartGame = false;
@@ -1195,13 +1219,21 @@ public class AccountManager : MonoBehaviour
         if (waitingToLoadGame)
         {
             waitingToLoadGame = false;
-            MainMenu mainMenuScript = FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include);
+
+            MainMenu mainMenuScript =
+                FindFirstObjectByType<MainMenu>(
+                    FindObjectsInactive.Include
+                );
+
             if (mainMenuScript != null)
                 mainMenuScript.LoadGame();
             else
-                Debug.LogError("AccountManager: MainMenu script not found after website classroom selection.");
+                Debug.LogError(
+                    "AccountManager: MainMenu script not found after website classroom selection."
+                );
         }
     }
+
 
     void HideAllPanels()
     {
@@ -1226,19 +1258,69 @@ public class AccountManager : MonoBehaviour
 
     public void OpenAccountMenu()
     {
-        GameAuthManager websiteAuth = GameAuthManager.Instance;
-        if (websiteAuth == null || !websiteAuth.IsSignedIn)
+        Debug.Log("[Account Menu] Opening Account Selection Panel.");
+
+        // Hide unrelated account panels.
+        HideAllPanels();
+
+        if (loginPanel != null)
+            loginPanel.SetActive(false);
+
+        if (accountRecoveryPanel != null)
+            accountRecoveryPanel.SetActive(false);
+
+        if (accountRecoveryDisplay != null)
+            accountRecoveryDisplay.SetActive(false);
+
+        // Show the complete Account Menu.
+        if (accountSelectPanel != null)
+            accountSelectPanel.SetActive(true);
+        else
+            Debug.LogError("AccountSelectPanel reference is missing.");
+
+        RefreshWebsiteAccountDetails();
+        ConfigureAccountViewsForRole();
+
+        // Show the classroom section.
+        if (classroomSelectionPanel != null)
+            classroomSelectionPanel.SetActive(true);
+
+        // Show and restore the Back Button.
+        if (backButton != null)
         {
-            Debug.Log("[Account Menu] Starting website authentication.");
-            if (websiteAuth != null)
-                websiteAuth.BeginWebsiteLogin();
-            else
-                Debug.LogError("GameAuthManager is not present in the scene.");
+            backButton.SetActive(true);
+
+            Button button = backButton.GetComponent<Button>();
+
+            if (button != null)
+                button.interactable = true;
+        }
+        else
+        {
+            Debug.LogError("AccountManager: Back Button reference is missing.");
+        }
+    }
+
+    public void BeginWebsiteLoginFromAccountPanel()
+    {
+        GameAuthManager websiteAuth = GameAuthManager.Instance;
+
+        if (websiteAuth == null)
+        {
+            Debug.LogError("GameAuthManager is not present in the scene.");
             return;
         }
 
-        OpenWebsiteAccountMenu();
-        FirestoreClassroomManager.Instance?.OpenClassroomSelection();
+        if (websiteAuth.IsSignedIn)
+        {
+            OpenWebsiteAccountMenu();
+            FirestoreClassroomManager.Instance?.OpenClassroomSelection();
+            return;
+        }
+
+        Debug.Log("[Account Menu] User selected Login/Signup.");
+
+        websiteAuth.BeginWebsiteLogin();
     }
 
     /// <summary>
@@ -1250,31 +1332,81 @@ public class AccountManager : MonoBehaviour
     {
         Debug.Log("[Account Menu] Opening website account session.");
 
-        HideAllPanels();
+        // Hide unrelated account panels.
+        if (accountManagementPanel != null)
+            accountManagementPanel.SetActive(false);
 
-        if (mainMenu != null) mainMenu.SetActive(false);
-        if (cardDeck != null) cardDeck.SetActive(false);
-        if (accountButton != null) accountButton.SetActive(false);
+        if (createAccountPanel != null)
+            createAccountPanel.SetActive(false);
 
-        if (accountSelectPanel != null) accountSelectPanel.SetActive(false);
-        if (accountManagementPanel != null) accountManagementPanel.SetActive(false);
-        if (createAccountPanel != null) createAccountPanel.SetActive(false);
-        if (classroomSelectionPanel != null) classroomSelectionPanel.SetActive(false);
-        if (classroomCreationPanel != null) classroomCreationPanel.SetActive(false);
-        if (teacherInfoPanel != null) teacherInfoPanel.SetActive(false);
-        if (studentInfoPanel != null) studentInfoPanel.SetActive(false);
-        if (classroomPanel != null) classroomPanel.SetActive(true);
+        if (classroomCreationPanel != null)
+            classroomCreationPanel.SetActive(false);
 
+        if (teacherInfoPanel != null)
+            teacherInfoPanel.SetActive(false);
+
+        if (studentInfoPanel != null)
+            studentInfoPanel.SetActive(false);
+
+        if (loginPanel != null)
+            loginPanel.SetActive(false);
+
+        if (accountRecoveryPanel != null)
+            accountRecoveryPanel.SetActive(false);
+
+        if (accountRecoveryDisplay != null)
+            accountRecoveryDisplay.SetActive(false);
+
+        if (progressScrollView != null)
+            progressScrollView.SetActive(false);
+
+        if (studentSelectScrollView != null)
+            studentSelectScrollView.SetActive(false);
+
+        if (teacherTeacherButton != null)
+            teacherTeacherButton.SetActive(false);
+
+        if (teacherStudentButton != null)
+            teacherStudentButton.SetActive(false);
+
+        // Show the complete Account Menu.
+        if (accountSelectPanel != null)
+            accountSelectPanel.SetActive(true);
+        else
+            Debug.LogError("AccountSelectPanel reference is missing.");
+
+        RefreshWebsiteAccountDetails();
+        ConfigureAccountViewsForRole();
+
+        // Keep the classroom section visible inside the Account Menu.
+        if (classroomSelectionPanel != null)
+            classroomSelectionPanel.SetActive(true);
+
+        if (mainMenu != null)
+            mainMenu.SetActive(false);
+
+        if (cardDeck != null)
+            cardDeck.SetActive(false);
+
+        if (accountButton != null)
+            accountButton.SetActive(false);
+
+        // Restore the Back Button.
         if (backButton != null)
         {
             backButton.SetActive(true);
+
             Button backButtonComponent = backButton.GetComponent<Button>();
+
             if (backButtonComponent != null)
                 backButtonComponent.interactable = true;
         }
 
-        if (syncInputBlocker != null) syncInputBlocker.SetActive(false);
-        if (waitSyncPanel != null) waitSyncPanel.SetActive(false);
+        if (syncInputBlocker != null)
+            syncInputBlocker.SetActive(false);
+
+        if (waitSyncPanel != null)
+            waitSyncPanel.SetActive(false);
     }
 
     public void OpenCreateStudentMenu()
@@ -1544,15 +1676,48 @@ public class AccountManager : MonoBehaviour
         Debug.Log("Student Information Panel closed.");
     }
 
+
+    /// <summary>
+    /// Connect this to the website account menu's Logout button.
+    /// Closing the account menu alone intentionally does not sign the user out.
+    /// </summary>
+    public void LogoutWebsiteAccount()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null)
+        {
+            Debug.LogError(
+                "[Account Menu] Cannot log out: GameAuthManager is missing."
+            );
+            return;
+        }
+
+        Debug.Log("[Account Menu] Logging out website account.");
+
+        waitingToStartGame = false;
+        waitingToLoadGame = false;
+
+        // Clear the Firebase authentication and active game session.
+        auth.SignOut();
+
+        // Restore the unauthenticated account UI.
+        RefreshWebsiteAccountDetails();
+        ConfigureAccountViewsForRole();
+
+        // Return to the main menu.
+        CloseAccountMenu();
+
+        Debug.Log("[Account Menu] Logout completed.");
+    }
+
     public void CloseAccountMenu()
     {
         // Do not handle Back while the Options menu is open.
         if (MainMenu.IsOptionsMenuOpen)
-        {
             return;
-        }
 
-        // Only close Accounts when the Accounts menu is actually open.
+        // Check whether any Account Menu section is open.
         bool isAccountMenuOpen =
             (accountSelectPanel != null && accountSelectPanel.activeSelf) ||
             (accountManagementPanel != null && accountManagementPanel.activeSelf) ||
@@ -1561,42 +1726,80 @@ public class AccountManager : MonoBehaviour
             (studentInfoPanel != null && studentInfoPanel.activeSelf) ||
             (classroomPanel != null && classroomPanel.activeSelf) ||
             (classroomSelectionPanel != null && classroomSelectionPanel.activeSelf) ||
-            (classroomCreationPanel != null && classroomCreationPanel.activeSelf);
+            (classroomCreationPanel != null && classroomCreationPanel.activeSelf) ||
+            (loginPanel != null && loginPanel.activeSelf) ||
+            (accountRecoveryPanel != null && accountRecoveryPanel.activeSelf);
 
         if (!isAccountMenuOpen)
-        {
             return;
-        }
+
+        Debug.Log("[Account Menu] Closing Account Menu.");
 
         waitingToStartGame = false;
         waitingToLoadGame = false;
 
-        accountButton.SetActive(true);
+        // Hide the Account Menu and its sections.
+        if (accountSelectPanel != null)
+            accountSelectPanel.SetActive(false);
 
-        mainMenu.SetActive(true);
+        if (accountManagementPanel != null)
+            accountManagementPanel.SetActive(false);
 
-        accountSelectPanel.SetActive(false);
+        if (createAccountPanel != null)
+            createAccountPanel.SetActive(false);
 
-        accountManagementPanel.SetActive(false);
-        ShowAccountManagementTitle();
+        if (teacherInfoPanel != null)
+            teacherInfoPanel.SetActive(false);
 
-        createAccountPanel.SetActive(false);
+        if (studentInfoPanel != null)
+            studentInfoPanel.SetActive(false);
 
-        backButton.SetActive(false);
-
-        teacherInfoPanel.SetActive(false);
-
-        mainMenu.SetActive(true);
-
-        cardDeck.SetActive(true);
-
-        classroomPanel.SetActive(false);
+        if (classroomPanel != null)
+            classroomPanel.SetActive(false);
 
         if (classroomSelectionPanel != null)
             classroomSelectionPanel.SetActive(false);
+
         if (classroomCreationPanel != null)
             classroomCreationPanel.SetActive(false);
+
+        if (loginPanel != null)
+            loginPanel.SetActive(false);
+
+        if (accountRecoveryPanel != null)
+            accountRecoveryPanel.SetActive(false);
+
+        if (accountRecoveryDisplay != null)
+            accountRecoveryDisplay.SetActive(false);
+
+        // Restore the main menu.
+        if (mainMenu != null)
+            mainMenu.SetActive(true);
+
+        if (cardDeck != null)
+            cardDeck.SetActive(true);
+
+        if (accountButton != null)
+            accountButton.SetActive(true);
+
+        // Hide and disable the Back Button.
+        if (backButton != null)
+        {
+            backButton.SetActive(false);
+
+            Button backButtonComponent = backButton.GetComponent<Button>();
+
+            if (backButtonComponent != null)
+                backButtonComponent.interactable = false;
+        }
+
+        // Restore the account management title if available.
+        if (accountManagementPanel != null)
+            ShowAccountManagementTitle();
+
+        HideAccountSyncUI();
     }
+
 
     public void SelectTeacherStudent(AccountCardUI card)
     {
@@ -2479,6 +2682,200 @@ public class AccountManager : MonoBehaviour
             syncInputBlocker.SetActive(false);
     }
 
+    private void RefreshWebsiteAccountDetails()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null || !auth.IsSignedIn)
+        {
+            if (accountDetailsText != null)
+            {
+                accountDetailsText.text = "";
+                accountDetailsText.gameObject.SetActive(false);
+            }
+
+            if (loginSignupButton != null)
+                loginSignupButton.SetActive(true);
+
+            return;
+        }
+
+        if (accountDetailsText != null)
+        {
+            string createdDate = "Unknown";
+
+            if (!string.IsNullOrWhiteSpace(auth.CreatedAt) &&
+                System.DateTime.TryParse(
+                    auth.CreatedAt,
+                    out System.DateTime parsedDate))
+            {
+                createdDate = parsedDate.ToLocalTime()
+                    .ToString("MMMM dd, yyyy");
+            }
+
+            accountDetailsText.text =
+                "Username: " + auth.Username + "\n" +
+                "Role: " + auth.Role + "\n" +
+                "Date Created: " + createdDate;
+
+            // Make the account details visible.
+            accountDetailsText.gameObject.SetActive(true);
+        }
+
+        // Hide Login/Signup after successful authentication.
+        if (loginSignupButton != null)
+            loginSignupButton.SetActive(false);
+    }
+
+    private void ConfigureAccountViewsForRole()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (progressDismissArea != null)
+            progressDismissArea.SetActive(false);
+
+        if (auth == null || !auth.IsSignedIn)
+        {
+            if (teacherTeacherButton != null)
+                teacherTeacherButton.SetActive(false);
+
+            if (teacherStudentButton != null)
+                teacherStudentButton.SetActive(false);
+
+            if (progressScrollView != null)
+                progressScrollView.SetActive(false);
+
+            if (studentSelectScrollView != null)
+                studentSelectScrollView.SetActive(false);
+
+            return;
+        }
+
+        bool isStudent = auth.IsStudent;
+        bool isTeacher = auth.IsTeacher;
+
+        // Students immediately see their own progress.
+        if (progressScrollView != null)
+            progressScrollView.SetActive(isStudent);
+
+        // Teacher navigation buttons are only shown to teachers.
+        if (teacherTeacherButton != null)
+            teacherTeacherButton.SetActive(isTeacher);
+
+        if (teacherStudentButton != null)
+            teacherStudentButton.SetActive(isTeacher);
+
+        // The teacher chooses which view to open.
+        if (studentSelectScrollView != null)
+            studentSelectScrollView.SetActive(false);
+    }
+
+    public void ShowTeacherOwnProgress()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
+            return;
+
+        if (teacherTeacherButton != null)
+            teacherTeacherButton.SetActive(false);
+
+        if (teacherStudentButton != null)
+            teacherStudentButton.SetActive(false);
+
+        if (studentSelectScrollView != null)
+            studentSelectScrollView.SetActive(false);
+
+        if (progressScrollView != null)
+            progressScrollView.SetActive(true);
+
+        if (progressDismissArea != null)
+            progressDismissArea.SetActive(true);
+
+        if (TeacherStudentProgressManager.Instance != null)
+        {
+            TeacherStudentProgressManager.Instance.LoadTeacherOwnProgress();
+        }
+
+        Debug.Log("[Account Menu] Showing teacher's own progress.");
+    }
+
+    public void ShowTeacherStudentSelection()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
+            return;
+
+        if (teacherTeacherButton != null)
+            teacherTeacherButton.SetActive(false);
+
+        if (teacherStudentButton != null)
+            teacherStudentButton.SetActive(false);
+
+        if (progressScrollView != null)
+            progressScrollView.SetActive(false);
+
+        if (studentSelectScrollView != null)
+            studentSelectScrollView.SetActive(true);
+
+        if (progressDismissArea != null)
+            progressDismissArea.SetActive(true);
+
+        if (TeacherStudentProgressManager.Instance != null)
+        {
+            TeacherStudentProgressManager.Instance.LoadClassroomStudents();
+        }
+
+        Debug.Log("[Account Menu] Showing student selection.");
+    }
+
+    public void CloseTeacherProgressView()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (progressScrollView != null)
+            progressScrollView.SetActive(false);
+
+        if (studentSelectScrollView != null)
+            studentSelectScrollView.SetActive(false);
+
+        if (progressDismissArea != null)
+            progressDismissArea.SetActive(false);
+
+        // Only restore the teacher navigation buttons for teachers.
+        if (auth != null && auth.IsSignedIn && auth.IsTeacher)
+        {
+            if (teacherTeacherButton != null)
+                teacherTeacherButton.SetActive(true);
+
+            if (teacherStudentButton != null)
+                teacherStudentButton.SetActive(true);
+        }
+
+        Debug.Log("[Account Menu] Closed progress view.");
+    }
+
+    public void ShowSelectedStudentProgress()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
+            return;
+
+        if (studentSelectScrollView != null)
+            studentSelectScrollView.SetActive(false);
+
+        if (progressScrollView != null)
+            progressScrollView.SetActive(true);
+
+        // Keep the dismissal area active so clicking outside
+        // the progress panel still closes it.
+        if (progressDismissArea != null)
+            progressDismissArea.SetActive(true);
+
+        Debug.Log("[Account Menu] Showing selected student's progress.");
+    }
     public void ConnectUI(AccountUIReferences ui)
     {
         accountButton = ui.accountButton;
@@ -2548,8 +2945,38 @@ public class AccountManager : MonoBehaviour
         confirmAccountRecoveryButton.onClick.RemoveAllListeners();
         confirmAccountRecoveryButton.onClick.AddListener(ConfirmAccountRecovery);
 
+        // Website Account Details
+        accountDetailsText = ui.accountDetailsText;
+        loginSignupButton = ui.loginSignupButton;
+
+        // Teacher Progress Display
+        teacherTeacherButton = ui.teacherTeacherButton;
+        teacherStudentButton = ui.teacherStudentButton;
+        progressScrollView = ui.progressScrollView;
+        studentSelectScrollView = ui.studentSelectScrollView;
 
         // Accounts Button
+        if (teacherTeacherButton != null)
+        {
+            Button button = teacherTeacherButton.GetComponent<Button>();
+
+            if (button != null)
+            {
+                button.onClick.RemoveListener(ShowTeacherOwnProgress);
+                button.onClick.AddListener(ShowTeacherOwnProgress);
+            }
+        }
+
+        if (teacherStudentButton != null)
+        {
+            Button button = teacherStudentButton.GetComponent<Button>();
+
+            if (button != null)
+            {
+                button.onClick.RemoveListener(ShowTeacherStudentSelection);
+                button.onClick.AddListener(ShowTeacherStudentSelection);
+            }
+        }
         Button accountBtn = accountButton.GetComponent<Button>();
 
         accountBtn.onClick.RemoveAllListeners();
@@ -2619,6 +3046,19 @@ public class AccountManager : MonoBehaviour
 
         createTeacherBtn.onClick.AddListener(OpenCreateTeacherMenu);
 
+        //Progress Dismiss Area 
+        progressDismissArea = ui.progressDismissArea;
+
+        if (progressDismissArea != null)
+        {
+            Button dismissButton = progressDismissArea.GetComponent<Button>();
+
+            if (dismissButton != null)
+            {
+                dismissButton.onClick.RemoveListener(CloseTeacherProgressView);
+                dismissButton.onClick.AddListener(CloseTeacherProgressView);
+            }
+        }
 
         // Submit Username Button
         Button submitBtn =
@@ -2683,6 +3123,20 @@ public class AccountManager : MonoBehaviour
         cancelBtn.onClick.RemoveAllListeners();
 
         cancelBtn.onClick.AddListener(CancelLogin);
+
+        //Logout Button
+        logoutButton = ui.logoutButton;
+
+        if (logoutButton != null)
+        {
+            Button logoutBtn = logoutButton.GetComponent<Button>();
+
+            if (logoutBtn != null)
+            {
+                logoutBtn.onClick.RemoveListener(LogoutWebsiteAccount);
+                logoutBtn.onClick.AddListener(LogoutWebsiteAccount);
+            }
+        }
 
         LoadAccount();
 

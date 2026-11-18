@@ -29,10 +29,15 @@ public static class WebsiteCallableClient
     }
 
     [Serializable]
-    private class CallableEnvelope<T>
+    private class CallableSuccessEnvelope<T>
     {
         public T result;
         public T data;
+    }
+
+    [Serializable]
+    private class CallableFailureEnvelope
+    {
         public CallableError error;
     }
 
@@ -68,6 +73,13 @@ public static class WebsiteCallableClient
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Authorization", "Bearer " + idToken);
 
+            Debug.Log(
+                "[Website Callable] Sending request\n" +
+                "Function: " + functionName + "\n" +
+                "Endpoint: " + endpoint + "\n" +
+                "Payload: " + body
+            );
+
             UnityWebRequestAsyncOperation operation = request.SendWebRequest();
             while (!operation.isDone)
                 await Task.Yield();
@@ -76,36 +88,69 @@ public static class WebsiteCallableClient
                 ? request.downloadHandler.text
                 : string.Empty;
 
+
             if (request.result != UnityWebRequest.Result.Success)
             {
                 string message = request.responseCode + " " + request.error;
+
                 try
                 {
-                    CallableEnvelope<T> errorEnvelope =
-                        JsonUtility.FromJson<CallableEnvelope<T>>(responseText);
-                    if (errorEnvelope != null && errorEnvelope.error != null &&
-                        !string.IsNullOrWhiteSpace(errorEnvelope.error.message))
+                    CallableFailureEnvelope errorEnvelope =
+                        JsonUtility.FromJson<CallableFailureEnvelope>(responseText);
+
+                    if (errorEnvelope != null && errorEnvelope.error != null)
                     {
-                        message = errorEnvelope.error.message;
+                        message =
+                            errorEnvelope.error.message ??
+                            errorEnvelope.error.status ??
+                            message;
                     }
                 }
                 catch { }
 
-                throw new Exception("Website function '" + functionName + "' failed: " + message);
+                Debug.LogError(
+                    "[Website Callable] HTTP Failure\n" +
+                    "Function: " + functionName + "\n" +
+                    "Endpoint: " + endpoint + "\n" +
+                    "Status: " + request.responseCode + "\n" +
+                    "Error: " + message + "\n" +
+                    "Response: " + responseText
+                );
+
+                throw new Exception(
+                    "Website function '" + functionName + "' failed: " + message
+                );
             }
 
-            CallableEnvelope<T> envelope =
-                JsonUtility.FromJson<CallableEnvelope<T>>(responseText);
+            Debug.Log(
+                "[Website Callable] Response received\n" +
+                "Function: " + functionName + "\n" +
+                "Status: " + request.responseCode +
+                "\nResponse: " + responseText
+            );
+
+            CallableSuccessEnvelope<T> envelope =
+                JsonUtility.FromJson<CallableSuccessEnvelope<T>>(responseText);
 
             if (envelope == null)
-                throw new Exception("Website function returned an unreadable response.");
+            {
+                throw new Exception(
+                    "Website function returned an unreadable response: " +
+                    responseText
+                );
+            }
 
-            if (envelope.error != null)
-                throw new Exception(envelope.error.message);
+            T result = envelope.result != null
+                ? envelope.result
+                : envelope.data;
 
-            T result = envelope.result != null ? envelope.result : envelope.data;
             if (result == null)
-                throw new Exception("Website function returned no result. Response: " + responseText);
+            {
+                throw new Exception(
+                    "Website function returned no result: " +
+                    responseText
+                );
+            }
 
             return result;
         }
@@ -115,12 +160,16 @@ public static class WebsiteCallableClient
     {
         return "{}";
     }
-
+    
     private static string BuildEndpoint(string functionName)
     {
         if (USE_EMULATOR)
-            return "http://127.0.0.1:5001/" + PROJECT_ID + "/" + REGION + "/" + functionName;
+        {
+            return "http://127.0.0.1:5001/" +
+                   PROJECT_ID + "/" + REGION + "/" + functionName;
+        }
 
-        return "https://" + REGION + "-" + PROJECT_ID + ".cloudfunctions.net/" + functionName;
+        return "https://" + REGION + "-" + PROJECT_ID +
+               ".cloudfunctions.net/" + functionName;
     }
 }

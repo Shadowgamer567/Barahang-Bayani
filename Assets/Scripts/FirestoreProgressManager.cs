@@ -1,751 +1,259 @@
-using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class FirestoreProgressManager : MonoBehaviour
+/// <summary>
+/// Progress access through authenticated website callable functions.
+/// Direct client Firestore access is intentionally not used because the
+/// production Firestore rules deny all direct client reads and writes.
+/// </summary>
+public static class FirestoreProgressManager
 {
-    public static async Task UploadProgressForNewGame(
-       string accountID,
-        ProgressData progress)
+    [Serializable]
+    private class ProgressPayload
     {
-        Dictionary<string, object> data =
-            new Dictionary<string, object>();
-
-        data["username"] = progress.username;
-        data["accountType"] = progress.accountType;
-
-        data["completedLevels"] =
-            progress.completedLevel;
-
-        data["lastCampaignScene"] =
-            progress.lastCampaignScene;
-
-        data["playthroughId"] =
-            progress.playthroughId ?? "";
-
-        data["multipleChoiceCorrect"] =
-            progress.multipleChoiceCorrect;
-
-        data["multipleChoiceTotal"] =
-            progress.multipleChoiceTotal;
-
-        data["identificationCorrect"] =
-            progress.identificationCorrect;
-
-        data["identificationTotal"] =
-            progress.identificationTotal;
-
-        data["trueFalseCorrect"] =
-            progress.trueFalseCorrect;
-
-        data["trueFalseTotal"] =
-            progress.trueFalseTotal;
-
-        data["multipleSelectCorrect"] =
-            progress.multipleSelectCorrect;
-        
-        data["multipleSelectTotal"] =
-            progress.multipleSelectTotal;
-
-        data["fillInTheBlankCorrect"] =
-            progress.fillInTheBlankCorrect;
-
-        data["fillInTheBlankTotal"] =
-            progress.fillInTheBlankTotal;
-
-        data["tutorialCompleted"] = 
-            progress.tutorialCompleted;
-
-        Debug.Log(
-            "Uploading Progress | Account ID: " +
-            accountID +
-            " | Username: " +
-            progress.username
-        );
-
-        await FirestoreManager.Instance
-            .ProgressCollection()
-            .Document(accountID)
-            .SetAsync(data);
-
-        Debug.Log(
-            "Uploaded Progress for account: " +
-            accountID
-        );
+        public string username;
+        public string accountType;
+        public List<string> completedLevels;
+        public string lastCampaignScene;
+        public string playthroughId;
+        public bool tutorialCompleted;
+        public bool quizResultLedgerInitialized;
+        public int multipleChoiceCorrect, multipleChoiceTotal;
+        public int identificationCorrect, identificationTotal;
+        public int trueFalseCorrect, trueFalseTotal;
+        public int multipleSelectCorrect, multipleSelectTotal;
+        public int fillInTheBlankCorrect, fillInTheBlankTotal;
     }
 
-    public static async Task<bool> UploadProgressIfCurrent(
-        string accountID,
-        ProgressData progress)
+    [Serializable]
+    private class ProgressEnvelope
     {
-        DocumentReference document =
-            FirestoreManager.Instance
-                .ProgressCollection()
-                .Document(accountID);
+        public bool success;
+        public bool exists;
+        public ProgressPayload progress;
+    }
 
-        return await FirestoreManager.Instance
-            .ProgressCollection()
-            .Firestore
-            .RunTransactionAsync(async transaction =>
-            {
-                DocumentSnapshot snapshot =
-                    await transaction.GetSnapshotAsync(document);
+    [Serializable] private class BoolEnvelope { public bool success; }
 
-                if (!snapshot.Exists)
-                {
-                    Debug.LogWarning(
-                        "No cloud progress exists yet. " +
-                        "Guarded upload was not performed."
-                    );
+    [Serializable]
+    private class ResetRequest
+    {
+        public string classroomId;
+        public string previousPlaythroughId;
+        public ProgressPayload progress;
+    }
 
-                    return false;
-                }
+    [Serializable]
+    private class CampaignRequest
+    {
+        public string classroomId;
+        public string playthroughId;
+        public List<string> completedLevels;
+        public bool tutorialCompleted;
+        public string lastCampaignScene;
+    }
 
-                string cloudPlaythroughId = "";
+    [Serializable]
+    private class QuizResultRequest
+    {
+        public string classroomId;
+        public QuizResultData result;
+    }
 
-                if (snapshot.ContainsField("playthroughId"))
-                {
-                    cloudPlaythroughId =
-                        snapshot.GetValue<string>("playthroughId");
-                }
+    [Serializable]
+    private class ReconciliationRequest
+    {
+        public string classroomId;
+        public string playthroughId;
+        public List<QuizResultData> pendingResults;
+    }
 
-                if (cloudPlaythroughId != progress.playthroughId)
-                {
-                    Debug.LogWarning(
-                        "Upload rejected: Playthrough ID mismatch."
-                    );
+    [Serializable]
+    private class ReconciliationEnvelope
+    {
+        public bool success;
+        public ProgressPayload progress;
+        public string[] uploadedResultIds;
+    }
 
-                    return false;
-                }
+    private static string GetClassroomId(string accountID)
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+        if (auth == null || !auth.IsSignedIn)
+            throw new InvalidOperationException("A signed-in website account is required.");
 
-                Dictionary<string, object> data =
-                    new Dictionary<string, object>
-                    {
-                    { "username", progress.username },
-                    { "accountType", progress.accountType },
-                    { "completedLevels", progress.completedLevel },
-                    { "lastCampaignScene", progress.lastCampaignScene },
-                    { "playthroughId", progress.playthroughId },
-                    { "multipleChoiceCorrect", progress.multipleChoiceCorrect },
-                    { "multipleChoiceTotal", progress.multipleChoiceTotal },
-                    { "identificationCorrect", progress.identificationCorrect },
-                    { "identificationTotal", progress.identificationTotal },
-                    { "trueFalseCorrect", progress.trueFalseCorrect },
-                    { "trueFalseTotal", progress.trueFalseTotal },
-                    { "multipleSelectCorrect", progress.multipleSelectCorrect },
-                    { "multipleSelectTotal", progress.multipleSelectTotal },
-                    { "fillInTheBlankCorrect", progress.fillInTheBlankCorrect },
-                    { "fillInTheBlankTotal", progress.fillInTheBlankTotal },
-                    { "tutorialCompleted", progress.tutorialCompleted },
-                    { "quizResultLedgerInitialized", progress.quizResultLedgerInitialized }
-                    };
+        if (!string.Equals(auth.UserUID, accountID, StringComparison.Ordinal))
+            throw new InvalidOperationException("Progress account does not match the signed-in user.");
 
-                transaction.Set(document, data);
+        if (string.IsNullOrWhiteSpace(auth.SelectedClassroomID))
+            throw new InvalidOperationException("Select a classroom before accessing progress.");
 
-                return true;
-            });
+        return auth.SelectedClassroomID;
+    }
+
+    private static ProgressPayload ToPayload(ProgressData progress)
+    {
+        if (progress == null) throw new ArgumentNullException(nameof(progress));
+        return new ProgressPayload
+        {
+            username = progress.username ?? "",
+            accountType = progress.accountType ?? "",
+            completedLevels = progress.completedLevel ?? new List<string>(),
+            lastCampaignScene = progress.lastCampaignScene ?? "MapMenu",
+            playthroughId = progress.playthroughId ?? "",
+            tutorialCompleted = progress.tutorialCompleted,
+            quizResultLedgerInitialized = progress.quizResultLedgerInitialized,
+            multipleChoiceCorrect = progress.multipleChoiceCorrect,
+            multipleChoiceTotal = progress.multipleChoiceTotal,
+            identificationCorrect = progress.identificationCorrect,
+            identificationTotal = progress.identificationTotal,
+            trueFalseCorrect = progress.trueFalseCorrect,
+            trueFalseTotal = progress.trueFalseTotal,
+            multipleSelectCorrect = progress.multipleSelectCorrect,
+            multipleSelectTotal = progress.multipleSelectTotal,
+            fillInTheBlankCorrect = progress.fillInTheBlankCorrect,
+            fillInTheBlankTotal = progress.fillInTheBlankTotal
+        };
+    }
+
+    private static ProgressData FromPayload(ProgressPayload payload)
+    {
+        if (payload == null) return null;
+        return new ProgressData
+        {
+            username = payload.username ?? "",
+            accountType = payload.accountType ?? "",
+            completedLevel = payload.completedLevels ?? new List<string>(),
+            lastCampaignScene = payload.lastCampaignScene ?? "MapMenu",
+            playthroughId = payload.playthroughId ?? "",
+            tutorialCompleted = payload.tutorialCompleted,
+            quizResultLedgerInitialized = payload.quizResultLedgerInitialized,
+            multipleChoiceCorrect = payload.multipleChoiceCorrect,
+            multipleChoiceTotal = payload.multipleChoiceTotal,
+            identificationCorrect = payload.identificationCorrect,
+            identificationTotal = payload.identificationTotal,
+            trueFalseCorrect = payload.trueFalseCorrect,
+            trueFalseTotal = payload.trueFalseTotal,
+            multipleSelectCorrect = payload.multipleSelectCorrect,
+            multipleSelectTotal = payload.multipleSelectTotal,
+            fillInTheBlankCorrect = payload.fillInTheBlankCorrect,
+            fillInTheBlankTotal = payload.fillInTheBlankTotal
+        };
+    }
+
+    public static async Task UploadProgressForNewGame(string accountID, ProgressData progress)
+    {
+        bool success = await ResetPlaythrough(accountID, progress, "");
+        if (!success) throw new Exception("The new-game progress was rejected by the server.");
+    }
+
+    public static Task<bool> UploadProgressIfCurrent(string accountID, ProgressData progress)
+    {
+        return UploadCampaignProgress(accountID, progress.playthroughId,
+            progress.completedLevel, progress.tutorialCompleted, progress.lastCampaignScene);
     }
 
     public static async Task<bool> UploadCampaignProgress(
-        string accountID,
-        string expectedPlaythroughId,
-        List<string> completedLevels,
-        bool tutorialCompleted,
-        string lastCampaignScene)
+        string accountID, string expectedPlaythroughId,
+        List<string> completedLevels, bool tutorialCompleted, string lastCampaignScene)
     {
-        DocumentReference document =
-            FirestoreManager.Instance
-                .ProgressCollection()
-                .Document(accountID);
-
-        return await document.Firestore.RunTransactionAsync(
-            async transaction =>
-            {
-                DocumentSnapshot snapshot =
-                    await transaction.GetSnapshotAsync(document);
-
-                if (!snapshot.Exists)
-                {
-                    Debug.LogWarning(
-                        "Campaign upload skipped: Cloud progress does not exist."
-                    );
-                    return false;
-                }
-
-                string cloudPlaythroughId =
-                    snapshot.ContainsField("playthroughId")
-                        ? snapshot.GetValue<string>("playthroughId")
-                        : "";
-
-                if (cloudPlaythroughId != expectedPlaythroughId)
-                {
-                    Debug.LogWarning(
-                        "Campaign upload rejected: Playthrough ID mismatch."
-                    );
-                    return false;
-                }
-
-                List<string> mergedLevels = new List<string>();
-
-                if (snapshot.ContainsField("completedLevels"))
-                {
-                    List<string> cloudLevels =
-                        snapshot.GetValue<List<string>>("completedLevels");
-
-                    if (cloudLevels != null)
-                        mergedLevels.AddRange(cloudLevels);
-                }
-
-                if (completedLevels != null)
-                {
-                    foreach (string level in completedLevels)
-                    {
-                        if (!mergedLevels.Contains(level))
-                            mergedLevels.Add(level);
-                    }
-                }
-
-                bool mergedTutorialCompleted = tutorialCompleted;
-
-                if (snapshot.ContainsField("tutorialCompleted"))
-                {
-                    mergedTutorialCompleted |=
-                        snapshot.GetValue<bool>("tutorialCompleted");
-                }
-
-                // Update campaign fields only.
-                // Do not overwrite quiz counters or result ledger data.
-                Dictionary<string, object> updates =
-                    new Dictionary<string, object>
-                    {
-                    { "completedLevels", mergedLevels },
-                    { "tutorialCompleted", mergedTutorialCompleted }
-                    };
-
-                transaction.Update(document, updates);
-
-                return true;
-            });
+        CampaignRequest request = new CampaignRequest
+        {
+            classroomId = GetClassroomId(accountID),
+            playthroughId = expectedPlaythroughId,
+            completedLevels = completedLevels ?? new List<string>(),
+            tutorialCompleted = tutorialCompleted,
+            lastCampaignScene = lastCampaignScene ?? ""
+        };
+        BoolEnvelope response = await WebsiteCallableClient.CallAsync<BoolEnvelope>(
+            "saveGameCampaignProgress", JsonUtility.ToJson(request));
+        return response != null && response.success;
     }
 
     public static async Task<ProgressData> DownloadProgress(string accountID)
     {
-        DocumentReference document =
-            FirestoreManager.Instance
-                .ProgressCollection()
-                .Document(accountID);
-
-        DocumentSnapshot snapshot =
-            await document.GetSnapshotAsync();
-
-        if (!snapshot.Exists)
-        {
-            Debug.Log(
-                "No Firestore progress found for account: " +
-                accountID
-            );
-
-            return null;
-        }
-
-        ProgressData progress = new ProgressData();
-
-        if (snapshot.ContainsField("username"))
-        {
-            progress.username =
-                snapshot.GetValue<string>("username");
-        }
-
-        if (snapshot.ContainsField("accountType"))
-        {
-            progress.accountType =
-                snapshot.GetValue<string>("accountType");
-        }
-
-        if (snapshot.ContainsField("completedLevels"))
-        {
-            progress.completedLevel =
-                snapshot.GetValue<List<string>>("completedLevels");
-        }
-
-        if (snapshot.ContainsField("lastCampaignScene"))
-        {
-            progress.lastCampaignScene =
-                snapshot.GetValue<string>("lastCampaignScene");
-        }
-
-        if (snapshot.ContainsField("playthroughId"))
-        {
-            progress.playthroughId =
-                snapshot.GetValue<string>("playthroughId");
-        }
-
-        if (snapshot.ContainsField("multipleChoiceCorrect"))
-        {
-            progress.multipleChoiceCorrect =
-                snapshot.GetValue<int>("multipleChoiceCorrect");
-        }
-
-        if (snapshot.ContainsField("multipleChoiceTotal"))
-        {
-            progress.multipleChoiceTotal =
-                snapshot.GetValue<int>("multipleChoiceTotal");
-        }
-
-        if (snapshot.ContainsField("identificationCorrect"))
-        {
-            progress.identificationCorrect =
-                snapshot.GetValue<int>("identificationCorrect");
-        }
-
-        if (snapshot.ContainsField("identificationTotal"))
-        {
-            progress.identificationTotal =
-                snapshot.GetValue<int>("identificationTotal");
-        }
-
-        if (snapshot.ContainsField("trueFalseCorrect"))
-        {
-            progress.trueFalseCorrect =
-                snapshot.GetValue<int>("trueFalseCorrect");
-        }
-
-        if (snapshot.ContainsField("trueFalseTotal"))
-        {
-            progress.trueFalseTotal =
-                snapshot.GetValue<int>("trueFalseTotal");
-        }
-
-        if (snapshot.ContainsField("multipleSelectCorrect"))
-        {
-            progress.multipleSelectCorrect =
-                snapshot.GetValue<int>("multipleSelectCorrect");
-        }
-
-        if (snapshot.ContainsField("multipleSelectTotal"))
-        {
-            progress.multipleSelectTotal =
-                snapshot.GetValue<int>("multipleSelectTotal");
-        }
-
-        if (snapshot.ContainsField("fillInTheBlankCorrect"))
-        {
-            progress.fillInTheBlankCorrect =
-                snapshot.GetValue<int>("fillInTheBlankCorrect");
-        }
-
-        if (snapshot.ContainsField("fillInTheBlankTotal"))
-        {
-            progress.fillInTheBlankTotal =
-                snapshot.GetValue<int>("fillInTheBlankTotal");
-        }
-
-        if (snapshot.ContainsField("tutorialCompleted"))
-        {
-            progress.tutorialCompleted =
-                snapshot.GetValue<bool>("tutorialCompleted");
-        }
-
-        if (snapshot.ContainsField("quizResultLedgerInitialized"))
-        {
-            progress.quizResultLedgerInitialized =
-                snapshot.GetValue<bool>("quizResultLedgerInitialized");
-        }
-
-        Debug.Log(
-            "Downloaded Progress for: " +
-            progress.username
-        );
-
-        return progress;
+        string classroomId = GetClassroomId(accountID);
+        string json = "{\"classroomId\":\"" + EscapeJson(classroomId) + "\"}";
+        ProgressEnvelope response = await WebsiteCallableClient.CallAsync<ProgressEnvelope>(
+            "getGameProgress", json);
+        return response != null && response.exists ? FromPayload(response.progress) : null;
     }
-
 
     public static async Task<bool> ResetPlaythrough(
-        string accountID,
-        ProgressData newProgress,
-        string previousPlaythroughId)
+        string accountID, ProgressData newProgress, string previousPlaythroughId)
     {
-        DocumentReference document =
-            FirestoreManager.Instance
-                .ProgressCollection()
-                .Document(accountID);
-
-        return await FirestoreManager.Instance
-            .ProgressCollection()
-            .Firestore
-            .RunTransactionAsync(async transaction =>
-            {
-                DocumentSnapshot snapshot =
-                    await transaction.GetSnapshotAsync(document);
-
-                string cloudPlaythroughId = "";
-
-                if (snapshot.Exists &&
-                    snapshot.ContainsField("playthroughId"))
-                {
-                    cloudPlaythroughId =
-                        snapshot.GetValue<string>("playthroughId");
-                }
-
-                // The requested reset has already been applied.
-                // Do not overwrite any progress made since that reset.
-                if (cloudPlaythroughId == newProgress.playthroughId)
-                {
-                    Debug.Log(
-                        "New Game reset already exists in Firestore. " +
-                        "Treating retry as successful."
-                    );
-
-                    return true;
-                }
-
-                // Another playthrough is active, and it is not the one
-                // this reset was originally intended to replace.
-                if (cloudPlaythroughId != previousPlaythroughId)
-                {
-                    Debug.LogWarning(
-                        "New Game reset rejected: Firestore has a different playthrough."
-                    );
-
-                    return false;
-                }
-
-                Dictionary<string, object> data =
-                    new Dictionary<string, object>
-                    {
-                    { "username", newProgress.username },
-                    { "accountType", newProgress.accountType },
-                    { "completedLevels", newProgress.completedLevel },
-                    { "lastCampaignScene", newProgress.lastCampaignScene },
-                    { "playthroughId", newProgress.playthroughId },
-                    { "multipleChoiceCorrect", 0 },
-                    { "multipleChoiceTotal", 0 },
-                    { "identificationCorrect", 0 },
-                    { "identificationTotal", 0 },
-                    { "trueFalseCorrect", 0 },
-                    { "trueFalseTotal", 0 },
-                    { "multipleSelectCorrect", 0 },
-                    { "multipleSelectTotal", 0 },
-                    { "fillInTheBlankCorrect", 0 },
-                    { "fillInTheBlankTotal", 0 },
-                    { "tutorialCompleted", false },
-                    { "quizResultLedgerInitialized", true }
-                    };
-
-                transaction.Set(document, data);
-
-                return true;
-            });
-    }
-
-    private static CollectionReference QuizResultsCollection(string accountID, string playthroughId)
-    {
-        return FirestoreManager.Instance
-            .ProgressCollection()
-            .Document(accountID)
-            .Collection("playthroughs")
-            .Document(playthroughId)
-            .Collection("results");
+        ResetRequest request = new ResetRequest
+        {
+            classroomId = GetClassroomId(accountID),
+            previousPlaythroughId = previousPlaythroughId ?? "",
+            progress = ToPayload(newProgress)
+        };
+        BoolEnvelope response = await WebsiteCallableClient.CallAsync<BoolEnvelope>(
+            "resetGamePlaythrough", JsonUtility.ToJson(request));
+        return response != null && response.success;
     }
 
     public static async Task<bool> UploadQuizResult(string accountID, QuizResultData result)
     {
-        if (result == null || string.IsNullOrEmpty(result.resultId) || string.IsNullOrEmpty(result.playthroughId))
+        if (result == null || string.IsNullOrWhiteSpace(result.resultId) ||
+            string.IsNullOrWhiteSpace(result.playthroughId)) return false;
+
+        QuizResultRequest request = new QuizResultRequest
         {
-            Debug.LogWarning("Invalid quiz result.");
-            return false;
-        }
+            classroomId = GetClassroomId(accountID),
+            result = result
+        };
+        BoolEnvelope response = await WebsiteCallableClient.CallAsync<BoolEnvelope>(
+            "recordGameQuizResult", JsonUtility.ToJson(request));
+        return response != null && response.success;
+    }
 
-        DocumentReference progressDocument =
-            FirestoreManager.Instance
-                .ProgressCollection()
-                .Document(accountID);
-
-        DocumentReference playthroughDocument =
-            progressDocument
-                .Collection("playthroughs")
-                .Document(result.playthroughId);
-
-        DocumentReference resultDocument =
-            QuizResultsCollection(
-                accountID,
-                result.playthroughId
-            ).Document(result.resultId);
-
-        return await progressDocument.Firestore.RunTransactionAsync(async transaction =>
-            {
-                // Read both documents before writing.
-                DocumentSnapshot progressSnapshot =
-                    await transaction.GetSnapshotAsync(progressDocument);
-
-                DocumentSnapshot resultSnapshot =
-                    await transaction.GetSnapshotAsync(resultDocument);
-
-                if (!progressSnapshot.Exists)
-                    return false;
-
-                string cloudPlaythroughId =
-                    progressSnapshot.ContainsField("playthroughId")
-                        ? progressSnapshot.GetValue<string>("playthroughId")
-                        : "";
-
-                // Reject results from previous playthroughs.
-                if (cloudPlaythroughId != result.playthroughId)
-                {
-                    Debug.LogWarning("Quiz result rejected: Playthrough mismatch.");
-                    return false;
-                }
-
-                // Only accept results from an initialized ledger.
-                bool ledgerInitialized =
-                    progressSnapshot.ContainsField("quizResultLedgerInitialized") &&
-                    progressSnapshot.GetValue<bool>("quizResultLedgerInitialized");
-
-                if (!ledgerInitialized)
-                {
-                    Debug.LogWarning("Quiz result rejected: Firestore ledger is not initialized.");
-
-                    return false;
-                }
-
-                // Already recorded: no need to increment again.
-                if (resultSnapshot.Exists)
-                    return true;
-
-                string correctField;
-                string totalField;
-
-                switch (result.questionType)
-                {
-                    case "MultipleChoice":
-                        correctField = "multipleChoiceCorrect";
-                        totalField = "multipleChoiceTotal";
-                        break;
-
-                    case "Identification":
-                        correctField = "identificationCorrect";
-                        totalField = "identificationTotal";
-                        break;
-
-                    case "TrueOrFalse":
-                        correctField = "trueFalseCorrect";
-                        totalField = "trueFalseTotal";
-                        break;
-
-                    case "MultipleSelect":
-                        correctField = "multipleSelectCorrect";
-                        totalField = "multipleSelectTotal";
-                        break;
-
-                    case "FillInTheBlank":
-                        correctField = "fillInTheBlankCorrect";
-                        totalField = "fillInTheBlankTotal";
-                        break;
-
-                    default:
-                        Debug.LogWarning(
-                            "Unknown question type: " + result.questionType
-                        );
-                        return false;
-                }
-
-                Dictionary<string, object> updates =
-                    new Dictionary<string, object>
-                    {
-                    { totalField, FieldValue.Increment(1) }
-                    };
-
-                if (result.isCorrect)
-                {
-                    updates[correctField] =
-                        FieldValue.Increment(1);
-                }
-
-                transaction.Update(progressDocument, updates);
-
-                transaction.Set(
-                    playthroughDocument,
-                    new Dictionary<string, object>
-                    {
-                        { "playthroughId", result.playthroughId }
-                    },
-                    SetOptions.MergeAll
-);
-                transaction.Set(
-                    resultDocument,
-                    new Dictionary<string, object>
-                    {
-                    { "playthroughId", result.playthroughId },
-                    { "questionType", result.questionType },
-                    { "isCorrect", result.isCorrect }
-                    }
-                );
-
-                return true;
-            });
-
+    private static async Task<ReconciliationEnvelope> GetReconciliation(
+        string accountID, string playthroughId, List<QuizResultData> pendingResults)
+    {
+        ReconciliationRequest request = new ReconciliationRequest
+        {
+            classroomId = GetClassroomId(accountID),
+            playthroughId = playthroughId,
+            pendingResults = pendingResults ?? new List<QuizResultData>()
+        };
+        return await WebsiteCallableClient.CallAsync<ReconciliationEnvelope>(
+            "getGameQuizReconciliation", JsonUtility.ToJson(request));
     }
 
     public static async Task<HashSet<string>> GetUploadedQuizResultIds(
-        string accountID,
-        string playthroughId,
-        List<QuizResultData> pendingResults)
+        string accountID, string playthroughId, List<QuizResultData> pendingResults)
     {
-        HashSet<string> uploadedIds = new HashSet<string>();
-
-        if (string.IsNullOrEmpty(accountID) ||
-            string.IsNullOrEmpty(playthroughId) ||
-            pendingResults == null)
-        {
-            return uploadedIds;
-        }
-
-        CollectionReference resultsCollection =
-            QuizResultsCollection(accountID, playthroughId);
-
-        foreach (QuizResultData result in pendingResults)
-        {
-            if (result == null ||
-                string.IsNullOrEmpty(result.resultId) ||
-                result.playthroughId != playthroughId)
-            {
-                continue;
-            }
-
-            DocumentSnapshot snapshot =
-                await resultsCollection
-                    .Document(result.resultId)
-                    .GetSnapshotAsync(Source.Server);
-
-            if (snapshot.Exists)
-            {
-                uploadedIds.Add(result.resultId);
-            }
-        }
-
-        return uploadedIds;
+        HashSet<string> ids = new HashSet<string>();
+        ReconciliationEnvelope response = await GetReconciliation(accountID, playthroughId, pendingResults);
+        if (response != null && response.uploadedResultIds != null)
+            foreach (string id in response.uploadedResultIds) ids.Add(id);
+        return ids;
     }
-
 
     public static async Task<QuizReconciliationSnapshot> GetQuizReconciliationSnapshot(
-            string accountID,
-            string playthroughId,
-            List<QuizResultData> pendingResults)
+        string accountID, string playthroughId, List<QuizResultData> pendingResults)
     {
-        if (string.IsNullOrEmpty(accountID) ||
-            string.IsNullOrEmpty(playthroughId))
+        ReconciliationEnvelope response = await GetReconciliation(accountID, playthroughId, pendingResults);
+        if (response == null || response.progress == null) return null;
+
+        QuizReconciliationSnapshot snapshot = new QuizReconciliationSnapshot
         {
-            return null;
-        }
-
-        FirebaseFirestore database =
-            FirestoreManager.Instance.ProgressCollection().Firestore;
-
-        DocumentReference progressDocument =
-            FirestoreManager.Instance.ProgressCollection()
-                .Document(accountID);
-
-        CollectionReference resultsCollection =
-            QuizResultsCollection(accountID, playthroughId);
-
-        return await database.RunTransactionAsync(async transaction =>
-        {
-            DocumentSnapshot progressSnapshot =
-                await transaction.GetSnapshotAsync(progressDocument);
-
-            if (!progressSnapshot.Exists ||
-                !progressSnapshot.ContainsField("playthroughId") ||
-                progressSnapshot.GetValue<string>("playthroughId") != playthroughId)
-            {
-                return null;
-            }
-
-            bool ledgerInitialized =
-                progressSnapshot.ContainsField("quizResultLedgerInitialized") &&
-                progressSnapshot.GetValue<bool>("quizResultLedgerInitialized");
-
-            if (!ledgerInitialized)
-                return null;
-
-            QuizReconciliationSnapshot snapshot =
-                new QuizReconciliationSnapshot();
-
-            snapshot.cloudProgress = new ProgressData();
-            snapshot.cloudProgress.playthroughId = playthroughId;
-            snapshot.cloudProgress.quizResultLedgerInitialized = true;
-
-            snapshot.cloudProgress.multipleChoiceCorrect =
-                progressSnapshot.GetValue<int>("multipleChoiceCorrect");
-
-            snapshot.cloudProgress.multipleChoiceTotal =
-                progressSnapshot.GetValue<int>("multipleChoiceTotal");
-
-            snapshot.cloudProgress.identificationCorrect =
-                progressSnapshot.GetValue<int>("identificationCorrect");
-
-            snapshot.cloudProgress.identificationTotal =
-                progressSnapshot.GetValue<int>("identificationTotal");
-
-            snapshot.cloudProgress.trueFalseCorrect =
-                progressSnapshot.GetValue<int>("trueFalseCorrect");
-
-            snapshot.cloudProgress.multipleSelectCorrect =
-                progressSnapshot.ContainsField("multipleSelectCorrect")
-                    ? progressSnapshot.GetValue<int>("multipleSelectCorrect")
-                    : 0;
-
-            snapshot.cloudProgress.multipleSelectTotal =
-                progressSnapshot.ContainsField("multipleSelectTotal")
-                    ? progressSnapshot.GetValue<int>("multipleSelectTotal")
-                    : 0;
-
-            snapshot.cloudProgress.fillInTheBlankCorrect =
-                progressSnapshot.ContainsField("fillInTheBlankCorrect")
-                    ? progressSnapshot.GetValue<int>("fillInTheBlankCorrect")
-                    : 0;
-
-            snapshot.cloudProgress.fillInTheBlankTotal =
-                progressSnapshot.ContainsField("fillInTheBlankTotal")
-                    ? progressSnapshot.GetValue<int>("fillInTheBlankTotal")
-                    : 0;
-
-            snapshot.cloudProgress.trueFalseTotal =
-                progressSnapshot.GetValue<int>("trueFalseTotal");
-
-            HashSet<string> checkedIds = new HashSet<string>();
-
-            if (pendingResults != null)
-            {
-                foreach (QuizResultData result in pendingResults)
-                {
-                    if (result == null ||
-                        string.IsNullOrEmpty(result.resultId) ||
-                        result.playthroughId != playthroughId ||
-                        !checkedIds.Add(result.resultId))
-                    {
-                        continue;
-                    }
-
-                    DocumentSnapshot resultSnapshot =
-                        await transaction.GetSnapshotAsync(
-                            resultsCollection.Document(result.resultId)
-                        );
-
-                    if (resultSnapshot.Exists)
-                    {
-                        snapshot.uploadedResultIds.Add(result.resultId);
-                    }
-                }
-            }
-
-            return snapshot;
-        });
+            cloudProgress = FromPayload(response.progress)
+        };
+        if (response.uploadedResultIds != null)
+            foreach (string id in response.uploadedResultIds)
+                snapshot.uploadedResultIds.Add(id);
+        return snapshot;
     }
 
+    private static string EscapeJson(string value)
+    {
+        return (value ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"");
+    }
 }
-
 
 public class QuizReconciliationSnapshot
 {
