@@ -14,6 +14,7 @@ public class EnemyPanel
     public GameObject enemyPanel;
     public TextMeshProUGUI EnemyName;
     public Image hpFill;
+    public Color normalHpColor;
     public TextMeshProUGUI hpText;
     public Image shieldFill;
     public TextMeshProUGUI shieldText;
@@ -27,6 +28,7 @@ public class HeroPanel
     public GameObject heroPanel;
     public TextMeshProUGUI HeroName;
     public Image hpFill;
+    public Color normalHpColor;
     public TextMeshProUGUI hpText;
     public Image shieldFill;
     public TextMeshProUGUI shieldText;
@@ -36,6 +38,10 @@ public class HeroPanel
 public class UIMain : MonoBehaviour
 {
     public event Action OnFullCardOpened;
+
+    [Header("Health Bar Colors")]
+    [SerializeField, Range(0f, 1f)] private float lowHealthThreshold = 0.25f;
+    [SerializeField] private Color lowHealthColor = Color.red;
 
     [Header("Full CardPanel")]
     public GameObject fullCardPanel;
@@ -122,6 +128,7 @@ public class UIMain : MonoBehaviour
             panel.HeroName = panelObj.transform.Find("Name").GetComponent<TextMeshProUGUI>();
 
             panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill").GetComponent<Image>();
+            panel.normalHpColor = panel.hpFill.color;
 
             panel.hpText = panelObj.transform.Find("HP_Background/HP_Text").GetComponent<TextMeshProUGUI>();
 
@@ -179,6 +186,7 @@ public class UIMain : MonoBehaviour
             panel.EnemyName = panelObj.transform.Find("Name").GetComponent<TextMeshProUGUI>();
 
             panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill").GetComponent<Image>();
+            panel.normalHpColor = panel.hpFill.color;
 
             panel.hpText = panelObj.transform.Find("HP_Background/HP_Text").GetComponent<TextMeshProUGUI>();
 
@@ -229,6 +237,7 @@ public class UIMain : MonoBehaviour
                 enemydisplayedHP[i] = Mathf.Lerp(enemydisplayedHP[i], targetHP, Time.deltaTime * 8f);
 
                 enemypanel[i].hpFill.fillAmount = enemydisplayedHP[i];
+                enemypanel[i].hpFill.color = targetHP <= lowHealthThreshold ? lowHealthColor : enemypanel[i].normalHpColor;
                 enemypanel[i].hpText.text = $"{enemy.currentHP} / {enemy.enemyType.maxHp}";
 
                 float maxShield = Mathf.Max(1, enemy.enemyType.maxShield);
@@ -293,6 +302,7 @@ public class UIMain : MonoBehaviour
                 herodisplayedHP[i] = Mathf.Lerp(herodisplayedHP[i], targetHP, Time.deltaTime * 8f);
 
                 heropanel[i].hpFill.fillAmount = herodisplayedHP[i];
+                heropanel[i].hpFill.color = targetHP <= lowHealthThreshold ? lowHealthColor : heropanel[i].normalHpColor;
                 heropanel[i].hpText.text = $"{hero.currentHP} / {hero.heroType.maxHp}";
 
                 // SHIELD

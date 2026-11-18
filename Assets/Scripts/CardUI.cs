@@ -27,6 +27,7 @@ public class CardUI : MonoBehaviour
     private QuizManager quizManager;
     private UIMain uiMain;
 
+    public CardType Type => cardType;
     public Sprite CurrentBackground => cardBackground != null ? cardBackground.sprite : null;
 
     public Color CurrentOutlineColor => cardOutline != null ? cardOutline.effectColor : Color.white;

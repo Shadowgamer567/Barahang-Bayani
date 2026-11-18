@@ -29,7 +29,8 @@ public enum EnemyActionType
     Heal,
     Shield,
     Buff,
-    Debuff
+    Debuff,
+    PartyHeal
 }
 
 [System.Serializable]
