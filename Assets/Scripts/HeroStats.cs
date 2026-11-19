@@ -22,6 +22,16 @@ public class HeroStats : MonoBehaviour
     public void RollSpeed() => rolledSpeed = Random.Range(1, MaxSpeed + 1);
     public int attack;
     public int shield;
+    public bool LowHealthRallyActive { get; private set; }
+    public int LowHealthRallyDamageBonusPercent { get; private set; }
+    public int LowHealthRallyResistancePercent { get; private set; }
+
+    public void SetLowHealthRally(bool active, int damageBonusPercent, int resistancePercent)
+    {
+        LowHealthRallyActive = active;
+        LowHealthRallyDamageBonusPercent = active ? Mathf.Max(0, damageBonusPercent) : 0;
+        LowHealthRallyResistancePercent = active ? Mathf.Clamp(resistancePercent, 0, 90) : 0;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -51,6 +61,13 @@ public class HeroStats : MonoBehaviour
 
         amount = Mathf.Max(0, amount);
         piercingDamage = Mathf.Max(0, piercingDamage);
+
+        if (LowHealthRallyActive)
+        {
+            float damageMultiplier = 1f - LowHealthRallyResistancePercent / 100f;
+            amount = Mathf.CeilToInt(amount * damageMultiplier);
+            piercingDamage = Mathf.CeilToInt(piercingDamage * damageMultiplier);
+        }
 
         int previousHP = currentHP;
 
