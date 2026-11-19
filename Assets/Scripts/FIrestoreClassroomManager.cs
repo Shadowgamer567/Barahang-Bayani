@@ -66,6 +66,7 @@ public class FirestoreClassroomManager : MonoBehaviour
         loadingClassrooms = true;
         ClearClassroomCards();
         availableClassrooms.Clear();
+        string requestingUID = auth.UserUID;
 
         try
         {
@@ -79,6 +80,18 @@ public class FirestoreClassroomManager : MonoBehaviour
 
             WebsiteClassroomListResult result =
                 await WebsiteCallableClient.CallAsync<WebsiteClassroomListResult>(functionName);
+
+            // Ignore responses belonging to an account that has since logged out
+            // or changed.
+            if (!auth.IsOnlineAuthenticated ||
+                auth.UserUID != requestingUID)
+            {
+                Debug.LogWarning(
+                    "[Classroom Manager] Ignoring classroom response from a previous session."
+                );
+
+                return;
+            }
 
             if (result == null || !result.success)
                 throw new Exception("The website did not return a successful classroom response.");
@@ -135,13 +148,18 @@ public class FirestoreClassroomManager : MonoBehaviour
             }
             else
             {
-                // No classrooms are available. Keep the selected classroom empty.
+                // No classrooms are available.
                 auth.ClearSelectedClassroom();
+
                 if (DatabaseManager.Instance != null)
                     DatabaseManager.Instance.SetDatabase("DefaultDatabase");
 
                 if (currentClassroomText != null)
                     currentClassroomText.text = "No Classroom Selected";
+
+                // There is no classroom to synchronize.
+                // Release the Account Menu input blocker.
+                AccountManager.Instance?.HideAccountSyncUIForNoClassroom();
             }
 
             if (openClassroomCreationButton != null)
@@ -407,6 +425,30 @@ public class FirestoreClassroomManager : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    public void ClearClassroomData()
+    {
+        // Remove all visible classroom cards.
+        ClearClassroomCards();
+
+        // Clear the in-memory list from the previous account.
+        availableClassrooms.Clear();
+
+        // Reset classroom-related UI.
+        if (currentClassroomText != null)
+            currentClassroomText.text = "No Classroom Selected";
+
+        if (openClassroomCreationButton != null)
+            openClassroomCreationButton.SetActive(false);
+
+        if (classroomSelectionPanel != null)
+            classroomSelectionPanel.SetActive(false);
+
+        if (classroomCreationPanel != null)
+            classroomCreationPanel.SetActive(false);
+
+        Debug.Log("[Classroom Manager] Previous account's classroom UI cleared.");
     }
 
     private void ClearClassroomCards()

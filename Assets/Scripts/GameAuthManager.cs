@@ -202,34 +202,52 @@ public class GameAuthManager : MonoBehaviour
     private async void Start()
     {
         bool firebaseReady = await FirebaseManager.WaitUntilReady();
+        bool currentlyOffline =
+            Application.internetReachability == NetworkReachability.NotReachable;
 
-        // Firebase may be unavailable offline. Restore the locally cached
-        // identity so the player can continue using downloaded content/saves.
+        // Online launches always begin at the MainMenu without restoring the
+        // previous account session. Keep the cache file so it can be used if
+        // the player later launches while offline.
+        if (!currentlyOffline)
+        {
+            if (firebaseReady && FirebaseManager.Auth != null &&
+                FirebaseManager.Auth.CurrentUser != null)
+            {
+                FirebaseManager.Auth.SignOut();
+            }
+
+            IsOfflineSession = false;
+            StudentUID = string.Empty;
+            Username = string.Empty;
+            Role = string.Empty;
+            CreatedAt = string.Empty;
+            SelectedClassroomID = string.Empty;
+            CurrentAccount.ActiveAccount = null;
+            ProgressManager.Instance?.ClearActiveAccount();
+
+            if (DatabaseManager.Instance != null)
+                DatabaseManager.Instance.SetDatabase("DefaultDatabase");
+
+            Debug.Log("Online startup: previous session was not restored. Opening MainMenu.");
+            return;
+        }
+
+        // Offline launch: Firebase may or may not initialize. Either way,
+        // restore only the local identity and save; cloud calls remain paused.
         if (!firebaseReady)
         {
             RestoreCachedOfflineSession();
             return;
         }
 
-        // Firebase Auth persists its session. If the persisted user matches
-        // our cached website identity, restore the profile metadata locally.
         CachedGameSession cached = ReadCachedSession();
-        if (FirebaseManager.Auth.CurrentUser != null && cached != null &&
-            FirebaseManager.Auth.CurrentUser.UserId == cached.uid)
+        if (cached != null)
         {
-            bool currentlyOffline = Application.internetReachability == NetworkReachability.NotReachable;
-            RestoreCachedIdentity(cached, offline: currentlyOffline);
-            Debug.Log(currentlyOffline
-                ? "Restored cached identity for offline gameplay."
-                : "Restored persisted website authentication session.");
+            RestoreCachedOfflineSession(cached);
             return;
         }
 
-        // Do not silently sign out a valid Firebase session at startup.
-        // If no Firebase user exists, a cached identity may still be used
-        // for local-only offline gameplay.
-        if (cached != null)
-            RestoreCachedOfflineSession(cached);
+        Debug.LogWarning("Offline startup: no cached account is available.");
     }
 
     private void RestoreCachedOfflineSession()
@@ -275,12 +293,8 @@ public class GameAuthManager : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(SelectedClassroomID) && DatabaseManager.Instance != null)
             DatabaseManager.Instance.SetDatabase(SelectedClassroomID);
 
-        if (AccountManager.Instance != null)
-        {
-            AccountManager.Instance.OpenWebsiteAccountMenu();
-            if (offline && AccountManager.Instance.classroomSelectionPanel != null)
-                AccountManager.Instance.classroomSelectionPanel.SetActive(false);
-        }
+        // Do not change the startup screen here. Cached identity restoration
+        // is for authentication/progress state only; MainMenu remains visible.
 
         // Load the local save immediately. Do not call cloud endpoints from
         // this restoration path.
@@ -398,8 +412,153 @@ public class GameAuthManager : MonoBehaviour
             string code = context.Request.QueryString["code"];
             string state = context.Request.QueryString["state"];
 
-            byte[] response = System.Text.Encoding.UTF8.GetBytes(
-                "<html><body><h2>Barahang Bayani</h2><p>Sign-in received. You may return to the game.</p></body></html>");
+            string html = @"
+            <!DOCTYPE html>
+            <html lang=""en"">
+            <head>
+                <meta charset=""UTF-8"">
+                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                <title>Barahang Bayani - Login Complete</title>
+
+                <style>
+                    * {
+                        box-sizing: border-box;
+                    }
+
+                    body {
+                        margin: 0;
+                        min-height: 100vh;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 24px;
+                        font-family: Georgia, 'Times New Roman', serif;
+                        background:
+                            radial-gradient(circle at top, #625038, #29251d 75%);
+                        color: #3c2b1b;
+                    }
+
+                    .card {
+                        width: 100%;
+                        max-width: 440px;
+                        padding: 42px 32px;
+                        text-align: center;
+                        background: #eee0bd;
+                        border: 3px solid #a47a3e;
+                        outline: 1px solid #d2b477;
+                        outline-offset: -10px;
+                        border-radius: 8px;
+                        box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+                    }
+
+                    .icon {
+                        width: 76px;
+                        height: 76px;
+                        margin: 0 auto 22px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 3px solid #8b713c;
+                        border-radius: 50%;
+                        color: #52633b;
+                        font-family: Arial, sans-serif;
+                        font-size: 42px;
+                    }
+
+                    h1 {
+                        margin: 0 0 12px;
+                        color: #553b23;
+                        font-size: 29px;
+                    }
+
+                    .subtitle {
+                        margin: 0 0 24px;
+                        color: #796343;
+                        font-size: 13px;
+                        letter-spacing: 3px;
+                        text-transform: uppercase;
+                    }
+
+                    .message {
+                        margin: 0 auto 28px;
+                        max-width: 320px;
+                        font-family: Arial, sans-serif;
+                        font-size: 15px;
+                        line-height: 1.7;
+                        color: #574630;
+                    }
+
+                    .divider {
+                        width: 65%;
+                        height: 1px;
+                        margin: 0 auto 22px;
+                        background: #b99b69;
+                    }
+
+                    .countdown {
+                        font-family: Arial, sans-serif;
+                        font-size: 13px;
+                        color: #78603e;
+                    }
+
+                    #seconds {
+                        font-weight: bold;
+                        color: #62451f;
+                    }
+
+                    .footer {
+                        margin-top: 22px;
+                        font-family: Arial, sans-serif;
+                        font-size: 12px;
+                        color: #927b57;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <main class=""card"">
+                    <div class=""icon"">&#10003;</div>
+
+                    <h1>Barahang Bayani</h1>
+                    <p class=""subtitle"">Game Connection</p>
+
+                    <p class=""message"">
+                        Your sign-in request has been received successfully.
+                        You may now return to the game and continue your adventure.
+                    </p>
+
+                    <div class=""divider""></div>
+
+                    <p class=""countdown"">
+                        This page will attempt to close in
+                        <span id=""seconds"">5</span> seconds.
+                    </p>
+
+                    <p class=""footer"">
+                        If the browser prevents automatic closing,
+                        you may close this tab manually.
+                    </p>
+                </main>
+
+                <script>
+                    let remaining = 5;
+                    const seconds = document.getElementById('seconds');
+
+                    const countdown = setInterval(() => {
+                        remaining--;
+                        seconds.textContent = remaining;
+
+                        if (remaining <= 0) {
+                            clearInterval(countdown);
+                            window.close();
+                        }
+                    }, 1000);
+                </script>
+            </body>
+            </html>";
+
+            byte[] response = System.Text.Encoding.UTF8.GetBytes(html);
+
 
             context.Response.ContentType = "text/html; charset=utf-8";
             context.Response.ContentLength64 = response.Length;

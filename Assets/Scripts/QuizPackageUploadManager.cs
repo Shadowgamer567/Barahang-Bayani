@@ -8,12 +8,185 @@ using System.Threading.Tasks;
 
 public class QuizPackageUploadManager : MonoBehaviour
 {
+    [Serializable]
+    private class CreateQuizPackageRequest
+    {
+        public string classroomId;
+        public string packageId;
+    }
+
+    [Serializable]
+    private class CreateQuizPackageResponse
+    {
+        public bool success;
+        public bool created;
+        public string packageId;
+        public string ownerUID;
+        public string ownerRole;
+    }
+
+    [Serializable]
+    private class QuizUploadRequest
+    {
+        public string classroomId;
+        public string packageId;
+        public string versionId;
+        public string expectedVersion;
+
+        public string contentId;
+        public string uploadId;
+        public string dataBase64;
+
+        public int chunkIndex;
+        public int fileSize;
+        public int chunkCount;
+        public int fileCount;
+
+        public string fileId;
+        public string relativePath;
+        public string sha256;
+    }
+
+    [Serializable]
+    private class QuizUploadResponse
+    {
+        public bool success;
+        public bool alreadyComplete;
+        public string versionId;
+        public string contentId;
+        public string fileId;
+        public int chunkIndex;
+        public int fileCount;
+    }
+
+
+    [Serializable]
+    private class QuizPackageFileInfo
+    {
+        public string relativePath;
+        public string sha256;
+        public string contentId;
+    }
+
+    [Serializable]
+    private class QuizPackageStateResponse
+    {
+        public bool success;
+        public bool exists;
+        public bool deleted;
+        public string activeVersion;
+        public string activeStatus;
+        public QuizPackageFileInfo[] files;
+    }
+
+
     public const int ChunkSize = 256 * 1024;
     public const long MaxPackageSize = 20L * 1024 * 1024;
 
     private string expectedVersionID;
     private string expectedClassroomID;
     private string expectedPackageID;
+
+
+    private async Task<bool> CreateRemotePackageAsync(
+        string classroomID,
+        string packageID)
+    {
+        try
+        {
+            CreateQuizPackageRequest request =
+                new CreateQuizPackageRequest
+                {
+                    classroomId = classroomID,
+                    packageId = packageID
+                };
+
+            string requestJson = JsonUtility.ToJson(request);
+
+            CreateQuizPackageResponse response =
+                await WebsiteCallableClient.CallAsync<CreateQuizPackageResponse>(
+                    "createClassroomQuizPackage",
+                    requestJson
+                );
+
+            if (response == null || !response.success)
+            {
+                Debug.LogError(
+                    "Quiz Package creation was rejected by the website."
+                );
+
+                return false;
+            }
+
+            Debug.Log(
+                "Remote Quiz Package is ready. " +
+                "Package: " + response.packageId +
+                " | Owner: " + response.ownerUID +
+                " | Role: " + response.ownerRole +
+                " | Newly created: " + response.created
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Could not create the remote Quiz Package: " + ex.Message
+            );
+
+            return false;
+        }
+    }
+
+    private async Task<QuizUploadResponse> CallQuizUploadFunctionAsync(
+        string functionName,
+        QuizUploadRequest request)
+    {
+        string json = JsonUtility.ToJson(request);
+
+        QuizUploadResponse response =
+            await WebsiteCallableClient.CallAsync<QuizUploadResponse>(
+                functionName,
+                json
+            );
+
+        if (response == null || !response.success)
+        {
+            throw new IOException(
+                "Quiz upload function failed: " + functionName
+            );
+        }
+
+        return response;
+    }
+
+    private async Task<QuizPackageStateResponse> GetPackageUploadStateAsync(
+        string classroomID,
+        string packageID)
+    {
+        QuizUploadRequest request = new QuizUploadRequest
+        {
+            classroomId = classroomID,
+            packageId = packageID
+        };
+
+        string json = JsonUtility.ToJson(request);
+
+        QuizPackageStateResponse response =
+            await WebsiteCallableClient.CallAsync<QuizPackageStateResponse>(
+                "getClassroomQuizPackageUploadState",
+                json
+            );
+
+        if (response == null || !response.success)
+        {
+            throw new IOException(
+                "Could not retrieve Quiz Package upload state."
+            );
+        }
+
+        return response;
+    }
 
     public bool TryValidatePackage(
         string quizFilePath,
@@ -326,7 +499,6 @@ public class QuizPackageUploadManager : MonoBehaviour
             return false;
         }
 
-
         string quizPath = QuizMakerManager.SelectedQuizFilePath;
 
         if (!TryValidatePackage(quizPath, out string packageFolder))
@@ -351,11 +523,26 @@ public class QuizPackageUploadManager : MonoBehaviour
             .Collection("versions")
             .Document(versionID);
 
+        string ownerUID = FirebaseManager.Auth.CurrentUser.UserId;
+
+        string ownerRole = GameAuthManager.Instance != null
+            ? GameAuthManager.Instance.Role
+            : null;
+
+        if (string.IsNullOrWhiteSpace(ownerUID) ||
+            (ownerRole != "Student" && ownerRole != "Teacher"))
+        {
+            Debug.LogError(
+                "Quiz Package upload blocked: No valid online account or role."
+            );
+
+            return false;
+        }
+
         string snapshotFolder = null;
 
         try
-        {
-
+        { 
             QuizPackageSyncData localSync =
                 QuizPackageSyncManager.Load(
                     classroomID,
@@ -366,52 +553,43 @@ public class QuizPackageUploadManager : MonoBehaviour
             string expectedVersion =
                 localSync != null ? localSync.baseVersionID : null;
 
+
             if (isNewPackage)
             {
-                DocumentSnapshot remoteSnapshot =
-                    await packageDoc.GetSnapshotAsync();
+                Debug.Log(
+                    "New Quiz Package detected. Requesting remote package creation: " +
+                    packageID
+                );
 
-                // A package already exists remotely, but we have
-                // no synchronization history for it.
-                if (remoteSnapshot.Exists)
+                bool packageCreated = await CreateRemotePackageAsync(
+                    classroomID,
+                    packageID
+                );
+
+                if (!packageCreated)
                 {
                     Debug.LogWarning(
-                        "Quiz Package upload blocked: " +
-                        "A remote package already exists without " +
-                        "verified local synchronization history: " +
-                        packageID
+                        "Quiz Package upload stopped: " +
+                        "Remote package creation or ownership verification failed."
                     );
 
                     return false;
                 }
 
                 Debug.Log(
-                    "New Quiz Package detected. Preparing first upload: " +
+                    "Remote Quiz Package is ready. Preparing first upload: " +
                     packageID
                 );
             }
-            else if (await HasVersionConflictAsync(
-                packageDoc,
-                classroomID,
-                packageID))
-            {
-                Debug.LogWarning(
-                    "Quiz Package upload blocked: " +
-                    "A synchronization conflict was detected."
-                );
-
-                return false;
-            }
-
 
             if (await IsPackageUnchangedAsync(
-                packageDoc,
+                classroomID,
+                packageID,
                 packageFolder))
             {
                 // Check again in case another computer published
                 // a new version while we compared the files.
                 if (await HasVersionConflictAsync(
-                    packageDoc,
                     classroomID,
                     packageID))
                 {
@@ -463,12 +641,22 @@ public class QuizPackageUploadManager : MonoBehaviour
                 return false;
             }
 
+            QuizUploadResponse versionResponse =
+                await CallQuizUploadFunctionAsync(
+                    "beginClassroomQuizPackageVersion",
+                    new QuizUploadRequest
+                    {
+                        classroomId = classroomID,
+                        packageId = packageID,
+                        versionId = versionID,
+                        expectedVersion = expectedVersion ?? ""
+                    }
+                );
 
-            await versionDoc.SetAsync(new Dictionary<string, object>
-        {
-            { "status", "uploading" },
-            { "createdAt", FieldValue.ServerTimestamp }
-        });
+            Debug.Log(
+                "Remote Quiz Package version initialized: " + versionID
+            );
+
 
             string[] files = Directory.GetFiles(
             snapshotFolder,
@@ -485,22 +673,31 @@ public class QuizPackageUploadManager : MonoBehaviour
                     continue;
 
                 await UploadFileAsync(
-                packageDoc,
-                versionDoc,
-                snapshotFolder,
-                filePath
+                    packageDoc,
+                    versionDoc,
+                    classroomID,
+                    packageID,
+                    versionID,
+                    snapshotFolder,
+                    filePath
                 );
 
                 uploadedFiles++;
             }
 
             // Mark the version complete before publishing it.
-            await versionDoc.UpdateAsync(new Dictionary<string, object>
-        {
-            { "status", "complete" },
-            { "fileCount", uploadedFiles },
-            { "completedAt", FieldValue.ServerTimestamp }
-        });
+
+            await CallQuizUploadFunctionAsync(
+                "completeClassroomQuizPackageVersion",
+                new QuizUploadRequest
+                {
+                    classroomId = classroomID,
+                    packageId = packageID,
+                    versionId = versionID,
+                    fileCount = uploadedFiles
+                }
+            );
+
 
             // Verify that the original Quiz Package still matches
             // the snapshot after all files have been uploaded.
@@ -534,7 +731,6 @@ public class QuizPackageUploadManager : MonoBehaviour
             // Publish only if Firestore still has the version
             // recorded in our local synchronization metadata.
             bool published = await PublishVersionSafelyAsync(
-                packageDoc,
                 classroomID,
                 packageID,
                 versionID,
@@ -571,9 +767,13 @@ public class QuizPackageUploadManager : MonoBehaviour
         }
     }
 
+
     private async Task UploadFileAsync(
         DocumentReference packageDoc,
         DocumentReference versionDoc,
+        string classroomID,
+        string packageID,
+        string versionID,
         string packageFolder,
         string filePath)
     {
@@ -584,39 +784,38 @@ public class QuizPackageUploadManager : MonoBehaviour
 
         byte[] fileBytes = File.ReadAllBytes(filePath);
 
-        // Calculate hash of the file contents.
         string hash = CalculateSHA256(fileBytes);
 
-        // Calculate a stable ID based on the relative file path.
         string fileID = CalculateSHA256(
             System.Text.Encoding.UTF8.GetBytes(relativePath)
         );
 
-        // Upload the binary content only if it doesn't already exist.
         await UploadContentIfMissingAsync(
-            packageDoc,
+            classroomID,
+            packageID,
+            versionID,
             fileBytes,
             hash
         );
 
-        // Create a reference to the content for this version.
-        DocumentReference fileDoc = versionDoc
-            .Collection("files")
-            .Document(fileID);
-
-        await fileDoc.SetAsync(new Dictionary<string, object>
-    {
-        { "relativePath", relativePath },
-        { "size", fileBytes.Length },
-        { "sha256", hash },
-        { "contentID", hash }
-    });
+        await CallQuizUploadFunctionAsync(
+            "registerClassroomQuizPackageFile",
+            new QuizUploadRequest
+            {
+                classroomId = classroomID,
+                packageId = packageID,
+                versionId = versionID,
+                fileId = fileID,
+                relativePath = relativePath,
+                contentId = hash,
+                sha256 = hash
+            }
+        );
 
         Debug.Log(
             $"Registered file: {relativePath} (content: {hash})"
         );
     }
-
 
     private async Task<bool> TryClaimContentUploadAsync(
         DocumentReference contentDoc,
@@ -727,57 +926,43 @@ public class QuizPackageUploadManager : MonoBehaviour
     }
 
 
-
-
     private async Task UploadContentIfMissingAsync(
-        DocumentReference packageDoc,
+        string classroomID,
+        string packageID,
+        string versionID,
         byte[] fileBytes,
         string hash)
     {
-        DocumentReference contentDoc = packageDoc
-            .Collection("content")
-            .Document(hash);
-
         int chunkCount =
             (fileBytes.Length + ChunkSize - 1) / ChunkSize;
 
-        // Reuse already completed content.
-        if (await IsContentCompleteAsync(
-            contentDoc, hash, fileBytes.Length, chunkCount))
+        string uploadID = Guid.NewGuid().ToString("N");
+
+        QuizUploadResponse claimResponse =
+            await CallQuizUploadFunctionAsync(
+                "beginClassroomQuizContentUpload",
+                new QuizUploadRequest
+                {
+                    classroomId = classroomID,
+                    packageId = packageID,
+                    versionId = versionID,
+                    contentId = hash,
+                    uploadId = uploadID,
+                    fileSize = fileBytes.Length,
+                    chunkCount = chunkCount
+                }
+            );
+
+        if (claimResponse.alreadyComplete)
         {
             Debug.Log("Reusing existing content: " + hash);
             return;
         }
 
-        string uploadID = Guid.NewGuid().ToString("N");
-
-        bool claimed = await TryClaimContentUploadAsync(
-            contentDoc,
-            hash,
-            fileBytes.Length,
-            chunkCount,
-            uploadID
-        );
-
-        if (!claimed)
-        {
-            // Another computer may be uploading this content.
-            if (await WaitForContentAsync(
-                contentDoc, hash, fileBytes.Length, chunkCount))
-            {
-                Debug.Log("Content completed by another uploader: " + hash);
-                return;
-            }
-
-            throw new IOException(
-                "Content upload is incomplete or timed out: " + hash
-            );
-        }
-
-        // This uploader owns the content record.
         for (int i = 0; i < chunkCount; i++)
         {
             int offset = i * ChunkSize;
+
             int length = Math.Min(
                 ChunkSize,
                 fileBytes.Length - offset
@@ -793,56 +978,40 @@ public class QuizPackageUploadManager : MonoBehaviour
                 length
             );
 
-            DocumentReference chunkDoc = contentDoc
-                .Collection("chunks")
-                .Document(i.ToString("D6"));
+            string base64 = Convert.ToBase64String(chunk);
 
-            await chunkDoc.SetAsync(new Dictionary<string, object>
-        {
-            { "data", chunk }
-        });
-        }
-
-        // Only the owner may mark the content complete.
-        bool completed = await FirestoreManager.Instance.DB
-            .RunTransactionAsync(async transaction =>
-            {
-                DocumentSnapshot snapshot =
-                    await transaction.GetSnapshotAsync(contentDoc);
-
-                if (!snapshot.Exists ||
-                    !snapshot.TryGetValue("uploadID", out string ownerID) ||
-                    ownerID != uploadID ||
-                    !snapshot.TryGetValue("status", out string status) ||
-                    status != "uploading")
+            await CallQuizUploadFunctionAsync(
+                "uploadClassroomQuizContentChunk",
+                new QuizUploadRequest
                 {
-                    return false;
+                    classroomId = classroomID,
+                    packageId = packageID,
+                    versionId = versionID,
+                    contentId = hash,
+                    uploadId = uploadID,
+                    chunkIndex = i,
+                    dataBase64 = base64
                 }
-
-                transaction.Update(
-                    contentDoc,
-                    new Dictionary<string, object>
-                    {
-                    { "status", "complete" },
-                    { "completedAt", FieldValue.ServerTimestamp }
-                    }
-                );
-
-                return true;
-            });
-
-        if (!completed)
-        {
-            throw new IOException(
-                "Content upload ownership changed before completion: " +
-                hash
             );
         }
 
+        await CallQuizUploadFunctionAsync(
+            "completeClassroomQuizContentUpload",
+            new QuizUploadRequest
+            {
+                classroomId = classroomID,
+                packageId = packageID,
+                versionId = versionID,
+                contentId = hash,
+                uploadId = uploadID
+            }
+        );
+
         Debug.Log(
-            $"Uploaded new content: {hash} ({chunkCount} chunks)"
+            $"Uploaded content through website: {hash} ({chunkCount} chunks)"
         );
     }
+
 
 
     private string CalculateSHA256(byte[] data)
@@ -857,62 +1026,41 @@ public class QuizPackageUploadManager : MonoBehaviour
         }
     }
 
+
     private async Task<bool> IsPackageUnchangedAsync(
-        DocumentReference packageDoc,
+        string classroomID,
+        string packageID,
         string packageFolder)
     {
-        DocumentSnapshot packageSnapshot =
-            await packageDoc.GetSnapshotAsync();
+        QuizPackageStateResponse state =
+            await GetPackageUploadStateAsync(classroomID, packageID);
 
-        if (!packageSnapshot.Exists ||
-            !packageSnapshot.TryGetValue(
-                "activeVersion",
-                out string activeVersion) ||
-            string.IsNullOrEmpty(activeVersion))
+        if (!state.exists ||
+            state.deleted ||
+            string.IsNullOrEmpty(state.activeVersion) ||
+            state.activeStatus != "complete")
         {
             return false;
         }
-
-        DocumentReference versionDoc = packageDoc
-            .Collection("versions")
-            .Document(activeVersion);
-
-        DocumentSnapshot versionSnapshot =
-            await versionDoc.GetSnapshotAsync();
-
-        if (!versionSnapshot.Exists ||
-            !versionSnapshot.TryGetValue(
-                "status",
-                out string status) ||
-            status != "complete")
-        {
-            return false;
-        }
-
-        QuerySnapshot fileSnapshot = await versionDoc
-            .Collection("files")
-            .GetSnapshotAsync();
 
         Dictionary<string, string> remoteFiles =
             new Dictionary<string, string>(StringComparer.Ordinal);
 
-        foreach (DocumentSnapshot document in fileSnapshot.Documents)
+        if (state.files == null)
+            return false;
+
+        foreach (QuizPackageFileInfo file in state.files)
         {
-            if (!document.TryGetValue(
-                    "relativePath", out string relativePath) ||
-                !document.TryGetValue(
-                    "sha256", out string hash) ||
-                !document.TryGetValue(
-                    "contentID", out string contentID) ||
-                string.IsNullOrEmpty(relativePath) ||
-                string.IsNullOrEmpty(hash) ||
-                string.IsNullOrEmpty(contentID))
+            if (file == null ||
+                string.IsNullOrEmpty(file.relativePath) ||
+                string.IsNullOrEmpty(file.sha256) ||
+                string.IsNullOrEmpty(file.contentId))
             {
-                // Legacy versions don't have contentID.
+                // Legacy or incomplete manifest.
                 return false;
             }
 
-            if (!remoteFiles.TryAdd(relativePath, hash))
+            if (!remoteFiles.TryAdd(file.relativePath, file.sha256))
                 return false;
         }
 
@@ -945,8 +1093,8 @@ public class QuizPackageUploadManager : MonoBehaviour
                 return false;
             }
 
-            byte[] fileBytes = File.ReadAllBytes(filePath);
-            string localHash = CalculateSHA256(fileBytes);
+            string localHash =
+                CalculateSHA256(File.ReadAllBytes(filePath));
 
             if (!string.Equals(
                 localHash,
@@ -960,12 +1108,10 @@ public class QuizPackageUploadManager : MonoBehaviour
         return localFileCount == remoteFiles.Count;
     }
 
+
+
     public async Task<bool> CaptureExpectedVersionAsync()
     {
-        if (!TryGetQuizCollection(
-            out CollectionReference collection))
-            return false;
-
         string quizPath = QuizMakerManager.SelectedQuizFilePath;
 
         if (!TryValidatePackage(
@@ -979,25 +1125,26 @@ public class QuizPackageUploadManager : MonoBehaviour
         string classroomID =
             DatabaseManager.Instance.CurrentDatabase;
 
-        DocumentReference packageDoc =
-            collection.Document(packageID);
-
         try
         {
-            DocumentSnapshot snapshot =
-                await packageDoc.GetSnapshotAsync();
+            QuizPackageStateResponse state =
+                await GetPackageUploadStateAsync(classroomID, packageID);
 
-            string activeVersion = null;
-
-            if (snapshot.Exists)
+            if (state.deleted)
             {
-                snapshot.TryGetValue(
-                    "activeVersion",
-                    out activeVersion
+                Debug.LogWarning(
+                    "Cannot capture the base version: " +
+                    "This Quiz Package has been deleted remotely."
                 );
+
+                return false;
             }
 
-            expectedVersionID = activeVersion;
+            expectedVersionID =
+                state.exists && !string.IsNullOrEmpty(state.activeVersion)
+                    ? state.activeVersion
+                    : null;
+
             expectedClassroomID = classroomID;
             expectedPackageID = packageID;
 
@@ -1018,8 +1165,9 @@ public class QuizPackageUploadManager : MonoBehaviour
         }
     }
 
+
+
     private async Task<bool> HasVersionConflictAsync(
-        DocumentReference packageDoc,
         string classroomID,
         string packageID)
     {
@@ -1029,36 +1177,27 @@ public class QuizPackageUploadManager : MonoBehaviour
                 packageID
             );
 
-        DocumentSnapshot remoteSnapshot =
-            await packageDoc.GetSnapshotAsync();
+        QuizPackageStateResponse state =
+            await GetPackageUploadStateAsync(classroomID, packageID);
 
-        if (remoteSnapshot.Exists &&
-        remoteSnapshot.TryGetValue(
-            "deleted",
-            out bool isDeleted) &&
-        isDeleted)
+        if (state.deleted)
         {
             Debug.LogWarning(
                 "Quiz Package upload blocked: " +
-                "The package has been deleted from Firestore: " +
+                "The package has been deleted from the website: " +
                 packageID
             );
 
             return true;
         }
 
-        string remoteVersion = null;
+        string remoteVersion =
+            state.exists && !string.IsNullOrEmpty(state.activeVersion)
+                ? state.activeVersion
+                : null;
 
-        if (remoteSnapshot.Exists)
-        {
-            remoteSnapshot.TryGetValue(
-                "activeVersion",
-                out remoteVersion
-            );
-        }
-
-        // No local sync record means we cannot establish
-        // which Firestore version the local package came from.
+        // Without local synchronization history, we cannot safely
+        // establish which remote version this package came from.
         if (localSync == null)
         {
             Debug.LogWarning(
@@ -1076,7 +1215,7 @@ public class QuizPackageUploadManager : MonoBehaviour
                 "Package: " + packageID + "\n" +
                 "Local base version: " +
                 (localSync.baseVersionID ?? "(none)") + "\n" +
-                "Firestore active version: " +
+                "Website active version: " +
                 (remoteVersion ?? "(none)")
             );
 
@@ -1084,15 +1223,14 @@ public class QuizPackageUploadManager : MonoBehaviour
         }
 
         Debug.Log(
-            "Quiz Package version check passed: " +
-            packageID
+            "Quiz Package version check passed: " + packageID
         );
 
         return false;
     }
 
+
     private async Task<bool> PublishVersionSafelyAsync(
-        DocumentReference packageDoc,
         string classroomID,
         string packageID,
         string versionID,
@@ -1105,8 +1243,8 @@ public class QuizPackageUploadManager : MonoBehaviour
             );
 
         if (expectedVersion != null &&
-           (currentSync == null ||
-           currentSync.baseVersionID != expectedVersion))
+            (currentSync == null ||
+             currentSync.baseVersionID != expectedVersion))
         {
             Debug.LogWarning(
                 "Quiz Package publication cancelled: " +
@@ -1118,83 +1256,16 @@ public class QuizPackageUploadManager : MonoBehaviour
 
         try
         {
-            bool published = await FirestoreManager.Instance.DB
-                .RunTransactionAsync(async transaction =>
+            await CallQuizUploadFunctionAsync(
+                "publishClassroomQuizPackageVersion",
+                new QuizUploadRequest
                 {
-                    DocumentSnapshot snapshot =
-                        await transaction.GetSnapshotAsync(packageDoc);
-                    
-                    if (snapshot.Exists &&
-                    snapshot.TryGetValue(
-                        "deleted",
-                        out bool isDeleted) &&
-                    isDeleted)
-                    {
-                        return false;
-                    }
-
-                    string currentVersion = null;
-
-                    if (snapshot.Exists)
-                    {
-                        // A first-time upload must never overwrite an
-                        // existing package, even if it has no activeVersion.
-                        if (expectedVersion == null)
-                        {
-                            Debug.LogWarning(
-                                "First-time Quiz Package publication rejected: " +
-                                "Package already exists in Firestore."
-                            );
-
-                            return false;
-                        }
-
-                        if (!snapshot.TryGetValue(
-                            "activeVersion",
-                            out currentVersion))
-                        {
-                            return false;
-                        }
-                    }
-
-                    else
-                    {
-                        // An existing synchronized package should not
-                        // unexpectedly disappear from Firestore.
-                        if (expectedVersion != null)
-                            return false;
-                    }
-
-                    if (currentVersion != expectedVersion)
-                    {
-                        return false;
-                    }
-
-
-                    transaction.Set(
-                        packageDoc,
-                        new Dictionary<string, object>
-                        {
-                        { "packageName", packageID },
-                        { "activeVersion", versionID },
-                        { "updatedAt", FieldValue.ServerTimestamp }
-                        },
-                        SetOptions.MergeAll
-                    );
-
-                    return true;
-                });
-
-            if (!published)
-            {
-                Debug.LogWarning(
-                    "Quiz Package publication rejected because " +
-                    "Firestore has a different active version: " +
-                    packageID
-                );
-
-                return false;
-            }
+                    classroomId = classroomID,
+                    packageId = packageID,
+                    versionId = versionID,
+                    expectedVersion = expectedVersion ?? ""
+                }
+            );
 
             QuizPackageSyncManager.Save(
                 classroomID,
@@ -1230,12 +1301,14 @@ public class QuizPackageUploadManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError(
-                "Transactional Quiz Package publication failed: " + ex
+                "Quiz Package publication failed: " + ex
             );
 
             return false;
         }
     }
+
+
 
     public async Task<bool> InitializeExistingPackageSyncAsync()
     {
@@ -1246,24 +1319,14 @@ public class QuizPackageUploadManager : MonoBehaviour
             out string packageFolder))
             return false;
 
-        if (!TryGetQuizCollection(
-            out CollectionReference collection))
-            return false;
-
         string classroomID =
             DatabaseManager.Instance.CurrentDatabase;
 
         string packageID =
             Path.GetFileNameWithoutExtension(quizPath);
 
-        DocumentReference packageDoc =
-            collection.Document(packageID);
-
         QuizPackageSyncData existingSync =
-            QuizPackageSyncManager.Load(
-                classroomID,
-                packageID
-            );
+            QuizPackageSyncManager.Load(classroomID, packageID);
 
         if (existingSync != null)
         {
@@ -1277,73 +1340,64 @@ public class QuizPackageUploadManager : MonoBehaviour
 
         try
         {
-            DocumentSnapshot packageSnapshot =
-                await packageDoc.GetSnapshotAsync();
+            // Retrieve the currently published package state.
+            QuizPackageStateResponse state =
+                await GetPackageUploadStateAsync(classroomID, packageID);
 
-            if (!packageSnapshot.Exists ||
-                !packageSnapshot.TryGetValue(
-                    "activeVersion",
-                    out string activeVersion) ||
-                string.IsNullOrEmpty(activeVersion))
+            if (!state.exists ||
+                state.deleted ||
+                string.IsNullOrEmpty(state.activeVersion) ||
+                state.activeStatus != "complete")
             {
                 Debug.LogWarning(
-                    "No published Quiz Package version found: " +
+                    "No valid published Quiz Package version found: " +
                     packageID
                 );
 
                 return false;
             }
 
-            DocumentReference versionDoc = packageDoc
-                .Collection("versions")
-                .Document(activeVersion);
+            string activeVersion = state.activeVersion;
 
-            DocumentSnapshot versionSnapshot =
-                await versionDoc.GetSnapshotAsync();
-
-            if (!versionSnapshot.Exists ||
-                !versionSnapshot.TryGetValue(
-                    "status",
-                    out string status) ||
-                status != "complete")
+            if (state.files == null)
             {
                 Debug.LogWarning(
-                    "Active Quiz Package version is not complete."
+                    "Quiz Package manifest is unavailable: " + packageID
                 );
 
                 return false;
             }
 
-            QuerySnapshot manifestSnapshot =
-                await versionDoc.Collection("files").GetSnapshotAsync();
-
             Dictionary<string, string> remoteFiles =
-                new Dictionary<string, string>(
-                    StringComparer.Ordinal
-                );
+                new Dictionary<string, string>(StringComparer.Ordinal);
 
-            foreach (DocumentSnapshot fileSnapshot
-                in manifestSnapshot.Documents)
+            foreach (QuizPackageFileInfo file in state.files)
             {
-                string relativePath =
-                    fileSnapshot.GetValue<string>("relativePath");
-
-                string hash =
-                    fileSnapshot.GetValue<string>("sha256");
-
-                if (remoteFiles.ContainsKey(relativePath))
+                if (file == null ||
+                    string.IsNullOrEmpty(file.relativePath) ||
+                    string.IsNullOrEmpty(file.sha256))
                 {
                     Debug.LogWarning(
-                        "Duplicate path in Firestore manifest: " +
-                        relativePath
+                        "Quiz Package manifest contains invalid file metadata."
                     );
 
                     return false;
                 }
 
-                remoteFiles.Add(relativePath, hash);
+                if (remoteFiles.ContainsKey(file.relativePath))
+                {
+                    Debug.LogWarning(
+                        "Duplicate path in website manifest: " +
+                        file.relativePath
+                    );
+
+                    return false;
+                }
+
+                remoteFiles.Add(file.relativePath, file.sha256);
             }
 
+            // Compare every local package file against the website manifest.
             string[] localFiles = Directory.GetFiles(
                 packageFolder,
                 "*",
@@ -1369,26 +1423,15 @@ public class QuizPackageUploadManager : MonoBehaviour
                     out string remoteHash))
                 {
                     Debug.LogWarning(
-                        "Local file missing from Firestore manifest: " +
+                        "Local file missing from website manifest: " +
                         relativePath
                     );
 
                     return false;
                 }
 
-                byte[] fileBytes = File.ReadAllBytes(localFile);
-
-                string localHash;
-
-                using (SHA256 sha = SHA256.Create())
-                {
-                    byte[] hashBytes =
-                        sha.ComputeHash(fileBytes);
-
-                    localHash = BitConverter.ToString(hashBytes)
-                        .Replace("-", "")
-                        .ToLowerInvariant();
-                }
+                string localHash =
+                    CalculateSHA256(File.ReadAllBytes(localFile));
 
                 if (!string.Equals(
                     localHash,
@@ -1396,7 +1439,7 @@ public class QuizPackageUploadManager : MonoBehaviour
                     StringComparison.OrdinalIgnoreCase))
                 {
                     Debug.LogWarning(
-                        "Quiz Package file differs from Firestore: " +
+                        "Quiz Package file differs from website: " +
                         relativePath
                     );
 
@@ -1411,34 +1454,37 @@ public class QuizPackageUploadManager : MonoBehaviour
                 Debug.LogWarning(
                     "Quiz Package file count mismatch. " +
                     $"Local: {checkedFiles}, " +
-                    $"Firestore: {remoteFiles.Count}"
+                    $"Website: {remoteFiles.Count}"
                 );
 
                 return false;
             }
 
-            DocumentSnapshot latestPackageSnapshot = await packageDoc.GetSnapshotAsync();
+            // Retrieve the state again to ensure the published version
+            // did not change while the local files were being verified.
+            QuizPackageStateResponse latestState =
+                await GetPackageUploadStateAsync(classroomID, packageID);
 
-            if (!latestPackageSnapshot.Exists ||
-                !latestPackageSnapshot.TryGetValue(
-                    "activeVersion",
-                    out string latestActiveVersion) ||
-                latestActiveVersion != activeVersion)
+            if (!latestState.exists ||
+                latestState.deleted ||
+                latestState.activeStatus != "complete" ||
+                latestState.activeVersion != activeVersion)
             {
                 Debug.LogWarning(
-                    "Quiz Package synchronization initialization cancelled: " +
-                    "Firestore active version changed during verification."
+                    "Quiz Package initialization cancelled: " +
+                    "The website's active version changed during verification."
                 );
 
                 return false;
             }
 
+            // Confirm the selected Classroom and Quiz Package are unchanged.
             if (DatabaseManager.Instance == null ||
-            DatabaseManager.Instance.CurrentDatabase != classroomID ||
-            QuizMakerManager.SelectedQuizFilePath != quizPath)
+                DatabaseManager.Instance.CurrentDatabase != classroomID ||
+                QuizMakerManager.SelectedQuizFilePath != quizPath)
             {
                 Debug.LogWarning(
-                    "Quiz Package synchronization initialization cancelled: " +
+                    "Quiz Package initialization cancelled: " +
                     "The active Classroom or selected Quiz Package changed."
                 );
 
@@ -1469,15 +1515,14 @@ public class QuizPackageUploadManager : MonoBehaviour
         }
     }
 
+
     public async Task<bool> IsPackageDeletionConfirmedAsync(
-        string classroomID,
-        string packageID)
+    string classroomID,
+    string packageID)
     {
         if (string.IsNullOrWhiteSpace(classroomID) ||
             string.IsNullOrWhiteSpace(packageID))
-        {
             return false;
-        }
 
         if (DatabaseManager.Instance == null ||
             DatabaseManager.Instance.CurrentDatabase != classroomID)
@@ -1489,37 +1534,16 @@ public class QuizPackageUploadManager : MonoBehaviour
             return false;
         }
 
-        if (!TryGetQuizCollection(
-            out CollectionReference collection))
-        {
-            return false;
-        }
-
         try
         {
-            DocumentReference packageDoc =
-                collection.Document(packageID);
+            QuizPackageStateResponse state =
+                await GetPackageUploadStateAsync(classroomID, packageID);
 
-            DocumentSnapshot snapshot =
-                await packageDoc.GetSnapshotAsync(
-                    Source.Server
-                );
-
-            if (!snapshot.Exists)
-                return false;
-
-            if (!snapshot.TryGetValue(
-                "deleted",
-                out bool isDeleted))
-            {
-                return false;
-            }
-
-            if (!isDeleted)
+            if (!state.exists || !state.deleted)
                 return false;
 
             Debug.Log(
-                "Firestore confirmed Quiz Package was already deleted: " +
+                "Website confirmed Quiz Package was already deleted: " +
                 packageID
             );
 
@@ -1528,8 +1552,7 @@ public class QuizPackageUploadManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError(
-                "Failed to verify Quiz Package deletion state: " +
-                ex
+                "Failed to verify Quiz Package deletion state: " + ex
             );
 
             return false;
@@ -1541,86 +1564,40 @@ public class QuizPackageUploadManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(packageID))
             return false;
 
-        if (!TryGetQuizCollection(
-            out CollectionReference collection))
+        if (!TryGetQuizCollection(out CollectionReference collection))
             return false;
 
         string classroomID =
             DatabaseManager.Instance.CurrentDatabase;
 
         QuizPackageSyncData localSync =
-            QuizPackageSyncManager.Load(
-                classroomID,
-                packageID
-            );
+            QuizPackageSyncManager.Load(classroomID, packageID);
 
         if (localSync == null ||
             string.IsNullOrEmpty(localSync.baseVersionID))
         {
             Debug.LogWarning(
-                "Deletion blocked: No verified synchronization " +
-                "record exists for " + packageID
+                "Deletion blocked: No verified synchronization record exists for " +
+                packageID
             );
 
             return false;
         }
 
-        string expectedVersion = localSync.baseVersionID;
-
-        DocumentReference packageDoc =
-            collection.Document(packageID);
-
         try
         {
-            bool deleted = await FirestoreManager.Instance.DB
-                .RunTransactionAsync(async transaction =>
+            await CallQuizUploadFunctionAsync(
+                "markClassroomQuizPackageDeleted",
+                new QuizUploadRequest
                 {
-                    DocumentSnapshot snapshot =
-                        await transaction.GetSnapshotAsync(packageDoc);
-
-                    if (!snapshot.Exists ||
-                        !snapshot.TryGetValue(
-                            "activeVersion",
-                            out string currentVersion) ||
-                        currentVersion != expectedVersion)
-                    {
-                        return false;
-                    }
-
-                    if (snapshot.TryGetValue(
-                        "deleted",
-                        out bool alreadyDeleted) &&
-                        alreadyDeleted)
-                    {
-                        return false;
-                    }
-
-                    transaction.Update(
-                        packageDoc,
-                        new Dictionary<string, object>
-                        {
-                        { "deleted", true },
-                        { "deletedAt", FieldValue.ServerTimestamp }
-                        }
-                    );
-
-                    return true;
-                });
-
-            if (!deleted)
-            {
-                Debug.LogWarning(
-                    "Quiz Package deletion rejected: " +
-                    "The package was already deleted or " +
-                    "its published version has changed."
-                );
-
-                return false;
-            }
+                    classroomId = classroomID,
+                    packageId = packageID,
+                    expectedVersion = localSync.baseVersionID
+                }
+            );
 
             Debug.Log(
-                "Quiz Package marked as deleted in Firestore: " +
-                packageID
+                "Quiz Package successfully marked as deleted: " + packageID
             );
 
             return true;
@@ -1636,14 +1613,12 @@ public class QuizPackageUploadManager : MonoBehaviour
     }
 
     public async Task<bool> MarkLocalOnlyPackageDeletedAsync(
-        string classroomID,
-        string packageID)
+    string classroomID,
+    string packageID)
     {
         if (string.IsNullOrWhiteSpace(classroomID) ||
             string.IsNullOrWhiteSpace(packageID))
-        {
             return false;
-        }
 
         if (DatabaseManager.Instance == null ||
             DatabaseManager.Instance.CurrentDatabase != classroomID)
@@ -1651,57 +1626,23 @@ public class QuizPackageUploadManager : MonoBehaviour
             Debug.LogWarning(
                 "Local-only deletion blocked: Active Classroom changed."
             );
+
             return false;
         }
 
-        if (!TryGetQuizCollection(
-            out CollectionReference collection))
-        {
+        if (!TryGetQuizCollection(out CollectionReference collection))
             return false;
-        }
-
-        DocumentReference packageDoc =
-            collection.Document(packageID);
 
         try
         {
-            bool deleted = await FirestoreManager.Instance.DB
-                .RunTransactionAsync(async transaction =>
+            await CallQuizUploadFunctionAsync(
+                "reserveDeletedLocalQuizPackage",
+                new QuizUploadRequest
                 {
-                    DocumentSnapshot snapshot =
-                        await transaction.GetSnapshotAsync(packageDoc);
-
-                    // Never delete or overwrite an existing package,
-                    // including an existing deletion tombstone.
-                    if (snapshot.Exists)
-                    {
-                        return false;
-                    }
-
-                    // Reserve this package ID as deleted.
-                    transaction.Set(
-                        packageDoc,
-                        new Dictionary<string, object>
-                        {
-                        { "packageName", packageID },
-                        { "deleted", true },
-                        { "deletedAt", FieldValue.ServerTimestamp }
-                        }
-                    );
-
-                    return true;
-                });
-
-            if (!deleted)
-            {
-                Debug.LogWarning(
-                    "Local-only deletion rejected: " +
-                    "Package already exists in Firestore: " +
-                    packageID
-                );
-
-                return false;
-            }
+                    classroomId = classroomID,
+                    packageId = packageID
+                }
+            );
 
             Debug.Log(
                 "Local-only Quiz Package deletion tombstone created: " +
@@ -1713,8 +1654,7 @@ public class QuizPackageUploadManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError(
-                "Failed to mark local-only Quiz Package as deleted: " +
-                ex
+                "Failed to mark local-only Quiz Package as deleted: " + ex
             );
 
             return false;
@@ -2087,6 +2027,52 @@ public class QuizPackageUploadManager : MonoBehaviour
                 "TEST NOT COMPLETED: Quiz Package synchronization " +
                 "initialization was rejected or failed."
             );
+        }
+    }
+
+    private async Task<bool> ReserveNewPackageAsync(
+    DocumentReference packageDoc,
+    string packageID,
+    string ownerUID,
+    string ownerRole)
+    {
+        try
+        {
+            return await FirestoreManager.Instance.DB.RunTransactionAsync(
+                async transaction =>
+                {
+                    DocumentSnapshot snapshot =
+                        await transaction.GetSnapshotAsync(packageDoc);
+
+                    // Never overwrite an existing package or tombstone.
+                    if (snapshot.Exists)
+                        return false;
+
+                    transaction.Set(
+                        packageDoc,
+                        new Dictionary<string, object>
+                        {
+                        { "packageName", packageID },
+                        { "ownerUID", ownerUID },
+                        { "ownerRole", ownerRole },
+                        { "editors", new List<string>() },
+                        { "managers", new List<string>() },
+                        { "reserved", true },
+                        { "updatedAt", FieldValue.ServerTimestamp }
+                        }
+                    );
+
+                    return true;
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to reserve Quiz Package ownership: " + ex
+            );
+
+            return false;
         }
     }
 

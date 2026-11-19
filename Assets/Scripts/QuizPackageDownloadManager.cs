@@ -1975,6 +1975,22 @@ public class QuizPackageDownloadManager : MonoBehaviour
 
     public async Task<bool> SyncActiveClassroomPackagesAsync()
     {
+        // Package synchronization requires both an authenticated Firebase
+        // session and network connectivity. Do not attempt recovery or
+        // Firestore access during an offline session; installed package
+        // files remain available for the user to select through the file
+        // explorer.
+        if (!FirebaseManager.IsAuthenticated ||
+            Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Debug.Log(
+                "[Quiz Sync] Skipped: Firebase authentication or network " +
+                "connectivity is unavailable. Installed Quiz Packages were preserved."
+            );
+
+            return false;
+        }
+
         if (isSynchronizing || isDownloading)
         {
             Debug.LogWarning(
@@ -2628,13 +2644,13 @@ public class QuizPackageDownloadManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     [ContextMenu("Test Quiz Package Discovery")]

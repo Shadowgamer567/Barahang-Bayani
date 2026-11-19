@@ -1197,11 +1197,20 @@ public class AccountManager : MonoBehaviour
         OpenAccountMenu();
     }
 
-
-    public void ContinueAfterWebsiteClassroomSelected()
+    public async void ContinueAfterWebsiteClassroomSelected()
     {
-        // Load the authenticated student's own progress
-        // after selecting an authorized classroom.
+        // Wait for Account Menu synchronization before continuing.
+        bool syncSuccessful = await SynchronizeAccountMenuAsync();
+
+        if (!syncSuccessful)
+        {
+            Debug.LogWarning(
+                "[Account Menu] Cannot continue because synchronization failed."
+            );
+            return;
+        }
+
+        // Load the authenticated student's own progress.
         GameAuthManager auth = GameAuthManager.Instance;
 
         if (auth != null && auth.IsSignedIn && auth.IsStudent)
@@ -1233,7 +1242,6 @@ public class AccountManager : MonoBehaviour
                 );
         }
     }
-
 
     void HideAllPanels()
     {
@@ -1332,6 +1340,13 @@ public class AccountManager : MonoBehaviour
     {
         Debug.Log("[Account Menu] Opening website account session.");
 
+        // Block all Account Menu interaction while synchronization is running.
+        if (syncInputBlocker != null)
+            syncInputBlocker.SetActive(true);
+
+        if (waitSyncPanel != null)
+            waitSyncPanel.SetActive(true);
+
         // Hide unrelated account panels.
         if (accountManagementPanel != null)
             accountManagementPanel.SetActive(false);
@@ -1401,12 +1416,6 @@ public class AccountManager : MonoBehaviour
             if (backButtonComponent != null)
                 backButtonComponent.interactable = true;
         }
-
-        if (syncInputBlocker != null)
-            syncInputBlocker.SetActive(false);
-
-        if (waitSyncPanel != null)
-            waitSyncPanel.SetActive(false);
     }
 
     public void OpenCreateStudentMenu()
@@ -1693,13 +1702,38 @@ public class AccountManager : MonoBehaviour
             return;
         }
 
+        // Do not destroy the cached identity needed for offline play.
+        if (auth.IsOfflineSession)
+        {
+            Debug.LogWarning(
+                "[Account Menu] Website logout is unavailable during an offline session. " +
+                "Your cached identity and offline progress have been preserved."
+            );
+
+            return;
+        }
+
+        // Only allow this logout flow for an authenticated online account.
+        if (!auth.IsOnlineAuthenticated)
+        {
+            Debug.LogWarning(
+                "[Account Menu] No online account is currently authenticated."
+            );
+
+            return;
+        }
+
         Debug.Log("[Account Menu] Logging out website account.");
 
         waitingToStartGame = false;
         waitingToLoadGame = false;
 
-        // Clear the Firebase authentication and active game session.
+        // Clear the Firebase authentication and cached game session.
         auth.SignOut();
+
+        // Clear only the previous account's classroom UI and runtime list.
+        if (FirestoreClassroomManager.Instance != null)
+            FirestoreClassroomManager.Instance.ClearClassroomData();
 
         // Restore the unauthenticated account UI.
         RefreshWebsiteAccountDetails();
@@ -2574,56 +2608,91 @@ public class AccountManager : MonoBehaviour
         }
     }
 
-    private async Task SynchronizeAccountMenuAsync()
+
+    private async Task<bool> SynchronizeAccountMenuAsync()
     {
         if (isAccountMenuSynchronizing)
         {
-            return;
+            Debug.LogWarning(
+                "[Account Menu Sync] Synchronization is already running."
+            );
+
+            return false;
         }
 
-        if (DatabaseManager.Instance == null || string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase))
+        if (DatabaseManager.Instance == null ||
+            string.IsNullOrWhiteSpace(DatabaseManager.Instance.CurrentDatabase) ||
+            DatabaseManager.Instance.CurrentDatabase == "DefaultDatabase")
         {
-            Debug.LogWarning("[Account Menu Sync] No active classroom.");
+            Debug.LogWarning(
+                "[Account Menu Sync] No valid classroom is selected."
+            );
+
             HideAccountSyncUI();
-            return;
+            return false;
         }
 
         isAccountMenuSynchronizing = true;
 
-        Task syncTask = RunAccountMenuSynchronizationAsync();
+        // Tracks whether the synchronization task continues after the UI timeout.
+        bool continuesInBackground = false;
 
         try
         {
+            Task syncTask = RunAccountMenuSynchronizationAsync();
+
+            Task timeoutTask = Task.Delay(30000);
+
             Task completedTask = await Task.WhenAny(
                 syncTask,
-                Task.Delay(15000)
+                timeoutTask
             );
 
-            if (completedTask == syncTask)
+            if (completedTask == timeoutTask)
             {
-                await syncTask;
-                isAccountMenuSynchronizing = false;
-            }
-
-            else
-            {
-                Debug.LogWarning("[Account Menu Sync] Wait limit reached. " + "Synchronization is continuing in the background."
+                Debug.LogWarning(
+                    "[Account Menu Sync] Synchronization timed out after 30 seconds. " +
+                    "Continuing in the background."
                 );
 
+                // Keep the synchronization lock until the background task finishes.
+                continuesInBackground = true;
+
                 _ = ReleaseSyncLockWhenFinished(syncTask);
+
+                // A timeout is not a synchronization failure.
+                return true;
             }
+
+            await syncTask;
+
+            Debug.Log(
+                "[Account Menu Sync] Synchronization completed successfully."
+            );
+
+            return true;
         }
         catch (System.Exception ex)
         {
-            Debug.LogError("[Account Menu Sync] Synchronization failed: " + ex);
-            isAccountMenuSynchronizing = false;
-        }
+            Debug.LogError(
+                "[Account Menu Sync] Synchronization failed: " + ex
+            );
 
+            return false;
+        }
         finally
         {
+            // The background task owns the lock if the 30-second limit was reached.
+            if (!continuesInBackground)
+            {
+                isAccountMenuSynchronizing = false;
+            }
+
+            // The player can proceed after completion, failure, or timeout.
             HideAccountSyncUI();
         }
     }
+
 
     private async Task RunAccountMenuSynchronizationAsync()
     {
@@ -2651,6 +2720,16 @@ public class AccountManager : MonoBehaviour
         }
 
         Debug.Log("[Account Menu Sync] Website-user progress and quiz synchronization finished.");
+    }
+
+    public void HideAccountSyncUIForNoClassroom()
+    {
+        isAccountMenuSynchronizing = false;
+        HideAccountSyncUI();
+
+        Debug.Log(
+            "[Account Menu Sync] No classroom available. Synchronization skipped."
+        );
     }
 
     private async Task ReleaseSyncLockWhenFinished(Task syncTask)

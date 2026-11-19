@@ -1,0 +1,9 @@
+ID:TEST 11
+1. Test 1
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. 1 "C"
+B.
+C.
+D.
+
