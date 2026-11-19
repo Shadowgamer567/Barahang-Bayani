@@ -36,6 +36,22 @@ public class BattleControl : MonoBehaviour
     [SerializeField] private Vector3 activeCharacterArrowOffset = new Vector3(0f, 0.3f, 0f);
     [SerializeField, Min(0.1f)] private float activeCharacterArrowScale = 0.8f;
     [SerializeField, Min(0f)] private float turnTransitionDelay = 0.5f;
+    [Header("Battle Progress UI")]
+    [SerializeField] private RectTransform battleProgressPanel;
+    [SerializeField] private Image battleProgressFill;
+    [SerializeField] private TextMeshProUGUI battleProgressLabel;
+    [SerializeField] private Color battleProgressColor = new Color(1f, 0.72f, 0.25f, 1f);
+    [SerializeField, Min(0.01f)] private float battleProgressAnimationSpeed = 0.6f;
+    private int battleStartingEnemyCount;
+    [Header("Hero Damage Scaling")]
+    [SerializeField, Min(0f)] private float heroDamageBonusPerEnemyOverTwo = 0.15f;
+    [Header("Low Health Hero Rally")]
+    [SerializeField, Range(0f, 1f)] private float lowHealthHeroThreshold = 0.25f;
+    [SerializeField, Range(0f, 1f)] private float lowHealthTeamDamageBonus = 0.25f;
+    [SerializeField, Range(0f, 0.9f)] private float lowHealthTeamDamageResistance = 0.5f;
+    private bool lowHealthRallyWasActive;
+    [Header("Penalty Turn")]
+    [SerializeField, Range(0f, 1f)] private float penaltyTurnDamagePercent = 0.35f;
     [Header("Turn State UI")]
     [SerializeField] private GameObject penaltyTurnPanel;
 
@@ -111,6 +127,7 @@ public class BattleControl : MonoBehaviour
         SetEnemiesActive(false);
         if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
         CreateTurnOrderDisplay();
+        CreateBattleProgressDisplay();
     }
 
     public void Initialize(LevelData data)
@@ -204,6 +221,8 @@ public class BattleControl : MonoBehaviour
         {
             uiMain.GenerateHeroPanels(heroes);
         }
+
+        RefreshLowHealthRally();
     }
 
     void SetupEnemies()
@@ -234,6 +253,10 @@ public class BattleControl : MonoBehaviour
         }
 
         AssignEnemyDisplayNames();
+
+        battleStartingEnemyCount = enemies.Count(IsAlive);
+        if (battleProgressPanel != null) battleProgressPanel.gameObject.SetActive(true);
+        UpdateBattleProgressDisplay();
 
         if (uiMain != null)
         {
@@ -350,6 +373,103 @@ public class BattleControl : MonoBehaviour
         arrowRect.anchorMax = new Vector2(0f, 1f);
         arrowRect.pivot = new Vector2(0.5f, 0.5f);
         arrowRect.sizeDelta = new Vector2(24f, 24f);
+    }
+
+    private void CreateBattleProgressDisplay()
+    {
+        Canvas canvas = endButton != null ? endButton.GetComponentInParent<Canvas>() : null;
+        if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null) return;
+
+        if (battleProgressPanel == null)
+        {
+            GameObject panel = new GameObject("Battle Progress", typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(canvas.transform, false);
+            battleProgressPanel = panel.GetComponent<RectTransform>();
+            battleProgressPanel.anchorMin = new Vector2(0.5f, 1f);
+            battleProgressPanel.anchorMax = new Vector2(0.5f, 1f);
+            battleProgressPanel.pivot = new Vector2(0.5f, 1f);
+            battleProgressPanel.anchoredPosition = new Vector2(0f, -18f);
+            battleProgressPanel.sizeDelta = new Vector2(360f, 68f);
+            Image background = panel.GetComponent<Image>();
+            background.color = new Color(0.08f, 0.06f, 0.04f, 0.88f);
+            background.raycastTarget = false;
+        }
+
+        if (battleProgressLabel == null)
+        {
+            GameObject labelObject = new GameObject("Progress Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            labelObject.transform.SetParent(battleProgressPanel, false);
+            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0f, 0.5f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.offsetMin = new Vector2(8f, 0f);
+            labelRect.offsetMax = new Vector2(-8f, -3f);
+            battleProgressLabel = labelObject.GetComponent<TextMeshProUGUI>();
+            battleProgressLabel.font = TMP_Settings.defaultFontAsset;
+            battleProgressLabel.fontSize = 20f;
+            battleProgressLabel.color = Color.white;
+            battleProgressLabel.alignment = TextAlignmentOptions.Center;
+            battleProgressLabel.raycastTarget = false;
+        }
+
+        if (battleProgressFill == null)
+        {
+            GameObject barBackground = new GameObject("Progress Bar Background", typeof(RectTransform), typeof(Image));
+            barBackground.transform.SetParent(battleProgressPanel, false);
+            RectTransform barRect = barBackground.GetComponent<RectTransform>();
+            barRect.anchorMin = new Vector2(0f, 0f);
+            barRect.anchorMax = new Vector2(1f, 0.48f);
+            barRect.offsetMin = new Vector2(12f, 8f);
+            barRect.offsetMax = new Vector2(-12f, -1f);
+            Image barBackgroundImage = barBackground.GetComponent<Image>();
+            barBackgroundImage.color = new Color(0.16f, 0.14f, 0.12f, 1f);
+            barBackgroundImage.raycastTarget = false;
+
+            GameObject fillObject = new GameObject("Progress Fill", typeof(RectTransform), typeof(Image));
+            fillObject.transform.SetParent(barBackground.transform, false);
+            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+            battleProgressFill = fillObject.GetComponent<Image>();
+            battleProgressFill.type = Image.Type.Filled;
+            battleProgressFill.fillMethod = Image.FillMethod.Horizontal;
+            battleProgressFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+            battleProgressFill.color = battleProgressColor;
+            battleProgressFill.raycastTarget = false;
+        }
+
+        if (battleProgressFill != null)
+        {
+            if (battleProgressFill.sprite == null)
+                battleProgressFill.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            battleProgressFill.type = Image.Type.Filled;
+            battleProgressFill.fillMethod = Image.FillMethod.Horizontal;
+            battleProgressFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        }
+
+        battleProgressPanel.gameObject.SetActive(false);
+    }
+
+    private void UpdateBattleProgressDisplay()
+    {
+        if (levelData == null || battleStartingEnemyCount <= 0 || enemies == null) return;
+        int totalBattles = Mathf.Max(1, levelData.battlesRequired);
+        int currentBattle = Mathf.Clamp(battleNumber, 1, totalBattles);
+        int completedBattles = Mathf.Max(0, currentBattle - 1);
+        int defeatedCount = Mathf.Clamp(battleStartingEnemyCount - enemies.Count(IsAlive), 0, battleStartingEnemyCount);
+        float currentBattleProgress = (float)defeatedCount / battleStartingEnemyCount;
+        float progress = Mathf.Clamp01((completedBattles + currentBattleProgress) / totalBattles);
+        if (battleAlreadyWon) progress = Mathf.Clamp01((float)currentBattle / totalBattles);
+        if (battleProgressFill != null)
+            battleProgressFill.fillAmount = Mathf.MoveTowards(
+                battleProgressFill.fillAmount,
+                progress,
+                battleProgressAnimationSpeed * Time.unscaledDeltaTime);
+        if (battleProgressLabel != null)
+            battleProgressLabel.text = $"LEVEL PROGRESS   BATTLE {currentBattle} / {totalBattles}";
     }
 
     private void UpdateTurnOrderDisplay()
@@ -475,6 +595,7 @@ public class BattleControl : MonoBehaviour
 
     public void DealDamageToAll(int damage)
     {
+        damage = ScaleHeroDamageForEnemyCount(damage);
         foreach (EnemyStats enemy in enemies)
         {
             if (enemy != null && !enemy.isDead)
@@ -579,7 +700,7 @@ public class BattleControl : MonoBehaviour
             UpdateTurnOrderDisplay();
             SetActiveWorldArrow(enemy.currentModel != null ? enemy.currentModel.transform : enemy.transform);
             EnemyAction action = GetStrongestPenaltyAttack(enemy);
-            ExecuteEnemyAction(enemy, action);
+            ExecuteEnemyAction(enemy, action, true);
             if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
             acted = true;
         }
@@ -693,7 +814,7 @@ public class BattleControl : MonoBehaviour
     }
 
 
-    void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action)
+    void ExecuteEnemyAction(EnemyStats enemy, EnemyAction action, bool isPenaltyTurn = false)
     {
         string enemyName = enemy.DisplayName;
 
@@ -708,7 +829,10 @@ public class BattleControl : MonoBehaviour
                     int actionBonus = action.value;
 
                     int pendingBuff = enemy.PendingActionModifier;
-                    int finalDamage = enemy.GetModifiedActionValue(Mathf.Max(0, baseDamage + actionBonus));
+                    int fullDamage = enemy.GetModifiedActionValue(Mathf.Max(0, baseDamage + actionBonus));
+                    int finalDamage = isPenaltyTurn
+                        ? Mathf.CeilToInt(fullDamage * penaltyTurnDamagePercent)
+                        : fullDamage;
 
                     int previousHP = target.currentHP;
                     int previousShield = target.shield;
@@ -722,6 +846,7 @@ public class BattleControl : MonoBehaviour
                         ? Mathf.Max(1, finalDamage / 2)
                         : 0;
                     target.TakeDamage(finalDamage, shieldDamageMultiplier, piercingDamage);
+                    RefreshLowHealthRally();
 
                     int hpDamage = Mathf.Max(0, previousHP - target.currentHP);
 
@@ -1392,6 +1517,50 @@ public class BattleControl : MonoBehaviour
         return Mathf.Max(0, baseValue);
     }
 
+    private int ScaleHeroDamageForEnemyCount(int baseDamage)
+    {
+        if (baseDamage <= 0 || enemies == null) return Mathf.Max(0, baseDamage);
+        int livingEnemyCount = enemies.Count(IsAlive);
+        int enemiesOverThreshold = Mathf.Max(0, livingEnemyCount - 2);
+        float multiplier = 1f + enemiesOverThreshold * heroDamageBonusPerEnemyOverTwo;
+        if (HasLowHealthHero()) multiplier *= 1f + lowHealthTeamDamageBonus;
+        return Mathf.CeilToInt(baseDamage * multiplier);
+    }
+
+    private bool HasLowHealthHero()
+    {
+        if (heroes == null) return false;
+        foreach (HeroStats hero in heroes)
+        {
+            if (!IsAlive(hero) || hero.heroType == null) continue;
+            float healthRatio = (float)hero.currentHP / Mathf.Max(1, hero.heroType.maxHp);
+            if (healthRatio <= lowHealthHeroThreshold) return true;
+        }
+        return false;
+    }
+
+    private void RefreshLowHealthRally()
+    {
+        bool active = HasLowHealthHero();
+        if (heroes != null)
+        {
+            int damageBonusPercent = Mathf.RoundToInt(lowHealthTeamDamageBonus * 100f);
+            int resistancePercent = Mathf.RoundToInt(lowHealthTeamDamageResistance * 100f);
+            foreach (HeroStats hero in heroes)
+                if (hero != null)
+                    hero.SetLowHealthRally(active && IsAlive(hero), damageBonusPercent, resistancePercent);
+        }
+
+        if (active != lowHealthRallyWasActive && battleLog != null)
+        {
+            if (active)
+                battleLog.AddLog($"Last Stand activated: heroes gain +{Mathf.RoundToInt(lowHealthTeamDamageBonus * 100f)}% damage and {Mathf.RoundToInt(lowHealthTeamDamageResistance * 100f)}% damage resistance.");
+            else
+                battleLog.AddLog("Last Stand faded as the heroes recovered.");
+        }
+        lowHealthRallyWasActive = active;
+    }
+
     private void ExecuteCardEffect(CardType card, HeroStats actingHero, HeroStats targetHero = null, EnemyStats targetEnemy = null, int? calculatedValue = null, bool suppressLog = false)
     {
         if (card == null || actingHero == null)
@@ -1407,7 +1576,7 @@ public class BattleControl : MonoBehaviour
             case CardEffectType.Damage:
                 if (targetEnemy != null && !targetEnemy.isDead)
                 {
-                    int finalDamage = calculatedValue ?? GetModifiedPlayerValue(value);
+                    int finalDamage = ScaleHeroDamageForEnemyCount(calculatedValue ?? GetModifiedPlayerValue(value));
 
                     // Record the target's stats before damage.
                     int previousHP = targetEnemy.currentHP;
@@ -1448,7 +1617,7 @@ public class BattleControl : MonoBehaviour
             case CardEffectType.Piercing:
                 if (targetEnemy != null && !targetEnemy.isDead)
                 {
-                    int finalDamage = calculatedValue ?? GetModifiedPlayerValue(value);
+                    int finalDamage = ScaleHeroDamageForEnemyCount(calculatedValue ?? GetModifiedPlayerValue(value));
 
                     int previousHP = targetEnemy.currentHP;
 
@@ -1494,6 +1663,7 @@ public class BattleControl : MonoBehaviour
                     int previousHP = targetHero.currentHP;
 
                     targetHero.Heal(finalHeal);
+                    RefreshLowHealthRally();
 
                     int actualHeal = targetHero.currentHP - previousHP;
 
@@ -1933,6 +2103,8 @@ public class BattleControl : MonoBehaviour
     private void Update()
     {
         UpdateActiveWorldArrow();
+        UpdateBattleProgressDisplay();
+        RefreshLowHealthRally();
 
         if (!autoEndTurnPending && currentstate == BattleState.PlayerTurn && currentActionPoint <= 0 &&
             !isSelectingTarget && activeCardAnimationRelay == null && !IsQuizInteractionOpen())

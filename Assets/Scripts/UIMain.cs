@@ -327,6 +327,16 @@ public class UIMain : MonoBehaviour
                 if (heropanel[i].effectContainer != null)
                 {
                     heropanel[i].effectContainer.SetEffect("Modifier", modifierSprite, modifier, 0);
+                    heropanel[i].effectContainer.SetEffect(
+                        "LowHealthRallyDamage",
+                        modifierSprite,
+                        hero.LowHealthRallyActive ? hero.LowHealthRallyDamageBonusPercent : 0,
+                        1);
+                    heropanel[i].effectContainer.SetEffect(
+                        "LowHealthRallyResistance",
+                        modifierSprite,
+                        hero.LowHealthRallyActive ? hero.LowHealthRallyResistancePercent : 0,
+                        2);
                 }
 
             }

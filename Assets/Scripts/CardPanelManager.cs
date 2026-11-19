@@ -32,6 +32,7 @@ public class CardPanelManager : MonoBehaviour
 
     public CardType[] availableCards;
     public int cardCount = 5;
+    [SerializeField, Range(0f, 1f)] private float lowHealthHealingThreshold = 0.25f;
     //private bool isRefilling = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -80,17 +81,73 @@ public class CardPanelManager : MonoBehaviour
                 affordableCards.Add(candidate);
         }
 
+        if (HasLowHealthHero() && !HandContainsHealingCard())
+        {
+            List<CardPoolEntry> healingCards = new List<CardPoolEntry>();
+            foreach (CardPoolEntry candidate in cardPool)
+            {
+                if (candidate != null && candidate.card != null && candidate.card.effectType == CardEffectType.Heal)
+                    healingCards.Add(candidate);
+            }
+
+            if (healingCards.Count > 0)
+            {
+                // Prefer an affordable heal, but keep the guarantee even when
+                // every healing card costs more than the current AP.
+                List<CardPoolEntry> affordableHealingCards = new List<CardPoolEntry>();
+                foreach (CardPoolEntry candidate in healingCards)
+                    if (candidate.card.cost <= maxAffordableCost)
+                        affordableHealingCards.Add(candidate);
+
+                List<CardPoolEntry> choices = affordableHealingCards.Count > 0 ? affordableHealingCards : healingCards;
+                CreateCardFromEntry(choices[Random.Range(0, choices.Count)]);
+                return;
+            }
+        }
+
         if (affordableCards.Count == 0)
             return;
 
         CardPoolEntry entry = affordableCards[Random.Range(0, affordableCards.Count)];
 
+        CreateCardFromEntry(entry);
+    }
+
+    private void CreateCardFromEntry(CardPoolEntry entry)
+    {
         GameObject obj = Instantiate(cardTemplate, cardContainer);
         obj.SetActive(true);
 
         CardUI ui = obj.GetComponent<CardUI>();
 
         SetupCardUI(ui, entry);
+    }
+
+    private bool HasLowHealthHero()
+    {
+        HeroStats[] heroes = FindObjectsByType<HeroStats>(FindObjectsSortMode.None);
+        foreach (HeroStats hero in heroes)
+        {
+            if (hero == null || !hero.gameObject.activeInHierarchy || hero.IsDead() || hero.heroType == null)
+                continue;
+
+            float healthRatio = (float)hero.currentHP / Mathf.Max(1, hero.heroType.maxHp);
+            if (healthRatio <= lowHealthHealingThreshold)
+                return true;
+        }
+        return false;
+    }
+
+    private bool HandContainsHealingCard()
+    {
+        if (cardContainer == null) return false;
+        foreach (Transform child in cardContainer)
+        {
+            CardUI cardUI = child.GetComponent<CardUI>();
+            if (cardUI != null && cardUI.Type != null && cardUI.Type.effectType == CardEffectType.Heal)
+                return true;
+        }
+        return false;
     }
 
     //THis is for Tutorial
