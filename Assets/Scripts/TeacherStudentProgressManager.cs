@@ -16,6 +16,11 @@ public class TeacherStudentProgressManager : MonoBehaviour
     [Header("Student Progress UI")]
     private TMP_Text progressDisplayText;
 
+    // Cached logged-in student's own progress display.
+    // This survives scene changes with this manager.
+    private string cachedOwnStudentProgressText;
+    private string cachedOwnStudentUID;
+
     private readonly List<StudentProgressOverview> students =
         new List<StudentProgressOverview>();
 
@@ -149,6 +154,7 @@ public class TeacherStudentProgressManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -162,6 +168,24 @@ public class TeacherStudentProgressManager : MonoBehaviour
         studentCardPrefab = ui.studentProgressCardPrefab;
 
         progressDisplayText = ui.progressDisplayText;
+
+        // Restore the logged-in student's cached progress
+        // when the Main Menu UI reconnects.
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (progressDisplayText != null &&
+            auth != null &&
+            auth.IsSignedIn &&
+            auth.IsStudent &&
+            !string.IsNullOrEmpty(cachedOwnStudentProgressText) &&
+            cachedOwnStudentUID == auth.UserUID)
+        {
+            progressDisplayText.text = cachedOwnStudentProgressText;
+
+            Debug.Log(
+                "[Student Progress] Restored cached progress display."
+            );
+        }
     }
 
     public async void LoadClassroomStudents()
@@ -302,6 +326,22 @@ public class TeacherStudentProgressManager : MonoBehaviour
                 );
             }
         }
+    }
+
+    private void CacheOwnStudentProgress()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null ||
+            !auth.IsSignedIn ||
+            !auth.IsStudent ||
+            progressDisplayText == null)
+        {
+            return;
+        }
+
+        cachedOwnStudentUID = auth.UserUID;
+        cachedOwnStudentProgressText = progressDisplayText.text;
     }
 
     private void SelectStudent(string accountID)
@@ -555,6 +595,8 @@ public class TeacherStudentProgressManager : MonoBehaviour
                     "Student: " + auth.Username + "\n\n" +
                     "PROGRESS\nNo progress has been recorded yet.\n\n" +
                     "METRICS\nNo quiz attempts recorded.";
+
+                CacheOwnStudentProgress();
                 return;
             }
 
@@ -603,8 +645,9 @@ public class TeacherStudentProgressManager : MonoBehaviour
                     }
                 }
             };
-
             DisplayProgress(result, "Student");
+
+            CacheOwnStudentProgress();
 
             Debug.Log("[Student Progress] Successfully loaded own progress.");
         }

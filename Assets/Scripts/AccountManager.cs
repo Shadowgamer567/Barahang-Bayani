@@ -3034,6 +3034,21 @@ public class AccountManager : MonoBehaviour
         progressScrollView = ui.progressScrollView;
         studentSelectScrollView = ui.studentSelectScrollView;
 
+        // Login/Signup Button
+        if (loginSignupButton != null)
+        {
+            Button loginSignupButtonComponent =
+                loginSignupButton.GetComponent<Button>();
+
+            if (loginSignupButtonComponent != null)
+            {
+                loginSignupButtonComponent.onClick.RemoveAllListeners();
+                loginSignupButtonComponent.onClick.AddListener(
+                    BeginWebsiteLoginFromAccountPanel
+                );
+            }
+        }
+
         // Accounts Button
         if (teacherTeacherButton != null)
         {

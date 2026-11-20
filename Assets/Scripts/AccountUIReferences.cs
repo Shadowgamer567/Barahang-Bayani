@@ -147,10 +147,5 @@ public class AccountUIReferences : MonoBehaviour
         {
             TeacherStudentProgressManager.Instance.ConnectUI(this);
         }
-
-        if (TeacherStudentProgressManager.Instance != null)
-        {
-            TeacherStudentProgressManager.Instance.ConnectUI(this);
-        }
     }
 }

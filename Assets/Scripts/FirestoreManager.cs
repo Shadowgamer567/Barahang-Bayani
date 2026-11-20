@@ -8,11 +8,7 @@ public class FirestoreManager : MonoBehaviour
 
     public FirebaseFirestore DB { get; private set; }
 
-#if UNITY_EDITOR
-    private const bool USE_FIREBASE_EMULATOR = true;
-#else
     private const bool USE_FIREBASE_EMULATOR = false;
-#endif
 
     private void Awake()
     {
@@ -35,7 +31,7 @@ public class FirestoreManager : MonoBehaviour
                 );
             }
 
-            else
+            else 
             {
                 Debug.Log("Firestore connected to production.");
             }

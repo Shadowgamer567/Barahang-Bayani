@@ -130,11 +130,7 @@ public class GameAuthManager : MonoBehaviour
             ProgressManager.Instance.SetActiveAccount(CurrentAccount.ActiveAccount);
     }
 
-#if UNITY_EDITOR
-    private const bool USE_EMULATOR = true;
-#else
     private const bool USE_EMULATOR = false;
-#endif
 
     private HttpListener listener;
     private string expectedState;
@@ -567,6 +563,10 @@ public class GameAuthManager : MonoBehaviour
 
             receivedCode = code;
             receivedState = state;
+
+            Debug.Log("[GameAuth] Browser callback received.");
+            Debug.Log("[GameAuth] Authorization code received: " + !string.IsNullOrEmpty(receivedCode));
+            Debug.Log("[GameAuth] State received: " + !string.IsNullOrEmpty(receivedState));
         }
         catch (Exception exception)
         {
@@ -576,6 +576,8 @@ public class GameAuthManager : MonoBehaviour
 
     private IEnumerator WaitForCodeAndRedeem()
     {
+        Debug.Log("[GameAuth] Waiting for browser callback...");
+
         float timeout = 180f;
         while (timeout > 0f && string.IsNullOrEmpty(receivedCode) &&
                string.IsNullOrEmpty(listenerError))
@@ -607,12 +609,18 @@ public class GameAuthManager : MonoBehaviour
             yield break;
         }
 
+        Debug.Log("[GameAuth] Callback received. Starting code redemption...");
         yield return RedeemCode(receivedCode);
     }
 
     private IEnumerator RedeemCode(string code)
     {
+        Debug.Log("[GameAuth] RedeemCode started.");
+
         string endpoint = USE_EMULATOR ? emulatorRedeemUrl : productionRedeemUrl;
+
+        Debug.Log("[GameAuth] Redemption endpoint: " + endpoint);
+
         string json = JsonUtility.ToJson(new CallableRequest
         {
             data = new CallableData { code = code }
@@ -626,6 +634,10 @@ public class GameAuthManager : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/json");
 
             yield return request.SendWebRequest();
+
+            Debug.Log("[GameAuth] Redemption request completed. Result: " + request.result);
+            Debug.Log("[GameAuth] HTTP Response: " + request.responseCode);
+            Debug.Log("[GameAuth] Response Body: " + request.downloadHandler.text);
 
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -659,8 +671,29 @@ public class GameAuthManager : MonoBehaviour
                 yield break;
             }
 
+            Debug.Log("[GameAuth] Custom token received. Starting Firebase sign-in...");
+
             Task signInTask =
                 FirebaseManager.Auth.SignInWithCustomTokenAsync(result.customToken);
+
+            yield return new WaitUntil(() => signInTask.IsCompleted);
+
+            Debug.Log("[GameAuth] Firebase sign-in task completed.");
+
+            if (signInTask.IsFaulted || signInTask.IsCanceled)
+            {
+                Debug.LogError("[GameAuth] Firebase sign-in failed: " +
+                    (signInTask.Exception != null
+                        ? signInTask.Exception.ToString()
+                        : "Cancelled"));
+
+                IsSigningIn = false;
+                yield break;
+            }
+
+            Debug.Log("[GameAuth] Firebase sign-in successful.");
+            Debug.Log("[GameAuth] Current Firebase UID: " +
+                FirebaseManager.Auth.CurrentUser.UserId);
 
             yield return new WaitUntil(() => signInTask.IsCompleted);
 
