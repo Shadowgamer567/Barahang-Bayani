@@ -124,7 +124,11 @@ public class BattleControl : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        currentstate = BattleState.Busy;
+        SetActiveWorldArrow(null);
+        if (turnOrderArrowImage != null) turnOrderArrowImage.gameObject.SetActive(false);
         SetEnemiesActive(false);
+        if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
         if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
         CreateTurnOrderDisplay();
         CreateBattleProgressDisplay();
@@ -2429,6 +2433,7 @@ public class BattleControl : MonoBehaviour
         {
             yield break;
         }
+        if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
         currentstate = BattleState.Busy;
 
         groundloop.isMoving = true;
@@ -2469,6 +2474,8 @@ public class BattleControl : MonoBehaviour
         {
             yield break;
         }
+
+        if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
 
         currentstate = BattleState.Busy;
 

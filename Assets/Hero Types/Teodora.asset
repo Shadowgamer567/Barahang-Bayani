@@ -16,6 +16,7 @@ MonoBehaviour:
   maxHp: 40
   shield: 30
   maxShield: 120
+  panelIcon: {fileID: 21300000, guid: af8f33bae9fa532d91f3c143783100a7, type: 3}
   prefab: {fileID: 5793887613308761351, guid: 46a6f0a524c78ce40a33054ffd8c5ed8, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
   modelPositionOffset: {x: 0, y: 0.75, z: 0}

@@ -9,6 +9,7 @@ public class EnemyTypes : ScriptableObject
     public int damage;
     public int shield;
     public int maxShield;
+    public Sprite panelIcon;
     public GameObject prefab;
     public EnemyAction[] actions;
 
