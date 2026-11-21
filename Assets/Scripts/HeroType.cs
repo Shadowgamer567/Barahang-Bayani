@@ -8,6 +8,7 @@ public class HeroType : ScriptableObject
     [Min(1)] public int speed = 5;
     public int shield;
     public int maxShield;
+    public Sprite panelIcon;
     public GameObject prefab;
     public Vector3 modelRotationOffset;
     public Vector3 modelPositionOffset;

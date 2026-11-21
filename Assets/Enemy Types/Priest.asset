@@ -17,6 +17,7 @@ MonoBehaviour:
   damage: 6
   shield: 0
   maxShield: 0
+  panelIcon: {fileID: 21300000, guid: cd061f5eb8c45ebe9a2e14076611562a, type: 3}
   prefab: {fileID: 2446511508103551290, guid: a019c777f267ed243a187c486f2f949f, type: 3}
   actions:
   - actionType: 1

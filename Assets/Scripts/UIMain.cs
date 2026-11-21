@@ -13,6 +13,7 @@ public class EnemyPanel
 {
     public GameObject enemyPanel;
     public TextMeshProUGUI EnemyName;
+    public Image characterIcon;
     public Image hpFill;
     public Color normalHpColor;
     public TextMeshProUGUI hpText;
@@ -27,6 +28,7 @@ public class HeroPanel
 {
     public GameObject heroPanel;
     public TextMeshProUGUI HeroName;
+    public Image characterIcon;
     public Image hpFill;
     public Color normalHpColor;
     public TextMeshProUGUI hpText;
@@ -126,6 +128,9 @@ public class UIMain : MonoBehaviour
             panel.heroPanel = panelObj;
 
             panel.HeroName = panelObj.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+            panel.characterIcon = panelObj.transform.Find("CharacterIcon").GetComponent<Image>();
+            if (heroes[i].heroType != null && heroes[i].heroType.panelIcon != null)
+                panel.characterIcon.sprite = heroes[i].heroType.panelIcon;
 
             panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill").GetComponent<Image>();
             panel.normalHpColor = panel.hpFill.color;
@@ -184,6 +189,9 @@ public class UIMain : MonoBehaviour
             panel.enemyPanel = panelObj;
 
             panel.EnemyName = panelObj.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+            panel.characterIcon = panelObj.transform.Find("CharacterIcon").GetComponent<Image>();
+            if (enemies[i].enemyType != null && enemies[i].enemyType.panelIcon != null)
+                panel.characterIcon.sprite = enemies[i].enemyType.panelIcon;
 
             panel.hpFill = panelObj.transform.Find("HP_Background/HP_Fill").GetComponent<Image>();
             panel.normalHpColor = panel.hpFill.color;
@@ -231,7 +239,7 @@ public class UIMain : MonoBehaviour
             if (enemy != null && enemy.gameObject.activeInHierarchy)
             {
                 enemypanel[i].enemyPanel.SetActive(true);
-                enemypanel[i].EnemyName.text = enemy.DisplayName + "  SPD " + enemy.Speed;
+                enemypanel[i].EnemyName.text = enemy.DisplayName;
 
                 float targetHP = (float)enemy.currentHP / enemy.enemyType.maxHp;
                 enemydisplayedHP[i] = Mathf.Lerp(enemydisplayedHP[i], targetHP, Time.deltaTime * 8f);
@@ -295,7 +303,7 @@ public class UIMain : MonoBehaviour
             if (hero != null && hero.gameObject.activeInHierarchy)
             {
                 heropanel[i].heroPanel.SetActive(true);
-                heropanel[i].HeroName.text = hero.heroType.heroName + "  SPD " + hero.Speed;
+                heropanel[i].HeroName.text = hero.heroType.heroName;
 
                 // HP
                 float targetHP = (float)hero.currentHP / hero.heroType.maxHp;
