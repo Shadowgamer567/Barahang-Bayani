@@ -130,7 +130,11 @@ public class GameAuthManager : MonoBehaviour
             ProgressManager.Instance.SetActiveAccount(CurrentAccount.ActiveAccount);
     }
 
+#if UNITY_EDITOR
+    private const bool USE_EMULATOR = true;
+#else
     private const bool USE_EMULATOR = false;
+#endif
 
     private HttpListener listener;
     private string expectedState;

@@ -332,4 +332,9 @@ public class MainMenu : MonoBehaviour
 
         optionsBackButton.SetActive(false);
     }
+
+    public void OpenAdminPage()
+    {
+        Application.OpenURL("https://barahangbayani.web.app/index.html");
+    }
 }

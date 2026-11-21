@@ -12,7 +12,11 @@ using UnityEngine.Networking;
 /// </summary>
 public static class WebsiteCallableClient
 {
+#if UNITY_EDITOR
+    private const bool USE_EMULATOR = true;
+#else
     private const bool USE_EMULATOR = false;
+#endif
 
     private const string PROJECT_ID = "barahangbayani";
     private const string REGION = "us-central1";
@@ -156,7 +160,7 @@ public static class WebsiteCallableClient
     {
         return "{}";
     }
-    
+
     private static string BuildEndpoint(string functionName)
     {
         if (USE_EMULATOR)

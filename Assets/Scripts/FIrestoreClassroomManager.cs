@@ -163,7 +163,7 @@ public class FirestoreClassroomManager : MonoBehaviour
             }
 
             if (openClassroomCreationButton != null)
-                openClassroomCreationButton.SetActive(auth.IsTeacher);
+                openClassroomCreationButton.SetActive(auth.IsTeacher || auth.IsStudent);
 
             Debug.Log("Loaded " + availableClassrooms.Count +
                 " authorized website classroom(s) for " + auth.Role + ".");
@@ -260,9 +260,9 @@ public class FirestoreClassroomManager : MonoBehaviour
     public async void ConfirmClassroomCreation()
     {
         GameAuthManager auth = GameAuthManager.Instance;
-        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
+        if (auth == null || !auth.IsSignedIn || (!auth.IsTeacher && !auth.IsStudent))
         {
-            Debug.LogWarning("Only an authenticated website teacher can create a classroom.");
+            Debug.LogWarning("Only an authenticated website student or teacher can create a classroom.");
             return;
         }
 
@@ -328,7 +328,7 @@ public class FirestoreClassroomManager : MonoBehaviour
             availableClassrooms.AddRange(result.classrooms);
 
         if (openClassroomCreationButton != null)
-            openClassroomCreationButton.SetActive(auth.IsTeacher);
+            openClassroomCreationButton.SetActive(auth.IsTeacher || auth.IsStudent);
 
         ClearClassroomCards();
         foreach (WebsiteClassroomData classroom in availableClassrooms)
@@ -350,9 +350,9 @@ public class FirestoreClassroomManager : MonoBehaviour
     {
         GameAuthManager auth = GameAuthManager.Instance;
 
-        if (auth == null || !auth.IsSignedIn || !auth.IsTeacher)
+        if (auth == null || !auth.IsSignedIn || (!auth.IsTeacher && !auth.IsStudent))
         {
-            Debug.LogWarning("Classroom creation is available only to website teachers.");
+            Debug.LogWarning("Classroom creation is available to website students and teachers.");
             return;
         }
 

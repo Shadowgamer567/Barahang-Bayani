@@ -16,7 +16,11 @@ public class FirebaseManager : MonoBehaviour
 
     private static Task initializationTask = Task.CompletedTask;
 
+#if UNITY_EDITOR
+    private const bool USE_FIREBASE_EMULATOR = true;
+#else
     private const bool USE_FIREBASE_EMULATOR = false;
+#endif
 
     private void Awake()
     {
