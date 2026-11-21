@@ -12,11 +12,7 @@ using UnityEngine.Networking;
 /// </summary>
 public static class WebsiteCallableClient
 {
-#if UNITY_EDITOR
-    private const bool USE_EMULATOR = true;
-#else
-    private const bool USE_EMULATOR = false;
-#endif
+    private static bool UseEmulator => FirebaseManager.UseEmulator;
 
     private const string PROJECT_ID = "barahangbayani";
     private const string REGION = "us-central1";
@@ -163,7 +159,7 @@ public static class WebsiteCallableClient
 
     private static string BuildEndpoint(string functionName)
     {
-        if (USE_EMULATOR)
+        if (UseEmulator)
         {
             return "http://127.0.0.1:5001/" +
                    PROJECT_ID + "/" + REGION + "/" + functionName;

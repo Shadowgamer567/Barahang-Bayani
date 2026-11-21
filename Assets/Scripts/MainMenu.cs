@@ -335,6 +335,12 @@ public class MainMenu : MonoBehaviour
 
     public void OpenAdminPage()
     {
-        Application.OpenURL("https://barahangbayani.web.app/index.html");
+        string adminPageUrl = FirebaseManager.UseEmulator
+            ? "http://127.0.0.1:5500/index.html"
+            : "https://barahangbayani.web.app/index.html";
+
+        Application.OpenURL(adminPageUrl);
+
+        Debug.Log("Opening Admin Page: " + adminPageUrl);
     }
 }

@@ -130,11 +130,7 @@ public class GameAuthManager : MonoBehaviour
             ProgressManager.Instance.SetActiveAccount(CurrentAccount.ActiveAccount);
     }
 
-#if UNITY_EDITOR
-    private const bool USE_EMULATOR = true;
-#else
-    private const bool USE_EMULATOR = false;
-#endif
+    private bool UseEmulator => FirebaseManager.UseEmulator;
 
     private HttpListener listener;
     private string expectedState;
@@ -387,7 +383,7 @@ public class GameAuthManager : MonoBehaviour
             _ = WaitForBrowserCallback();
 
             string redirect = "http://127.0.0.1:" + callbackPort + "/";
-            string baseUrl = USE_EMULATOR ? emulatorLoginUrl : productionLoginUrl;
+            string baseUrl = UseEmulator ? emulatorLoginUrl : productionLoginUrl;
             string loginUrl = baseUrl +
                 (baseUrl.Contains("?") ? "&" : "?") +
                 "unity=1&redirect=" + Uri.EscapeDataString(redirect) +
@@ -621,7 +617,7 @@ public class GameAuthManager : MonoBehaviour
     {
         Debug.Log("[GameAuth] RedeemCode started.");
 
-        string endpoint = USE_EMULATOR ? emulatorRedeemUrl : productionRedeemUrl;
+        string endpoint = UseEmulator ? emulatorRedeemUrl : productionRedeemUrl;
 
         Debug.Log("[GameAuth] Redemption endpoint: " + endpoint);
 

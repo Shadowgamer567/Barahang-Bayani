@@ -2,17 +2,12 @@
 using UnityEngine;
 using Firebase.Firestore;
 
+[DefaultExecutionOrder(-900)]
 public class FirestoreManager : MonoBehaviour
 {
     public static FirestoreManager Instance;
 
     public FirebaseFirestore DB { get; private set; }
-
-#if UNITY_EDITOR
-    private const bool USE_FIREBASE_EMULATOR = true;
-#else
-    private const bool USE_FIREBASE_EMULATOR = false;
-#endif
 
     private void Awake()
     {
@@ -22,10 +17,12 @@ public class FirestoreManager : MonoBehaviour
 
             DontDestroyOnLoad(gameObject);
 
+            // FirebaseManager runs before this component and selects the
+            // environment synchronously in its Awake method.
             DB = FirebaseFirestore.DefaultInstance;
 
             // Configure Firestore before any database operations.
-            if (USE_FIREBASE_EMULATOR)
+            if (FirebaseManager.UseEmulator)
             {
                 DB.Settings.Host = "127.0.0.1:8080";
                 DB.Settings.SslEnabled = false;
