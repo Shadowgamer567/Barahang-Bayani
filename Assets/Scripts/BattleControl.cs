@@ -643,6 +643,10 @@ public class BattleControl : MonoBehaviour
         if (activeHero != null) activeHero.DecayShieldOverflow();
         resetActionPointsOnNextHeroTurn = currentActionPoint <= 0 || !HasPlayableCardInHand();
 
+        // Apply enemy bleed after the hero ends their turn, before the next actor can act.
+        ProcessEnemyBleedEffects();
+        if (battleAlreadyWon || isLevelFinished) return;
+
         UpdateUI();
 
         Debug.Log("Advancing to next turn actor");
@@ -670,11 +674,6 @@ public class BattleControl : MonoBehaviour
 
     private IEnumerator EnemyActorTurn(EnemyStats enemy)
     {
-        if (IsAlive(enemy))
-        {
-            ProcessEnemyBleedEffect(enemy);
-        }
-
         if (IsAlive(enemy))
         {
             EnemyAction action = ChooseEnemyAction(enemy) ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
@@ -707,12 +706,6 @@ public class BattleControl : MonoBehaviour
             if (penaltyActorIndex >= 0) turnIndex = penaltyActorIndex;
             UpdateTurnOrderDisplay();
             SetActiveWorldArrow(enemy.currentModel != null ? enemy.currentModel.transform : enemy.transform);
-            ProcessEnemyBleedEffect(enemy);
-            if (!IsAlive(enemy))
-            {
-                if (battleAlreadyWon || isLevelFinished) yield break;
-                continue;
-            }
             EnemyAction action = GetStrongestPenaltyAttack(enemy);
             ExecuteEnemyAction(enemy, action, true);
             if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
@@ -739,21 +732,6 @@ public class BattleControl : MonoBehaviour
         if (battleLog != null)
         {
             battleLog.AddLog(isPenaltyTurn ? "--- Enemy Penalty Turn ---" : "--- Enemy Turn ---");
-        }
-
-        // Bleed activates only when the player normally ends their turn.
-        if (!isPenaltyTurn)
-        {
-            ProcessEnemyBleedEffects();
-
-            // Allow death animations to finish before enemy actions.
-            yield return new WaitForSecondsRealtime(1f);
-
-            // Bleed may have defeated every enemy.
-            if (battleAlreadyWon || isLevelFinished || currentstate == BattleState.Win)
-            {
-                yield break;
-            }
         }
 
         yield return new WaitForSecondsRealtime(1f);
