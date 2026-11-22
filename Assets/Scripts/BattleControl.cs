@@ -529,8 +529,6 @@ public class BattleControl : MonoBehaviour
             if (turnIndex >= turnOrder.Count)
             {
                 turnIndex = 0;
-                ProcessEnemyBleedEffects();
-                if (battleAlreadyWon || isLevelFinished) return;
                 DecayShieldOverflow(true, true);
                 RebuildTurnOrder();
                 turnIndex = -1;
@@ -674,9 +672,15 @@ public class BattleControl : MonoBehaviour
     {
         if (IsAlive(enemy))
         {
+            ProcessEnemyBleedEffect(enemy);
+        }
+
+        if (IsAlive(enemy))
+        {
             EnemyAction action = ChooseEnemyAction(enemy) ?? new EnemyAction { actionType = EnemyActionType.Attack, value = 0 };
             ExecuteEnemyAction(enemy, action);
         }
+        if (battleAlreadyWon || isLevelFinished) yield break;
         if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
         if (IsAlive(enemy)) enemy.DecayShieldOverflow();
         if (turnTransitionDelay > 0f) yield return new WaitForSecondsRealtime(turnTransitionDelay);
@@ -703,6 +707,12 @@ public class BattleControl : MonoBehaviour
             if (penaltyActorIndex >= 0) turnIndex = penaltyActorIndex;
             UpdateTurnOrderDisplay();
             SetActiveWorldArrow(enemy.currentModel != null ? enemy.currentModel.transform : enemy.transform);
+            ProcessEnemyBleedEffect(enemy);
+            if (!IsAlive(enemy))
+            {
+                if (battleAlreadyWon || isLevelFinished) yield break;
+                continue;
+            }
             EnemyAction action = GetStrongestPenaltyAttack(enemy);
             ExecuteEnemyAction(enemy, action, true);
             if (CheckLoseCondition()) { HandleBattleLost(); yield break; }
@@ -1735,24 +1745,21 @@ public class BattleControl : MonoBehaviour
 
         foreach (EnemyStats enemy in enemies)
         {
-            if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead || enemy.BleedValue <= 0)
-            {
-                continue;
-            }
-
-            int damage = enemy.BleedValue;
-            int previousHP = enemy.currentHP;
-
-            enemy.ProcessBleed();
-
-            int actualDamage = previousHP - enemy.currentHP;
-
-            if (battleLog != null && actualDamage > 0)
-            {
-                battleLog.AddLog( $"{enemy.DisplayName} suffered " + $"{actualDamage} Bleed Damage, ignoring Shield. " + $"Remaining Bleed: {enemy.BleedValue}."
-                );
-            }
+            ProcessEnemyBleedEffect(enemy);
         }
+    }
+
+    private void ProcessEnemyBleedEffect(EnemyStats enemy)
+    {
+        if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.isDead || enemy.BleedValue <= 0)
+            return;
+
+        int previousHP = enemy.currentHP;
+        enemy.ProcessBleed();
+        int actualDamage = previousHP - enemy.currentHP;
+
+        if (battleLog != null && actualDamage > 0)
+            battleLog.AddLog($"{enemy.DisplayName} suffered {actualDamage} Bleed Damage, ignoring Shield. Remaining Bleed: {enemy.BleedValue}.");
     }
 
     private void DecayShieldOverflow(bool decayHeroes, bool decayEnemies)
