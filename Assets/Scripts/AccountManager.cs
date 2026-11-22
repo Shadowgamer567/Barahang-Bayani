@@ -1097,7 +1097,7 @@ public class AccountManager : MonoBehaviour
 
         pendingStudents.Clear();
 
-        if (assigningTeacher.assignedStudentIDs == null)assigningTeacher.assignedStudentIDs = new List<string>();
+        if (assigningTeacher.assignedStudentIDs == null) assigningTeacher.assignedStudentIDs = new List<string>();
 
         // Start with students already assigned to this teacher.
         foreach (AccountData student in registry.accounts)
@@ -1288,6 +1288,10 @@ public class AccountManager : MonoBehaviour
 
         RefreshWebsiteAccountDetails();
         ConfigureAccountViewsForRole();
+
+        // Refresh the signed-in website user's own progress whenever the
+        // Account Menu opens. Never request cloud progress for a signed-out user.
+        RefreshSignedInUserProgressOnAccountMenuOpen();
 
         // Show the classroom section.
         if (classroomSelectionPanel != null)
@@ -2520,7 +2524,7 @@ public class AccountManager : MonoBehaviour
             {
                 if (DatabaseManager.Instance == null || DatabaseManager.Instance.CurrentDatabase != synchronizationClassroomID)
                 {
-                    Debug.LogWarning("Pending account synchronization stopped: " +"The active classroom changed."
+                    Debug.LogWarning("Pending account synchronization stopped: " + "The active classroom changed."
                     );
 
                     break;
@@ -2804,6 +2808,35 @@ public class AccountManager : MonoBehaviour
         // Hide Login/Signup after successful authentication.
         if (loginSignupButton != null)
             loginSignupButton.SetActive(false);
+    }
+
+    private void RefreshSignedInUserProgressOnAccountMenuOpen()
+    {
+        GameAuthManager auth = GameAuthManager.Instance;
+
+        if (auth == null || !auth.IsSignedIn)
+        {
+            Debug.Log("[Account Menu] Progress refresh skipped: no website user is signed in.");
+            return;
+        }
+
+        TeacherStudentProgressManager progressManager =
+            TeacherStudentProgressManager.Instance;
+
+        if (progressManager == null)
+        {
+            Debug.LogWarning("[Account Menu] Progress refresh skipped: progress manager is unavailable.");
+            return;
+        }
+
+        if (auth.IsStudent)
+        {
+            progressManager.LoadStudentOwnProgress();
+        }
+        else if (auth.IsTeacher)
+        {
+            progressManager.LoadTeacherOwnProgress();
+        }
     }
 
     private void ConfigureAccountViewsForRole()
