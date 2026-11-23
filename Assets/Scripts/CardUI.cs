@@ -1,6 +1,7 @@
 //Handles Card effect logic
 
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,6 +27,8 @@ public class CardUI : MonoBehaviour
     private CardPanelManager cardManager;
     private QuizManager quizManager;
     private UIMain uiMain;
+    private GameObject cardTypeIndicator;
+    private static readonly Dictionary<CardEffectType, Sprite> effectIconCache = new Dictionary<CardEffectType, Sprite>();
 
     public CardType Type => cardType;
     public Sprite CurrentBackground => cardBackground != null ? cardBackground.sprite : null;
@@ -58,6 +61,7 @@ public class CardUI : MonoBehaviour
         descriptionText.richText = true;
         descriptionText.text = CombatTextFormatter.Colorize(type.cardShortDesc);
         UpdateCardOutline(type.effectType);
+        UpdateTypeIndicator(type.effectType);
 
         if (cardBackground != null)
         {
@@ -76,6 +80,102 @@ public class CardUI : MonoBehaviour
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnClick);
     }
+
+    private void UpdateTypeIndicator(CardEffectType effectType)
+    {
+        if (cardTypeIndicator == null)
+        {
+            cardTypeIndicator = new GameObject("Card Type Indicator", typeof(RectTransform), typeof(Image));
+            RectTransform indicatorRect = cardTypeIndicator.GetComponent<RectTransform>();
+            indicatorRect.SetParent(transform, false);
+            indicatorRect.anchorMin = new Vector2(0.5f, 1f);
+            indicatorRect.anchorMax = new Vector2(0.5f, 1f);
+            indicatorRect.pivot = new Vector2(0.5f, 0f);
+            indicatorRect.anchoredPosition = new Vector2(0f, 5f);
+            indicatorRect.sizeDelta = new Vector2(136f, 28f);
+
+            Image background = cardTypeIndicator.GetComponent<Image>();
+            background.color = new Color(0.12f, 0.1f, 0.08f, 0.94f);
+            background.raycastTarget = false;
+
+            GameObject iconObject = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+            RectTransform iconRect = iconObject.GetComponent<RectTransform>();
+            iconRect.SetParent(indicatorRect, false);
+            iconRect.anchorMin = new Vector2(0f, 0.5f);
+            iconRect.anchorMax = new Vector2(0f, 0.5f);
+            iconRect.pivot = new Vector2(0f, 0.5f);
+            iconRect.anchoredPosition = new Vector2(5f, 0f);
+            iconRect.sizeDelta = new Vector2(22f, 22f);
+            Image iconImage = iconObject.GetComponent<Image>();
+            iconImage.preserveAspect = true;
+            iconImage.raycastTarget = false;
+
+            GameObject labelObject = new GameObject("Type Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+            labelRect.SetParent(indicatorRect, false);
+            labelRect.anchorMin = new Vector2(0f, 0f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.offsetMin = new Vector2(32f, 0f);
+            labelRect.offsetMax = new Vector2(-28f, 0f);
+            TextMeshProUGUI label = labelObject.GetComponent<TextMeshProUGUI>();
+            label.font = TMP_Settings.defaultFontAsset;
+            label.fontSize = 13f;
+            label.fontStyle = FontStyles.Bold;
+            label.color = Color.white;
+            label.alignment = TextAlignmentOptions.MidlineLeft;
+            label.raycastTarget = false;
+
+            GameObject questionObject = new GameObject("Question Type Icon", typeof(RectTransform), typeof(Image));
+            RectTransform questionRect = questionObject.GetComponent<RectTransform>();
+            questionRect.SetParent(indicatorRect, false);
+            questionRect.anchorMin = new Vector2(1f, 0.5f);
+            questionRect.anchorMax = new Vector2(1f, 0.5f);
+            questionRect.pivot = new Vector2(1f, 0.5f);
+            questionRect.anchoredPosition = new Vector2(-4f, 0f);
+            questionRect.sizeDelta = new Vector2(20f, 20f);
+            Image questionIconImage = questionObject.GetComponent<Image>();
+            questionIconImage.preserveAspect = true;
+            questionIconImage.raycastTarget = false;
+        }
+
+        Image icon = cardTypeIndicator.transform.Find("Icon").GetComponent<Image>();
+        TextMeshProUGUI typeLabel = cardTypeIndicator.transform.Find("Type Label").GetComponent<TextMeshProUGUI>();
+        Image questionIcon = cardTypeIndicator.transform.Find("Question Type Icon").GetComponent<Image>();
+        Sprite typeIcon = LoadEffectIcon(effectType);
+        icon.sprite = typeIcon;
+        icon.enabled = typeIcon != null;
+        Sprite questionSprite = Resources.Load<Sprite>("CardTypeIcons/Question");
+        questionIcon.sprite = questionSprite;
+        questionIcon.enabled = cardType != null && cardType.quizCard && questionSprite != null;
+        typeLabel.text = cardType != null && cardType.quizCard ? "QUESTION" : GetEffectLabel(effectType);
+        cardTypeIndicator.transform.SetAsLastSibling();
+    }
+
+    private static Sprite LoadEffectIcon(CardEffectType effectType)
+    {
+        if (!effectIconCache.TryGetValue(effectType, out Sprite icon))
+        {
+            icon = Resources.Load<Sprite>("CardTypeIcons/" + effectType.ToString());
+            effectIconCache[effectType] = icon;
+        }
+        return icon;
+    }
+
+    private static string GetEffectLabel(CardEffectType effectType)
+    {
+        switch (effectType)
+        {
+            case CardEffectType.Damage: return "ATTACK";
+            case CardEffectType.Heal: return "HEAL";
+            case CardEffectType.Shield: return "SHIELD";
+            case CardEffectType.Buff: return "BUFF";
+            case CardEffectType.Debuff: return "DEBUFF";
+            case CardEffectType.Piercing: return "PIERCING";
+            case CardEffectType.Bleed: return "BLEED";
+            default: return effectType.ToString().ToUpperInvariant();
+        }
+    }
+
     private void UpdateCardOutline(CardEffectType effectType)
     {
         if (cardOutline == null)

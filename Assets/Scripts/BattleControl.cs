@@ -570,7 +570,7 @@ public class BattleControl : MonoBehaviour
         FindFirstObjectByType<CardPanelManager>()?.RefillToMax(currentActionPoint);
         SetCardsInteractable(true);
         if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
-        if (battleLog != null) battleLog.AddLog("--- " + hero.heroType.heroName + "'s Turn (Speed " + hero.Speed + ") ---");
+        if (battleLog != null) battleLog.AddLog("--- " + hero.heroType.heroName + "'s Turn ---");
         UpdateUI();
         UpdateTurnOrderDisplay();
     }
