@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using UnityEngine;
@@ -134,6 +135,37 @@ public class GameAuthManager : MonoBehaviour
 
     private HttpListener listener;
     private string expectedState;
+
+    // Keep Unity running while the external browser is in front, then restore
+    // the user's previous setting when the game regains focus.
+    private bool previousRunInBackground;
+    private bool backgroundExecutionForLogin;
+
+    private void EnableBackgroundExecutionForLogin()
+    {
+        if (backgroundExecutionForLogin)
+            return;
+
+        previousRunInBackground = Application.runInBackground;
+        backgroundExecutionForLogin = true;
+        Application.runInBackground = true;
+
+        Debug.Log("[GameAuth] Background execution enabled for browser login.");
+    }
+
+    private void RestoreBackgroundExecution()
+    {
+        if (!backgroundExecutionForLogin)
+            return;
+
+        Application.runInBackground = previousRunInBackground;
+        backgroundExecutionForLogin = false;
+
+        Debug.Log("[GameAuth] Restored Application.runInBackground to " +
+            previousRunInBackground + ".");
+    }
+
+
     private int callbackPort;
     private string receivedCode;
     private string receivedState;
@@ -389,6 +421,7 @@ public class GameAuthManager : MonoBehaviour
                 "unity=1&redirect=" + Uri.EscapeDataString(redirect) +
                 "&state=" + Uri.EscapeDataString(expectedState);
 
+            EnableBackgroundExecutionForLogin();
             Application.OpenURL(loginUrl);
             StartCoroutine(WaitForCodeAndRedeem());
         }
@@ -396,6 +429,7 @@ public class GameAuthManager : MonoBehaviour
         {
             Debug.LogError("Unable to start website login: " + exception);
             StopListener();
+            RestoreBackgroundExecution();
             IsSigningIn = false;
         }
     }
@@ -748,6 +782,10 @@ public class GameAuthManager : MonoBehaviour
             Debug.Log("Website game sign-in successful. UID: " + StudentUID +
                 " | Role: " + Role);
 
+            // Login and Firebase token redemption have succeeded. Unity no
+            // longer needs to keep running in the background for the browser.
+            RestoreBackgroundExecution();
+
             IsSigningIn = false;
         }
     }
@@ -802,7 +840,9 @@ public class GameAuthManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        RestoreBackgroundExecution();
         StopListener();
+
         if (Instance == this)
             Instance = null;
     }

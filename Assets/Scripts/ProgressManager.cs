@@ -48,6 +48,7 @@ public class ProgressManager : MonoBehaviour
     private bool isSyncingQuizResults = false;
     private bool isReconcilingProgress = false;
     private bool isResettingPlaythrough = false;
+    private bool isStartingNewGame = false;
     private bool isAutomaticallySynchronizing = false;
     private int progressGeneration = 0;
     private string deletingAccountID = null;
@@ -252,8 +253,24 @@ public class ProgressManager : MonoBehaviour
 
     public void SetActiveAccount(AccountData account)
     {
-        progressGeneration++;
+        if (account == null)
+        {
+            ClearActiveAccount();
+            return;
+        }
 
+        // Classroom loading can re-select the already active classroom when
+        // the Account Menu refreshes. Rebinding the same session must not
+        // increment progressGeneration or invalidate an in-flight New Game reset.
+        if (currentAccount != null &&
+            currentAccount.id == account.id &&
+            currentAccount.classroomID == account.classroomID)
+        {
+            currentAccount = account;
+            return;
+        }
+
+        progressGeneration++;
         currentAccount = account;
 
         // Clear temporary statistics from the previous account/level.
@@ -765,51 +782,66 @@ public class ProgressManager : MonoBehaviour
     /// </summary>
     public async Task<bool> StartNewGameAndWaitForCloudAsync()
     {
-        if (!CanSynchronizeWithCloud())
+        if (isStartingNewGame)
         {
+            Debug.LogWarning("[New Game] A reset workflow is already running.");
+            return false;
+        }
+
+        isStartingNewGame = true;
+
+        try
+        {
+            if (!CanSynchronizeWithCloud())
+            {
+                if (currentAccount == null || IsAccountDeletionInProgress ||
+                    isResettingPlaythrough || pendingNewGameReset)
+                    return false;
+
+                // Use the locally saved playthrough as the baseline. The reset is
+                // marked pending and retained until an online server confirms it.
+                LoadProgress();
+                NewGame(false);
+                return pendingNewGameReset;
+            }
+
             if (currentAccount == null || IsAccountDeletionInProgress ||
                 isResettingPlaythrough || pendingNewGameReset)
+            {
+                Debug.LogWarning("New Game cannot start: account state is not ready.");
+                return false;
+            }
+
+            // Load the cloud playthrough first so ResetPlaythrough receives the
+            // actual previousPlaythroughId for returning players.
+            bool loaded = await LoadProgressForActiveAccount();
+            if (!loaded || currentAccount == null)
                 return false;
 
-            // Use the locally saved playthrough as the baseline. The reset is
-            // marked pending and retained until an online server confirms it.
-            LoadProgress();
+            if (pendingNewGameReset)
+                return await RetryPendingNewGameResetInternal();
+
             NewGame(false);
-            return pendingNewGameReset;
-        }
+            if (!pendingNewGameReset)
+                return false;
 
-        if (currentAccount == null || IsAccountDeletionInProgress ||
-            isResettingPlaythrough || pendingNewGameReset)
+            string accountId = currentAccount.id;
+            string oldPlaythroughId = previousPlaythroughId;
+            string newPlaythroughId = playthroughId;
+            int operationGeneration = progressGeneration;
+
+            bool confirmed = await UploadNewGameProgress(
+                accountId, oldPlaythroughId, newPlaythroughId, operationGeneration);
+
+            return confirmed && !pendingNewGameReset &&
+                currentAccount != null && currentAccount.id == accountId &&
+                playthroughId == newPlaythroughId &&
+                progressGeneration == operationGeneration;
+        }
+        finally
         {
-            Debug.LogWarning("New Game cannot start: account state is not ready.");
-            return false;
+            isStartingNewGame = false;
         }
-
-        // Load the cloud playthrough first so ResetPlaythrough receives the
-        // actual previousPlaythroughId for returning players.
-        bool loaded = await LoadProgressForActiveAccount();
-        if (!loaded || currentAccount == null)
-            return false;
-
-        if (pendingNewGameReset)
-            return await RetryPendingNewGameResetInternal();
-
-        NewGame(false);
-        if (!pendingNewGameReset)
-            return false;
-
-        string accountId = currentAccount.id;
-        string oldPlaythroughId = previousPlaythroughId;
-        string newPlaythroughId = playthroughId;
-        int operationGeneration = progressGeneration;
-
-        bool confirmed = await UploadNewGameProgress(
-            accountId, oldPlaythroughId, newPlaythroughId, operationGeneration);
-
-        return confirmed && !pendingNewGameReset &&
-            currentAccount != null && currentAccount.id == accountId &&
-            playthroughId == newPlaythroughId &&
-            progressGeneration == operationGeneration;
     }
 
     public void NewGame(bool uploadToFirestore = true)
@@ -911,7 +943,15 @@ public class ProgressManager : MonoBehaviour
             playthroughId != expectedPlaythroughId ||
             progressGeneration != operationGeneration)
         {
-            Debug.LogWarning("New Game confirmation ignored: Account or playthrough changed.");
+            Debug.LogWarning(
+                "[New Game] Confirmation ignored because the active session changed. " +
+                "Expected Account: " + accountId +
+                ", Actual Account: " + (currentAccount != null ? currentAccount.id : "<none>") +
+                ", Expected Playthrough: " + expectedPlaythroughId +
+                ", Actual Playthrough: " + playthroughId +
+                ", Expected Generation: " + operationGeneration +
+                ", Actual Generation: " + progressGeneration
+            );
             return;
         }
 

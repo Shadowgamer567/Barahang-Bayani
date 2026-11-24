@@ -6,6 +6,10 @@ public class MainMenu : MonoBehaviour
 {
     public static bool IsOptionsMenuOpen { get; private set; }
 
+    // Prevent multiple login/classroom callbacks from starting overlapping
+    // New Game reset operations.
+    private static bool isStartingNewGame;
+
     public ProgressManager loadGame;
 
     [SerializeField] private GameObject optionsMenu;
@@ -59,33 +63,50 @@ public class MainMenu : MonoBehaviour
 
     public static async void StartNewGame()
     {
-        ProgressManager progress = ProgressManager.Instance;
-        if (progress == null)
+        if (isStartingNewGame)
         {
-            Debug.LogError("Cannot start New Game: ProgressManager is missing.");
-            return;
-        }
-
-        bool resetConfirmed = await progress.StartNewGameAndWaitForCloudAsync();
-        if (!resetConfirmed)
-        {
-            Debug.LogError(
-                "New Game was not started because Firestore did not confirm the playthrough reset. " +
-                "Check the connection and try again."
+            Debug.LogWarning(
+                "[New Game] A start request is already running. Ignoring duplicate request."
             );
             return;
         }
 
-        if (TutorialManager.Instance != null)
-            TutorialManager.Instance.StartTutorial();
+        isStartingNewGame = true;
 
-        if (SceneTransitionManager.Instance == null)
+        try
         {
-            Debug.LogError("Cannot start New Game: SceneTransitionManager is missing.");
-            return;
-        }
+            ProgressManager progress = ProgressManager.Instance;
+            if (progress == null)
+            {
+                Debug.LogError("Cannot start New Game: ProgressManager is missing.");
+                return;
+            }
 
-        SceneTransitionManager.Instance.SwitchScene("MapMenu", true);
+            bool resetConfirmed = await progress.StartNewGameAndWaitForCloudAsync();
+            if (!resetConfirmed)
+            {
+                Debug.LogError(
+                    "New Game was not started because Firestore did not confirm the playthrough reset. " +
+                    "Check the connection and try again."
+                );
+                return;
+            }
+
+            if (TutorialManager.Instance != null)
+                TutorialManager.Instance.StartTutorial();
+
+            if (SceneTransitionManager.Instance == null)
+            {
+                Debug.LogError("Cannot start New Game: SceneTransitionManager is missing.");
+                return;
+            }
+
+            SceneTransitionManager.Instance.SwitchScene("MapMenu", true);
+        }
+        finally
+        {
+            isStartingNewGame = false;
+        }
     }
 
     public async void LoadGame()
@@ -259,7 +280,7 @@ public class MainMenu : MonoBehaviour
     {
         Application.Quit();
     }
-    
+
     public void RegionSelect_Back()
     {
         SceneTransitionManager.Instance.SwitchScene("MainMenu");
