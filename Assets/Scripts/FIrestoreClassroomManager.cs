@@ -121,6 +121,8 @@ public class FirestoreClassroomManager : MonoBehaviour
                 card.Setup(classroom.id, displayName);
             }
 
+            RefreshClassroomCardSelection();
+
             // Automatically select a classroom if none is selected
             // or if the previous selection is no longer available.
             string currentSelectedID = auth.SelectedClassroomID;
@@ -238,6 +240,8 @@ public class FirestoreClassroomManager : MonoBehaviour
                 currentClassroomText.text = string.IsNullOrWhiteSpace(selected.name)
                     ? selected.id
                     : selected.name;
+
+            RefreshClassroomCardSelection();
 
             // The account database is intentionally not downloaded here.
             // Progress loading is kept out of this stage until its production
@@ -414,6 +418,29 @@ public class FirestoreClassroomManager : MonoBehaviour
             WebsiteClassroomData selected = availableClassrooms.Find(
                 item => item != null && item.id == GameAuthManager.Instance.SelectedClassroomID);
             currentClassroomText.text = selected != null ? selected.name : GameAuthManager.Instance.SelectedClassroomID;
+        }
+
+        RefreshClassroomCardSelection();
+    }
+
+    private void RefreshClassroomCardSelection()
+    {
+        if (classroomContainer == null)
+            return;
+
+        GameAuthManager auth = GameAuthManager.Instance;
+        string selectedID = auth != null ? auth.SelectedClassroomID : "";
+
+        for (int i = 0; i < classroomContainer.childCount; i++)
+        {
+            ClassroomCardUI card = classroomContainer.GetChild(i).GetComponent<ClassroomCardUI>();
+            if (card == null)
+                continue;
+
+            card.SetSelected(
+                !string.IsNullOrWhiteSpace(selectedID) &&
+                string.Equals(card.GetClassroomID(), selectedID, StringComparison.Ordinal)
+            );
         }
     }
 
