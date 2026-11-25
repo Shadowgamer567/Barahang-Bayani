@@ -420,6 +420,44 @@ public class FirestoreClassroomManager : MonoBehaviour
             currentClassroomText.text = selected != null ? selected.name : GameAuthManager.Instance.SelectedClassroomID;
         }
 
+        // Scene objects are destroyed when MainMenu unloads. Rebuild cards from
+        // the persistent manager cache when AccountUIReferences reconnects.
+        RebuildClassroomCards();
+
+        if (availableClassrooms.Count == 0 && GameAuthManager.Instance != null &&
+            GameAuthManager.Instance.IsSignedIn)
+        {
+            LoadClassrooms();
+        }
+    }
+
+    private void RebuildClassroomCards()
+    {
+        if (classroomContainer == null || classroomCardPrefab == null)
+            return;
+
+        ClearClassroomCards();
+        foreach (WebsiteClassroomData classroom in availableClassrooms)
+        {
+            if (classroom == null || string.IsNullOrWhiteSpace(classroom.id))
+                continue;
+
+            GameObject cardObject = Instantiate(classroomCardPrefab, classroomContainer);
+            cardObject.SetActive(true);
+            ClassroomCardUI card = cardObject.GetComponent<ClassroomCardUI>();
+            if (card == null)
+            {
+                Debug.LogError("Classroom card prefab is missing ClassroomCardUI.");
+                Destroy(cardObject);
+                continue;
+            }
+
+            string displayName = string.IsNullOrWhiteSpace(classroom.name)
+                ? classroom.id
+                : classroom.name;
+            card.Setup(classroom.id, displayName);
+        }
+
         RefreshClassroomCardSelection();
     }
 
