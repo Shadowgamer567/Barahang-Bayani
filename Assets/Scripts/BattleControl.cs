@@ -93,7 +93,7 @@ public class BattleControl : MonoBehaviour
     public bool IsTargetingEnemies =>
     isSelectingTarget &&
     pendingCard != null &&
-    (pendingCard.effectType == CardEffectType.Damage || 
+    (pendingCard.effectType == CardEffectType.Damage ||
      pendingCard.effectType == CardEffectType.Piercing ||
      pendingCard.effectType == CardEffectType.Debuff ||
      pendingCard.effectType == CardEffectType.Bleed);
@@ -116,6 +116,9 @@ public class BattleControl : MonoBehaviour
     private readonly List<TurnActor> turnOrder = new List<TurnActor>();
     private int turnIndex = -1;
     private HeroStats activeHero;
+
+    // Current Hero context used to filter newly drawn custom cards.
+    public HeroType ActiveHeroType => activeHero != null ? activeHero.heroType : null;
     private Transform activeWorldArrowTarget;
     private Transform activeWorldArrowHeadTarget;
     private GameObject activeWorldArrowObject;
@@ -154,7 +157,7 @@ public class BattleControl : MonoBehaviour
 
         SetupHeroes();
 
-        
+
     }
 
     public enum BattleState
@@ -173,7 +176,7 @@ public class BattleControl : MonoBehaviour
         enemies = enemyController.GetComponentsInChildren<EnemyStats>(true);
 
         aliveEnemies = 0;
-        foreach(var e in enemies)
+        foreach (var e in enemies)
         {
             if (e.gameObject.activeInHierarchy)
             {
@@ -231,7 +234,7 @@ public class BattleControl : MonoBehaviour
 
     void SetupEnemies()
     {
-        battleAlreadyWon = false; 
+        battleAlreadyWon = false;
         // A new battle starts with a full AP pool on its first hero turn.
         currentActionPoint = 0;
         resetActionPointsOnNextHeroTurn = true;
@@ -856,7 +859,7 @@ public class BattleControl : MonoBehaviour
 
                         else if (shieldDamage > 0)
                         {
-                            battleLog.AddLog($"{enemyName} attacked {targetName}, " +$"removing {shieldDamage} Shield.");
+                            battleLog.AddLog($"{enemyName} attacked {targetName}, " + $"removing {shieldDamage} Shield.");
                         }
 
                         else
@@ -871,7 +874,7 @@ public class BattleControl : MonoBehaviour
 
             case EnemyActionType.Shield:
                 EnemyStats shieldTarget = SelectEnemyAllyTarget(EnemyActionType.Shield, enemy);
-                
+
                 //Temp Debug
                 if (shieldTarget != null)
                 {
@@ -920,7 +923,7 @@ public class BattleControl : MonoBehaviour
 
                     if (battleLog != null)
                     {
-                        battleLog.AddLog($"{enemyName} used Heal, restoring " +$"{actualHeal} HP to " + $"{healTarget.DisplayName}.");
+                        battleLog.AddLog($"{enemyName} used Heal, restoring " + $"{actualHeal} HP to " + $"{healTarget.DisplayName}.");
                     }
                 }
                 break;
@@ -979,7 +982,7 @@ public class BattleControl : MonoBehaviour
                     battleLog.AddLog($"{enemyName} used Debuff, reducing " + $"the player's next action value by {debuffAmount}.");
                 }
 
-                Debug.Log(enemy.name +" debuffed the player team by " + action.value);
+                Debug.Log(enemy.name + " debuffed the player team by " + action.value);
                 break;
         }
     }
@@ -1602,7 +1605,7 @@ public class BattleControl : MonoBehaviour
                         }
                     }
 
-                    Debug.Log(actingHero.name + " dealt " + finalDamage +" damage to " + targetEnemy.name);
+                    Debug.Log(actingHero.name + " dealt " + finalDamage + " damage to " + targetEnemy.name);
                 }
                 break;
 
@@ -1625,12 +1628,12 @@ public class BattleControl : MonoBehaviour
                         );
                     }
 
-                    Debug.Log( actingHero.name + " dealt " + actualDamage + " Piercing Damage to " + targetEnemy.name);
+                    Debug.Log(actingHero.name + " dealt " + actualDamage + " Piercing Damage to " + targetEnemy.name);
                 }
                 break;
 
             case CardEffectType.Bleed:
-                if (targetEnemy != null &&!targetEnemy.isDead)
+                if (targetEnemy != null && !targetEnemy.isDead)
                 {
                     int finalBleed = calculatedValue ?? GetModifiedPlayerValue(value);
 
@@ -1643,7 +1646,7 @@ public class BattleControl : MonoBehaviour
                         battleLog.AddLog($"You played \"{card.cardName}\", " + $"applying {finalBleed} Bleed to " + $"{targetEnemy.DisplayName}.");
                     }
 
-                    Debug.Log(actingHero.name + " applied " + finalBleed + " Bleed to " +targetEnemy.name);
+                    Debug.Log(actingHero.name + " applied " + finalBleed + " Bleed to " + targetEnemy.name);
                 }
                 break;
 
@@ -1827,7 +1830,7 @@ public class BattleControl : MonoBehaviour
                 {
                     if (enemy != null && enemy.gameObject.activeInHierarchy && !enemy.isDead)
                     {
-                        ExecuteCardEffect(card, actingHero, targetEnemy: enemy, calculatedValue: finalValue,suppressLog: true);
+                        ExecuteCardEffect(card, actingHero, targetEnemy: enemy, calculatedValue: finalValue, suppressLog: true);
 
                         enemiesAffected++;
                     }
@@ -1846,7 +1849,7 @@ public class BattleControl : MonoBehaviour
 
                 foreach (HeroStats hero in heroes)
                 {
-                    if (hero != null &&hero.gameObject.activeInHierarchy && !hero.IsDead())
+                    if (hero != null && hero.gameObject.activeInHierarchy && !hero.IsDead())
                     {
                         ExecuteCardEffect(card, actingHero, targetHero: hero, calculatedValue: finalValue, suppressLog: true);
 
@@ -1896,7 +1899,8 @@ public class BattleControl : MonoBehaviour
         {
             QuizManager quizManager = FindFirstObjectByType<QuizManager>();
 
-            if (quizManager != null) {
+            if (quizManager != null)
+            {
                 QuizQuestion q = quizManager.GetRandomQuestions();
                 quizManager.StartQuiz(q, card, this);
             }
@@ -1949,12 +1953,12 @@ public class BattleControl : MonoBehaviour
 
     public void ResolveQuizCard(CardType card)
     {
-        if(card == null)
+        if (card == null)
         {
             return;
         }
 
-        if(card.targetType == TargetType.AllEnemies || card.targetType == TargetType.AllHeroes || card.targetType == TargetType.Self)
+        if (card.targetType == TargetType.AllEnemies || card.targetType == TargetType.AllHeroes || card.targetType == TargetType.Self)
         {
             HeroStats selectedHero = GetHeroForCard(card);
 
@@ -1985,7 +1989,7 @@ public class BattleControl : MonoBehaviour
 
     public void SelectEnemyTarget(EnemyStats enemy)
     {
-        if (!isSelectingTarget || pendingCard == null || pendingHero == null || enemy == null ||enemy.IsDead())
+        if (!isSelectingTarget || pendingCard == null || pendingHero == null || enemy == null || enemy.IsDead())
         {
             return;
         }
@@ -2031,7 +2035,7 @@ public class BattleControl : MonoBehaviour
             card.effectType == CardEffectType.Damage ||
             card.effectType == CardEffectType.Piercing ||
             card.effectType == CardEffectType.Debuff ||
-            card.effectType == CardEffectType.Bleed 
+            card.effectType == CardEffectType.Bleed
             ? CharacterAnimationType.Attack
             : CharacterAnimationType.Action;
 
@@ -2486,7 +2490,7 @@ public class BattleControl : MonoBehaviour
 
         StartPlayerTurn();
 
-        if(battleNumber == 2)
+        if (battleNumber == 2)
         {
             Debug.Log("BattleControl: Second battle started.");
             OnSecondBattleStarted?.Invoke();

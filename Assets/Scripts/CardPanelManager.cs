@@ -69,7 +69,7 @@ public class CardPanelManager : MonoBehaviour
 
     public void DrawCard(int maxAffordableCost = int.MaxValue)
     {
-        if(cardPool == null || cardPool.Count == 0)
+        if (cardPool == null || cardPool.Count == 0)
         {
             return;
         }
@@ -77,7 +77,7 @@ public class CardPanelManager : MonoBehaviour
         List<CardPoolEntry> affordableCards = new List<CardPoolEntry>();
         foreach (CardPoolEntry candidate in cardPool)
         {
-            if (candidate != null && candidate.card != null && candidate.card.cost <= maxAffordableCost)
+            if (IsEligibleForActiveHero(candidate) && candidate.card.cost <= maxAffordableCost)
                 affordableCards.Add(candidate);
         }
 
@@ -86,7 +86,7 @@ public class CardPanelManager : MonoBehaviour
             List<CardPoolEntry> healingCards = new List<CardPoolEntry>();
             foreach (CardPoolEntry candidate in cardPool)
             {
-                if (candidate != null && candidate.card != null && candidate.card.effectType == CardEffectType.Heal)
+                if (IsEligibleForActiveHero(candidate) && candidate.card.effectType == CardEffectType.Heal)
                     healingCards.Add(candidate);
             }
 
@@ -111,6 +111,21 @@ public class CardPanelManager : MonoBehaviour
         CardPoolEntry entry = affordableCards[Random.Range(0, affordableCards.Count)];
 
         CreateCardFromEntry(entry);
+    }
+
+    // Only newly drawn cards are filtered. Existing hand instances are never removed.
+    // General cards (owner == null) are always eligible; custom cards must belong
+    // to the Hero whose turn is currently active.
+    private bool IsEligibleForActiveHero(CardPoolEntry entry)
+    {
+        if (entry == null || entry.card == null)
+            return false;
+
+        if (entry.owner == null)
+            return true;
+
+        HeroType activeHeroType = battle != null ? battle.ActiveHeroType : null;
+        return activeHeroType != null && entry.owner == activeHeroType;
     }
 
     private void CreateCardFromEntry(CardPoolEntry entry)
@@ -159,7 +174,7 @@ public class CardPanelManager : MonoBehaviour
         // Find all available non-Quiz Cards.
         foreach (CardPoolEntry entry in cardPool)
         {
-            if (entry.card != null && !entry.card.quizCard)
+            if (IsEligibleForActiveHero(entry) && !entry.card.quizCard)
             {
                 nonQuizCards.Add(entry);
             }
@@ -203,7 +218,7 @@ public class CardPanelManager : MonoBehaviour
 
         foreach (CardPoolEntry entry in cardPool)
         {
-            if (entry.card != null && entry.card.quizCard)
+            if (IsEligibleForActiveHero(entry) && entry.card.quizCard)
             {
                 quizEntry = entry;
                 break;
@@ -308,7 +323,7 @@ public class CardPanelManager : MonoBehaviour
                 if (hero.customCards == null)
                 {
                     continue;
-                } 
+                }
 
                 foreach (CardType card in hero.customCards)
                 {
@@ -364,7 +379,7 @@ public class CardPanelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void SyncToData(GameData data)
