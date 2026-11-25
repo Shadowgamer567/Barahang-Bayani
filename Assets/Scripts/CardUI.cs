@@ -122,7 +122,7 @@ public class CardUI : MonoBehaviour
             label.fontSize = 13f;
             label.fontStyle = FontStyles.Bold;
             label.color = Color.white;
-            label.alignment = TextAlignmentOptions.MidlineLeft;
+            label.alignment = TextAlignmentOptions.Midline;
             label.raycastTarget = false;
 
             GameObject questionObject = new GameObject("Question Type Icon", typeof(RectTransform), typeof(Image));
