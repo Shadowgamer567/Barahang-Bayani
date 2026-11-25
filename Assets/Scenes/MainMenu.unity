@@ -6973,7 +6973,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -18, y: 0}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &227593208
 MonoBehaviour:
@@ -16842,7 +16842,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.000009855224}
-  m_SizeDelta: {x: 0.5629883, y: 300}
+  m_SizeDelta: {x: 0.5629883, y: 63.43}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &536900298
 MonoBehaviour:
@@ -17660,6 +17660,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClassroomCardUI
   classroomNameText: {fileID: 116101159}
+  borderImage: {fileID: 0}
+  selectedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!4 &568640658 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a3576355c79f65948978f8d4e97f8d80, type: 3}
@@ -22218,7 +22220,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 50
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -22645,7 +22647,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4281479730
   m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -22658,19 +22660,19 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
+  m_fontSize: 50
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 50
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -31885,7 +31887,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 915119773}
   m_HandleRect: {fileID: 915119772}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -36847,7 +36849,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1894588640}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.2
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -37572,7 +37574,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1338444065}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.11147666}
+  m_AnchorMin: {x: 0, y: 0.11147654}
   m_AnchorMax: {x: 1, y: 0.9999999}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -55522,7 +55524,7 @@ RectTransform:
   m_Father: {fileID: 725742298}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.2}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -59802,8 +59804,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1237583909}
   m_HandleRect: {fileID: 1237583908}
   m_Direction: 2
-  m_Value: 1.000001
-  m_Size: 0.88852334
+  m_Value: 1
+  m_Size: 0.88852346
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
