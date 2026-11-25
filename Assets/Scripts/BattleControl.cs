@@ -24,6 +24,12 @@ public class BattleControl : MonoBehaviour
     [Header("Battle Log")]
     public BattleLogManager battleLog;
 
+    [Header("Card Ownership Warning")]
+    [SerializeField] private GameObject cardOwnershipWarningPanel;
+    [SerializeField, Min(0.5f)] private float cardOwnershipWarningDuration = 2.5f;
+    private TextMeshProUGUI cardOwnershipWarningText;
+    private Coroutine cardOwnershipWarningRoutine;
+
     [Header("Turn Order UI")]
     [SerializeField] private Color activeTurnColor = new Color(1f, 0.83f, 0.36f, 1f);
     [SerializeField] private string turnOrderTitle = "TURN ORDER";
@@ -133,6 +139,11 @@ public class BattleControl : MonoBehaviour
         SetEnemiesActive(false);
         if (notEnoughAPPanel != null) notEnoughAPPanel.SetActive(false);
         if (penaltyTurnPanel != null) penaltyTurnPanel.SetActive(false);
+        if (cardOwnershipWarningPanel != null)
+        {
+            cardOwnershipWarningText = cardOwnershipWarningPanel.GetComponentInChildren<TextMeshProUGUI>(true);
+            cardOwnershipWarningPanel.SetActive(false);
+        }
         CreateTurnOrderDisplay();
         CreateBattleProgressDisplay();
     }
@@ -1880,6 +1891,9 @@ public class BattleControl : MonoBehaviour
         if (cardHero == null || cardHero != activeHero)
         {
             Debug.Log("That hero's card can only be used on their turn.");
+            ShowCardOwnershipWarning(cardHero == null
+                ? "This card cannot be used by this Hero."
+                : "This card does not belong to this Hero.", cardUI);
             return false;
         }
 
@@ -1949,6 +1963,100 @@ public class BattleControl : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void ShowCardOwnershipWarning(string message, CardUI sourceCard)
+    {
+        if (battleLog != null) battleLog.AddLog(message);
+
+        if (cardOwnershipWarningPanel == null)
+        {
+            Canvas sourceCanvas = sourceCard != null ? sourceCard.GetComponentInParent<Canvas>() : null;
+            CreateCardOwnershipWarningPanel(sourceCanvas);
+        }
+
+        if (cardOwnershipWarningPanel == null || cardOwnershipWarningText == null)
+            return;
+
+        cardOwnershipWarningText.text = message;
+        cardOwnershipWarningPanel.SetActive(true);
+        cardOwnershipWarningPanel.transform.SetAsLastSibling();
+
+        if (cardOwnershipWarningRoutine != null)
+            StopCoroutine(cardOwnershipWarningRoutine);
+        cardOwnershipWarningRoutine = StartCoroutine(HideCardOwnershipWarningAfterDelay());
+    }
+
+    private void CreateCardOwnershipWarningPanel(Canvas preferredCanvas)
+    {
+        Canvas canvas = preferredCanvas;
+        if (canvas == null && endButton != null)
+        {
+            canvas = endButton.GetComponentInParent<Canvas>();
+        }
+        if (canvas == null)
+        {
+            Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            foreach (Canvas candidate in canvases)
+            {
+                if (candidate != null && candidate.isActiveAndEnabled && candidate.renderMode == RenderMode.ScreenSpaceOverlay)
+                {
+                    canvas = candidate;
+                    break;
+                }
+            }
+            if (canvas == null && canvases.Length > 0) canvas = canvases[0];
+        }
+        if (canvas == null)
+        {
+            Debug.LogWarning("Cannot show card ownership warning because no Canvas was found.");
+            return;
+        }
+
+        cardOwnershipWarningPanel = new GameObject("Card Ownership Warning Panel", typeof(RectTransform), typeof(Image), typeof(Outline));
+        RectTransform panelRect = cardOwnershipWarningPanel.GetComponent<RectTransform>();
+        panelRect.SetParent(canvas.transform, false);
+        panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+        panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+        panelRect.pivot = new Vector2(0.5f, 0.5f);
+        panelRect.anchoredPosition = Vector2.zero;
+        panelRect.sizeDelta = new Vector2(460f, 110f);
+
+        Image panelImage = cardOwnershipWarningPanel.GetComponent<Image>();
+        panelImage.color = new Color(0.16f, 0.09f, 0.06f, 0.97f);
+        panelImage.raycastTarget = false;
+        Outline outline = cardOwnershipWarningPanel.GetComponent<Outline>();
+        outline.effectColor = new Color(0.85f, 0.68f, 0.37f, 1f);
+        outline.effectDistance = new Vector2(3f, 3f);
+        outline.useGraphicAlpha = true;
+
+        GameObject textObject = new GameObject("Message", typeof(RectTransform), typeof(TextMeshProUGUI));
+        RectTransform textRect = textObject.GetComponent<RectTransform>();
+        textRect.SetParent(panelRect, false);
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = new Vector2(20f, 12f);
+        textRect.offsetMax = new Vector2(-20f, -12f);
+
+        cardOwnershipWarningText = textObject.GetComponent<TextMeshProUGUI>();
+        cardOwnershipWarningText.font = TMP_Settings.defaultFontAsset;
+        cardOwnershipWarningText.fontSize = 24f;
+        cardOwnershipWarningText.enableAutoSizing = true;
+        cardOwnershipWarningText.fontSizeMin = 17f;
+        cardOwnershipWarningText.fontSizeMax = 24f;
+        cardOwnershipWarningText.color = new Color(1f, 0.94f, 0.81f, 1f);
+        cardOwnershipWarningText.alignment = TextAlignmentOptions.Center;
+        cardOwnershipWarningText.textWrappingMode = TextWrappingModes.Normal;
+        cardOwnershipWarningText.raycastTarget = false;
+        cardOwnershipWarningPanel.SetActive(false);
+    }
+
+    private IEnumerator HideCardOwnershipWarningAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(cardOwnershipWarningDuration);
+        if (cardOwnershipWarningPanel != null)
+            cardOwnershipWarningPanel.SetActive(false);
+        cardOwnershipWarningRoutine = null;
     }
 
     public void ResolveQuizCard(CardType card)
