@@ -1,0 +1,9 @@
+ID:STUDENT_DCRUZ_QUIZ1
+1. Test Question.
+TYPE:TEXT
+INPUT:IDENTIFICATION
+A. wahaha "C"
+B.
+C.
+D.
+

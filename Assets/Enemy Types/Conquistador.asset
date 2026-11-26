@@ -13,14 +13,23 @@ MonoBehaviour:
   m_Name: Conquistador
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTypes
   enemyName: Spanish Conquestor
-  maxHp: 15
-  damage: 3
-  shield: 0
-  maxShield: 0
+  maxHp: 35
+  speed: 5
+  damage: 4
+  shield: 10
+  maxShield: 15
   panelIcon: {fileID: 21300000, guid: 112e695501f75775932cbda12b2d20ea, type: 3}
   prefab: {fileID: 5239452982573887266, guid: f028ec07a4f39c6438107414090da673, type: 3}
   actions:
   - actionType: 5
+    value: 6
+  - actionType: 0
+    value: 7
+  - actionType: 2
+    value: 6
+  - actionType: 3
+    value: 5
+  - actionType: 4
     value: 5
   attackWeight: 5
   healWeight: 3

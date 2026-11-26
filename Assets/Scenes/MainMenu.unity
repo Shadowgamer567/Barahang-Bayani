@@ -2920,7 +2920,7 @@ RectTransform:
   m_Father: {fileID: 491450094}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5173,12 +5173,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "**CREDITS**\n\n<size=34><b>DEVELOPMENT TEAM</b></size>\n\nPatino, Rozl
-    Angelo M.\nJasper, James Pedro V.\nDela Cruz, Stephen Dave\nRoberto, Sangueza
-    Jr L.\n\n<size=34><b>GAME DESIGN</b></size>\n\nPatino, Rozl Angelo M.\nJasper,
-    James Pedro V.\nDela Cruz, Stephen Dave\n\n<size=34><b>ARTWORK AND VISUAL ASSETS</b></size>\n\nJasper,
-    James Pedro V.\nPatino, Rozl Angelo M.\n\nSketchfab.com\n\n<size=34><b>MUSIC
-    AND SOUND</b></size>\n\nJasper, James Pedro V.\n\nPixabay.com\nMyInstants.com\n\n<size=34><b>HISTORICAL
-    REFERENCES</b></size>\n\nProject Gutenberg, for acrchinving of historical texts
+    Angelo M.\nPedro, Jasper James V.\nDela Cruz, Stephen Dave\nRoberto, Sangueza
+    Jr L.\n\n<size=34><b>GAME DESIGN</b></size>\n\nPatino, Rozl Angelo M.\nPedro,
+    Jasper James V.\nDela Cruz, Stephen Dave\n\n<size=34><b>ARTWORK AND VISUAL ASSETS</b></size>\n\nPedro,
+    Jasper James V.\nPatino, Rozl Angelo M.\n\nsketchfab.com\n\n<size=34><b>MUSIC
+    AND SOUND</b></size>\n\nPedro, Jasper James V.\n\npixabay.com/music\nmyinstants.com\n\n<size=34><b>HISTORICAL
+    REFERENCES</b></size>\n\nProject Gutenberg, for archiving of historical texts
     and publishing it for public use\r\n\r\nJose Rizal for writing memoirs about
     his life experiences\r\n\r\nAustin Craig, for being the birographer that documented
     Jose Rizal's ancestry and life\r\n\r\njoserizal.com for documenting comprehensive
@@ -6103,7 +6103,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1415663635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.6832242}
+  m_AnchorMin: {x: 0, y: 0.68314034}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -15337,7 +15337,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &496037985
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21721,7 +21721,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &698382346
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29346,7 +29346,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 197872789}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.31677577
+  m_Size: 0.31685966
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -37390,7 +37390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1230108111
 RectTransform:
   m_ObjectHideFlags: 0
@@ -51595,9 +51595,9 @@ RectTransform:
   m_Father: {fileID: 589972861}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -22.516, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1767764798
 MonoBehaviour:
@@ -52664,7 +52664,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1800435383
 MonoBehaviour:
