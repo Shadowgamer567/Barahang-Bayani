@@ -73,12 +73,24 @@ public static class AchievementManager
             if (isUnlocked)
                 unlockedCount++;
 
+            builder.Append("<sprite name=\"").Append(GetIconName(ids[i])).Append("\">  ");
             builder.Append(isUnlocked ? "[Unlocked] " : "[Locked] ");
             builder.AppendLine(titles[i]);
         }
 
         return "ACHIEVEMENTS (" + unlockedCount + "/" + ids.Length + ")\n" +
             builder.ToString();
+    }
+
+    public static string GetIconName(string id)
+    {
+        switch (id)
+        {
+            case "complete_tutorial": return "FirstSteps";
+            case "triple_elimination": return "TripleElimination";
+            case "master_healer": return "MasterHealer";
+            default: return "FirstSteps";
+        }
     }
 
     public static void SetActiveAccount(string accountId)
@@ -111,6 +123,7 @@ public static class AchievementManager
 
         SaveLocal();
         Debug.Log("Achievement unlocked: " + id);
+        AchievementPopupUI.Show(id);
 
         if (IsOnlineAuthenticated())
             _ = SynchronizeAsync();

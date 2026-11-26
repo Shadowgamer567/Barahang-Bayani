@@ -176,6 +176,7 @@ public class TeacherStudentProgressManager : MonoBehaviour
         studentCardPrefab = ui.studentProgressCardPrefab;
 
         progressDisplayText = ui.progressDisplayText;
+        AchievementInlineIcons.Apply(progressDisplayText);
 
         // Restore the logged-in student's cached progress
         // when the Main Menu UI reconnects.
@@ -498,6 +499,9 @@ public class TeacherStudentProgressManager : MonoBehaviour
             {
                 bool isUnlocked = unlocked.Contains(ids[i]);
                 if (isUnlocked) count++;
+                display.Append("<sprite name=\"")
+                    .Append(AchievementManager.GetIconName(ids[i]))
+                    .Append("\">  ");
                 display.Append(isUnlocked ? "[Unlocked] " : "[Locked] ");
                 display.AppendLine(titles[i]);
             }

@@ -4661,6 +4661,78 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &161613229
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 161613231}
+  - component: {fileID: 161613230}
+  m_Layer: 0
+  m_Name: Achievement Popup UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &161613230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161613229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c7dc77490a4d14a294f0912a9c5bf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AchievementPopupUI
+  achievements:
+  - id: complete_tutorial
+    title: First Steps
+    description: Complete the tutorial and begin your journey.
+    icon: {fileID: 21300000, guid: a2e58d9eefca1a44785874d862e3f55d, type: 3}
+    badgeColor: {r: 0.29, g: 0.68, b: 0.87, a: 1}
+  - id: triple_elimination
+    title: Triple Elimination
+    description: Defeat three enemies in a single turn.
+    icon: {fileID: 21300000, guid: 21d5975949174854ea6fa8866bb8a2c7, type: 3}
+    badgeColor: {r: 0.85, g: 0.32, b: 0.27, a: 1}
+  - id: master_healer
+    title: Master Healer
+    description: Restore 100 HP in one level.
+    icon: {fileID: 21300000, guid: c630f47a8e95b0048b3cfc182ed4de62, type: 3}
+    badgeColor: {r: 0.34, g: 0.72, b: 0.47, a: 1}
+  panelSize: {x: 540, y: 112}
+  topCenterOffset: {x: 0, y: -34}
+  panelColor: {r: 0.12, g: 0.1, b: 0.08, a: 0.97}
+  titleColor: {r: 1, g: 0.82, b: 0.4, a: 1}
+  descriptionColor: {r: 0.95, g: 0.93, b: 0.88, a: 1}
+  panelSprite: {fileID: 0}
+  defaultAchievementIcon: {fileID: 0}
+  font: {fileID: 11400000, guid: 6ac6a62f9c05cf24c8f7bf9abf879375, type: 2}
+  slideDistance: 150
+  slideDuration: 0.42
+  visibleDuration: 3.2
+  createPopupCanvasIfMissing: 1
+--- !u!4 &161613231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161613229}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &166436328
 GameObject:
   m_ObjectHideFlags: 0
@@ -62234,3 +62306,4 @@ SceneRoots:
   - {fileID: 1784880699}
   - {fileID: 1661978414}
   - {fileID: 281236445}
+  - {fileID: 161613231}
