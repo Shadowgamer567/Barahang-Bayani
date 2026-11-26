@@ -8,7 +8,7 @@ C. Leonore
 D. Saturnina "C"
 
 ID:RIZALCAMPAIGNQUIZ2
-2. At what age did Concepcion Rizal or Concha pass away from her illness? 
+2. At what age did Rizal's sister Concha die? 
 TYPE:TEXT
 INPUT:IDENTIFICATION
 A. Three "C"
@@ -21,7 +21,7 @@ ID:RIZALCAMPAIGNQUIZ3
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Calamba, Laguna
-B. Antipolo, Manila "C"
+B. Antipolo "C"
 C. Quezon City
 D. Sta. Cruz, Laguna
 
@@ -83,7 +83,7 @@ C. Soldier
 D. Sailor
 
 ID:RIZALCAMPAIGNQUIZ11
-11. Did Jose Rizal treat his mother's blindness?
+11. Did Rizal perform eye surgery on his mother?
 TYPE:TEXT
 INPUT:TRUE_OR_FALSE
 ANSWER:TRUE
@@ -98,10 +98,10 @@ C. Ferdinand Marcos
 D. Marcelo Del Pilar "C"
 
 ID:RIZALCAMPAIGNQUIZ13
-13. Was Jose Rizal executed by Spaniards?
+13. Was Rizal shot by a firing squad of Filipino soldiers?
 TYPE:TEXT
 INPUT:TRUE_OR_FALSE
-ANSWER:FALSE
+ANSWER:TRUE
 
 ID:RIZALCAMPAIGNQUIZ14
 14. When is Rizal Day celebrated?
@@ -161,7 +161,7 @@ C. Juancho
 D. Alberto
 
 ID:RIZALCAMPAIGNQUIZ21
-21. Who is Jose Rizal's closest friend? Select only one answer.
+21. Who among the following is Jose Rizal's closest friend? Select only one answer.
 TYPE:TEXT
 INPUT:MULTIPLE_CHOICE
 A. Jose Burgos
@@ -185,7 +185,7 @@ INPUT:TRUE_OR_FALSE
 ANSWER:FALSE
 
 ID:RIZALCAMPAIGNQUIZ24
-24. Trinidad is Jose Rizal's ____ sister.
+24. Soledad is Jose Rizal's ____ sister.
 TYPE:TEXT
 INPUT:FILL_IN_THE_BLANK
 A. Youngest "C"
