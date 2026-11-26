@@ -94,6 +94,9 @@ public class BattleControl : MonoBehaviour
     public System.Action OnCardPlayAccepted;
     public System.Action OnCardResolutionComplete;
 
+    private bool trackingCurrentCardDefeats;
+    private int currentCardDefeatCount;
+
     private CharacterAnimationRelay activeCardAnimationRelay;
 
     public bool IsTargetingEnemies =>
@@ -133,6 +136,7 @@ public class BattleControl : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        EnemyStats.OnEnemyDefeated += HandleEnemyDefeatedForAchievement;
         currentstate = BattleState.Busy;
         SetActiveWorldArrow(null);
         if (turnOrderArrowImage != null) turnOrderArrowImage.gameObject.SetActive(false);
@@ -1443,6 +1447,28 @@ public class BattleControl : MonoBehaviour
         OnBattleLost?.Invoke();
     }
 
+    private void BeginAchievementCardResolution()
+    {
+        trackingCurrentCardDefeats = true;
+        currentCardDefeatCount = 0;
+    }
+
+    private void EndAchievementCardResolution()
+    {
+        trackingCurrentCardDefeats = false;
+
+        if (currentCardDefeatCount >= 3)
+            AchievementManager.Unlock("triple_elimination");
+
+        currentCardDefeatCount = 0;
+    }
+
+    private void HandleEnemyDefeatedForAchievement(EnemyStats enemy)
+    {
+        if (trackingCurrentCardDefeats)
+            currentCardDefeatCount++;
+    }
+
     public void OnEnemyKilled()
     {
         if (isLevelFinished)
@@ -1927,7 +1953,9 @@ public class BattleControl : MonoBehaviour
         {
             HeroStats selectedHero = GetHeroForCard(card);
 
+            BeginAchievementCardResolution();
             ModifierEffectHandler(card, selectedHero);
+            EndAchievementCardResolution();
 
             Destroy(cardUI.gameObject);
             return true;
@@ -2070,7 +2098,9 @@ public class BattleControl : MonoBehaviour
         {
             HeroStats selectedHero = GetHeroForCard(card);
 
+            BeginAchievementCardResolution();
             ModifierEffectHandler(card, selectedHero);
+            EndAchievementCardResolution();
         }
 
         else if (card.targetType == TargetType.SingleTarget)
@@ -2151,7 +2181,9 @@ public class BattleControl : MonoBehaviour
 
         // ExecuteCardEffect already applies the correct effect
         // and consumes player modifiers for numerical actions.
+        BeginAchievementCardResolution();
         ExecuteCardEffect(card, actingHero, targetHero: targetHero, targetEnemy: targetEnemy);
+        EndAchievementCardResolution();
 
         isSelectingTarget = false;
         pendingCard = null;
@@ -2517,6 +2549,7 @@ public class BattleControl : MonoBehaviour
 
     private void OnDestroy()
     {
+        EnemyStats.OnEnemyDefeated -= HandleEnemyDefeatedForAchievement;
         if (activeCardAnimationRelay != null)
         {
             activeCardAnimationRelay.OnActionAnimationComplete -= HandleCardAnimationComplete;

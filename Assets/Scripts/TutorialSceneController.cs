@@ -165,6 +165,7 @@ public class TutorialSceneController : MonoBehaviour
         {
             ProgressManager.Instance.tutorialCompleted = true;
             ProgressManager.Instance.SaveProgress();
+            AchievementManager.Unlock("complete_tutorial");
 
             Debug.Log("Final Tutorial: Completion saved to progress.");
         }
@@ -224,6 +225,7 @@ public class TutorialSceneController : MonoBehaviour
         {
             ProgressManager.Instance.tutorialCompleted = true;
             ProgressManager.Instance.SaveProgress();
+            AchievementManager.Unlock("complete_tutorial");
 
             Debug.Log("Tutorial skip: Completion saved to progress.");
         }

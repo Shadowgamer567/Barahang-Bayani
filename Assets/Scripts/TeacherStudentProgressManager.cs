@@ -45,6 +45,14 @@ public class TeacherStudentProgressManager : MonoBehaviour
     }
 
     [Serializable]
+    private class StudentAchievementsResponse
+    {
+        public bool success;
+        public string studentUID;
+        public string[] unlockedIds;
+    }
+
+    [Serializable]
     private class StudentOverviewResult
     {
         public bool success;
@@ -417,6 +425,7 @@ public class TeacherStudentProgressManager : MonoBehaviour
             SelectedStudentProgress = result;
 
             DisplayProgress(result, "Student");
+            await AppendSelectedStudentAchievements(classroomID, studentUID, requestVersion);
 
             Debug.Log(
                 "[Teacher Progress] Successfully loaded progress for " +
@@ -435,6 +444,73 @@ public class TeacherStudentProgressManager : MonoBehaviour
 
             if (progressDisplayText != null)
                 progressDisplayText.text = "Unable to load student progress.";
+        }
+    }
+
+
+    private async Task AppendSelectedStudentAchievements(
+        string classroomID,
+        string studentUID,
+        int requestVersion)
+    {
+        if (progressDisplayText == null)
+            return;
+
+        try
+        {
+            StudentProgressRequest request = new StudentProgressRequest
+            {
+                classroomId = classroomID,
+                studentUID = studentUID
+            };
+
+            StudentAchievementsResponse response =
+                await WebsiteCallableClient.CallAsync<StudentAchievementsResponse>(
+                    "getStudentGameAchievements",
+                    JsonUtility.ToJson(request)
+                );
+
+            if (requestVersion != progressRequestVersion ||
+                SelectedStudentAccountID != studentUID ||
+                response == null || !response.success)
+                return;
+
+            HashSet<string> unlocked = new HashSet<string>(
+                response.unlockedIds ?? Array.Empty<string>()
+            );
+
+            string[] ids =
+            {
+                "complete_tutorial",
+                "triple_elimination",
+                "master_healer"
+            };
+            string[] titles =
+            {
+                "Complete the Tutorial",
+                "Triple Elimination",
+                "Master Healer"
+            };
+
+            int count = 0;
+            System.Text.StringBuilder display = new System.Text.StringBuilder();
+            for (int i = 0; i < ids.Length; i++)
+            {
+                bool isUnlocked = unlocked.Contains(ids[i]);
+                if (isUnlocked) count++;
+                display.Append(isUnlocked ? "[Unlocked] " : "[Locked] ");
+                display.AppendLine(titles[i]);
+            }
+
+            progressDisplayText.text +=
+                "\n\nSTUDENT ACHIEVEMENTS (" + count + "/" + ids.Length + ")\n" +
+                display.ToString();
+        }
+        catch (Exception exception)
+        {
+            Debug.LogWarning(
+                "[Teacher Progress] Could not load student achievements: " + exception.Message
+            );
         }
     }
 
@@ -506,7 +582,16 @@ public class TeacherStudentProgressManager : MonoBehaviour
             FormatQuestionStats("True/False", stats?.trueFalse) + "\n\n" +
             FormatQuestionStats("Multiple Select", stats?.multipleSelect) + "\n\n" +
             FormatQuestionStats("Fill in the Blank", stats?.fillInTheBlank);
-            }
+    }
+
+    private void AppendOwnAchievements()
+    {
+        if (progressDisplayText == null)
+            return;
+
+        progressDisplayText.text += "\n\n" +
+            AchievementManager.GetAchievementDisplayText();
+    }
 
     private int GetCorrect(QuestionTypeStats stats)
     {
@@ -596,6 +681,7 @@ public class TeacherStudentProgressManager : MonoBehaviour
                     "PROGRESS\nNo progress has been recorded yet.\n\n" +
                     "METRICS\nNo quiz attempts recorded.";
 
+                AppendOwnAchievements();
                 CacheOwnStudentProgress();
                 return;
             }
@@ -646,6 +732,7 @@ public class TeacherStudentProgressManager : MonoBehaviour
                 }
             };
             DisplayProgress(result, "Student");
+            AppendOwnAchievements();
 
             CacheOwnStudentProgress();
 
@@ -707,6 +794,7 @@ public class TeacherStudentProgressManager : MonoBehaviour
                 throw new Exception("Unable to retrieve teacher progress.");
 
             DisplayProgress(result, "Teacher");
+            AppendOwnAchievements();
 
             Debug.Log(
                 "[Teacher Progress] Successfully loaded teacher progress."

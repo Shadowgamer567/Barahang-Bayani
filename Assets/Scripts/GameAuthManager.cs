@@ -94,6 +94,7 @@ public class GameAuthManager : MonoBehaviour
 
         CurrentAccount.ActiveAccount = null;
         ProgressManager.Instance?.ClearActiveAccount();
+        AchievementManager.SetActiveAccount("");
 
         if (DatabaseManager.Instance != null)
             DatabaseManager.Instance.SetDatabase("DefaultDatabase");
@@ -252,6 +253,7 @@ public class GameAuthManager : MonoBehaviour
             SelectedClassroomID = string.Empty;
             CurrentAccount.ActiveAccount = null;
             ProgressManager.Instance?.ClearActiveAccount();
+            AchievementManager.SetActiveAccount("");
 
             if (DatabaseManager.Instance != null)
                 DatabaseManager.Instance.SetDatabase("DefaultDatabase");
@@ -300,6 +302,7 @@ public class GameAuthManager : MonoBehaviour
     private void RestoreCachedIdentity(CachedGameSession cached, bool offline)
     {
         StudentUID = cached.uid;
+        AchievementManager.SetActiveAccount(StudentUID);
         Username = cached.username;
         Role = cached.role;
         CreatedAt = cached.createdAt;
@@ -740,6 +743,7 @@ public class GameAuthManager : MonoBehaviour
             }
 
             StudentUID = result.uid;
+            AchievementManager.SetActiveAccount(StudentUID);
             Username = result.username;
             Role = result.role;
             CreatedAt = result.createdAt;

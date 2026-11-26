@@ -774,6 +774,9 @@ public class ProgressManager : MonoBehaviour
         fillInTheBlankTotal = data.fillInTheBlankTotal;
 
         tutorialCompleted = data.tutorialCompleted;
+
+        if (tutorialCompleted)
+            AchievementManager.Unlock("complete_tutorial");
     }
 
     /// <summary>

@@ -139,6 +139,7 @@ public class HeroStats : MonoBehaviour
         if (currentHP > previousHP)
         {
             OnHealed?.Invoke();
+            AchievementManager.RecordHealing(currentHP - previousHP);
         }
 
         Debug.Log(name + " Healed for" + amount + " | Current HP: " + currentHP);

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
 {
+    public static event System.Action<EnemyStats> OnEnemyDefeated;
     public static event System.Action OnHpLost;
     public static event System.Action OnShieldGained;
     public static event System.Action OnHealed;
@@ -168,6 +169,7 @@ public class EnemyStats : MonoBehaviour
         if (currentHP <= 0 && !isDying)
         {
             isDead = true;
+            OnEnemyDefeated?.Invoke(this);
             Debug.Log(name + " ENTERING DEATH");
             isDying = true;
 

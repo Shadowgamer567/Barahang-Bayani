@@ -19,6 +19,7 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
+        AchievementManager.BeginLevel();
 
         if (GameManager.Instance != null && GameManager.Instance.selectedLevel != null)
         {
