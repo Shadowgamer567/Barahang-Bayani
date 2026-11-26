@@ -22,7 +22,7 @@ MonoBehaviour:
       there on Sunday under the care of my brother. Parting from my family was both
       hard and sad for all of us; I managed to hide my own tears, even though I was
       only nine. "
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 1
   - speakerName: Jose Rizal
     speakerType: 0

@@ -58,7 +58,7 @@ MonoBehaviour:
     hero: {fileID: 11400000, guid: 618ec32722d755e4e80a7f213a9d80b0, type: 2}
     enemy: {fileID: 0}
     Dialogue: With Chapter III Complete. Let's start with the next chapter.
-    isLeftSide: 1
+    isLeftSide: 0
     pose: 0
   - speakerName: 
     speakerType: 2

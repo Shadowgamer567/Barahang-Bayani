@@ -77,12 +77,12 @@ MonoBehaviour:
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: And with Chapter 1 finished, now we go to the next Chapter.
-    isLeftSide: 1
+    isLeftSide: 0
     pose: 0
   - speakerName: 
     speakerType: 2
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: "Chapter II: My Schooling and Daily Life in Bi\xF1an"
-    isLeftSide: 1
+    isLeftSide: 0
     pose: 0

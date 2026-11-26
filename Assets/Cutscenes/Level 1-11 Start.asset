@@ -87,7 +87,7 @@ MonoBehaviour:
     enemy: {fileID: 0}
     Dialogue: My dear friend! We finally met at last! How long have I wished to meet
       you!
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 1
   - speakerName: 
     speakerType: 2
@@ -118,7 +118,7 @@ MonoBehaviour:
     hero: {fileID: 11400000, guid: b24d169703cccb744be0cce9c4863fb5, type: 2}
     enemy: {fileID: 0}
     Dialogue: Come, come! Let me show you around!
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 1
   - speakerName: Jose Rizal
     speakerType: 0

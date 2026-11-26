@@ -23,7 +23,7 @@ MonoBehaviour:
       after. Then I went out in the yard to look for apples. Then came breakfast,
       where I ate a plate of rice and two dried sardines. There was class work until
       ten and after lunch a study period.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 1
   - speakerName: Jose Rizal
     speakerType: 0

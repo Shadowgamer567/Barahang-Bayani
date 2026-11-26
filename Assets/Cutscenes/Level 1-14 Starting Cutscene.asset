@@ -21,7 +21,7 @@ MonoBehaviour:
       asking permission to join them. My brother-in-law Manuel Hidalgo was deported
       under the governor of La Laguna, stating that Filipinos were mistaken in thinking
       that the new Civic Code gave them any rights.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 1
   - speakerName: Jose Rizal
     speakerType: 0
@@ -30,7 +30,7 @@ MonoBehaviour:
     Dialogue: When I arrived there, I learned that my brother Paciano had been released
       from exile in Mindoro, but that three of my sisters had been summoned with
       the probability of deportation.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 3
   - speakerName: Jose Rizal
     speakerType: 0
@@ -39,7 +39,7 @@ MonoBehaviour:
     Dialogue: A trap was set for us to get me into the government's hands. They targeted
       my mother and sister. I was angry at this fact, but I remained where I am as
       my parents told me to not come to Manila.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 5
   - speakerName: Jose Rizal
     speakerType: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
       Jose M. Basa, who was a fearsome fellow who managed to get out of proclamations.
       He helped me with a few things, one of which was a case against me. I am grateful
       for that.
-    isLeftSide: 0
+    isLeftSide: 1
     pose: 4
   - speakerName: Jose Rizal
     speakerType: 0
@@ -153,12 +153,12 @@ MonoBehaviour:
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: Chapter VI The Period of Propaganda. End.
-    isLeftSide: 1
+    isLeftSide: 0
     pose: 6
   - speakerName: Narrator
     speakerType: 2
     hero: {fileID: 0}
     enemy: {fileID: 0}
     Dialogue: Chapter VII The Execution of Rizal. Start.
-    isLeftSide: 1
+    isLeftSide: 0
     pose: 6
